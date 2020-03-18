@@ -1,8 +1,6 @@
-import React, { useState, useRef } from "react";
-import { useAnimation, Animate } from "react-rebound";
+import React, { useState } from "react";
 import {
   PanelHeaderSimple,
-  Search,
   List,
   Cell,
   PanelHeaderButton,
@@ -11,9 +9,8 @@ import {
   Tabs
 } from "@vkontakte/vkui";
 
-import Animal24 from './../../../img/animal30.png' 
-import './addsTab.css' 
-
+import Animal24 from "./../../../img/animal30.png";
+import "./addsTab.css";
 
 import Icon24Done from "@vkontakte/icons/dist/24/done";
 import Icon24Notification from "@vkontakte/icons/dist/24/notification";
@@ -21,7 +18,7 @@ import Icon16Dropdown from "@vkontakte/icons/dist/16/dropdown";
 
 import Icon28SettingsOutline from "@vkontakte/icons/dist/28/settings_outline";
 
-import AddsTab from "./tabs/adds/AddsTab"
+import AddsTab from "./tabs/adds/AddsTab";
 
 const tabAdds = "adds";
 const tabAddsText = "Объявления";
@@ -29,14 +26,12 @@ const tabAddsText = "Объявления";
 const tabNotification = "notification";
 const tabNotificationText = "Уведомления";
 
-const AddsTabs = props => {
-  const [search, setSearch] = useState("");
+const AddsTabs = () => {
   const [contextOpened, setContextOpened] = useState(false);
   const [mode, setmode] = useState("all");
   const [activeTab, setActiveTab] = useState(tabAdds);
 
   function select(e) {
-    setHovered(true);
     setmode(e.currentTarget.dataset.mode);
     setContextOpened(false);
   }
@@ -55,7 +50,6 @@ const AddsTabs = props => {
         <Tabs>
           <TabsItem
             onClick={() => {
-                setHovered(true)
               if (activeTab === tabAdds) {
                 setContextOpened(!contextOpened);
               }
@@ -63,13 +57,13 @@ const AddsTabs = props => {
             }}
             selected={activeTab === tabAdds}
             after={
-                <Icon16Dropdown
-                  fill="var(--accent)"
-                  style={{
-                    transition: "0.3s",
-                    transform: `rotate(${contextOpened ? "180deg" : "0"})`
-                  }}
-                />
+              <Icon16Dropdown
+                fill="var(--accent)"
+                style={{
+                  transition: "0.3s",
+                  transform: `rotate(${contextOpened ? "180deg" : "0"})`
+                }}
+              />
             }
           >
             {tabAddsText}
@@ -93,7 +87,7 @@ const AddsTabs = props => {
       >
         <List>
           <Cell
-            before={<img src={Animal24} alt="logo" className="wrapper"  />}
+            before={<img src={Animal24} alt="logo" className="wrapper" />}
             asideContent={
               mode === "all" ? <Icon24Done fill="var(--accent)" /> : null
             }
