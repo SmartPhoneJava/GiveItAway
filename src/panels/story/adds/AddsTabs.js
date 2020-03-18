@@ -26,7 +26,7 @@ const tabAddsText = "Объявления";
 const tabNotification = "notification";
 const tabNotificationText = "Уведомления";
 
-const AddsTabs = () => {
+const AddsTabs = props => {
   const [contextOpened, setContextOpened] = useState(false);
   const [mode, setmode] = useState("all");
   const [activeTab, setActiveTab] = useState(tabAdds);
@@ -108,7 +108,7 @@ const AddsTabs = () => {
           </Cell>
         </List>
       </PanelHeaderContext>
-      <AddsTab></AddsTab>
+      <AddsTab onFiltersClick={props.onFiltersClick}></AddsTab>
     </React.Fragment>
   );
 };

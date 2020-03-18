@@ -1,24 +1,12 @@
 import React, { useState, useRef } from "react";
-import { useAnimation, Animate } from "react-rebound";
 import {
-  PanelHeaderSimple,
   Search,
   List,
   Cell,
-  PanelHeaderButton,
-  PanelHeaderContext,
-  TabsItem,
-  Tabs
 } from "@vkontakte/vkui";
 
 
-import Icon24Done from "@vkontakte/icons/dist/24/done";
 import Icon24Filter from "@vkontakte/icons/dist/24/filter";
-import Icon24Notification from "@vkontakte/icons/dist/24/notification";
-import Icon16Dropdown from "@vkontakte/icons/dist/16/dropdown";
-
-import Icon28UsersOutline from "@vkontakte/icons/dist/28/users_outline";
-import Icon28SettingsOutline from "@vkontakte/icons/dist/28/settings_outline";
 
 const addsArr = [
   { id: 3201, name: "Объявление1" },
