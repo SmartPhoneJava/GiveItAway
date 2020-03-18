@@ -18,7 +18,7 @@ import {
   IS_PLATFORM_IOS,
 } from "@vkontakte/vkui";
 
-import AddsTab from "./story/adds/tabs/adds/AddsTab"
+import AddsTabs from "./story/adds/AddsTabs"
 
 import Icon28User from "@vkontakte/icons/dist/28/user";
 import Icon28NewsfeedOutline from "@vkontakte/icons/dist/28/newsfeed_outline";
@@ -136,7 +136,7 @@ const Main = () => {
         header={false}
       >
         <Panel id="header-search" separator={false}>
-          <AddsTab
+          <AddsTabs
             onFiltersClick={() => setActiveModal("filters")}
             goSearch={goSearch}
           />

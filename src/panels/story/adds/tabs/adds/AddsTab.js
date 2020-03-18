@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import { useAnimation, Animate } from "react-rebound";
 import {
   PanelHeaderSimple,
   Search,
@@ -9,6 +10,7 @@ import {
   TabsItem,
   Tabs
 } from "@vkontakte/vkui";
+
 
 import Icon24Done from "@vkontakte/icons/dist/24/done";
 import Icon24Filter from "@vkontakte/icons/dist/24/filter";
@@ -28,22 +30,8 @@ const addsArr = [
   { id: 3285, name: "Объявление7" }
 ];
 
-const tabAdds = "adds";
-const tabAddsText = "Объявления";
-
-const tabNotification = "notification";
-const tabNotificationText = "Уведомления";
-
 const AddsTab = props => {
   const [search, setSearch] = useState("");
-  const [contextOpened, setContextOpened] = useState(false);
-  const [mode, setmode] = useState("all");
-  const [activeTab, setActiveTab] = useState(tabAdds);
-
-  function select(e) {
-    setmode(e.currentTarget.dataset.mode);
-    setContextOpened(false);
-  }
 
   function onChange(e) {
     setSearch(e.target.value);
@@ -51,86 +39,11 @@ const AddsTab = props => {
 
   function adds() {
     const s = search.toLowerCase();
-    return addsArr.filter(
-      ({ name }) => name.toLowerCase().indexOf(s) > -1
-    );
+    return addsArr.filter(({ name }) => name.toLowerCase().indexOf(s) > -1);
   }
 
   return (
-    <React.Fragment>
-      <PanelHeaderSimple
-        left={<PanelHeaderButton />}
-        separator={false}
-        right={
-          <PanelHeaderButton>
-            <Icon24Notification />
-          </PanelHeaderButton>
-        }
-      >
-        <Tabs>
-          <TabsItem
-            onClick={() => {
-              if (activeTab === tabAdds) {
-                setContextOpened(!contextOpened);
-              }
-              setActiveTab(tabAdds);
-            }}
-            selected={activeTab === tabAdds}
-            after={
-              <Icon16Dropdown
-                fill="var(--accent)"
-                style={{
-                  transform: `rotate(${contextOpened ? "180deg" : "0"})`
-                }}
-              />
-            }
-          >
-            {tabAddsText}
-          </TabsItem>
-          <TabsItem
-            onClick={() => {
-              setActiveTab(tabNotification);
-              setContextOpened(false);
-            }}
-            selected={activeTab === tabNotification}
-          >
-            {tabNotificationText}
-          </TabsItem>
-        </Tabs>
-      </PanelHeaderSimple>
-      <PanelHeaderContext
-        opened={contextOpened}
-        onClose={() => {
-          setContextOpened(false);
-        }}
-      >
-        <List>
-          <Cell
-            before={<Icon28UsersOutline />}
-            asideContent={
-              mode === "all" ? (
-                <Icon24Done fill="var(--accent)" />
-              ) : null
-            }
-            onClick={select}
-            data-mode="all"
-          >
-            Communities
-          </Cell>
-          <Cell
-            before={<Icon28SettingsOutline />}
-            asideContent={
-              mode === "managed" ? (
-                <Icon24Done fill="var(--accent)" />
-              ) : null
-            }
-            onClick={select}
-            data-mode="managed"
-          >
-            Managed Communities
-          </Cell>
-        </List>
-      </PanelHeaderContext>
+    <div>
       <Search
         value={search}
         onChange={onChange}
@@ -142,7 +55,7 @@ const AddsTab = props => {
           <Cell key={thematic.id}>{thematic.name}</Cell>
         ))}
       </List>
-    </React.Fragment>
+    </div>
   );
 };
 
