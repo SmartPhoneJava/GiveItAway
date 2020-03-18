@@ -1,18 +1,7 @@
 import React, { useState, useEffect } from "react";
 import bridge from "@vkontakte/vk-bridge";
 import {
-  View,
-  Panel,
-  PanelHeader,
-  Header,
-  Group,
-  Cell,
-  CellButton,
   ScreenSpinner,
-  Root,
-  Epic,
-  Tabbar,
-  TabbarItem
 } from "@vkontakte/vkui";
 
 import "@vkontakte/vkui/dist/vkui.css";
