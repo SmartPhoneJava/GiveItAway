@@ -15,123 +15,135 @@ import Icon24Filter from "@vkontakte/icons/dist/24/filter";
 import Icon24Notification from "@vkontakte/icons/dist/24/notification";
 import Icon16Dropdown from "@vkontakte/icons/dist/16/dropdown";
 
-
 import Icon28UsersOutline from "@vkontakte/icons/dist/28/users_outline";
 import Icon28SettingsOutline from "@vkontakte/icons/dist/28/settings_outline";
 
-const thematics = [
+const addsArr = [
   { id: 3201, name: "Объявление1" },
   { id: 3273, name: "Объявление2" },
   { id: 3205, name: "Объявление3" },
   { id: 3282, name: "Объявление4" },
   { id: 3283, name: "Объявление5" },
   { id: 3284, name: "Объявление6" },
-  { id: 3285, name: "Объявление7" },
+  { id: 3285, name: "Объявление7" }
 ];
 
-class AddsTab extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      search: "",
-      contextOpened: false,
-      mode: 'all'
-    };
+const tabAdds = "adds";
+const tabAddsText = "Объявления";
 
-    this.onChange = this.onChange.bind(this);
-    this.select = this.select.bind(this);
+const tabNotification = "notification";
+const tabNotificationText = "Уведомления";
+
+const AddsTab = props => {
+  const [search, setSearch] = useState("");
+  const [contextOpened, setContextOpened] = useState(false);
+  const [mode, setmode] = useState("all");
+  const [activeTab, setActiveTab] = useState(tabAdds);
+
+  function select(e) {
+    setmode(e.currentTarget.dataset.mode);
+    setContextOpened(false);
   }
 
-  select(e) {
-    const mode = e.currentTarget.dataset.mode;
-    this.setState({ mode, contextOpened: false });
+  function onChange(e) {
+    setSearch(e.target.value);
   }
 
-  onChange(e) {
-    this.setState({ search: e.target.value });
-  }
-
-  get thematics() {
-    const search = this.state.search.toLowerCase();
-    return thematics.filter(
-      ({ name }) => name.toLowerCase().indexOf(search) > -1
+  function adds() {
+    const s = search.toLowerCase();
+    return addsArr.filter(
+      ({ name }) => name.toLowerCase().indexOf(s) > -1
     );
   }
 
-  render() {
-    return (
-      <React.Fragment>
-        <PanelHeaderSimple
-          left={<PanelHeaderButton />}
-          separator={false}
-          right={
-            <PanelHeaderButton>
-              <Icon24Notification />
-            </PanelHeaderButton>
-          }
-        >
-          <Tabs>
-                <TabsItem
-                  onClick={() => {
-                    if (this.state.activeTab1 === 'news') {
-                      this.setState({ contextOpened: !this.state.contextOpened });
-                    }
-                    this.setState({ activeTab1: 'news' })
-                  }}
-                  selected={this.state.activeTab1 === 'news'}
-                  after={<Icon16Dropdown fill="var(--accent)" style={{
-                    transform: `rotate(${this.state.contextOpened ? '180deg' : '0'})`
-                  }}/>}
-                >
-                  Объявления
-                </TabsItem>
-                <TabsItem
-                  onClick={() => {
-                    this.setState({ activeTab1: 'recomendations', contextOpened: false })
-                  }}
-                  selected={this.state.activeTab1 === 'recomendations'}
-                >
-                  Уведомления
-                </TabsItem>
-              </Tabs>
-        </PanelHeaderSimple>
-        <PanelHeaderContext
-              opened={this.state.contextOpened}
-              onClose={() => { this.setState({ contextOpened: false }) }}
-            >
-              <List>
-                <Cell
-                  before={<Icon28UsersOutline />}
-                  asideContent={this.state.mode === 'all' ? <Icon24Done fill="var(--accent)" /> : null}
-                  onClick={this.select}
-                  data-mode="all"
-                >
-                  Communities
-                </Cell>
-                <Cell
-                  before={<Icon28SettingsOutline />}
-                  asideContent={this.state.mode === 'managed' ? <Icon24Done fill="var(--accent)" /> : null}
-                  onClick={this.select}
-                  data-mode="managed"
-                >
-                  Managed Communities
-                </Cell>
-              </List>
-            </PanelHeaderContext>
-        <Search
-            value={this.state.search}
-            onChange={this.onChange}
-            icon={<Icon24Filter />}
-            onIconClick={this.props.onFiltersClick}
-          />
+  return (
+    <React.Fragment>
+      <PanelHeaderSimple
+        left={<PanelHeaderButton />}
+        separator={false}
+        right={
+          <PanelHeaderButton>
+            <Icon24Notification />
+          </PanelHeaderButton>
+        }
+      >
+        <Tabs>
+          <TabsItem
+            onClick={() => {
+              if (activeTab === tabAdds) {
+                setContextOpened(!contextOpened);
+              }
+              setActiveTab(tabAdds);
+            }}
+            selected={activeTab === tabAdds}
+            after={
+              <Icon16Dropdown
+                fill="var(--accent)"
+                style={{
+                  transform: `rotate(${contextOpened ? "180deg" : "0"})`
+                }}
+              />
+            }
+          >
+            {tabAddsText}
+          </TabsItem>
+          <TabsItem
+            onClick={() => {
+              setActiveTab(tabNotification);
+              setContextOpened(false);
+            }}
+            selected={activeTab === tabNotification}
+          >
+            {tabNotificationText}
+          </TabsItem>
+        </Tabs>
+      </PanelHeaderSimple>
+      <PanelHeaderContext
+        opened={contextOpened}
+        onClose={() => {
+          setContextOpened(false);
+        }}
+      >
         <List>
-          {this.thematics.map(thematic => (
-            <Cell key={thematic.id}>{thematic.name}</Cell>
-          ))}
+          <Cell
+            before={<Icon28UsersOutline />}
+            asideContent={
+              mode === "all" ? (
+                <Icon24Done fill="var(--accent)" />
+              ) : null
+            }
+            onClick={select}
+            data-mode="all"
+          >
+            Communities
+          </Cell>
+          <Cell
+            before={<Icon28SettingsOutline />}
+            asideContent={
+              mode === "managed" ? (
+                <Icon24Done fill="var(--accent)" />
+              ) : null
+            }
+            onClick={select}
+            data-mode="managed"
+          >
+            Managed Communities
+          </Cell>
         </List>
-      </React.Fragment>
-    );
-  }
-}
+      </PanelHeaderContext>
+      <Search
+        value={search}
+        onChange={onChange}
+        icon={<Icon24Filter />}
+        onIconClick={props.onFiltersClick}
+      />
+      <List>
+        {adds().map(thematic => (
+          <Cell key={thematic.id}>{thematic.name}</Cell>
+        ))}
+      </List>
+    </React.Fragment>
+  );
+};
 
 export default AddsTab;
