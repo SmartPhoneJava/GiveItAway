@@ -1,0 +1,1 @@
+{"version":3,"sources":["addsTab.css"],"names":[],"mappings":"AAAA,SACE,qBAAsB,CACtB,UACF","file":"main.4a9cba03.chunk.css","sourcesContent":[".wrapper {\n  transition: margin .5s;\n  margin: 2px;\n}"]}

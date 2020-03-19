@@ -9,9 +9,6 @@ import {
   Tabs
 } from "@vkontakte/vkui";
 
-import Animal24 from "./../../../img/animal30.png";
-import "./addsTab.css";
-
 import Icon24Done from "@vkontakte/icons/dist/24/done";
 import Icon24Notification from "@vkontakte/icons/dist/24/notification";
 import Icon16Dropdown from "@vkontakte/icons/dist/16/dropdown";
@@ -49,6 +46,7 @@ const AddsTabs = props => {
       >
         <Tabs>
           <TabsItem
+           
             onClick={() => {
               if (activeTab === tabAdds) {
                 setContextOpened(!contextOpened);
@@ -87,7 +85,7 @@ const AddsTabs = props => {
       >
         <List>
           <Cell
-            before={<img src={Animal24} alt="logo" className="wrapper" />}
+            before={<Icon28SettingsOutline />}
             asideContent={
               mode === "all" ? <Icon24Done fill="var(--accent)" /> : null
             }
