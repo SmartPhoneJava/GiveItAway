@@ -16,15 +16,35 @@ import {
   PanelHeaderButton,
   IS_PLATFORM_ANDROID,
   IS_PLATFORM_IOS,
+  Input,
+  Select,
+  Checkbox,
+  Link,
+  Button,
+  Textarea,
+  Card,
+  Group,
+  Header,
+  CardGrid,
+  Div,
+  Counter,
+  Cell,
+  List,
+  PanelHeaderBack,
+  PanelHeaderSimple
 } from "@vkontakte/vkui";
 
-import AddsTabs from "./story/adds/AddsTabs"
+import AddsTabs from "./story/adds/AddsTabs";
+import CreateAdd from "./story/create/CreateAdd";
+import { Categories } from "./template/Categories";
 
 import Icon28User from "@vkontakte/icons/dist/28/user";
 import Icon28NewsfeedOutline from "@vkontakte/icons/dist/28/newsfeed_outline";
 import Icon28Add from "@vkontakte/icons/dist/28/add_outline";
 import Icon24Done from "@vkontakte/icons/dist/24/done";
+import Icon24CommentOutline from "@vkontakte/icons/dist/24/comment_outline";
 import Icon24Cancel from "@vkontakte/icons/dist/24/cancel";
+import { setDisplayName } from "recompose";
 
 const ads = "ads";
 const adsText = "Объявления";
@@ -35,8 +55,12 @@ const addText = "Создать";
 const profile = "profile";
 const profileText = "Профиль";
 
+const categories = "categories";
+const categoriesText = "Категория";
+
 const Main = () => {
   const [activeStory, setActiveStory] = useState(ads);
+  const [prevStory, setPrevStory] = useState(ads);
 
   const onStoryChange = e => {
     setActiveStory(e.currentTarget.dataset.story);
@@ -45,9 +69,8 @@ const Main = () => {
   const [activePanel, setActivePanel] = useState("header-search");
   const [activeModal, setActiveModal] = useState(null);
 
-  function goHeaderSearch() {
-    setActivePanel("header-search");
-  }
+  const [category, setCategory] = useState("");
+
   function goSearch() {
     setActivePanel("search");
   }
@@ -142,14 +165,41 @@ const Main = () => {
           />
         </Panel>
       </View>
+
       <View id={add} activePanel={add}>
         <Panel id={add}>
           <PanelHeader>{addText}</PanelHeader>
+          <CreateAdd
+            openCategories={() => {
+              setPrevStory(add);
+              setActiveStory(categories);
+            }}
+            category={category}
+          />
         </Panel>
       </View>
       <View id={profile} activePanel={profile}>
         <Panel id={profile}>
           <PanelHeader>{profileText} </PanelHeader>
+        </Panel>
+      </View>
+      <View activePanel={categories} id={categories}>
+        <Panel id={categories}>
+          <PanelHeaderSimple
+            left={<PanelHeaderBack onClick={() => setActiveStory(prevStory)} />}
+            addon={
+              <PanelHeaderButton onClick={() => setActiveStory(prevStory)}>
+                Назад
+              </PanelHeaderButton>
+            }
+          >
+            Категория
+          </PanelHeaderSimple>
+          <Categories
+            category={category}
+            setCategory={cat => setCategory(cat)}
+            goBack={() => setActiveStory(prevStory)}
+          />
         </Panel>
       </View>
     </Epic>
