@@ -46,7 +46,6 @@ const AddsTabs = props => {
       >
         <Tabs>
           <TabsItem
-           
             onClick={() => {
               if (activeTab === tabAdds) {
                 setContextOpened(!contextOpened);

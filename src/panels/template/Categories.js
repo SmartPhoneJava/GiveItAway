@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Group, Cell, List } from "@vkontakte/vkui";
+import { Group, Cell, List, Select, FormLayout } from "@vkontakte/vkui";
 
 import Icon24Done from "@vkontakte/icons/dist/24/done";
 
@@ -74,48 +74,17 @@ export function GetCategoryImage(category) {
 
 export const Categories = props => {
   return (
-    <Group>
-      <List>
-        <Cell
-          onClick={() => {
-            props.setCategory("Россия");
-            props.goBack();
-          }}
-          asideContent={
-            props.category === "Россия" ? (
-              <Icon24Done fill="var(--accent)" />
-            ) : null
-          }
-        >
-          Россия
-        </Cell>
-        <Cell
-          onClick={() => {
-            props.setCategory("Италия");
-            props.goBack();
-          }}
-          asideContent={
-            props.category === "Италия" ? (
-              <Icon24Done fill="var(--accent)" />
-            ) : null
-          }
-        >
-          Италия
-        </Cell>
-        <Cell
-          onClick={() => {
-            props.setCategory("Англия");
-            props.goBack();
-          }}
-          asideContent={
-            props.category === "Англия" ? (
-              <Icon24Done fill="var(--accent)" />
-            ) : null
-          }
-        >
-          Англия
-        </Cell>
-      </List>
-    </Group>
+    <FormLayout>
+    <Select onClick={
+      e => {
+        const { _, value } = e.currentTarget;
+        props.choose(value)
+      }
+    } top="Обычный Select" placeholder="Выберите пол" >
+      <option value="m">Мужской</option>
+      <option value="f">Женский</option>
+      
+    </Select>
+  </FormLayout>
   );
 };

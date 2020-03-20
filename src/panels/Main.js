@@ -36,7 +36,6 @@ import {
 
 import AddsTabs from "./story/adds/AddsTabs";
 import CreateAdd from "./story/create/CreateAdd";
-import { Categories } from "./template/Categories";
 
 import Icon28User from "@vkontakte/icons/dist/28/user";
 import Icon28NewsfeedOutline from "@vkontakte/icons/dist/28/newsfeed_outline";
@@ -70,6 +69,7 @@ const Main = () => {
   const [activeModal, setActiveModal] = useState(null);
 
   const [category, setCategory] = useState("");
+  const [categoryID, setCategoryID] = useState("");
 
   function goSearch() {
     setActivePanel("search");
@@ -170,10 +170,12 @@ const Main = () => {
         <Panel id={add}>
           <PanelHeader>{addText}</PanelHeader>
           <CreateAdd
-            openCategories={() => {
+            openCategories={id => {
               setPrevStory(add);
               setActiveStory(categories);
+              setCategoryID(id)
             }}
+            id={categoryID}
             category={category}
           />
         </Panel>
@@ -181,25 +183,6 @@ const Main = () => {
       <View id={profile} activePanel={profile}>
         <Panel id={profile}>
           <PanelHeader>{profileText} </PanelHeader>
-        </Panel>
-      </View>
-      <View activePanel={categories} id={categories}>
-        <Panel id={categories}>
-          <PanelHeaderSimple
-            left={<PanelHeaderBack onClick={() => setActiveStory(prevStory)} />}
-            addon={
-              <PanelHeaderButton onClick={() => setActiveStory(prevStory)}>
-                Назад
-              </PanelHeaderButton>
-            }
-          >
-            Категория
-          </PanelHeaderSimple>
-          <Categories
-            category={category}
-            setCategory={cat => setCategory(cat)}
-            goBack={() => setActiveStory(prevStory)}
-          />
         </Panel>
       </View>
     </Epic>
