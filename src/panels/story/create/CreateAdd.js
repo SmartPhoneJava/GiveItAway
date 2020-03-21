@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect } from "react";
+import bridge from "@vkontakte/vk-bridge";
 import {
   Button,
   Textarea,
@@ -6,13 +7,19 @@ import {
   Group,
   Header,
   CardGrid,
-  Div
+  FormLayout,
+  Div,
+  InfoRow,
+  Checkbox,
+  Cell,
+  Link
 } from "@vkontakte/vkui";
 
-import CreateItem from "./CreateItem";
-import { compose } from "recompose";
+import Geocoder from "react-native-geocoding";
 
-let itemID = 1
+import CreateItem from "./CreateItem";
+
+let itemID = 1;
 
 const CreateAdd = props => {
   const [items, setItems] = useState([
@@ -25,17 +32,32 @@ const CreateAdd = props => {
     }
   ]);
 
-  function updateCategory(need, item, value) {
-    if (need) {
-      item.category = value;
-    }
-    return item.category;
-  }
+  const [hideGeo, setHideGeo] = useState(false);
+  const [geodata, setGeodata] = useState(null);
+  const [adress, setAdress] = useState("Не указан");
 
-  function get(a) {
-    console.log("!!!!!!!!!!!!!!!!!", a);
-    return a.name;
-  }
+  useEffect(() => {
+    async function fetchData() {
+      const value = await bridge.send("VKWebAppGetGeodata");
+      setGeodata(value);
+
+      console.log("geodata:", value);
+      Geocoder.init("no_code_here");
+      Geocoder.from(value.lat, value.long)
+        .then(json => {
+          var addressComponent = json.results[0].address_components[0];
+          console.log("addressComponent:", addressComponent);
+          setAdress(addressComponent)
+        })
+        .catch(error => {
+          console.warn(error);
+          setAdress("Город не обнаружен")
+        });
+    }
+
+    console.log("launch");
+    fetchData();
+  });
 
   return (
     <Group
@@ -53,16 +75,17 @@ const CreateAdd = props => {
             props.openCategories(i);
           }}
           amount={item.amount}
-          name={get(item)}
+          name={item.name}
           setItems={newItem => {
-            newItem.id = items[i].id
+            newItem.id = items[i].id;
             items[i] = newItem;
             setItems([...items]);
           }}
-          category={updateCategory(props.id == i, item, props.category)}
+          category={item.category}
           description={item.description}
         />
       ))}
+
       <Div
         style={{
           display: "flex",
@@ -96,6 +119,26 @@ const CreateAdd = props => {
           Вывести все
         </Button>
       </Div>
+
+      <Cell
+        indicator={
+          <Checkbox
+            value={hideGeo}
+            onClick={e => {
+              setHideGeo(!hideGeo);
+            }}
+          >
+            Не указывать
+          </Checkbox>
+        }
+      >
+        <InfoRow
+          style={{ color: hideGeo ? "grey" : "black" }}
+          header="Местоположение"
+        >
+          {!hideGeo ? adress : "Скрыто"}
+        </InfoRow>
+      </Cell>
     </Group>
   );
 };
