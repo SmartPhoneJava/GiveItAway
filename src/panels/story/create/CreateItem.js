@@ -6,10 +6,11 @@ import {
   Button,
   Card,
   CardGrid,
-  Div
+  Div,
+  Textarea
 } from "@vkontakte/vkui";
 
-import { Categories } from "./../../template/Categories";
+import { Categories, GetCategoryImage } from "./../../template/Categories";
 
 const amountLabel = "Количество";
 const nameLabel = "Название";
@@ -24,11 +25,6 @@ const CreateItem = props => {
 
   function checkAmount(a) {
     return Number(a) > 0 && Number(a) < 100;
-  }
-
-  function get(a) {
-    console.log("My message:", a);
-    return a;
   }
 
   return (
@@ -91,7 +87,7 @@ const CreateItem = props => {
             <Input
               top={nameLabel}
               name={nameLabel}
-              size="200"
+              size="20"
               placeholder="футбольный мяч"
               value={name}
               onChange={e => {
@@ -107,6 +103,7 @@ const CreateItem = props => {
               status={name ? "valid" : "error"}
             />
           </FormLayout>
+         
           <Categories
             choose={cat => {
               setCategory(cat);
@@ -121,18 +118,15 @@ const CreateItem = props => {
         </Div>
         <Div
           style={{
-            display: "flex",
-            alignItems: "flex-start",
             padding: "0px"
           }}
         >
           <FormLayout>
-            <Input
+            <Textarea
               top={descriptionLabel}
               name={descriptionLabel}
               placeholder="Состояние, габариты, дата покупки, особенности и т.д."
               value={description}
-              size="200"
               onChange={e => {
                 const { _, value } = e.currentTarget;
                 setDescription(value);

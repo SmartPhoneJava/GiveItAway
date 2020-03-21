@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Group, Cell, List, Select, FormLayout } from "@vkontakte/vkui";
+import { Div, Select, FormLayout } from "@vkontakte/vkui";
 
 import Icon24Done from "@vkontakte/icons/dist/24/done";
 
@@ -20,71 +20,133 @@ import Pencil from "./../../img/pencil.png";
 import Play from "./../../img/play.png";
 import Sport from "./../../img/sport.png";
 
-export function GetCategoryImage(category) {
-    let image = Another;
-    switch (category) {
-      case "animals":
-        image = Animal;
-        break;
-      case "books":
-        image = Book;
-        break;
-      case "build":
-        image = Build;
-        break;
-      case "children":
-        image = Child;
-        break;
-      case "clothers":
-        image = Clothers;
-        break;
-      case "cosmetic":
-        image = Cosmetic;
-        break;
-      case "electronics":
-        image = Electronics;
-        break;
-      case "flora":
-        image = Flora;
-        break;
-      case "food":
-        image = Food;
-        break;
-      case "furniture":
-        image = Furniture;
-        break;
-      case "music":
-        image = Music;
-        break;
-      case "old":
-        image = Old;
-        break;
-      case "pencil":
-        image = Pencil;
-        break;
-      case "play":
-        image = Play;
-        break;
-      case "sport":
-        image = Sport;
-        break;
-    }
-    return <img src={image} className="category" />;
+const CategoryAnimals = "animals"
+const CategoryAnother = "another"
+const CategoryBooks = "books"
+const CategoryBuild = "build"
+const CategoryChildren = "children"
+const CategoryClothers = "clothers"
+const CategoryCosmetic = "cosmetic"
+const CategoryElectronics= "electronics"
+const CategoryFlora = "flora"
+const CategoryFood = "food"
+const CategoryFurniture = "furniture"
+const CategoryMusic = "music"
+const CategoryOld = "old"
+const CategoryPencil = "pencil"
+const CategoryPlay = "play"
+const CategorySport = "sport"
+
+export function GetCategory(category) {
+  let image = Another;
+  switch (category) {
+    case CategoryAnimals:
+      image = Animal;
+      break;
+    case CategoryBooks:
+      image = Book;
+      break;
+    case CategoryBuild:
+      image = Build;
+      break;
+    case CategoryChildren:
+      image = Child;
+      break;
+    case CategoryClothers:
+      image = Clothers;
+      break;
+    case CategoryCosmetic:
+      image = Cosmetic;
+      break;
+    case CategoryElectronics:
+      image = Electronics;
+      break;
+    case CategoryFlora:
+      image = Flora;
+      break;
+    case CategoryFood:
+      image = Food;
+      break;
+    case CategoryFurniture:
+      image = Furniture;
+      break;
+    case CategoryMusic:
+      image = Music;
+      break;
+    case CategoryOld:
+      image = Old;
+      break;
+    case CategoryPencil:
+      image = Pencil;
+      break;
+    case CategoryPlay:
+      image = Play;
+      break;
+    case CategorySport:
+      image = Sport;
+      break;
   }
+  return image
+}
+
+export function GetCategoryImage(category) {
+  let image = GetCategory(category);
+  return <img src={image} className="category" />;
+}
+
+export function GetCategoryImageSmall(category) {
+  let image = GetCategory(category);
+  return <img src={image} className="category30" />;
+}
 
 export const Categories = props => {
+  const [category, setCategory] = useState("")
   return (
-    <FormLayout>
-    <Select onClick={
-      e => {
-        const { _, value } = e.currentTarget;
-        props.choose(value)
-      }
-    } top="Обычный Select" placeholder="Выберите пол" >
-      <option value="m">Мужской</option>
-      <option value="f">Женский</option>
-      
-    </Select>
-  </FormLayout>
+    <Div
+      style={{
+        display: "flex",
+        padding: "0px"
+      }}
+    >
+      <Div
+        style={{
+          display: "flex",
+          alignContent: "flex-end",
+          alignItems: "flex-end",
+          marginBottom:"10%",
+          padding: "0"
+        }}
+      >
+        {GetCategoryImageSmall(category)}
+      </Div>
+      <FormLayout>
+        <Select
+          onClick={e => {
+            const { _, value } = e.currentTarget;
+            props.choose(value);
+            setCategory(value)
+          }}
+          top="Категория"
+          placeholder="Не указана"
+        >
+          <option value={CategoryAnimals}>Животные</option>
+          <option value={CategoryAnother}>Другое</option>
+          <option value={CategoryBooks}>Книги</option>
+          <option value={CategoryBuild}>Стройматериалы и инструменты</option>
+          <option value={CategoryChildren}>Товары для детей</option>
+          <option value={CategoryClothers}>Одежда, обувь и сумки</option>
+          <option value={CategoryCosmetic}>Косметика, бижутерия, парфюмерия</option>
+          <option value={CategoryElectronics}>Бытовая техника и электроника</option>
+          <option value={CategoryFlora}>Растения</option>
+          <option value={CategoryFood}>Продукты питания</option>
+          <option value={CategoryFurniture}>Мебель</option>
+          <option value={CategoryMusic}>Музыкальные инструменты</option>
+          <option value={CategoryOld}>Средства реабилитации</option>
+          <option value={CategoryPencil}>Канцтовары</option>
+          <option value={CategoryPlay}>Игры и развлечения</option>
+          <option value={CategorySport}>Спортивный инвентарь</option>
+        </Select>
+      </FormLayout>
+    </Div>
   );
 };
