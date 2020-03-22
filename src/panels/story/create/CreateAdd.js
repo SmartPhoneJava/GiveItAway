@@ -4,20 +4,27 @@ import {
   Button,
   Textarea,
   Card,
+  Radio,
   Group,
   Header,
   CardGrid,
+  CellButton,
   FormLayout,
   Div,
   InfoRow,
   Checkbox,
   Cell,
-  Link
+  Link,
+  Separator
 } from "@vkontakte/vkui";
 
 import Geocoder from "react-native-geocoding";
 
 import CreateItem from "./CreateItem";
+
+import Icon24Add from "@vkontakte/icons/dist/24/add";
+
+import Icon24Locate from "@vkontakte/icons/dist/32/place";
 
 let itemID = 1;
 
@@ -32,11 +39,27 @@ const CreateAdd = props => {
     }
   ]);
 
+  const [description, setDescription] = useState("");
+
   const [hideGeo, setHideGeo] = useState(false);
   const [geodata, setGeodata] = useState(null);
   const [adress, setAdress] = useState("Не указан");
 
-  useEffect(() => {
+
+  // function checkItems() {
+  //   const item = items[0].amount
+  //   if (item.amount < 0 || item.amount > 50) {
+  //     return false
+  //   }
+  //   if (item.name == "" || item.category == "" ) {
+  //     return false
+  //   }
+  //   items. /
+  //   тут надо проверить
+  //   return true
+  // }
+
+  function updateGeo() {
     async function fetchData() {
       const value = await bridge.send("VKWebAppGetGeodata");
       setGeodata(value);
@@ -47,99 +70,174 @@ const CreateAdd = props => {
         .then(json => {
           var addressComponent = json.results[0].address_components[0];
           console.log("addressComponent:", addressComponent);
-          setAdress(addressComponent)
+          setAdress(addressComponent);
         })
         .catch(error => {
           console.warn(error);
-          setAdress("Город не обнаружен")
+          setAdress("Город не обнаружен");
         });
     }
 
     console.log("launch");
     fetchData();
-  });
+  }
+  updateGeo();
 
   return (
-    <Group
-      separator="hide"
-      header={<Header mode="secondary">Опишите выставляемые предметы</Header>}
-    >
-      {items.map((item, i) => (
-        <CreateItem
-          key={item.id}
-          len={items.length}
-          deleteMe={() => {
-            setItems([...items.slice(0, i), ...items.slice(i + 1)]);
-          }}
-          openCategories={() => {
-            props.openCategories(i);
-          }}
-          amount={item.amount}
-          name={item.name}
-          setItems={newItem => {
-            newItem.id = items[i].id;
-            items[i] = newItem;
-            setItems([...items]);
-          }}
-          category={item.category}
-          description={item.description}
-        />
-      ))}
-
-      <Div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center"
-        }}
+    <div>
+      <Group
+        separator="hide"
+        header={<Header mode="secondary">Опишите выставляемые предметы</Header>}
       >
-        <Button
-          mode="secondary"
-          onClick={() => {
-            setItems([
-              ...items,
-              {
-                id: ++itemID,
-                amount: "1",
-                name: "",
-                category: "",
-                description: ""
-              }
-            ]);
-          }}
-        >
-          Добавить еще вещь
-        </Button>
-        <Button
-          mode="secondary"
-          onClick={() => {
-            console.log(items);
-          }}
-        >
-          Вывести все
-        </Button>
-      </Div>
+        {items.map((item, i) => (
+          <CreateItem
+            key={item.id}
+            len={items.length}
+            deleteMe={() => {
+              setItems([...items.slice(0, i), ...items.slice(i + 1)]);
+            }}
+            openCategories={() => {
+              props.openCategories(i);
+            }}
+            amount={item.amount}
+            name={item.name}
+            setItems={newItem => {
+              newItem.id = items[i].id;
+              items[i] = newItem;
+              setItems([...items]);
+            }}
+            category={item.category}
+            description={item.description}
+          />
+        ))}
 
-      <Cell
-        indicator={
-          <Checkbox
-            value={hideGeo}
-            onClick={e => {
-              setHideGeo(!hideGeo);
+        {items.length == 1 ? (
+          ""
+        ) : (
+          <InfoRow
+            style={{
+              color: "grey",
+              margin: "12px"
             }}
           >
-            Не указывать
-          </Checkbox>
-        }
-      >
-        <InfoRow
-          style={{ color: hideGeo ? "grey" : "black" }}
-          header="Местоположение"
+            Вы указали несколько вещей, поэтому будет создано несколько
+            объявлений: по одному на каждый предмет.
+          </InfoRow>
+        )}
+
+        <Div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
         >
-          {!hideGeo ? adress : "Скрыто"}
-        </InfoRow>
-      </Cell>
-    </Group>
+          <CellButton
+            onClick={() => {
+              setItems([
+                ...items,
+                {
+                  id: ++itemID,
+                  amount: "1",
+                  name: "",
+                  category: "",
+                  description: ""
+                }
+              ]);
+            }}
+            before={<Icon24Add />}
+          >
+            Добавить предмет
+          </CellButton>
+        </Div>
+      </Group>
+      <Separator />
+      <FormLayout>
+        <Textarea
+          top="Дополнительная информация"
+          name="Дополнительная информация"
+          placeholder="..."
+          value={description}
+          onChange={e => {
+            const { _, value } = e.currentTarget;
+            setDescription(value);
+          }}
+        />
+      </FormLayout>
+      <Separator />
+      <Div
+        style={{
+          padding: "10px",
+          display: "flex"
+        }}
+      >
+        <Cell indicator={<Icon24Locate />} onClick={updateGeo}></Cell>
+        <Cell
+          indicator={
+            <Div
+              style={{
+                padding: "0px",
+                display: "flex"
+              }}
+            >
+              <Checkbox
+                value={hideGeo}
+                onClick={e => {
+                  setHideGeo(!hideGeo);
+                  console.log("claaaaaack");
+                }}
+              >
+                Не указывать
+              </Checkbox>
+            </Div>
+          }
+        >
+          <InfoRow
+            style={{ color: hideGeo ? "grey" : "black" }}
+            header="Местоположение"
+          >
+            {!hideGeo ? adress : "Скрыто"}
+          </InfoRow>
+        </Cell>
+      </Div>
+      <Separator />
+      <Group
+        separator="show"
+        header={<Header mode="secondary">Тип фидбека</Header>}
+      >
+        <div>
+          <Radio
+            name="radio"
+            value="1"
+            description="Любой желающий может написать вам в лс"
+            defaultChecked
+          >
+            Личные сообщения
+          </Radio>
+          <Radio
+            name="radio"
+            value="2"
+            description="Пользователи оставляют комментарии к вашему объявлению"
+          >
+            Комментарии
+          </Radio>
+          <Radio
+            name="radio"
+            value="3"
+            description="Вы указываете контакты для связи, пользователи связываются с вами"
+          >
+            Контакты
+          </Radio>
+        </div>
+      </Group>
+      <Div style={{ display: "flex" }}>
+        <Button 
+        mode="commerce" 
+        size="l" stretched style={{ marginRight: 8 }}>
+          Добавить
+        </Button>
+      </Div>
+    </div>
   );
 };
 

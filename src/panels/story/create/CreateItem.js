@@ -103,7 +103,7 @@ const CreateItem = props => {
               status={name ? "valid" : "error"}
             />
           </FormLayout>
-         
+
           <Categories
             choose={cat => {
               setCategory(cat);
