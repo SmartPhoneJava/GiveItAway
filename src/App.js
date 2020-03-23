@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import bridge from "@vkontakte/vk-bridge";
-import {
-  ScreenSpinner,
-} from "@vkontakte/vkui";
+import { ScreenSpinner } from "@vkontakte/vkui";
 
 import "@vkontakte/vkui/dist/vkui.css";
 
@@ -23,22 +21,41 @@ const App = () => {
         document.body.attributes.setNamedItem(schemeAttribute);
       }
     });
+
+    async function checkMe(user) {
+      fetch(`http://localhost:8091/api/user/auth`, {
+        method: "post",
+        mode: "cors",
+        body: JSON.stringify({
+          Url: window.location.href,
+          name: user.first_name,
+          surname: user.last_name,
+          photo_url: user.photo_100
+        }),
+        credentials: "include"
+      })
+        .then(function(response) {
+          console.log("hello ", response);
+          return response.json();
+        })
+        .then(function(data) {
+          console.log("Request successful", data);
+          return data;
+        })
+        .catch(function(error) {
+          console.log("Request failed", error);
+        });
+    }
+
     async function fetchData() {
       const user = await bridge.send("VKWebAppGetUserInfo");
       setUser(user);
       setPopout(null);
-      
-      console.log("url:", window.location.href)
-
-
-      const value = await bridge.send("VKWebAppGetGeodata");
-      
-
-      console.log("baza:", value);
-
+      console.log("baza:", user);
+      checkMe(user);
     }
-    console.log("urll:", window.location.href)
-    console.log("query:", window.location.query)
+    console.log("urll:", window.location.href);
+    console.log("query:", window.location.query);
     fetchData();
   }, []);
 
@@ -46,9 +63,7 @@ const App = () => {
     setActivePanel(e.currentTarget.dataset.to);
   };
 
-  return (
-      <Main id="main" go={go} />
-  );
+  return <Main id="main" go={go} />;
 };
 
 export default App;

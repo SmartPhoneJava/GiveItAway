@@ -20,7 +20,8 @@ import {
 
 import Geocoder from "react-native-geocoding";
 
-import CreateItem from "./CreateItem";
+import CreateItem from "./components/CreateItem";
+import ChooseAddType from "./components/ChooseType";
 
 import Icon24Add from "@vkontakte/icons/dist/24/add";
 
@@ -45,7 +46,8 @@ const CreateAdd = props => {
   const [geodata, setGeodata] = useState(null);
   const [adress, setAdress] = useState("Не указан");
 
-
+  const [addType, setAddType] = useState(1);
+  const [itemDescription, setItemDescription] = useState(false);
   // function checkItems() {
   //   const item = items[0].amount
   //   if (item.amount < 0 || item.amount > 50) {
@@ -84,7 +86,25 @@ const CreateAdd = props => {
   updateGeo();
 
   return (
+  
     <div>
+      {  /*
+      <Separator />
+      <ChooseAddType set={setAddType}/>
+      <FormLayout>
+        <Textarea
+          top="Описание"
+          name="Описание"
+          placeholder="..."
+          value={description}
+          onChange={e => {
+            const { _, value } = e.currentTarget;
+            setDescription(value);
+          }}
+        />
+      </FormLayout>
+      <Separator />
+        */}
       <Group
         separator="hide"
         header={<Header mode="secondary">Опишите выставляемые предметы</Header>}
@@ -132,6 +152,7 @@ const CreateAdd = props => {
             justifyContent: "center"
           }}
         >
+            {  /*
           <CellButton
             onClick={() => {
               setItems([
@@ -148,23 +169,11 @@ const CreateAdd = props => {
             before={<Icon24Add />}
           >
             Добавить предмет
-          </CellButton>
+          </CellButton> */}
         </Div>
       </Group>
       <Separator />
-      <FormLayout>
-        <Textarea
-          top="Дополнительная информация"
-          name="Дополнительная информация"
-          placeholder="..."
-          value={description}
-          onChange={e => {
-            const { _, value } = e.currentTarget;
-            setDescription(value);
-          }}
-        />
-      </FormLayout>
-      <Separator />
+     
       <Div
         style={{
           padding: "10px",
@@ -231,9 +240,7 @@ const CreateAdd = props => {
         </div>
       </Group>
       <Div style={{ display: "flex" }}>
-        <Button 
-        mode="commerce" 
-        size="l" stretched style={{ marginRight: 8 }}>
+        <Button mode="commerce" size="l" stretched style={{ marginRight: 8 }}>
           Добавить
         </Button>
       </Div>

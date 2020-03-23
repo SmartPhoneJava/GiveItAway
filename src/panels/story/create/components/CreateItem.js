@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  SelectMimicry,
   FormLayout,
   Input,
   Button,
@@ -10,7 +9,7 @@ import {
   Textarea
 } from "@vkontakte/vkui";
 
-import { Categories, GetCategoryImage } from "./../../template/Categories";
+import { Categories } from "./../../../template/Categories";
 
 const amountLabel = "Количество";
 const nameLabel = "Название";
@@ -60,31 +59,6 @@ const CreateItem = props => {
         >
           <FormLayout>
             <Input
-              top={amountLabel}
-              name={amountLabel}
-              size="1"
-              placeholder="0"
-              value={amount}
-              onChange={e => {
-                const { _, value } = e.currentTarget;
-                setAmount(value);
-                props.setItems({
-                  value,
-                  name,
-                  category,
-                  description
-                });
-              }}
-              status={checkAmount(amount) ? "valid" : "error"}
-              bottom={
-                checkAmount(amount)
-                  ? ""
-                  : "Пожалуйста, введите число от 1 до 100"
-              }
-            />
-          </FormLayout>
-          <FormLayout>
-            <Input
               top={nameLabel}
               name={nameLabel}
               size="20"
@@ -125,7 +99,7 @@ const CreateItem = props => {
             <Textarea
               top={descriptionLabel}
               name={descriptionLabel}
-              placeholder="Состояние, габариты, дата покупки, особенности и т.д."
+              placeholder="Количество, состояние, габариты, дата покупки, особенности и т.д."
               value={description}
               onChange={e => {
                 const { _, value } = e.currentTarget;
