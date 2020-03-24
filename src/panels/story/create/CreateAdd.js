@@ -15,7 +15,10 @@ import {
   Checkbox,
   Cell,
   Link,
-  Separator
+  Separator,
+  ScreenSpinner,
+  Snackbar,
+  Avatar
 } from "@vkontakte/vkui";
 
 import Geocoder from "react-native-geocoding";
@@ -25,6 +28,9 @@ import ChooseAddType from "./components/ChooseType";
 import ChooseFeedback from "./components/ChooseFeedback";
 
 import Icon24Add from "@vkontakte/icons/dist/24/add";
+import Icon24Favorite from "@vkontakte/icons/dist/24/favorite";
+import Icon24Cancel from "@vkontakte/icons/dist/24/cancel";
+import Icon24DoneOutline from "@vkontakte/icons/dist/24/done_outline";
 
 import { store } from "./../../../user/store";
 
@@ -47,6 +53,8 @@ const CreateAdd = props => {
     setItemsR(r);
     checkItems();
   }
+
+  const [snackbar, setSnackbar] = useState(null);
 
   const [description, setDescription] = useState("");
 
@@ -123,8 +131,69 @@ const CreateAdd = props => {
     updateGeo();
   }, []);
 
-  function createAdd() {
+  function saveSuccess(goToAds) {
+    if (snackbar) return;
+    goToAds(
+      <Snackbar
+        onClose={() => {
+          setSnackbar(null)
+          
+        }}
+        action="Отменить"
+        onActionClick={() => {
+          /* тут запрос на удаление */
+        }}
+        before={
+          <Avatar size={24} style={{ background: "green" }}>
+            <Icon24DoneOutline fill="#fff" width={14} height={14} />
+          </Avatar>
+        }
+      >
+        Объявление создано! Спасибо, что делаете мир лучше :)
+      </Snackbar>
+    );
+   
+  }
+
+  function saveFail(err) {
+    if (snackbar) return;
+    setSnackbar(
+      <Snackbar
+        onClose={() => setSnackbar(null)}
+        action="Повторить"
+        onActionClick={() => {
+          /* тут запрос на повторение */
+        }}
+        before={
+          <Avatar size={24} style={{ background: "red" }}>
+            <Icon24Cancel fill="#fff" width={14} height={14} />
+          </Avatar>
+        }
+      >
+        Произошла ошибка: {err}
+      </Snackbar>
+    );
+  }
+
+  function saveCancel() {
+    if (snackbar) return;
+    setSnackbar(
+      <Snackbar
+        onClose={() => setSnackbar(null)}
+        before={
+          <Avatar size={24} style={{ background: "orange" }}>
+            <Icon24Favorite fill="#fff" width={14} height={14} />
+          </Avatar>
+        }
+      >
+        Пожалуйста, заполните все обязательные поля.
+      </Snackbar>
+    );
+  }
+
+  function createAd(setPopout) {
     if (valid) {
+      setPopout(<ScreenSpinner size="large" />);
       const obj = JSON.stringify({
         author_id: store.getState().vk_id,
         header: items[0].name,
@@ -142,22 +211,35 @@ const CreateAdd = props => {
       });
       console.log("loook at me", obj);
 
-      fetch(`http://localhost:8091/api/ad/create`, {
-        method: "post",
-        mode: "cors",
-        body: obj,
-        credentials: "include"
-      })
-        .then(function(response) {
-          console.log(
-            "Вот ответ от бека на запрос создания объявления ",
-            response
-          );
-          return response.json();
+      async function fetchData() {
+        fetch(`http://localhost:8091/api/ad/create`, {
+          method: "post",
+          mode: "cors",
+          body: obj,
+          credentials: "include"
         })
-        .catch(function(error) {
-          console.log("Request failed", error);
-        });
+          .then(function(response) {
+            console.log(
+              "Вот ответ от бека на запрос создания объявления ",
+              response
+            );
+            setPopout(null);
+            if (response.status == 201) {
+              saveSuccess(props.goToAds);
+            } else {
+              saveFail(response.status + " - " + response.statusText);
+            }
+            return response.json();
+          })
+          .catch(function(error) {
+            console.log("Request failed", error);
+            setPopout(null);
+            saveFail(error);
+          });
+      }
+      fetchData();
+    } else {
+      saveCancel();
     }
   }
 
@@ -305,7 +387,7 @@ const CreateAdd = props => {
       )}
       <Div style={{ display: "flex" }}>
         <Button
-          onClick={createAdd()}
+          onClick={() => createAd(props.setPopout)}
           mode={valid ? "commerce" : "secondary"}
           size="l"
           stretched
@@ -314,6 +396,7 @@ const CreateAdd = props => {
           Добавить
         </Button>
       </Div>
+      {snackbar}
     </div>
   );
 };
