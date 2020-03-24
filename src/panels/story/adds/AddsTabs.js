@@ -105,7 +105,10 @@ const AddsTabs = props => {
           </Cell>
         </List>
       </PanelHeaderContext>
-      <AddsTab onFiltersClick={props.onFiltersClick}></AddsTab>
+      <AddsTab
+        setPopout={props.setPopout}
+        onFiltersClick={props.onFiltersClick}
+      ></AddsTab>
     </React.Fragment>
   );
 };

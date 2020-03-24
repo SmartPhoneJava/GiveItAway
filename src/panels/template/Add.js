@@ -61,7 +61,7 @@ const Add = props => {
   }
 
   function getFeedback(pm, comments, comments_counter, contacts, status) {
-    if (status === "active") {
+    if (status === "offer") {
       return (
         <div>
           {getPM(pm)}
@@ -117,7 +117,7 @@ const Add = props => {
           {props.description}
         </Div>
         <Cell
-          before={!props.anonymous ? <Avatar size={36} /> : <div />}
+          before={!props.anonymous ? <Avatar size={36} src={props.ava}/> : <div />}
           description={props.location}
           size="l"
           multiline="true"

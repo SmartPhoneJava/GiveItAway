@@ -32,7 +32,8 @@ import Icon24Favorite from "@vkontakte/icons/dist/24/favorite";
 import Icon24Cancel from "@vkontakte/icons/dist/24/cancel";
 import Icon24DoneOutline from "@vkontakte/icons/dist/24/done_outline";
 
-import { store } from "./../../../user/store";
+import {User} from "../../../store/user";
+import {Addr} from "../../../store/addr";
 
 import Icon24Locate from "@vkontakte/icons/dist/32/place";
 
@@ -195,7 +196,7 @@ const CreateAdd = props => {
     if (valid) {
       setPopout(<ScreenSpinner size="large" />);
       const obj = JSON.stringify({
-        author_id: store.getState().vk_id,
+        author_id: User.getState().vk_id,
         header: items[0].name,
         text: items[0].description,
         is_auction: false,
@@ -212,7 +213,7 @@ const CreateAdd = props => {
       console.log("loook at me", obj);
 
       async function fetchData() {
-        fetch(`http://localhost:8091/api/ad/create`, {
+        fetch(Addr.getState()+`/api/ad/create`, {
           method: "post",
           mode: "cors",
           body: obj,

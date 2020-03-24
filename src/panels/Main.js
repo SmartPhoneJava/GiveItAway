@@ -46,7 +46,8 @@ import Icon24Done from "@vkontakte/icons/dist/24/done";
 import Icon24CommentOutline from "@vkontakte/icons/dist/24/comment_outline";
 import Icon24Cancel from "@vkontakte/icons/dist/24/cancel";
 
-import { store } from "./../user/store";
+import { User } from "../store/user";
+import { Addr } from "../store/addr";
 
 const ads = "ads";
 const adsText = "Объявления";
@@ -91,7 +92,7 @@ const Main = () => {
     });
 
     async function checkMe(user) {
-      fetch(`http://localhost:8091/api/user/auth`, {
+      fetch(Addr.getState() + `/api/user/auth`, {
         method: "post",
         mode: "cors",
         body: JSON.stringify({
@@ -108,7 +109,7 @@ const Main = () => {
           return response.json();
         })
         .then(function(data) {
-          store.dispatch({ type: "set", new_state: data });
+          User.dispatch({ type: "set", new_state: data });
           console.log(
             "Request successful",
             data.name,
@@ -116,7 +117,7 @@ const Main = () => {
             data.photo_url,
             data.carma
           );
-          console.log("loook at me", store.getState());
+          console.log("loook at me", User.getState());
           return data;
         })
         .catch(function(error) {
@@ -217,6 +218,7 @@ const Main = () => {
           <AddsTabs
             onFiltersClick={() => setActiveModal("filters")}
             goSearch={goSearch}
+            setPopout={setPopout}
           />
           {snackbar}
         </Panel>
