@@ -11,7 +11,7 @@ module.exports = {
     rules: [
       //загрузчик для js
       {
-        test: /\.jsx?$/, // определяем тип файлов
+        test: /\.js$/, // определяем тип файлов
         exclude: /(node_modules)/, // исключаем из обработки папку node_modules
         loader: "babel-loader", // определяем загрузчик
         options: {

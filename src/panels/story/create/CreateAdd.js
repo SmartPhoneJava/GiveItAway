@@ -22,8 +22,11 @@ import Geocoder from "react-native-geocoding";
 
 import CreateItem from "./components/CreateItem";
 import ChooseAddType from "./components/ChooseType";
+import ChooseFeedback from "./components/ChooseFeedback";
 
 import Icon24Add from "@vkontakte/icons/dist/24/add";
+
+import { store } from "./../../../user/store";
 
 import Icon24Locate from "@vkontakte/icons/dist/32/place";
 
@@ -99,6 +102,8 @@ const CreateAdd = props => {
       setGeodata(value);
 
       console.log("geodata:", value);
+      setAdress(Math.floor(value.long) + ":" + Math.floor(value.lat));
+      /*
       Geocoder.init("no_code_here");
       Geocoder.from(value.lat, value.long)
         .then(json => {
@@ -109,14 +114,52 @@ const CreateAdd = props => {
         .catch(error => {
           console.warn(error);
           setAdress("Город не обнаружен");
-        });
+        });*/
     }
 
-    console.log("launch");
     fetchData();
   }
-  //updateGeo();
-  console.log("lvl3 props.user ", props.user);
+  useEffect(() => {
+    updateGeo();
+  }, []);
+
+  function createAdd() {
+    if (valid) {
+      const obj = JSON.stringify({
+        author_id: store.getState().vk_id,
+        header: items[0].name,
+        text: items[0].description,
+        is_auction: false,
+        feedback_type: feedbackType,
+        extra_field: contacts,
+        geo_position: {
+          long: geodata.long,
+          lat: geodata.lat
+        },
+        status: "offer",
+        category: items[0].category,
+        comments_count: 0
+      });
+      console.log("loook at me", obj);
+
+      fetch(`http://localhost:8091/api/ad/create`, {
+        method: "post",
+        mode: "cors",
+        body: obj,
+        credentials: "include"
+      })
+        .then(function(response) {
+          console.log(
+            "Вот ответ от бека на запрос создания объявления ",
+            response
+          );
+          return response.json();
+        })
+        .catch(function(error) {
+          console.log("Request failed", error);
+        });
+    }
+  }
 
   return (
     <div>
@@ -225,7 +268,6 @@ const CreateAdd = props => {
                 value={hideGeo}
                 onClick={e => {
                   setHideGeo(!hideGeo);
-                  console.log("claaaaaack");
                 }}
               >
                 Не указывать
@@ -242,61 +284,12 @@ const CreateAdd = props => {
         </Cell>
       </Div>
       <Separator />
-      <Group
-        separator="show"
-        header={<Header mode="secondary">Тип фидбека</Header>}
-      >
-        <div>
-          <Radio
-            name="radio"
-            value="1"
-            onClick={() => {
-              setFeedbackType("ls");
-            }}
-            description="Любой желающий может написать вам в лс"
-            defaultChecked
-          >
-            Личные сообщения
-          </Radio>
-          <Radio
-            name="radio"
-            value="2"
-            onClick={() => {
-              setFeedbackType("comments");
-            }}
-            description="Пользователи оставляют комментарии к вашему объявлению"
-          >
-            Комментарии
-          </Radio>
-          <Radio
-            name="radio"
-            value="3"
-            onClick={() => {
-              setFeedbackType("other");
-            }}
-            description="Вы указываете контакты для связи, пользователи связываются с вами"
-          >
-            Контакты
-          </Radio>
-        </div>
-      </Group>
-      {feedbackType == "other" ? (
-        <FormLayout>
-          <Textarea
-            top="Контакты"
-            name="Контакты"
-            placeholder="Почта, номер телфона, мессенджеры и т.д."
-            value={contacts}
-            onChange={e => {
-              const { _, value } = e.currentTarget;
-              setContacts(value);
-            }}
-            status={contacts ? "valid" : "error"}
-          />
-        </FormLayout>
-      ) : (
-        <div />
-      )}
+      <ChooseFeedback
+        setFeedbackType={setFeedbackType}
+        feedbackType={feedbackType}
+        setContacts={setContacts}
+        contacts={contacts}
+      />
       {valid ? (
         ""
       ) : (
@@ -312,57 +305,7 @@ const CreateAdd = props => {
       )}
       <Div style={{ display: "flex" }}>
         <Button
-          onClick={() => {
-            if (valid) {
-              const obj = JSON.stringify({
-                author_id: props.user().vk_id,
-                header: items[0].name,
-                text: items[0].description,
-                is_auction: false,
-                feedback_type: feedbackType,
-                extra_field: contacts,
-                geo_position: {
-                  long: geodata.long,
-                  lat: geodata.lat
-                },
-                status: "offer",
-                category: items[0].category,
-                comments_count: 0
-              });
-              console.log("loook at me", obj);
-              /*
-              fetch(`http://localhost:8091/api/ad/create`, {
-                method: "post",
-                mode: "cors",
-                body: JSON.stringify({
-                  author_id: props.user().vk_id,
-                  header: items[0].name,
-                  text: items[0].description,
-                  is_auction: false,
-                  feedback_type: feedbackType,
-                  extra_field: contacts,
-                  geo_position: {
-                    long: geodata.long,
-                    lat: geodata.lat
-                  },
-                  status: "offer",
-                  category: items[0].category,
-                  comments_count: 0
-                }),
-                credentials: "include"
-              })
-                .then(function(response) {
-                  console.log(
-                    "Вот ответ от бека на запрос создания объявления ",
-                    response
-                  );
-                  return response.json();
-                })
-                .catch(function(error) {
-                  console.log("Request failed", error);
-                });*/
-            }
-          }}
+          onClick={createAdd()}
           mode={valid ? "commerce" : "secondary"}
           size="l"
           stretched

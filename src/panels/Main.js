@@ -57,7 +57,7 @@ const profileText = "Профиль";
 const categories = "categories";
 const categoriesText = "Категория";
 
-const Main = props => {
+const Main = () => {
   const [activeStory, setActiveStory] = useState(ads);
   const [prevStory, setPrevStory] = useState(ads);
 
@@ -77,9 +77,6 @@ const Main = props => {
   function hideModal() {
     setActiveModal(null);
   }
-
-  console.log("lvl2 props.user ", props.user)
-
 
   return (
     <Epic
@@ -176,11 +173,10 @@ const Main = props => {
             openCategories={id => {
               setPrevStory(add);
               setActiveStory(categories);
-              setCategoryID(id)
+              setCategoryID(id);
             }}
             id={categoryID}
             category={category}
-            user={props.user}
           />
         </Panel>
       </View>

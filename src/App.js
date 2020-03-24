@@ -7,16 +7,11 @@ import "@vkontakte/vkui/dist/vkui.css";
 import "@vkontakte/vkui/dist/vkui.css";
 
 import Main from "./panels/Main";
-
-export let User = {
-  vk_id: "0"
-};
+import { store } from "./user/store";
 
 const App = () => {
   const [activePanel, setActivePanel] = useState("home");
-  const [user, setUser] = useState({
-    vk_id: "0"
-  });
+
   const [popout, setPopout] = useState(<ScreenSpinner size="large" />);
 
   useEffect(() => {
@@ -46,7 +41,7 @@ const App = () => {
           return response.json();
         })
         .then(function(data) {
-          User = data;
+          store.dispatch({ type: "set", new_state: data });
           console.log(
             "Request successful",
             data.name,
@@ -54,6 +49,7 @@ const App = () => {
             data.photo_url,
             data.carma
           );
+          console.log("loook at me", store.getState());
           return data;
         })
         .catch(function(error) {
@@ -73,13 +69,9 @@ const App = () => {
     setActivePanel(e.currentTarget.dataset.to);
   };
 
-  console.log("lvl1 props.user ", user);
+  console.log("lvl1 props.user ", store.getState());
 
-  function getUser() {
-    return user;
-  }
-
-  return <Main id="main" go={go} user={getUser} />;
+  return <Main id="main" go={go} />;
 };
 
 export default App;
