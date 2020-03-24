@@ -8,9 +8,15 @@ import "@vkontakte/vkui/dist/vkui.css";
 
 import Main from "./panels/Main";
 
+export let User = {
+  vk_id: "0"
+};
+
 const App = () => {
   const [activePanel, setActivePanel] = useState("home");
-  const [fetchedUser, setUser] = useState(null);
+  const [user, setUser] = useState({
+    vk_id: "0"
+  });
   const [popout, setPopout] = useState(<ScreenSpinner size="large" />);
 
   useEffect(() => {
@@ -27,6 +33,7 @@ const App = () => {
         method: "post",
         mode: "cors",
         body: JSON.stringify({
+          vk_id: user.id,
           Url: window.location.href,
           name: user.first_name,
           surname: user.last_name,
@@ -35,11 +42,18 @@ const App = () => {
         credentials: "include"
       })
         .then(function(response) {
-          console.log("hello ", response);
+          console.log("Вот ответ от бека на запрос регистрации ", response);
           return response.json();
         })
         .then(function(data) {
-          console.log("Request successful", data);
+          User = data;
+          console.log(
+            "Request successful",
+            data.name,
+            data.surname,
+            data.photo_url,
+            data.carma
+          );
           return data;
         })
         .catch(function(error) {
@@ -48,14 +62,10 @@ const App = () => {
     }
 
     async function fetchData() {
-      const user = await bridge.send("VKWebAppGetUserInfo");
-      setUser(user);
+      const us = await bridge.send("VKWebAppGetUserInfo");
       setPopout(null);
-      console.log("baza:", user);
-      checkMe(user);
+      checkMe(us);
     }
-    console.log("urll:", window.location.href);
-    console.log("query:", window.location.query);
     fetchData();
   }, []);
 
@@ -63,7 +73,13 @@ const App = () => {
     setActivePanel(e.currentTarget.dataset.to);
   };
 
-  return <Main id="main" go={go} />;
+  console.log("lvl1 props.user ", user);
+
+  function getUser() {
+    return user;
+  }
+
+  return <Main id="main" go={go} user={getUser} />;
 };
 
 export default App;

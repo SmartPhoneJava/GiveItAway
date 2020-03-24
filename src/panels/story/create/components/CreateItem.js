@@ -69,7 +69,7 @@ const CreateItem = props => {
                 setName(value);
                 props.setItems({
                   amount,
-                  value,
+                  name: value,
                   category,
                   description
                 });
@@ -84,7 +84,7 @@ const CreateItem = props => {
               props.setItems({
                 amount,
                 name,
-                cat,
+                category: cat,
                 description
               });
             }}
@@ -108,7 +108,7 @@ const CreateItem = props => {
                   amount,
                   name,
                   category,
-                  value
+                  description: value,
                 });
               }}
               status={description ? "valid" : "error"}
