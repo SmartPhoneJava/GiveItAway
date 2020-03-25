@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Search, Group, Header, ScreenSpinner } from "@vkontakte/vkui";
 
 import Icon24Filter from "@vkontakte/icons/dist/24/filter";
@@ -7,8 +7,11 @@ import Add from "./../../../../template/Add";
 
 import { User } from "./../../../../../store/user";
 import { Addr } from "./../../../../../store/addr";
+import { AdsPage } from "./../../../../../store/ads_page";
 
-const addsArrD = [
+import useAdSearch from "./useAdSearch";
+
+const addsArrDD = [
   {
     ad_id: 3201,
     status: "offer",
@@ -118,7 +121,7 @@ const addsArrD = [
   {
     ad_id: 3206,
     status: "waiting",
-    name: "Отдаю много всякого",
+    header: "Отдаю много всякого",
     anonymous: true,
     text: `Анон. Отдам чаи 500 тг. Роутер 10тыс тг, книга 500тг. Отдам даром туфли 37 размера
       `,
@@ -137,82 +140,95 @@ const addsArrD = [
 
 const AddsTab = props => {
   const [search, setSearch] = useState("");
-  const [addsArr, setAddsArr] = useState(addsArrD);
 
-  async function getAds() {
-    props.setPopout(<ScreenSpinner size="large" />);
-    const data = { page: 1, rows_per_page: 100 };
-    fetch(
-      Addr.getState() +
-        `/api/ad/find?page=${data.page}&rows_per_page=${data.rows_per_page}`,
-      {
-        method: "get",
-        mode: "cors",
-        credentials: "include"
-      }
-    )
-      .then(function(response) {
-        console.log(
-          "Вот ответ от бека на запрос получения объявлений ",
-          response
-        );
-        return response.json();
-      })
-      .then(function(response) {
-        console.log("Смотрим! ", response);
-        props.setPopout(null);
-        setAddsArr(response);
-        return response;
-      })
-      .catch(function(error) {
-        console.log("Request failed", error);
-        props.setPopout(null);
+  const [items, setItems] = useState([]);
+
+  const [pageNumber, setPageNumber] = useState(1);
+
+  const { loading, error, ads, hasMore } = useAdSearch(search, pageNumber, 5);
+  console.log("all our:", loading, error, ads, hasMore);
+
+  const observer = useRef();
+  const lastAdElementRef = useCallback(
+    node => {
+      console.log("i am last element and ", loading);
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting && hasMore) {
+          console.log("i am visible");
+          setPageNumber(prevPageNumber => prevPageNumber + 1);
+        }
       });
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
+
+  function handleSearch(e) {
+    setSearch(e.target.value);
+    setPageNumber(1);
     props.setPopout(null);
   }
 
-  useEffect(() => {
-    getAds();
-  }, []);
-
-  function onChange(e) {
-    setSearch(e.target.value);
-  }
-
-  function adds() {
-    const s = search.toLowerCase();
-    return addsArr; //.filter((val) => val.header.toLowerCase().indexOf(s) > -1);
-  }
-
   return (
-    <div>
+    <>
       <Search
         value={search}
-        onChange={onChange}
+        onChange={handleSearch}
         icon={<Icon24Filter />}
         onIconClick={props.onFiltersClick}
       />
-      <Group separator="hide">
-        {adds().map(add => (
-          <Add
-            key={add.ad_id}
-            category={add.category}
-            name={add.header}
-            description={add.text}
-            date={add.creation_date}
-            pm={add.feedback_type == "ls"}
-            comments={add.feedback_type == "comments"}
-            comments_counter={!add.comments_counter ? 0 : add.comments_counter}
-            contacts={add.extra_field}
-            location={add.location}
-            username={add.author.name + " " + add.author.surname}
-            ava={add.author.photo_url}
-            status={add.status}
-            anonymous={add.anonymous}
-          ></Add>
-        ))}
+      <Group>
+        {ads.map((ad, index) => {
+          if (ads.length === index + 1) {
+            return (
+              <div ref={lastAdElementRef}>
+                <Add
+                  key={ad.ad_id}
+                  category={ad.category}
+                  name={ad.header}
+                  description={ad.text}
+                  date={ad.creation_date}
+                  pm={ad.feedback_type == "ls"}
+                  comments={ad.feedback_type == "comments"}
+                  comments_counter={
+                    !ad.comments_counter ? 0 : ad.comments_counter
+                  }
+                  contacts={ad.extra_field}
+                  location={ad.location}
+                  username={ad.author.name + " " + ad.author.surname}
+                  ava={ad.author.photo_url}
+                  status={ad.status}
+                  anonymous={ad.anonymous}
+                />
+              </div>
+            );
+          } else {
+            return (
+              <Add
+                key={ad.ad_id}
+                category={ad.category}
+                name={ad.header}
+                description={ad.text}
+                date={ad.creation_date}
+                pm={ad.feedback_type == "ls"}
+                comments={ad.feedback_type == "comments"}
+                comments_counter={
+                  !ad.comments_counter ? 0 : ad.comments_counter
+                }
+                contacts={ad.extra_field}
+                location={ad.location}
+                username={ad.author.name + " " + ad.author.surname}
+                ava={ad.author.photo_url}
+                status={ad.status}
+                anonymous={ad.anonymous}
+              />
+            );
+          }
+        })}
       </Group>
-    </div>
+    </>
   );
 };
 

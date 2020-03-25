@@ -11,5 +11,6 @@ const reducer = (state="http://localhost:8091", action) => {
 export const Addr = createStore(reducer);
 const update = () => {
   console.log("sub:", Addr.getState()); // при каждом обращение к User будет выводить его значение
+
 }
 Addr.subscribe(update);  // Подписываемся на вызов User

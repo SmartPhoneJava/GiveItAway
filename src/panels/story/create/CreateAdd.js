@@ -55,8 +55,6 @@ const CreateAdd = props => {
     checkItems();
   }
 
-  const [snackbar, setSnackbar] = useState(null);
-
   const [description, setDescription] = useState("");
 
   const [hideGeo, setHideGeo] = useState(false);
@@ -133,12 +131,11 @@ const CreateAdd = props => {
   }, []);
 
   function saveSuccess(goToAds) {
-    if (snackbar) return;
+    if (props.snackbar) return;
     goToAds(
       <Snackbar
         onClose={() => {
-          setSnackbar(null)
-          
+          props.setSnackbar(null)
         }}
         action="Отменить"
         onActionClick={() => {
@@ -157,10 +154,10 @@ const CreateAdd = props => {
   }
 
   function saveFail(err) {
-    if (snackbar) return;
-    setSnackbar(
+    if (props.snackbar) return;
+    props.setSnackbar(
       <Snackbar
-        onClose={() => setSnackbar(null)}
+        onClose={() => props.setSnackbar(null)}
         action="Повторить"
         onActionClick={() => {
           /* тут запрос на повторение */
@@ -177,10 +174,10 @@ const CreateAdd = props => {
   }
 
   function saveCancel() {
-    if (snackbar) return;
-    setSnackbar(
+    if (props.snackbar) return;
+    props.setSnackbar(
       <Snackbar
-        onClose={() => setSnackbar(null)}
+        onClose={() => props.setSnackbar(null)}
         before={
           <Avatar size={24} style={{ background: "orange" }}>
             <Icon24Favorite fill="#fff" width={14} height={14} />
@@ -193,6 +190,8 @@ const CreateAdd = props => {
   }
 
   function createAd(setPopout) {
+    checkItems()
+    console.log("cliiiick ", valid)
     if (valid) {
       setPopout(<ScreenSpinner size="large" />);
       const obj = JSON.stringify({
@@ -397,7 +396,7 @@ const CreateAdd = props => {
           Добавить
         </Button>
       </Div>
-      {snackbar}
+      
     </div>
   );
 };

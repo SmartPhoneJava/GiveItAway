@@ -48,6 +48,7 @@ import Icon24Cancel from "@vkontakte/icons/dist/24/cancel";
 
 import { User } from "../store/user";
 import { Addr } from "../store/addr";
+import { AdsPage } from "../store/ads_page";
 
 const ads = "ads";
 const adsText = "Объявления";
@@ -59,7 +60,7 @@ const profile = "profile";
 const profileText = "Профиль";
 
 const Main = () => {
-  const [popout, setPopout] = useState(<ScreenSpinner size="large" />);
+  const [popout, setPopout] = useState(null);//<ScreenSpinner size="large" />
 
   const [activeStory, setActiveStory] = useState(ads);
 
@@ -80,6 +81,7 @@ const Main = () => {
   function goToAds(snack) {
     setActiveStory(ads);
     setSnackbar(snack);
+    AdsPage.dispatch({ type: "first_page" });
   }
 
   useEffect(() => {
@@ -227,7 +229,12 @@ const Main = () => {
       <View id={add} activePanel={add} popout={popout}>
         <Panel id={add}>
           <PanelHeader>{addText}</PanelHeader>
-          <CreateAdd setPopout={setPopout} goToAds={goToAds} />
+          <CreateAdd
+            setPopout={setPopout}
+            goToAds={goToAds}
+            snackbar={snackbar}
+            setSnackbar={setSnackbar}
+          />
           {snackbar}
         </Panel>
       </View>
