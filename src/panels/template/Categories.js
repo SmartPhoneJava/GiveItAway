@@ -20,22 +20,22 @@ import Pencil from "./../../img/pencil.png";
 import Play from "./../../img/play.png";
 import Sport from "./../../img/sport.png";
 
-const CategoryAnimals = "animals"
-const CategoryAnother = "another"
-const CategoryBooks = "books"
-const CategoryBuild = "build"
-const CategoryChildren = "children"
-const CategoryClothers = "clothers"
-const CategoryCosmetic = "cosmetic"
-const CategoryElectronics= "electronics"
-const CategoryFlora = "flora"
-const CategoryFood = "food"
-const CategoryFurniture = "furniture"
-const CategoryMusic = "music"
-const CategoryOld = "old"
-const CategoryPencil = "pencil"
-const CategoryPlay = "play"
-const CategorySport = "sport"
+const CategoryAnimals = "animals";
+const CategoryAnother = "another";
+const CategoryBooks = "books";
+const CategoryBuild = "build";
+const CategoryChildren = "children";
+const CategoryClothers = "clothers";
+const CategoryCosmetic = "cosmetic";
+const CategoryElectronics = "electronics";
+const CategoryFlora = "flora";
+const CategoryFood = "food";
+const CategoryFurniture = "furniture";
+const CategoryMusic = "music";
+const CategoryOld = "old";
+const CategoryPencil = "pencil";
+const CategoryPlay = "play";
+const CategorySport = "sport";
 
 export function GetCategory(category) {
   let image = Another;
@@ -86,7 +86,43 @@ export function GetCategory(category) {
       image = Sport;
       break;
   }
-  return image
+  return image;
+}
+
+export function GetCategoryText(category) {
+  switch (category) {
+    case CategoryAnimals:
+      return "Животные";
+    case CategoryBooks:
+      return "Книши";
+    case CategoryBuild:
+      return "Стройматериалы и инструменты";
+    case CategoryChildren:
+      return "Товары для детей";
+    case CategoryClothers:
+      return "Одежда, обувь и сумки";
+    case CategoryCosmetic:
+      return "Косметика, бижутерия, парфюмерия";
+    case CategoryElectronics:
+      return "Бытовая техника и электроника";
+    case CategoryFlora:
+      return "Растения";
+    case CategoryFood:
+      return "Продукты питания";
+    case CategoryFurniture:
+      return "Мебель";
+    case CategoryMusic:
+      return "Музыкальные инструменты";
+    case CategoryOld:
+      return "Средства реабилитации";
+    case CategoryPencil:
+      return "Канцтовары";
+    case CategoryPlay:
+      return "Игры и развлечения";
+    case CategorySport:
+      return "Спортивный инвентарь";
+  }
+  return "Другое";
 }
 
 export function GetCategoryImage(category) {
@@ -100,7 +136,26 @@ export function GetCategoryImageSmall(category) {
 }
 
 export const Categories = props => {
-  const [category, setCategory] = useState("")
+  const categories = [
+    "Не указана",
+    CategoryAnimals,
+    CategoryBooks,
+    CategoryBuild,
+    CategoryChildren,
+    CategoryClothers,
+    CategoryCosmetic,
+    CategoryElectronics,
+    CategoryFlora,
+    CategoryFood,
+    CategoryFurniture,
+    CategoryMusic,
+    CategoryOld,
+    CategoryPencil,
+    CategoryPlay,
+    CategorySport,
+    CategoryAnother
+  ];
+  const [category, setCategory] = useState(props.category);
   return (
     <Div
       style={{
@@ -113,8 +168,8 @@ export const Categories = props => {
           display: "flex",
           alignContent: "flex-end",
           alignItems: "flex-end",
-          marginBottom:"10%",
-          padding: "0"
+          marginBottom: "10%",
+          padding: "10px"
         }}
       >
         {GetCategoryImageSmall(category)}
@@ -124,27 +179,17 @@ export const Categories = props => {
           onClick={e => {
             const { _, value } = e.currentTarget;
             props.choose(value);
-            setCategory(value)
+            setCategory(value);
           }}
           top="Категория"
-          placeholder="Не указана"
+          placeholder={GetCategoryText(category)}
         >
-          <option value={CategoryAnimals}>Животные</option>
-          <option value={CategoryAnother}>Другое</option>
-          <option value={CategoryBooks}>Книги</option>
-          <option value={CategoryBuild}>Стройматериалы и инструменты</option>
-          <option value={CategoryChildren}>Товары для детей</option>
-          <option value={CategoryClothers}>Одежда, обувь и сумки</option>
-          <option value={CategoryCosmetic}>Косметика, бижутерия, парфюмерия</option>
-          <option value={CategoryElectronics}>Бытовая техника и электроника</option>
-          <option value={CategoryFlora}>Растения</option>
-          <option value={CategoryFood}>Продукты питания</option>
-          <option value={CategoryFurniture}>Мебель</option>
-          <option value={CategoryMusic}>Музыкальные инструменты</option>
-          <option value={CategoryOld}>Средства реабилитации</option>
-          <option value={CategoryPencil}>Канцтовары</option>
-          <option value={CategoryPlay}>Игры и развлечения</option>
-          <option value={CategorySport}>Спортивный инвентарь</option>
+          {categories.map((cat, i) => {
+            if (category != cat) {
+              return <option key={i} value={cat}>{GetCategoryText(cat)}</option>;
+            }
+            return "";
+          })}
         </Select>
       </FormLayout>
     </Div>

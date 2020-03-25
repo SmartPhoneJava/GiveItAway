@@ -7,7 +7,7 @@ import Add from "./../../../../template/Add";
 
 import { User } from "./../../../../../store/user";
 import { Addr } from "./../../../../../store/addr";
-import { AdsPage } from "./../../../../../store/ads_page";
+import { AdsPage } from "../../../../../store/activeModal";
 
 import useAdSearch from "./useAdSearch";
 
@@ -145,19 +145,16 @@ const AddsTab = props => {
 
   const [pageNumber, setPageNumber] = useState(1);
 
-  const { loading, error, ads, hasMore } = useAdSearch(search, pageNumber, 5);
-  console.log("all our:", loading, error, ads, hasMore);
+  const { loading, error, ads, hasMore, newPage } = useAdSearch(search, props.category, pageNumber, 5);
 
   const observer = useRef();
   const lastAdElementRef = useCallback(
     node => {
-      console.log("i am last element and ", loading);
       if (loading) return;
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver(entries => {
         if (entries[0].isIntersecting && hasMore) {
-          console.log("i am visible");
-          setPageNumber(prevPageNumber => prevPageNumber + 1);
+          setPageNumber(prevPageNumber => newPage + 1);
         }
       });
       if (node) observer.current.observe(node);
@@ -183,9 +180,9 @@ const AddsTab = props => {
         {ads.map((ad, index) => {
           if (ads.length === index + 1) {
             return (
-              <div ref={lastAdElementRef}>
+              <div key={ad.ad_id} ref={lastAdElementRef}>
                 <Add
-                  key={ad.ad_id}
+                  
                   category={ad.category}
                   name={ad.header}
                   description={ad.text}

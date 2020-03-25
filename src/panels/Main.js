@@ -39,16 +39,19 @@ import {
 import AddsTabs from "./story/adds/AddsTabs";
 import CreateAdd from "./story/create/CreateAdd";
 
+import { Categories } from "./template/Categories";
+
 import Icon28User from "@vkontakte/icons/dist/28/user";
 import Icon28NewsfeedOutline from "@vkontakte/icons/dist/28/newsfeed_outline";
 import Icon28Add from "@vkontakte/icons/dist/28/add_outline";
 import Icon24Done from "@vkontakte/icons/dist/24/done";
+import Icon24Dismiss from "@vkontakte/icons/dist/24/dismiss";
 import Icon24CommentOutline from "@vkontakte/icons/dist/24/comment_outline";
 import Icon24Cancel from "@vkontakte/icons/dist/24/cancel";
 
 import { User } from "../store/user";
 import { Addr } from "../store/addr";
-import { AdsPage } from "../store/ads_page";
+import { GetCategoryText } from "./template/Categories";
 
 const ads = "ads";
 const adsText = "Объявления";
@@ -59,10 +62,28 @@ const addText = "Создать";
 const profile = "profile";
 const profileText = "Профиль";
 
+const CategoryAnimals = "animals";
+const CategoryAnother = "another";
+const CategoryBooks = "books";
+const CategoryBuild = "build";
+const CategoryChildren = "children";
+const CategoryClothers = "clothers";
+const CategoryCosmetic = "cosmetic";
+const CategoryElectronics = "electronics";
+const CategoryFlora = "flora";
+const CategoryFood = "food";
+const CategoryFurniture = "furniture";
+const CategoryMusic = "music";
+const CategoryOld = "old";
+const CategoryPencil = "pencil";
+const CategoryPlay = "play";
+const CategorySport = "sport";
+
 const Main = () => {
-  const [popout, setPopout] = useState(null);//<ScreenSpinner size="large" />
+  const [popout, setPopout] = useState(null); //<ScreenSpinner size="large" />
 
   const [activeStory, setActiveStory] = useState(ads);
+  const [category, setCategory] = useState("не указана");
 
   const onStoryChange = e => {
     setActiveStory(e.currentTarget.dataset.story);
@@ -81,7 +102,6 @@ const Main = () => {
   function goToAds(snack) {
     setActiveStory(ads);
     setSnackbar(snack);
-    AdsPage.dispatch({ type: "first_page" });
   }
 
   useEffect(() => {
@@ -134,6 +154,26 @@ const Main = () => {
     }
     fetchData();
   }, []);
+
+  const categories = [
+    "Не указана",
+    CategoryAnimals,
+    CategoryBooks,
+    CategoryBuild,
+    CategoryChildren,
+    CategoryClothers,
+    CategoryCosmetic,
+    CategoryElectronics,
+    CategoryFlora,
+    CategoryFood,
+    CategoryFurniture,
+    CategoryMusic,
+    CategoryOld,
+    CategoryPencil,
+    CategoryPlay,
+    CategorySport,
+    CategoryAnother
+  ];
 
   return (
     <Epic
@@ -197,18 +237,86 @@ const Main = () => {
               }
             >
               <FormLayout>
-                <SelectMimicry top="Страна" placeholder="Не выбрана" />
-                <SelectMimicry top="Город" placeholder="Не выбран" />
-                <FormLayoutGroup top="Пол">
-                  <Radio name="sex" value="male" defaultChecked>
-                    Любой
-                  </Radio>
-                  <Radio name="sex" value="male">
-                    Мужской
-                  </Radio>
-                  <Radio name="sex" value="female">
-                    Женский
-                  </Radio>
+                <Categories category={category} choose={setCategory} />
+                {/** 
+          <FormLayoutGroup top="Пол">
+            <Radio name="sex" value="male" defaultChecked>
+              Любой
+            </Radio>
+            <Radio name="sex" value="male">
+              Мужской
+            </Radio>
+            <Radio name="sex" value="female">
+              Женский
+            </Radio>
+          </FormLayoutGroup>
+          */}
+                <Button
+                  mode="secondary"
+                  onClick={() => setActiveModal("categories")}
+                  size="xl"
+                >
+                  Информация о пользователе
+                </Button>
+              </FormLayout>
+            </ModalPage>
+            <ModalPage
+              id="categories"
+              header={
+                <ModalPageHeader
+                  left={
+                    IS_PLATFORM_ANDROID && (
+                      <PanelHeaderButton
+                        onClick={() => setActiveModal("categories")}
+                      >
+                        <Icon24Cancel />
+                      </PanelHeaderButton>
+                    )
+                  }
+                  right={
+                    IS_PLATFORM_IOS && (
+                      <PanelHeaderButton
+                        onClick={() => setActiveModal("categories")}
+                      >
+                        <Icon24Dismiss />
+                      </PanelHeaderButton>
+                    )
+                  }
+                >
+                  Выберите страну
+                </ModalPageHeader>
+              }
+              settlingHeight={80}
+            >
+              <FormLayout>
+                <Button
+                  mode="secondary"
+                  onClick={() => setActiveModal("filters")}
+                  size="xl"
+                >
+                  Выбрать
+                </Button>
+
+                <FormLayoutGroup>
+                  {categories.map((cat, i) => {
+                    if (category != cat) {
+                      return (
+                        <Radio
+                          key={i}
+                          name="cat"
+                          value={cat}
+                          onClick={e => {
+                            const { _, value } = e.currentTarget;
+                            setCategory(value);
+                            setActiveModal("filters")
+                          }}
+                        >
+                          {GetCategoryText(cat)}
+                        </Radio>
+                      );
+                    }
+                    return "";
+                  })}
                 </FormLayoutGroup>
               </FormLayout>
             </ModalPage>
@@ -221,6 +329,7 @@ const Main = () => {
             onFiltersClick={() => setActiveModal("filters")}
             goSearch={goSearch}
             setPopout={setPopout}
+            category={category}
           />
           {snackbar}
         </Panel>
