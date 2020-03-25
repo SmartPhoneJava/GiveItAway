@@ -10,3 +10,10 @@
   width: 30px;
   height: 30px;;
 }
+
+.category100 {
+  transition: margin .5s;
+  margin: 5px;
+  width: 100px;
+  height: 100px;;
+}

@@ -20,22 +20,23 @@ import Pencil from "./../../img/pencil.png";
 import Play from "./../../img/play.png";
 import Sport from "./../../img/sport.png";
 
-const CategoryAnimals = "animals";
-const CategoryAnother = "another";
-const CategoryBooks = "books";
-const CategoryBuild = "build";
-const CategoryChildren = "children";
-const CategoryClothers = "clothers";
-const CategoryCosmetic = "cosmetic";
-const CategoryElectronics = "electronics";
-const CategoryFlora = "flora";
-const CategoryFood = "food";
-const CategoryFurniture = "furniture";
-const CategoryMusic = "music";
-const CategoryOld = "old";
-const CategoryPencil = "pencil";
-const CategoryPlay = "play";
-const CategorySport = "sport";
+export const CategoryNo = "не определена";
+export const CategoryAnimals = "animals";
+export const CategoryAnother = "another";
+export const CategoryBooks = "books";
+export const CategoryBuild = "build";
+export const CategoryChildren = "children";
+export const CategoryClothers = "clothers";
+export const CategoryCosmetic = "cosmetic";
+export const CategoryElectronics = "electronics";
+export const CategoryFlora = "flora";
+export const CategoryFood = "food";
+export const CategoryFurniture = "furniture";
+export const CategoryMusic = "music";
+export const CategoryOld = "old";
+export const CategoryPencil = "pencil";
+export const CategoryPlay = "play";
+export const CategorySport = "sport";
 
 export function GetCategory(category) {
   let image = Another;
@@ -85,6 +86,9 @@ export function GetCategory(category) {
     case CategorySport:
       image = Sport;
       break;
+    case CategoryNo:
+      image = "";
+      break;
   }
   return image;
 }
@@ -94,7 +98,7 @@ export function GetCategoryText(category) {
     case CategoryAnimals:
       return "Животные";
     case CategoryBooks:
-      return "Книши";
+      return "Книги";
     case CategoryBuild:
       return "Стройматериалы и инструменты";
     case CategoryChildren:
@@ -121,8 +125,15 @@ export function GetCategoryText(category) {
       return "Игры и развлечения";
     case CategorySport:
       return "Спортивный инвентарь";
+    case CategoryNo:
+      return "Не определена";
   }
   return "Другое";
+}
+
+export function GetCategoryImageBig(category) {
+  let image = GetCategory(category);
+  return <img src={image} className="category100" />;
 }
 
 export function GetCategoryImage(category) {
@@ -137,7 +148,7 @@ export function GetCategoryImageSmall(category) {
 
 export const Categories = props => {
   const categories = [
-    "Не указана",
+    CategoryNo,
     CategoryAnimals,
     CategoryBooks,
     CategoryBuild,
@@ -186,7 +197,11 @@ export const Categories = props => {
         >
           {categories.map((cat, i) => {
             if (category != cat) {
-              return <option key={i} value={cat}>{GetCategoryText(cat)}</option>;
+              return (
+                <option key={i} value={cat}>
+                  {GetCategoryText(cat)}
+                </option>
+              );
             }
             return "";
           })}

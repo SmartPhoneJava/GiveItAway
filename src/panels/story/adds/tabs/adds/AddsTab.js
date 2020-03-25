@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Search, Group, Header, ScreenSpinner } from "@vkontakte/vkui";
+import { Search, Group, Placeholder, Button } from "@vkontakte/vkui";
 
 import Icon24Filter from "@vkontakte/icons/dist/24/filter";
+import Icon56UsersOutline from "@vkontakte/icons/dist/56/users_outline";
 
 import Add from "./../../../../template/Add";
 
@@ -145,7 +146,12 @@ const AddsTab = props => {
 
   const [pageNumber, setPageNumber] = useState(1);
 
-  const { loading, error, ads, hasMore, newPage } = useAdSearch(search, props.category, pageNumber, 5);
+  const { loading, error, ads, hasMore, newPage } = useAdSearch(
+    search,
+    props.category,
+    pageNumber,
+    5
+  );
 
   const observer = useRef();
   const lastAdElementRef = useCallback(
@@ -177,12 +183,34 @@ const AddsTab = props => {
         onIconClick={props.onFiltersClick}
       />
       <Group>
-        {ads.map((ad, index) => {
-          if (ads.length === index + 1) {
-            return (
-              <div key={ad.ad_id} ref={lastAdElementRef}>
+        {ads.length > 0 ? 
+          ads.map((ad, index) => {
+            if (ads.length === index + 1) {
+              return (
+                <div key={ad.ad_id} ref={lastAdElementRef}>
+                  <Add
+                    category={ad.category}
+                    name={ad.header}
+                    description={ad.text}
+                    date={ad.creation_date}
+                    pm={ad.feedback_type == "ls"}
+                    comments={ad.feedback_type == "comments"}
+                    comments_counter={
+                      !ad.comments_counter ? 0 : ad.comments_counter
+                    }
+                    contacts={ad.extra_field}
+                    location={ad.location}
+                    username={ad.author.name + " " + ad.author.surname}
+                    ava={ad.author.photo_url}
+                    status={ad.status}
+                    anonymous={ad.anonymous}
+                  />
+                </div>
+              );
+            } else {
+              return (
                 <Add
-                  
+                  key={ad.ad_id}
                   category={ad.category}
                   name={ad.header}
                   description={ad.text}
@@ -199,31 +227,24 @@ const AddsTab = props => {
                   status={ad.status}
                   anonymous={ad.anonymous}
                 />
-              </div>
-            );
-          } else {
-            return (
-              <Add
-                key={ad.ad_id}
-                category={ad.category}
-                name={ad.header}
-                description={ad.text}
-                date={ad.creation_date}
-                pm={ad.feedback_type == "ls"}
-                comments={ad.feedback_type == "comments"}
-                comments_counter={
-                  !ad.comments_counter ? 0 : ad.comments_counter
-                }
-                contacts={ad.extra_field}
-                location={ad.location}
-                username={ad.author.name + " " + ad.author.surname}
-                ava={ad.author.photo_url}
-                status={ad.status}
-                anonymous={ad.anonymous}
-              />
-            );
-          }
-        })}
+              );
+            }
+          })
+         : 
+          <Placeholder
+            icon={<Icon56UsersOutline />}
+            header="Упс &#128566;"
+            action={
+              <Button onClick={() => props.dropFilters()} size="l">
+                Сбросить фильтры
+              </Button>
+            }
+            stretched={true}
+          >
+            Кажется, ничего не удалось найти. Попробуйте изменить фильтры, чтобы
+            найти больше объявлений!
+          </Placeholder>
+        }
       </Group>
     </>
   );

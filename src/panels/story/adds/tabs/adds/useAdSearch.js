@@ -3,6 +3,8 @@ import axios from "axios";
 
 import { Addr } from "./../../../../../store/addr";
 
+import { CategoryNo} from "./../../../../template/Categories"
+
 let prevCategory = ""
 
 export default function useAdSearch(query, category, pageNumber, rowsPerPage) {
@@ -31,7 +33,7 @@ export default function useAdSearch(query, category, pageNumber, rowsPerPage) {
       page: pageNumber,
       category: category
     };
-    if (category == "" || category == "не указана") {
+    if (category == "" || category == CategoryNo) {
       params = {
         rows_per_page: rowsPerPage,
         page: pageNumber

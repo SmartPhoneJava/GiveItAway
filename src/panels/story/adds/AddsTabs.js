@@ -106,6 +106,7 @@ const AddsTabs = props => {
         </List>
       </PanelHeaderContext>
       <AddsTab
+        dropFilters={props.dropFilters}
         category={props.category}
         setPopout={props.setPopout}
         onFiltersClick={props.onFiltersClick}

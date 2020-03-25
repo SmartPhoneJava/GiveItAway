@@ -35,6 +35,8 @@ import Icon24DoneOutline from "@vkontakte/icons/dist/24/done_outline";
 import {User} from "../../../store/user";
 import {Addr} from "../../../store/addr";
 
+import {CategoryNo} from "./../../template/Categories"
+
 import Icon24Locate from "@vkontakte/icons/dist/32/place";
 
 let itemID = 1;
@@ -92,7 +94,7 @@ const CreateAdd = props => {
       if (
         val.category === undefined ||
         val.category.length == 0 ||
-        v.category == "Не определена"
+        v.category == CategoryNo
       ) {
         v = false;
       }
