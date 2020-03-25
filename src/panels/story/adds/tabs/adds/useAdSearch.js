@@ -3,11 +3,19 @@ import axios from "axios";
 
 import { Addr } from "./../../../../../store/addr";
 
-import { CategoryNo} from "./../../../../template/Categories"
+import { User } from "./AddsTab/../../../../../../store/user"
 
-let prevCategory = ""
+import { CategoryNo } from "./../../../../template/Categories";
 
-export default function useAdSearch(query, category, pageNumber, rowsPerPage) {
+let prevCategory = "";
+
+export default function useAdSearch(
+  query,
+  category,
+  mode,
+  pageNumber,
+  rowsPerPage
+) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [ads, setAds] = useState([]);
@@ -15,7 +23,7 @@ export default function useAdSearch(query, category, pageNumber, rowsPerPage) {
 
   useEffect(() => {
     setAds([]);
-  }, [category, query]);
+  }, [category, mode, query]);
 
   useEffect(() => {
     setLoading(true);
@@ -23,10 +31,10 @@ export default function useAdSearch(query, category, pageNumber, rowsPerPage) {
     let cancel;
 
     if (prevCategory != category) {
-        pageNumber = 1
-      }
-      console.log("prevCategory:", prevCategory, category, pageNumber)
-      prevCategory = category
+      pageNumber = 1;
+    }
+    console.log("prevCategory:", prevCategory, category, pageNumber);
+    prevCategory = category;
 
     let params = {
       rows_per_page: rowsPerPage,
@@ -38,6 +46,9 @@ export default function useAdSearch(query, category, pageNumber, rowsPerPage) {
         rows_per_page: rowsPerPage,
         page: pageNumber
       };
+    }
+    if (mode != "all") {
+        params.author_id = 343 //"User.getState().vk_id" 
     }
 
     axios({
@@ -61,7 +72,7 @@ export default function useAdSearch(query, category, pageNumber, rowsPerPage) {
         setError(true);
       });
     return () => cancel();
-  }, [category, query, pageNumber]);
+  }, [category, mode, query, pageNumber]);
 
   return { newPage: pageNumber, loading, error, ads, hasMore };
 }

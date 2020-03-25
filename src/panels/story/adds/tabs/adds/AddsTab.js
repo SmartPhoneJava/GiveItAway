@@ -149,6 +149,7 @@ const AddsTab = props => {
   const { loading, error, ads, hasMore, newPage } = useAdSearch(
     search,
     props.category,
+    props.mode,
     pageNumber,
     5
   );

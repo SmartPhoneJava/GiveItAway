@@ -7,7 +7,7 @@
   "scripts": {
     "start": "cross-env PORT=10888 HTTPS=true react-scripts start",
     "build": "webpack --mode development",
-    "predeploy": "npm run build",
+    "predeploy": "webpack --mode development && npm run build",
     "deploy": "vk-miniapps-deploy"
   },
   "keywords": [],

@@ -9,11 +9,11 @@ import {
   Tabs
 } from "@vkontakte/vkui";
 
-import Icon24Done from "@vkontakte/icons/dist/24/done";
-import Icon24Notification from "@vkontakte/icons/dist/24/notification";
-import Icon16Dropdown from "@vkontakte/icons/dist/16/dropdown";
+import Icon28LiveOutline from '@vkontakte/icons/dist/28/live_outline';
+import Icon28UserCircleOutline from '@vkontakte/icons/dist/28/user_circle_outline';
 
-import Icon28SettingsOutline from "@vkontakte/icons/dist/28/settings_outline";
+import Icon24Done from "@vkontakte/icons/dist/24/done";
+import Icon16Dropdown from "@vkontakte/icons/dist/16/dropdown";
 
 import AddsTab from "./tabs/adds/AddsTab";
 
@@ -38,11 +38,6 @@ const AddsTabs = props => {
       <PanelHeaderSimple
         left={<PanelHeaderButton />}
         separator={false}
-        right={
-          <PanelHeaderButton>
-            <Icon24Notification />
-          </PanelHeaderButton>
-        }
       >
         <Tabs>
           <TabsItem
@@ -84,7 +79,7 @@ const AddsTabs = props => {
       >
         <List>
           <Cell
-            before={<Icon28SettingsOutline />}
+            before={<Icon28LiveOutline />}
             asideContent={
               mode === "all" ? <Icon24Done fill="var(--accent)" /> : null
             }
@@ -94,7 +89,7 @@ const AddsTabs = props => {
             Все
           </Cell>
           <Cell
-            before={<Icon28SettingsOutline />}
+            before={<Icon28UserCircleOutline />}
             asideContent={
               mode === "managed" ? <Icon24Done fill="var(--accent)" /> : null
             }
@@ -108,6 +103,7 @@ const AddsTabs = props => {
       <AddsTab
         dropFilters={props.dropFilters}
         category={props.category}
+        mode={mode}
         setPopout={props.setPopout}
         onFiltersClick={props.onFiltersClick}
       ></AddsTab>
