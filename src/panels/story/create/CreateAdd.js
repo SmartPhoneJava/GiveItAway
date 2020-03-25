@@ -32,10 +32,10 @@ import Icon24Favorite from "@vkontakte/icons/dist/24/favorite";
 import Icon24Cancel from "@vkontakte/icons/dist/24/cancel";
 import Icon24DoneOutline from "@vkontakte/icons/dist/24/done_outline";
 
-import {User} from "../../../store/user";
-import {Addr} from "../../../store/addr";
+import { User } from "../../../store/user";
+import { Addr } from "../../../store/addr";
 
-import {CategoryNo} from "./../../template/Categories"
+import { CategoryNo } from "./../../template/Categories";
 
 import Icon24Locate from "@vkontakte/icons/dist/32/place";
 
@@ -134,14 +134,17 @@ const CreateAdd = props => {
 
   function saveSuccess(goToAds) {
     if (props.snackbar) return;
-    goToAds(
+    goToAds();
+    //!!! RK1 /** */
+    /*
       <Snackbar
         onClose={() => {
-          props.setSnackbar(null)
+         
+          //props.setSnackbar(null)
         }}
         action="Отменить"
         onActionClick={() => {
-          /* тут запрос на удаление */
+          // тут запрос на удаление 
         }}
         before={
           <Avatar size={24} style={{ background: "green" }}>
@@ -150,19 +153,20 @@ const CreateAdd = props => {
         }
       >
         Объявление создано! Спасибо, что делаете мир лучше :)
-      </Snackbar>
-    );
-   
+      </Snackbar>*/
   }
 
   function saveFail(err) {
     if (props.snackbar) return;
+
+    /*//!!! RK1
+     
     props.setSnackbar(
       <Snackbar
         onClose={() => props.setSnackbar(null)}
         action="Повторить"
         onActionClick={() => {
-          /* тут запрос на повторение */
+          // тут запрос на повторение 
         }}
         before={
           <Avatar size={24} style={{ background: "red" }}>
@@ -172,11 +176,12 @@ const CreateAdd = props => {
       >
         Произошла ошибка: {err}
       </Snackbar>
-    );
+    );*/
   }
 
   function saveCancel() {
     if (props.snackbar) return;
+    /*//!!! RK1
     props.setSnackbar(
       <Snackbar
         onClose={() => props.setSnackbar(null)}
@@ -188,14 +193,16 @@ const CreateAdd = props => {
       >
         Пожалуйста, заполните все обязательные поля.
       </Snackbar>
-    );
+    );*/
   }
 
   function createAd(setPopout) {
-    checkItems()
-    console.log("cliiiick ", valid)
+    checkItems();
+    console.log("cliiiick ", valid);
     if (valid) {
-      setPopout(<ScreenSpinner size="large" />);
+      //!!! RK1
+      //setPopout(<ScreenSpinner size="large" />);
+
       const obj = JSON.stringify({
         author_id: User.getState().vk_id,
         header: items[0].name,
@@ -211,10 +218,11 @@ const CreateAdd = props => {
         category: items[0].category,
         comments_count: 0
       });
+
       console.log("loook at me", obj);
 
       async function fetchData() {
-        fetch(Addr.getState()+`/api/ad/create`, {
+        fetch(Addr.getState() + `/api/ad/create`, {
           method: "post",
           mode: "cors",
           body: obj,
@@ -225,7 +233,8 @@ const CreateAdd = props => {
               "Вот ответ от бека на запрос создания объявления ",
               response
             );
-            setPopout(null);
+            // !RK!
+            //setPopout(null);
             if (response.status == 201) {
               saveSuccess(props.goToAds);
             } else {
@@ -235,7 +244,8 @@ const CreateAdd = props => {
           })
           .catch(function(error) {
             console.log("Request failed", error);
-            setPopout(null);
+            // !RK!
+            //setPopout(null);
             saveFail(error);
           });
       }
@@ -339,7 +349,8 @@ const CreateAdd = props => {
           display: "flex"
         }}
       >
-        <Cell indicator={<Icon24Locate />} onClick={updateGeo}></Cell>
+        {/**   //!!! RK1 
+         *  <Cell indicator={<Icon24Locate />} onClick={updateGeo}></Cell>
         <Cell
           indicator={
             <Div
@@ -366,6 +377,7 @@ const CreateAdd = props => {
             {!hideGeo ? adress : "Скрыто"}
           </InfoRow>
         </Cell>
+        */}
       </Div>
       <Separator />
       <ChooseFeedback
@@ -398,7 +410,6 @@ const CreateAdd = props => {
           Добавить
         </Button>
       </Div>
-      
     </div>
   );
 };
