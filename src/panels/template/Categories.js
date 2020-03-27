@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Div, Select, FormLayout } from "@vkontakte/vkui";
+import {
+  Div,
+  Select,
+  FormLayout,
+  FormLayoutGroup,
+  Radio,
+  SelectMimicry
+} from "@vkontakte/vkui";
 
 import Icon24Done from "@vkontakte/icons/dist/24/done";
 
@@ -19,6 +26,7 @@ import Old from "./../../img/old.png";
 import Pencil from "./../../img/pencil.png";
 import Play from "./../../img/play.png";
 import Sport from "./../../img/sport.png";
+import Question from "./../../img/question.png";
 
 export const CategoryNo = "не определена";
 export const CategoryAnimals = "animals";
@@ -87,7 +95,7 @@ export function GetCategory(category) {
       image = Sport;
       break;
     case CategoryNo:
-      image = "";
+      image = Question;
       break;
   }
   return image;
@@ -146,27 +154,27 @@ export function GetCategoryImageSmall(category) {
   return <img src={image} className="category30" />;
 }
 
-export const Categories = props => {
-  const categories = [
-    CategoryNo,
-    CategoryAnimals,
-    CategoryBooks,
-    CategoryBuild,
-    CategoryChildren,
-    CategoryClothers,
-    CategoryCosmetic,
-    CategoryElectronics,
-    CategoryFlora,
-    CategoryFood,
-    CategoryFurniture,
-    CategoryMusic,
-    CategoryOld,
-    CategoryPencil,
-    CategoryPlay,
-    CategorySport,
-    CategoryAnother
-  ];
-  const [category, setCategory] = useState(props.category);
+export const categories = [
+  CategoryNo,
+  CategoryAnimals,
+  CategoryBooks,
+  CategoryBuild,
+  CategoryChildren,
+  CategoryClothers,
+  CategoryCosmetic,
+  CategoryElectronics,
+  CategoryFlora,
+  CategoryFood,
+  CategoryFurniture,
+  CategoryMusic,
+  CategoryOld,
+  CategoryPencil,
+  CategoryPlay,
+  CategorySport,
+  CategoryAnother
+];
+
+export const CategoriesLabel = props => {
   return (
     <Div
       style={{
@@ -176,37 +184,60 @@ export const Categories = props => {
     >
       <Div
         style={{
-          display: "flex",
           alignContent: "flex-end",
           alignItems: "flex-end",
-          marginBottom: "10%",
           padding: "10px"
         }}
       >
-        {GetCategoryImageSmall(category)}
+        {GetCategoryImage(props.category)}
       </Div>
       <FormLayout>
-        <Select
-          onClick={e => {
-            const { _, value } = e.currentTarget;
-            props.choose(value);
-            setCategory(value);
-          }}
+        <SelectMimicry
           top="Категория"
-          placeholder={GetCategoryText(category)}
-        >
-          {categories.map((cat, i) => {
-            if (category != cat) {
-              return (
-                <option key={i} value={cat}>
-                  {GetCategoryText(cat)}
-                </option>
-              );
-            }
-            return "";
-          })}
-        </Select>
+          placeholder={GetCategoryText(props.category)}
+          onClick={() => props.open()}
+        />
       </FormLayout>
     </Div>
+  );
+};
+
+export const CategoriesRB = props => {
+  return (
+    <FormLayout>
+      <FormLayoutGroup>
+        {categories.map((cat, i) => {
+          if (props.category != cat) {
+            return (
+              <Radio
+                key={i}
+                name="cat"
+                value={cat}
+                onClick={e => {
+                  const { _, value } = e.currentTarget;
+                  props.choose(value);
+                }}
+              >
+                {GetCategoryText(cat)}
+              </Radio>
+            );
+          }
+          return (
+            <Radio
+              key={i}
+              name="cat"
+              value={cat}
+              defaultChecked
+              onClick={e => {
+                const { _, value } = e.currentTarget;
+                props.choose(value);
+              }}
+            >
+              {GetCategoryText(cat)}
+            </Radio>
+          );
+        })}
+      </FormLayoutGroup>
+    </FormLayout>
   );
 };

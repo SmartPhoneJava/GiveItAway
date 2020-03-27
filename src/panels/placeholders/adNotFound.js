@@ -1,19 +1,18 @@
 import React from "react";
 import { Placeholder, Button } from "@vkontakte/vkui";
 
-import Icon56UsersOutline from "@vkontakte/icons/dist/56/users_outline";
+import Icon56ErrorOutline from '@vkontakte/icons/dist/56/error_outline';
 
-const AdNotFound = dropFilters => {
+const AdNotFound = props => {
   return (
     <Placeholder
-      icon={<Icon56UsersOutline />}
+      icon={<Icon56ErrorOutline />}
       header="Упс &#128566;"
       action={
-        <Button onClick={() => dropFilters()} size="l">
+        <Button onClick={() => props.dropFilters()} size="l">
           Сбросить фильтры
         </Button>
       }
-      stretched={true}
     >
       Кажется, ничего не удалось найти. Попробуйте изменить фильтры, чтобы найти
       больше объявлений!

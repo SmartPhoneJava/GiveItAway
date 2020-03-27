@@ -3,7 +3,7 @@ import axios from "axios";
 
 import { Addr } from "./../../../../../store/addr";
 
-import { User } from "./AddsTab/../../../../../../store/user"
+import { User } from "./AddsTab/../../../../../../store/user";
 
 import { CategoryNo } from "./../../../../template/Categories";
 
@@ -48,7 +48,7 @@ export default function useAdSearch(
       };
     }
     if (mode != "all") {
-        params.author_id = 343 //"User.getState().vk_id" 
+      params.author_id = 343; //"User.getState().vk_id"
     }
 
     axios({
@@ -69,7 +69,9 @@ export default function useAdSearch(
       .catch(e => {
         console.log("fail", e);
         if (axios.isCancel(e)) return;
-        setError(true);
+        if ((""+e).indexOf("404") == -1) {
+          setError(true);
+        }
       });
     return () => cancel();
   }, [category, mode, query, pageNumber]);

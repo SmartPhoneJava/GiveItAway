@@ -2,14 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Search, Group, Placeholder, Button } from "@vkontakte/vkui";
 
 import Icon24Filter from "@vkontakte/icons/dist/24/filter";
-import Icon56UsersOutline from "@vkontakte/icons/dist/56/users_outline";
-import Icon56ErrorOutline from "@vkontakte/icons/dist/56/error_outline";
 
 import Add from "./../../../../template/Add";
-
-import { User } from "./../../../../../store/user";
-import { Addr } from "./../../../../../store/addr";
-import { AdsPage } from "../../../../../store/activeModal";
 
 import useAdSearch from "./useAdSearch";
 

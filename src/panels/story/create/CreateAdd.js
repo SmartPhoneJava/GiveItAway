@@ -273,9 +273,8 @@ const CreateAdd = props => {
             deleteMe={() => {
               setItems([...items.slice(0, i), ...items.slice(i + 1)]);
             }}
-            openCategories={() => {
-              props.openCategories(i);
-            }}
+
+            choose={props.chooseCategory}
             amount={item.amount}
             name={item.name}
             setItems={newItem => {
@@ -283,7 +282,7 @@ const CreateAdd = props => {
               items[i] = newItem;
               setItems([...items]);
             }}
-            category={item.category}
+            category={props.category}
             description={item.description}
           />
         ))}

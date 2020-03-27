@@ -6,10 +6,15 @@ import {
   Card,
   CardGrid,
   Div,
-  Textarea
+  Textarea,
+  SelectMimicry
 } from "@vkontakte/vkui";
 
-import { Categories } from "./../../../template/Categories";
+import {
+  Categories,
+  GetCategoryText,
+  CategoriesLabel
+} from "./../../../template/Categories";
 
 const amountLabel = "Количество";
 const nameLabel = "Название";
@@ -19,7 +24,6 @@ const descriptionLabel = "Описание";
 const CreateItem = props => {
   const [amount, setAmount] = useState("1");
   const [name, setName] = useState(props.name);
-  const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
 
   function checkAmount(a) {
@@ -61,7 +65,7 @@ const CreateItem = props => {
             <Input
               top={nameLabel}
               name={nameLabel}
-              size="20"
+              size="50"
               placeholder="футбольный мяч"
               value={name}
               onChange={e => {
@@ -70,25 +74,14 @@ const CreateItem = props => {
                 props.setItems({
                   amount,
                   name: value,
-                  category,
+                  caregory: props.category,
                   description
                 });
               }}
               status={name ? "valid" : "error"}
             />
           </FormLayout>
-
-          <Categories
-            choose={cat => {
-              setCategory(cat);
-              props.setItems({
-                amount,
-                name,
-                category: cat,
-                description
-              });
-            }}
-          />
+          <CategoriesLabel category={props.category} open={props.choose} />
         </Div>
         <Div
           style={{
@@ -107,8 +100,8 @@ const CreateItem = props => {
                 props.setItems({
                   amount,
                   name,
-                  category,
-                  description: value,
+                  category: props.category,
+                  description: value
                 });
               }}
               status={description ? "valid" : "error"}

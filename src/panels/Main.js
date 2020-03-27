@@ -7,34 +7,8 @@ import {
   Epic,
   Tabbar,
   TabbarItem,
-  Radio,
-  SelectMimicry,
-  FormLayoutGroup,
-  FormLayout,
-  ModalRoot,
-  ModalPage,
-  ModalPageHeader,
-  PanelHeaderButton,
-  IS_PLATFORM_ANDROID,
-  IS_PLATFORM_IOS,
   Placeholder,
-  ScreenSpinner,
-  Input,
-  Select,
-  Checkbox,
-  Link,
-  Button,
-  Textarea,
-  Card,
-  Group,
-  Header,
-  CardGrid,
-  Div,
-  Counter,
-  Cell,
-  List,
-  PanelHeaderBack,
-  PanelHeaderSimple
+  Button
 } from "@vkontakte/vkui";
 
 import AddsTabs from "./story/adds/AddsTabs";
@@ -43,36 +17,15 @@ import CreateAdd from "./story/create/CreateAdd";
 import Icon28User from "@vkontakte/icons/dist/28/user";
 import Icon28NewsfeedOutline from "@vkontakte/icons/dist/28/newsfeed_outline";
 import Icon28Add from "@vkontakte/icons/dist/28/add_outline";
-import Icon24Done from "@vkontakte/icons/dist/24/done";
-import Icon24Dismiss from "@vkontakte/icons/dist/24/dismiss";
-import Icon24CommentOutline from "@vkontakte/icons/dist/24/comment_outline";
-import Icon24Cancel from "@vkontakte/icons/dist/24/cancel";
 
 import Icon56UsersOutline from "@vkontakte/icons/dist/56/users_outline";
 
 import { User } from "../store/user";
 import { Addr } from "../store/addr";
-import {
-  GetCategoryText,
-  GetCategoryImage,
-  CategoryNo,
-  CategoryAnimals,
-  CategoryAnother,
-  CategoryBooks,
-  CategoryBuild,
-  CategoryChildren,
-  CategoryClothers,
-  CategoryCosmetic,
-  CategoryElectronics,
-  CategoryFlora,
-  CategoryFood,
-  CategoryFurniture,
-  CategoryMusic,
-  CategoryOld,
-  CategoryPencil,
-  CategoryPlay,
-  CategorySport
-} from "./template/Categories";
+import { CategoryNo } from "./template/Categories";
+
+import AddsModal, { MODAL_FILTERS, MODAL_CATEGORIES } from "./story/adds/AddsModal";
+import CreateModal from "./story/create/CreateModal"
 
 const ads = "ads";
 const adsText = "Объявления";
@@ -88,6 +41,7 @@ const Main = () => {
 
   const [activeStory, setActiveStory] = useState(ads);
   const [category, setCategory] = useState(CategoryNo);
+  const [category2, setCategory2] = useState(CategoryNo);
 
   const onStoryChange = e => {
     setActiveStory(e.currentTarget.dataset.story);
@@ -95,14 +49,13 @@ const Main = () => {
 
   const [activePanel, setActivePanel] = useState("header-search");
   const [activeModal, setActiveModal] = useState(null);
+  const [activeModal2, setActiveModal2] = useState(null);
   const [snackbar, setSnackbar] = useState(null);
 
   function goSearch() {
     setActivePanel("search");
   }
-  function hideModal() {
-    setActiveModal(null);
-  }
+
   function goToAds(snack) {
     setActiveStory(ads);
     if (snack != undefined) {
@@ -120,8 +73,8 @@ const Main = () => {
     });
 
     async function checkMe(user) {
-      console.log("secret:", window.location.href)
-      console.log("news:", document.location.href )
+      console.log("secret:", window.location.href);
+      console.log("news:", document.location.href);
       fetch(Addr.getState() + `/api/user/auth`, {
         method: "post",
         mode: "cors",
@@ -163,26 +116,6 @@ const Main = () => {
     fetchData();
   }, []);
 
-  const categories = [
-    CategoryNo,
-    CategoryAnimals,
-    CategoryBooks,
-    CategoryBuild,
-    CategoryChildren,
-    CategoryClothers,
-    CategoryCosmetic,
-    CategoryElectronics,
-    CategoryFlora,
-    CategoryFood,
-    CategoryFurniture,
-    CategoryMusic,
-    CategoryOld,
-    CategoryPencil,
-    CategoryPlay,
-    CategorySport,
-    CategoryAnother
-  ];
-
   return (
     <Epic
       activeStory={activeStory}
@@ -221,151 +154,18 @@ const Main = () => {
         id={ads}
         activePanel={activePanel}
         modal={
-          <ModalRoot activeModal={activeModal}>
-            <ModalPage
-              id="filters"
-              onClose={hideModal}
-              header={
-                <ModalPageHeader
-                  left={
-                    IS_PLATFORM_ANDROID && (
-                      <PanelHeaderButton onClick={hideModal}>
-                        <Icon24Cancel />
-                      </PanelHeaderButton>
-                    )
-                  }
-                  right={
-                    <PanelHeaderButton onClick={hideModal}>
-                      {IS_PLATFORM_IOS ? "Готово" : <Icon24Done />}
-                    </PanelHeaderButton>
-                  }
-                >
-                  Фильтры
-                </ModalPageHeader>
-              }
-            >
-              <Div
-                style={{
-                  display: "flex",
-                  padding: "0px",
-                  alignContent: "center",
-                  alignItems: "center"
-                }}
-              >
-                <Div
-                  style={{
-                    alignContent: "flex-end",
-                    alignItems: "flex-end",
-                    padding: "10px"
-                  }}
-                >
-                  {GetCategoryImage(category)}
-                </Div>
-
-                <FormLayout onClick={() => setActiveModal("categories")}>
-                  <Select
-                    top="Категория"
-                    placeholder={GetCategoryText(category)}
-                    disabled={true}
-                  >
-                    {categories.map((cat, i) => {
-                      if (category == cat) {
-                        return (
-                          <option
-                            key={i}
-                            value={cat}
-                            onClick={() => setActiveModal("categories")}
-                          >
-                            {GetCategoryText(cat)}
-                          </option>
-                        );
-                      }
-                      return "";
-                    })}
-                  </Select>
-                </FormLayout>
-                <Button
-                  mode="primary"
-                  onClick={() => setActiveModal("categories")}
-                  size="l"
-                >
-                  Изменить
-                </Button>
-              </Div>
-            </ModalPage>
-            <ModalPage
-              id="categories"
-              header={
-                <ModalPageHeader
-                  left={
-                    IS_PLATFORM_ANDROID && (
-                      <PanelHeaderButton
-                        onClick={() => setActiveModal("filters")}
-                      >
-                        <Icon24Cancel />
-                      </PanelHeaderButton>
-                    )
-                  }
-                  right={
-                    IS_PLATFORM_IOS && (
-                      <PanelHeaderButton
-                        onClick={() => setActiveModal("filters")}
-                      >
-                        <Icon24Dismiss />
-                      </PanelHeaderButton>
-                    )
-                  }
-                >
-                  Выберите категорию
-                </ModalPageHeader>
-              }
-              settlingHeight={80}
-            >
-              <FormLayout>
-                <FormLayoutGroup>
-                  {categories.map((cat, i) => {
-                    if (category != cat) {
-                      return (
-                        <Radio
-                          key={i}
-                          name="cat"
-                          value={cat}
-                          onClick={e => {
-                            const { _, value } = e.currentTarget;
-                            setCategory(value);
-                            setActiveModal("filters");
-                          }}
-                        >
-                          {GetCategoryText(cat)}
-                        </Radio>
-                      );
-                    }
-                    return (
-                      <Radio
-                        key={i}
-                        name="cat"
-                        value={cat}
-                        defaultChecked
-                        onClick={e => {
-                          const { _, value } = e.currentTarget;
-                          setCategory(value);
-                          setActiveModal("filters");
-                        }}
-                      >
-                        {GetCategoryText(cat)}
-                      </Radio>
-                    );
-                  })}
-                </FormLayoutGroup>
-              </FormLayout>
-            </ModalPage>
-          </ModalRoot>
+          <AddsModal
+            activeModal={activeModal}
+            setActiveModal={setActiveModal}
+            category={category}
+            setCategory={setCategory}
+          />
         }
         header={false}
       >
         <Panel id="header-search" separator={false}>
           <AddsTabs
-            onFiltersClick={() => setActiveModal("filters")}
+            onFiltersClick={() => setActiveModal(MODAL_FILTERS)}
             goSearch={goSearch}
             setPopout={setPopout}
             category={category}
@@ -375,7 +175,14 @@ const Main = () => {
         </Panel>
       </View>
 
-      <View id={add} activePanel={add} popout={popout}>
+      <View id={add} activePanel={add} popout={popout} modal={
+          <CreateModal
+            activeModal={activeModal2}
+            setActiveModal={setActiveModal2}
+            category={category2}
+            setCategory={setCategory2}
+          />
+        }>
         <Panel id={add}>
           <PanelHeader>{addText}</PanelHeader>
           <CreateAdd
@@ -383,6 +190,8 @@ const Main = () => {
             goToAds={goToAds}
             snackbar={snackbar}
             setSnackbar={setSnackbar}
+            category={category2}
+            chooseCategory={() => setActiveModal2(MODAL_CATEGORIES)}
           />
           {snackbar}
         </Panel>
@@ -394,7 +203,7 @@ const Main = () => {
             icon={<Icon56UsersOutline />}
             header="В разработке. Загляните позже &#128522;"
             action={
-              <Button onClick={()=>setActiveStory(ads)} size="l">
+              <Button onClick={() => setActiveStory(ads)} size="l">
                 Вернуться к ленте объявлений
               </Button>
             }
