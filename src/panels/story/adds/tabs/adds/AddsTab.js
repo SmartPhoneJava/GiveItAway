@@ -3,6 +3,7 @@ import { Search, Group, Placeholder, Button } from "@vkontakte/vkui";
 
 import Icon24Filter from "@vkontakte/icons/dist/24/filter";
 import Icon56UsersOutline from "@vkontakte/icons/dist/56/users_outline";
+import Icon56ErrorOutline from "@vkontakte/icons/dist/56/error_outline";
 
 import Add from "./../../../../template/Add";
 
@@ -11,6 +12,9 @@ import { Addr } from "./../../../../../store/addr";
 import { AdsPage } from "../../../../../store/activeModal";
 
 import useAdSearch from "./useAdSearch";
+
+import Error from "./../../../../placeholders/error";
+import AdNotFound from "./../../../../placeholders/adNotFound";
 
 const addsArrDD = [
   {
@@ -184,7 +188,7 @@ const AddsTab = props => {
         onIconClick={props.onFiltersClick}
       />
       <Group>
-        {ads.length > 0 ? 
+        {ads.length > 0 ? (
           ads.map((ad, index) => {
             if (ads.length === index + 1) {
               return (
@@ -231,21 +235,11 @@ const AddsTab = props => {
               );
             }
           })
-         : 
-          <Placeholder
-            icon={<Icon56UsersOutline />}
-            header="Упс &#128566;"
-            action={
-              <Button onClick={() => props.dropFilters()} size="l">
-                Сбросить фильтры
-              </Button>
-            }
-            stretched={true}
-          >
-            Кажется, ничего не удалось найти. Попробуйте изменить фильтры, чтобы
-            найти больше объявлений!
-          </Placeholder>
-        }
+        ) : error ? (
+          <Error />
+        ) : (
+          <AdNotFound dropFilters={props.dropFilters} />
+        )}
       </Group>
     </>
   );

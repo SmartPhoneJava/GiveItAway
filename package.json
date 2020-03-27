@@ -1,13 +1,13 @@
 {
-  "name": "hello_world",
-  "version": "1.0.0",
+  "name": "give",
+  "version": "1.0.1",
   "description": "",
-  "homepage": "./",
-  "main": "index.js",
+  "homepage": "./public/",
+  "main": "bundle.js",
   "scripts": {
     "start": "cross-env PORT=10888 HTTPS=true react-scripts start",
     "build": "webpack --mode development",
-    "predeploy": "webpack --mode development && npm run build",
+    "predeploy": "webpack --mode development",
     "deploy": "vk-miniapps-deploy"
   },
   "keywords": [],

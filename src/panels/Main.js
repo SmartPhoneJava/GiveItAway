@@ -120,6 +120,8 @@ const Main = () => {
     });
 
     async function checkMe(user) {
+      console.log("secret:", window.location.href)
+      console.log("news:", document.location.href )
       fetch(Addr.getState() + `/api/user/auth`, {
         method: "post",
         mode: "cors",

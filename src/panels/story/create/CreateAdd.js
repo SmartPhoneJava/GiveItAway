@@ -32,10 +32,10 @@ import Icon24Favorite from "@vkontakte/icons/dist/24/favorite";
 import Icon24Cancel from "@vkontakte/icons/dist/24/cancel";
 import Icon24DoneOutline from "@vkontakte/icons/dist/24/done_outline";
 
-import {User} from "../../../store/user";
-import {Addr} from "../../../store/addr";
+import { User } from "../../../store/user";
+import { Addr } from "../../../store/addr";
 
-import {CategoryNo} from "./../../template/Categories"
+import { CategoryNo } from "./../../template/Categories";
 
 import Icon24Locate from "@vkontakte/icons/dist/32/place";
 
@@ -133,11 +133,10 @@ const CreateAdd = props => {
   }, []);
 
   function saveSuccess(goToAds) {
-    if (props.snackbar) return;
     goToAds(
       <Snackbar
         onClose={() => {
-          props.setSnackbar(null)
+          props.setSnackbar(null);
         }}
         action="Отменить"
         onActionClick={() => {
@@ -152,17 +151,16 @@ const CreateAdd = props => {
         Объявление создано! Спасибо, что делаете мир лучше :)
       </Snackbar>
     );
-   
   }
 
-  function saveFail(err) {
-    if (props.snackbar) return;
+  function saveFail(err, repeat) {
     props.setSnackbar(
       <Snackbar
         onClose={() => props.setSnackbar(null)}
         action="Повторить"
         onActionClick={() => {
-          /* тут запрос на повторение */
+          props.setSnackbar(null);
+          repeat();
         }}
         before={
           <Avatar size={24} style={{ background: "red" }}>
@@ -176,7 +174,6 @@ const CreateAdd = props => {
   }
 
   function saveCancel() {
-    if (props.snackbar) return;
     props.setSnackbar(
       <Snackbar
         onClose={() => props.setSnackbar(null)}
@@ -192,8 +189,7 @@ const CreateAdd = props => {
   }
 
   function createAd(setPopout) {
-    checkItems()
-    console.log("cliiiick ", valid)
+    checkItems();
     if (valid) {
       setPopout(<ScreenSpinner size="large" />);
       const obj = JSON.stringify({
@@ -214,7 +210,7 @@ const CreateAdd = props => {
       console.log("loook at me", obj);
 
       async function fetchData() {
-        fetch(Addr.getState()+`/api/ad/create`, {
+        fetch(Addr.getState() + `/api/ad/create`, {
           method: "post",
           mode: "cors",
           body: obj,
@@ -229,14 +225,16 @@ const CreateAdd = props => {
             if (response.status == 201) {
               saveSuccess(props.goToAds);
             } else {
-              saveFail(response.status + " - " + response.statusText);
+              saveFail(response.status + " - " + response.statusText, () =>
+                createAd(setPopout)
+              );
             }
             return response.json();
           })
           .catch(function(error) {
             console.log("Request failed", error);
             setPopout(null);
-            saveFail(error);
+            saveFail("Нет соединения с сервером", () => createAd(setPopout));
           });
       }
       fetchData();
@@ -398,7 +396,6 @@ const CreateAdd = props => {
           Добавить
         </Button>
       </Div>
-      
     </div>
   );
 };
