@@ -1,5 +1,5 @@
 {
-  "static_path": "public",
+  "static_path": "build",
   "app_id": 7360033,
   "endpoints": {
     "mobile": "index.html",

@@ -6,8 +6,8 @@
   "main": "bundle.js",
   "scripts": {
     "start": "cross-env PORT=10888 HTTPS=true react-scripts start",
-    "build": "webpack",
-    "now-build": "webpack --mode development",
+    "build": "webpack --mode production",
+    "now-build": "webpack --mode production",
     "deploy": "vk-miniapps-deploy"
   },
   "keywords": [],
@@ -17,6 +17,7 @@
     "babel-core": "^6.26.3",
     "babel-preset-env": "^1.7.0",
     "cross-env": "^5.2.1",
+    "html-webpack-plugin": "^4.0.2",
     "react-hot-loader": "^4.12.20",
     "react-scripts": "^3.4.0",
     "redux-devtools": "^3.5.0"
