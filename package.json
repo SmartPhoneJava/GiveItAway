@@ -6,7 +6,7 @@
   "main": "bundle.js",
   "scripts": {
     "start": "cross-env PORT=10888 HTTPS=true react-scripts start",
-    "build": "webpack --mode production",
+    "build": "react-scripts build",
     "now-build": "webpack --mode production",
     "deploy": "vk-miniapps-deploy"
   },
