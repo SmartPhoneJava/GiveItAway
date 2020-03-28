@@ -21,6 +21,8 @@ import Icon28Add from "@vkontakte/icons/dist/28/add_outline";
 import Icon56UsersOutline from "@vkontakte/icons/dist/56/users_outline";
 
 import { User } from "../store/user";
+import { VkUser } from "../store/vkUser";
+
 import { Addr } from "../store/addr";
 import { CategoryNo } from "./template/Categories";
 
@@ -74,7 +76,7 @@ const Main = () => {
 
     async function checkMe(user) {
       console.log("secret:", window.location.href);
-      console.log("news:", document.location.href);
+      console.log("user user:", user);
       fetch(Addr.getState() + `/api/user/auth`, {
         method: "post",
         mode: "cors",
@@ -111,6 +113,13 @@ const Main = () => {
     async function fetchData() {
       const us = await bridge.send("VKWebAppGetUserInfo");
       setPopout(null);
+      VkUser.dispatch({ type: "set", new_state: us });
+      
+      const uss = await bridge.send("VKWebAppGetPersonalCard", {
+        type: ["phone", "email", "address"]
+      });
+      console.log("hello:", uss);
+      
       checkMe(us);
     }
     fetchData();
@@ -191,6 +200,7 @@ const Main = () => {
             snackbar={snackbar}
             setSnackbar={setSnackbar}
             category={category2}
+            VkUser={VkUser}
             chooseCategory={() => setActiveModal2(MODAL_CATEGORIES)}
           />
           {snackbar}

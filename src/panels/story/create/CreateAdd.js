@@ -14,7 +14,7 @@ import {
   InfoRow,
   Checkbox,
   Cell,
-  Link,
+  SelectMimicry,
   Separator,
   ScreenSpinner,
   Snackbar,
@@ -243,6 +243,13 @@ const CreateAdd = props => {
     }
   }
 
+  async function getUserInfo() {
+    const us = await bridge.send("VKWebAppGetPersonalCard", {
+      type: ["phone", "email", "address"]
+    });
+    console.log("hello:", us);
+  }
+
   return (
     <div>
       {/*
@@ -273,7 +280,6 @@ const CreateAdd = props => {
             deleteMe={() => {
               setItems([...items.slice(0, i), ...items.slice(i + 1)]);
             }}
-
             choose={props.chooseCategory}
             amount={item.amount}
             name={item.name}
@@ -363,6 +369,29 @@ const CreateAdd = props => {
             {!hideGeo ? adress : "Скрыто"}
           </InfoRow>
         </Cell>
+      </Div>
+      <Div
+        style={{
+          display: "flex",
+          padding: "0px"
+        }}
+      >
+        <FormLayout>
+          <SelectMimicry
+            top="Категория"
+            placeholder="хм"
+            onClick={() => {
+              getUserInfo();
+            }}
+          />
+        </FormLayout>
+        <FormLayout>
+          <SelectMimicry
+            top="Категория"
+            placeholder="хм"
+            onClick={() => props.open()}
+          />
+        </FormLayout>
       </Div>
       <Separator />
       <ChooseFeedback

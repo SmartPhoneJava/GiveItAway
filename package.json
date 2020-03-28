@@ -2,12 +2,12 @@
   "name": "give",
   "version": "1.0.1",
   "description": "",
-  "homepage": "./public/",
+  "homepage": "./",
   "main": "bundle.js",
   "scripts": {
     "start": "cross-env PORT=10888 HTTPS=true react-scripts start",
     "build": "webpack --mode development",
-    "predeploy": "webpack --mode development",
+    "now-build": "webpack --mode development",
     "deploy": "vk-miniapps-deploy"
   },
   "keywords": [],
