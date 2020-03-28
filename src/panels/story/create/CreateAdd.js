@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import bridge from "@vkontakte/vk-bridge";
+import axios from "axios";
 import {
   Button,
   Textarea,
@@ -47,12 +48,12 @@ const CreateAdd = props => {
       id: itemID,
       name: "",
       category: "",
-      description: ""
+      description: "",
+      photos: []
     }
   ]);
 
   function setItems(r) {
-    console.log("we are logs:", r);
     setItemsR(r);
     checkItems();
   }
@@ -85,6 +86,7 @@ const CreateAdd = props => {
   function checkItems() {
     let v = true;
     items.forEach(val => {
+      console.log("item!!!!", val, props.category);
       if (val.name === undefined || val.name.length == 0) {
         v = false;
       }
@@ -92,9 +94,9 @@ const CreateAdd = props => {
         v = false;
       }
       if (
-        val.category === undefined ||
-        val.category.length == 0 ||
-        v.category == CategoryNo
+        props.category === undefined ||
+        props.category.length == 0 ||
+        props.category == CategoryNo
       ) {
         v = false;
       }
@@ -132,7 +134,24 @@ const CreateAdd = props => {
     updateGeo();
   }, []);
 
-  function saveSuccess(goToAds) {
+  function saveSuccess(goToAds, id) {
+    items.forEach(item => {
+      item.photos.forEach(photo => {
+        const data = new FormData();
+        console.log("fiile", photo);
+        data.append("file", photo);
+
+        axios
+          .post(Addr.getState() + "/api/ad/" + id + "/upload_image", data)
+          .then(function(response) {
+            console.log("success uploaded", response);
+          })
+          .catch(function(error) {
+            console.log("failed uploaded", error);
+          });
+      });
+    });
+
     goToAds(
       <Snackbar
         onClose={() => {
@@ -209,45 +228,38 @@ const CreateAdd = props => {
       });
       console.log("loook at me", obj);
 
-      async function fetchData() {
-        fetch(Addr.getState() + `/api/ad/create`, {
-          method: "post",
-          mode: "cors",
-          body: obj,
-          credentials: "include"
-        })
-          .then(function(response) {
-            console.log(
-              "Вот ответ от бека на запрос создания объявления ",
-              response
+      let cancel;
+
+      axios({
+        method: "post",
+        url: Addr.getState() + "/api/ad/create",
+        data: obj,
+        cancelToken: new axios.CancelToken(c => (cancel = c))
+      })
+        .then(function(response) {
+          console.log(
+            "Вот ответ от бека на запрос создания объявления ",
+            response
+          );
+          console.log("json json json ", response.data);
+          setPopout(null);
+          if (response.status == 201) {
+            saveSuccess(props.goToAds, response.data.ad_id);
+          } else {
+            saveFail(response.status + " - " + response.statusText, () =>
+              createAd(setPopout)
             );
-            setPopout(null);
-            if (response.status == 201) {
-              saveSuccess(props.goToAds);
-            } else {
-              saveFail(response.status + " - " + response.statusText, () =>
-                createAd(setPopout)
-              );
-            }
-            return response.json();
-          })
-          .catch(function(error) {
-            console.log("Request failed", error);
-            setPopout(null);
-            saveFail("Нет соединения с сервером", () => createAd(setPopout));
-          });
-      }
-      fetchData();
+          }
+          return response.data;
+        })
+        .catch(function(error) {
+          console.log("Request failed", error);
+          setPopout(null);
+          saveFail("Нет соединения с сервером", () => createAd(setPopout));
+        });
     } else {
       saveCancel();
     }
-  }
-
-  async function getUserInfo() {
-    const us = await bridge.send("VKWebAppGetPersonalCard", {
-      type: ["phone", "email", "address"]
-    });
-    console.log("hello:", us);
   }
 
   return (
@@ -276,6 +288,7 @@ const CreateAdd = props => {
         {items.map((item, i) => (
           <CreateItem
             key={item.id}
+            item={item}
             len={items.length}
             deleteMe={() => {
               setItems([...items.slice(0, i), ...items.slice(i + 1)]);
@@ -377,13 +390,7 @@ const CreateAdd = props => {
         }}
       >
         <FormLayout>
-          <SelectMimicry
-            top="Категория"
-            placeholder="хм"
-            onClick={() => {
-              getUserInfo();
-            }}
-          />
+          <SelectMimicry top="Категория" placeholder="хм" onClick={() => {}} />
         </FormLayout>
         <FormLayout>
           <SelectMimicry

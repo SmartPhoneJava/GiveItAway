@@ -7,7 +7,6 @@
   "scripts": {
     "start": "cross-env PORT=10888 HTTPS=true react-scripts start",
     "build": "react-scripts build",
-    "now-build": "webpack --mode production",
     "deploy": "vk-miniapps-deploy"
   },
   "keywords": [],
@@ -44,6 +43,7 @@
     "prop-types": "^15.7.2",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
+    "react-image-gallery": "^1.0.7",
     "react-infinite-scroller": "^1.2.4",
     "react-native-geocoding": "^0.4.0",
     "react-native-geolocation-service": "^4.0.0",

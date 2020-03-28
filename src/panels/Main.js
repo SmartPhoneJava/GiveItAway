@@ -26,8 +26,11 @@ import { VkUser } from "../store/vkUser";
 import { Addr } from "../store/addr";
 import { CategoryNo } from "./template/Categories";
 
-import AddsModal, { MODAL_FILTERS, MODAL_CATEGORIES } from "./story/adds/AddsModal";
-import CreateModal from "./story/create/CreateModal"
+import AddsModal, {
+  MODAL_FILTERS,
+  MODAL_CATEGORIES
+} from "./story/adds/AddsModal";
+import CreateModal from "./story/create/CreateModal";
 
 const ads = "ads";
 const adsText = "Объявления";
@@ -114,12 +117,7 @@ const Main = () => {
       const us = await bridge.send("VKWebAppGetUserInfo");
       setPopout(null);
       VkUser.dispatch({ type: "set", new_state: us });
-      
-      const uss = await bridge.send("VKWebAppGetPersonalCard", {
-        type: ["phone", "email", "address"]
-      });
-      console.log("hello:", uss);
-      
+
       checkMe(us);
     }
     fetchData();
@@ -184,14 +182,19 @@ const Main = () => {
         </Panel>
       </View>
 
-      <View id={add} activePanel={add} popout={popout} modal={
+      <View
+        id={add}
+        activePanel={add}
+        popout={popout}
+        modal={
           <CreateModal
             activeModal={activeModal2}
             setActiveModal={setActiveModal2}
             category={category2}
             setCategory={setCategory2}
           />
-        }>
+        }
+      >
         <Panel id={add}>
           <PanelHeader>{addText}</PanelHeader>
           <CreateAdd
