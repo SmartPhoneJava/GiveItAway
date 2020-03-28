@@ -48,7 +48,7 @@ export default function useAdSearch(
       };
     }
     if (mode != "all") {
-      params.author_id = 343; //"User.getState().vk_id"
+      params.author_id = User.getState().vk_id
     }
 
     axios({

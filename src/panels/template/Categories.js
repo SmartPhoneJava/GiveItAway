@@ -179,18 +179,12 @@ export const CategoriesLabel = props => {
     <Div
       style={{
         display: "flex",
+        alignContent: "center",
+        alignItems: "center",
         padding: "0px"
       }}
     >
-      <Div
-        style={{
-          alignContent: "flex-end",
-          alignItems: "flex-end",
-          padding: "10px"
-        }}
-      >
-        {GetCategoryImage(props.category)}
-      </Div>
+      {GetCategoryImage(props.category)}
       <FormLayout>
         <SelectMimicry
           top="Категория"

@@ -1,13 +1,29 @@
 import React, { useState } from 'react';
-import { FormLayout, Input, Button, Card, CardGrid, Div, Textarea, File, HorizontalScroll } from '@vkontakte/vkui';
+import {
+	FormLayout,
+	Input,
+	Button,
+	Card,
+	CardGrid,
+	InfoRow,
+	Div,
+	Textarea,
+	File,
+	HorizontalScroll,
+	Avatar,
+	Snackbar,
+} from '@vkontakte/vkui';
 
 import { CategoriesLabel } from './../../../template/Categories';
 
 import Icon24Camera from '@vkontakte/icons/dist/24/camera';
+import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 
 const nameLabel = 'Название';
 const categoryLabel = 'Категория';
 const descriptionLabel = 'Описание';
+
+const PHOTO_TEXT = 'Не более трех фотографий (jpeg, png) размером 4мб';
 
 const images = [
 	{
@@ -24,7 +40,10 @@ const images = [
 	},
 ];
 
+let KEY = 0;
+
 const CreateItem = props => {
+	const [photoText, setPhotoText] = useState(PHOTO_TEXT);
 	const [name, setName] = useState(props.name);
 	const [description, setDescription] = useState('');
 	const [photosUrl, setPhotosUrl] = useState([]);
@@ -41,8 +60,9 @@ const CreateItem = props => {
 			// Closure to capture the file information.
 			console.log('we are here');
 			reader.onload = (function(theFile) {
+				KEY++;
 				return function(e) {
-					setPhotosUrl([...photosUrl, e.target.result]);
+					setPhotosUrl([...photosUrl, { src: e.target.result, id: KEY }]);
 				};
 			})(f);
 			// Read in the image file as a data URL.
@@ -129,25 +149,59 @@ const CreateItem = props => {
 					</FormLayout>
 				</Div>
 				<FormLayout>
-					<File
-						top="Снимки вещей"
-						before={<Icon24Camera />}
-						size="l"
-						onChange={e => {
-							const file = e.target.files[0];
-							console.log('files', e.target.files);
-							console.log('file:', file);
-							props.setItems({
-								name,
-								category: props.category,
-								description: description,
-								photos: [...props.item.photos, file],
-							});
-							handleFileSelect(e);
+					<Div
+						top="Снимки"
+						style={{
+							display: 'flex',
+							padding: '0px',
+							textAlign: 'center',
 						}}
 					>
-						Открыть галерею
-					</File>
+						<File
+							top="Снимки вещей"
+              before={<Icon24Camera />}
+              disabled={photosUrl.length == 3}
+							mode={photosUrl.length == 3 ? 'secondary' : 'primary'}
+							onChange={e => {
+								const file = e.target.files[0];
+								console.log('files', e.target.files);
+								console.log('file:', file);
+								const newLength = photosUrl.length + 1;
+								setPhotoText(PHOTO_TEXT + '. Загружено ' + newLength + '/3');
+								props.setItems({
+									name,
+									category: props.category,
+									description: description,
+									photos: [...props.item.photos, file],
+								});
+								handleFileSelect(e);
+								if (newLength == 3) {
+									props.setSnackbar(
+										<Snackbar
+											onClose={() => props.setSnackbar(null)}
+											before={
+												<Avatar size={24} style={{ background: 'orange' }}>
+													<Icon24Favorite fill="#fff" width={14} height={14} />
+												</Avatar>
+											}
+										>
+											Достигнут лимит фотографий. Чтобы загрузить новые, удалите старые.
+										</Snackbar>
+									);
+								}
+							}}
+						>
+							Открыть галерею
+						</File>
+						<InfoRow
+							style={{
+								color: 'grey',
+								marginTop: '6px',
+							}}
+						>
+							{photoText}
+						</InfoRow>
+					</Div>
 					<Div
 						style={{
 							display: 'flex',
@@ -160,6 +214,7 @@ const CreateItem = props => {
 								{photosUrl.map((img, i) => {
 									return (
 										<div
+											key={img.key}
 											style={{
 												alignItems: 'center',
 												justifyContent: 'center',
@@ -167,8 +222,7 @@ const CreateItem = props => {
 											}}
 										>
 											<img
-												key={i}
-												src={img}
+												src={img.src}
 												style={{
 													height: '120px',
 												}}
@@ -176,12 +230,18 @@ const CreateItem = props => {
 											<Button
 												mode="destructive"
 												onClick={() => {
-													setPhotosUrl(photosUrl.splice(i, 1));
+													setPhotoText(
+														PHOTO_TEXT + '. Загружено ' + (photosUrl.length - 1) + '/3'
+													);
+													setPhotosUrl([...photosUrl.slice(0, i), ...photosUrl.slice(i + 1)]);
 													props.setItems({
 														name: name,
 														caregory: props.category,
 														description,
-														photos: [props.item.photos.splice(i, 1)],
+														photos: [
+															...props.item.photos.slice(0, i),
+															...props.item.photos.slice(i + 1),
+														],
 													});
 												}}
 											>
