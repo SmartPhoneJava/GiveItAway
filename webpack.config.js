@@ -2,6 +2,11 @@ const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
+  devServer: {
+    compress: true,
+    port: 10888,
+    https: true
+  },
   output: {
     path: path.join(__dirname, "/build"), // путь к каталогу выходных файлов - папка public
     filename: "bundle.js" // название создаваемого файла

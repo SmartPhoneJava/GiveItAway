@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import bridge from '@vkontakte/vk-bridge';
 import {
 	FormLayout,
 	Input,
@@ -12,12 +13,15 @@ import {
 	HorizontalScroll,
 	Avatar,
 	Snackbar,
+	IS_PLATFORM_ANDROID,
+	IS_PLATFORM_IOS,
 } from '@vkontakte/vkui';
 
 import { CategoriesLabel } from './../../../template/Categories';
 
 import Icon24Camera from '@vkontakte/icons/dist/24/camera';
 import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
+import Icon24Delete from '@vkontakte/icons/dist/24/delete';
 
 const nameLabel = 'Название';
 const categoryLabel = 'Категория';
@@ -62,7 +66,7 @@ const CreateItem = props => {
 			reader.onload = (function(theFile) {
 				KEY++;
 				return function(e) {
-					setPhotosUrl([...photosUrl, { src: e.target.result, id: KEY }]);
+					setPhotosUrl([...photosUrl, { src: e.target.result, id: KEY, origin: theFile }]);
 				};
 			})(f);
 			// Read in the image file as a data URL.
@@ -159,8 +163,8 @@ const CreateItem = props => {
 					>
 						<File
 							top="Снимки вещей"
-              before={<Icon24Camera />}
-              disabled={photosUrl.length == 3}
+							before={<Icon24Camera />}
+							disabled={photosUrl.length == 3}
 							mode={photosUrl.length == 3 ? 'secondary' : 'primary'}
 							onChange={e => {
 								const file = e.target.files[0];
@@ -221,13 +225,44 @@ const CreateItem = props => {
 												padding: '10px',
 											}}
 										>
-											<img
-												src={img.src}
+											<Button
+												mode="secondary"
 												style={{
 													height: '120px',
 												}}
-											/>
+												onClick={() => {
+													console.log('origin', img.origin);
+                          console.log('src', img.src);
+                          console.log('oper', IS_PLATFORM_ANDROID, IS_PLATFORM_IOS);
+													let f = String(img.src);
+													if (IS_PLATFORM_ANDROID || IS_PLATFORM_IOS) {
+														// bridge.send('VKWebAppShowImages', {
+														// 	images: [f, f, f],
+														// });
+														bridge.send("VKWebAppShowImages", {
+															images: [
+															  "https://pp.userapi.com/c639229/v639229113/31b31/KLVUrSZwAM4.jpg",
+															  "https://pp.userapi.com/c639229/v639229113/31b94/mWQwkgDjav0.jpg",
+															  "https://pp.userapi.com/c639229/v639229113/31b3a/Lw2it6bdISc.jpg"
+															]
+														  });
+														return;
+													}
+
+													window.open(f, 'Image');
+												}}
+												before={
+													<img
+														src={img.src}
+														style={{
+															height: '120px',
+														}}
+													/>
+												}
+											></Button>
+
 											<Button
+												before={<Icon24Delete />}
 												mode="destructive"
 												onClick={() => {
 													setPhotoText(
