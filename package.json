@@ -8,7 +8,8 @@
     "start": "webpack-dev-server --mode development --open --hot",
     "build": "webpack --mode production",
     "watch": "webpack --watch",
-    "deploy": "vk-miniapps-deploy"
+    "deploy": "vk-miniapps-deploy",
+    "debug":  "cross-env PORT=10888 HTTPS=true react-scripts start"
   },
   "keywords": [],
   "author": "",

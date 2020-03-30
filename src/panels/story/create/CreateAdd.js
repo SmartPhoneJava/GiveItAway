@@ -10,6 +10,7 @@ import {
 	Header,
 	CardGrid,
 	CellButton,
+	Select,
 	FormLayout,
 	Div,
 	InfoRow,
@@ -42,6 +43,8 @@ import Icon24Locate from '@vkontakte/icons/dist/32/place';
 
 let itemID = 1;
 
+let request_id = 0;
+
 const CreateAdd = props => {
 	const [items, setItems] = useState([
 		{
@@ -65,6 +68,34 @@ const CreateAdd = props => {
 	const [feedbackType, setFeedbackType] = useState('ls');
 	const [itemDescription, setItemDescription] = useState(false);
 
+	const [countries, setCountries] = useState([{ id: 1, title: '' }]);
+	const [regions, setRegions] = useState([{ id: 1, title: '' }]);
+	const [cities, setCities] = useState([{ id: 1, title: '' }]);
+
+	const [city, setCity] = useState({ id: -1, title: '' });
+	const [country, setCountry] = useState({ id: 1, title: 'Россия' });
+	const [region, setRegion] = useState({ id: -1, title: '' });
+	const [accessToken, setAccessToken] = useState('');
+
+	useEffect(() => {
+		console.log('appID', props.appID);
+		async function loadDatabaseInfo() {
+			const el = await bridge.send('VKWebAppGetAuthToken', { app_id: props.appID, scope: '' });
+			setAccessToken(el.access_token);
+			const ctrs = await bridge.send('VKWebAppCallAPIMethod', {
+				method: 'database.getCountries',
+				request_id: 'api' + request_id,
+				params: { v: props.apiVersion, access_token: el.access_token },
+			});
+
+			console.log('el.access_token', el.access_token);
+			request_id++;
+			setCountries(ctrs.response.items);
+			updateRegions(1, el.access_token);
+			updateCities(1, null, el.access_token);
+		}
+		loadDatabaseInfo();
+	}, []);
 	useEffect(() => {
 		let v = true;
 		items.forEach(val => {
@@ -82,8 +113,11 @@ const CreateAdd = props => {
 		if (feedbackType == 'other' && contacts == '') {
 			v = false;
 		}
+		if (city.id < 0 || region.id < 0) {
+			v = false;
+		}
 		setValid(v);
-	}, [items, props.category, feedbackType, contacts]);
+	}, [items, props.category, feedbackType, contacts, country, city, region]);
 
 	function updateGeo() {
 		async function fetchData() {
@@ -111,6 +145,36 @@ const CreateAdd = props => {
 	useEffect(() => {
 		updateGeo();
 	}, []);
+
+	async function updateRegions(id, token) {
+		const rgs = await bridge.send('VKWebAppCallAPIMethod', {
+			method: 'database.getRegions',
+			request_id: 'region' + request_id,
+			params: { v: props.apiVersion, access_token: token, country_id: id },
+		});
+
+		request_id++;
+		console.log('regions:', rgs);
+		setRegions(rgs.response.items);
+	}
+
+	async function updateCities(id, rgs, token) {
+		const params = { v: props.apiVersion, access_token: token, country_id: id, need_all: 1 };
+		console.log('region', region);
+		// if (rgs) {
+		// 	console.log('region exist', rgs);
+		// 	params.region_id = rgs.id;
+		// }
+		const ci = await bridge.send('VKWebAppCallAPIMethod', {
+			method: 'database.getCities',
+			request_id: 'city' + request_id,
+			params: params,
+		});
+
+		request_id++;
+		console.log('cities:', ci);
+		setCities(ci.response.items);
+	}
 
 	function saveSuccess(goToAds, id) {
 		items.forEach(item => {
@@ -319,6 +383,7 @@ const CreateAdd = props => {
 			</Group>
 			<Separator />
 
+			{/** 
 			<Div
 				style={{
 					padding: '10px',
@@ -350,6 +415,7 @@ const CreateAdd = props => {
 					</InfoRow>
 				</Cell>
 			</Div>
+			*/}
 			<Div
 				style={{
 					display: 'flex',
@@ -357,10 +423,86 @@ const CreateAdd = props => {
 				}}
 			>
 				<FormLayout>
-					<SelectMimicry top="Категория" placeholder="хм" onClick={() => {}} />
+					<Select
+						top="Страна"
+						placeholder="Россия"
+						onClick={e => {
+							const c = countries[e.target.value];
+							setCountry(c);
+							setRegion({ id: -1, title: '' })
+							setCity({ id: -1, title: '' })
+							updateRegions(c.id, accessToken);
+							updateCities(c.id, null, accessToken);
+						}}
+					>
+						{countries.map((v, i) => {
+							if (v == country) {
+								return (
+									<option key={v.id} value={i} defaultChecked>
+										{v.title}
+									</option>
+								);
+							}
+							return (
+								<option key={v.id} value={i}>
+									{v.title}
+								</option>
+							);
+						})}
+					</Select>
 				</FormLayout>
+
 				<FormLayout>
-					<SelectMimicry top="Категория" placeholder="хм" onClick={() => props.open()} />
+					<Select
+						top="Регион"
+						placeholder="Не указан"
+						onClick={e => {
+							const c = regions[e.target.value];
+							setRegion(c);
+							updateCities(country.id, c, accessToken);
+						}}
+					>
+						{regions.map((v, i) => {
+							if (v == region) {
+								return (
+									<option key={v.id} value={i} defaultChecked>
+										{v.title}
+									</option>
+								);
+							}
+							return (
+								<option key={v.id} value={i}>
+									{v.title}
+								</option>
+							);
+						})}
+					</Select>
+				</FormLayout>
+
+				<FormLayout>
+					<Select
+						top="Город"
+						placeholder="Не указан"
+						onClick={e => {
+							const c = cities[e.target.value];
+							setCity(c);
+						}}
+					>
+						{cities.map((v, i) => {
+							if (v == city) {
+								return (
+									<option key={v.id} value={i} defaultChecked>
+										{v.title}
+									</option>
+								);
+							}
+							return (
+								<option key={v.id} value={i}>
+									{v.title}
+								</option>
+							);
+						})}
+					</Select>
 				</FormLayout>
 			</Div>
 			<Separator />

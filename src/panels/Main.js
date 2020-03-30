@@ -30,6 +30,8 @@ const addText = 'Создать';
 const profile = 'profile';
 const profileText = 'Профиль';
 
+const ApiVersion = "5.5"
+
 const Main = () => {
 	const [popout, setPopout] = useState(null); //<ScreenSpinner size="large" />
 
@@ -45,6 +47,9 @@ const Main = () => {
 	const [activeModal, setActiveModal] = useState(null);
 	const [activeModal2, setActiveModal2] = useState(null);
 	const [snackbar, setSnackbar] = useState(null);
+
+	const [vkPlatform, setVkPlatform] = useState('no');
+	const [appID, setAppID] = useState(0);
 
 	function goSearch() {
 		setActivePanel('search');
@@ -66,7 +71,7 @@ const Main = () => {
 			}
 		});
 
-		async function checkMe(user) {
+		async function getInputData() {
 			var tmp = new Array(); // два вспомогательных
 			var tmp2 = new Array(); // массива
 			const get = new Array();
@@ -83,7 +88,11 @@ const Main = () => {
 			const vk_platform = get['vk_platform'];
 			Platform.dispatch({ type: 'set', new_state: vk_platform });
 
-			console.log('vk_platform', vk_platform);
+			setVkPlatform(vk_platform);
+			setAppID(parseInt(get['vk_app_id']));
+		}
+
+		async function checkMe(user) {
 			console.log('secret:', window.location.href);
 			console.log('user user:', user);
 			fetch(Addr.getState() + `/api/user/auth`, {
@@ -111,15 +120,16 @@ const Main = () => {
 				.catch(function(error) {
 					console.log('Request failed', error);
 				});
+			setPopout(null);
 		}
 
 		async function fetchData() {
 			const us = await bridge.send('VKWebAppGetUserInfo');
-			setPopout(null);
 			VkUser.dispatch({ type: 'set', new_state: us });
-
 			checkMe(us);
 		}
+
+		getInputData();
 		fetchData();
 	}, []);
 
@@ -188,6 +198,9 @@ const Main = () => {
 				<Panel id={add}>
 					<PanelHeader>{addText}</PanelHeader>
 					<CreateAdd
+						vkPlatform={vkPlatform}
+						appID={appID}
+						apiVersion={ApiVersion}
 						setPopout={setPopout}
 						goToAds={goToAds}
 						snackbar={snackbar}
