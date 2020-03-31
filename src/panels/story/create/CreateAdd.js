@@ -177,9 +177,13 @@ const CreateAdd = props => {
 				console.log('fiile', photo);
 				data.append('file', photo);
 
-				axios
-					.post(Addr.getState() + '/api/ad/' + id + '/upload_image', data)
-					.then(function(response) {
+				axios.axios({
+					method: 'post',
+					url: Addr.getState() + '/api/ad/' + id + '/upload_image',
+					withCredentials: true,
+					data: data,
+					cancelToken: new axios.CancelToken(c => (cancel = c)),
+				}).then(function(response) {
 						console.log('success uploaded', response);
 					})
 					.catch(function(error) {
@@ -248,6 +252,7 @@ const CreateAdd = props => {
 
 		axios({
 			method: 'post',
+			withCredentials: true,
 			url: Addr.getState() + 'ad/' + ad_id + '/delete',
 			cancelToken: new axios.CancelToken(c => (cancel = c)),
 		})
@@ -294,6 +299,7 @@ const CreateAdd = props => {
 			axios({
 				method: 'post',
 				url: Addr.getState() + '/api/ad/create',
+				withCredentials: true,
 				data: obj,
 				cancelToken: new axios.CancelToken(c => (cancel = c)),
 			})
@@ -438,7 +444,7 @@ const CreateAdd = props => {
 			*/}
 			<Div
 				style={{
-					display: 'flex',
+					display: props.vkPlatform == 'desktop_web' ? 'flex' : 'block',
 					padding: '0px',
 				}}
 			>

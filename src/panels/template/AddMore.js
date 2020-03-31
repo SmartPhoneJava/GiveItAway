@@ -51,7 +51,11 @@ export const AdDefault = {
 	category: 'animals',
 	extra_field: '',
 	location: 'Барнаул, Яблочная улица',
-	photos: [Kitten, Jins, Tea],
+	pathes_to_photo: [
+		{ AdPhotoId: 1, PhotoUrl: Kitten },
+		{ AdPhotoId: 2, PhotoUrl: Jins },
+		{ AdPhotoId: 3, PhotoUrl: Tea },
+	],
 	author: {
 		vk_id: 2,
 		name: 'Алёна',

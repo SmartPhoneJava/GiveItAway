@@ -127,13 +127,19 @@ const CreateItem = props => {
 					<div />
 				)}
 
-				<Div
+				<div
 					style={{
-						display: 'flex',
+						display: props.vkPlatform == 'desktop_web' ? 'flex' : 'block',
 						alignItems: 'flex-start',
-						padding: '0px',
 					}}
 				>
+					<div
+						style={{
+							paddingLeft: '10px',
+						}}
+					>
+						<CategoriesLabel category={props.category} open={props.choose} />
+					</div>
 					<FormLayout>
 						<Input
 							top={nameLabel}
@@ -154,8 +160,7 @@ const CreateItem = props => {
 							status={name ? 'valid' : 'error'}
 						/>
 					</FormLayout>
-					<CategoriesLabel category={props.category} open={props.choose} />
-				</Div>
+				</div>
 				<Div
 					style={{
 						padding: '0px',
@@ -181,37 +186,11 @@ const CreateItem = props => {
 						/>
 					</FormLayout>
 				</Div>
-				<Div
-						top="Снимки"
-						style={{
-							display: 'flex',
-							padding: '0px',
-							textAlign: 'center',
-						}}
-					>
-						<File
-							top="Снимки вещей"
-							before={<Icon24Camera />}
-							disabled={photosUrl.length == 3}
-							mode={photosUrl.length == 3 ? 'secondary' : 'primary'}
-							onChange={loadPhoto}
-						>
-							Открыть галерею
-						</File>
-						<InfoRow
-							style={{
-								color: 'grey',
-								marginTop: '6px',
-							}}
-						>
-							{photoText}
-						</InfoRow>
-					</Div>
 				<FormLayout>
 					<Div
 						top="Снимки"
 						style={{
-							display: 'flex',
+							display: props.vkPlatform == 'desktop_web' ? 'flex' : 'block',
 							padding: '0px',
 							textAlign: 'center',
 						}}

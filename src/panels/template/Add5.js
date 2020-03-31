@@ -112,7 +112,8 @@ const Add5 = props => {
 		return;
 	}
 
-	const image = props.photos ? props.photos[0] : '';
+	console.log("props.ad.pathes_to_photo", 'http://localhost:8091/'+props.ad.pathes_to_photo[0].PhotoUrl)
+	const image = props.ad.pathes_to_photo ? 'http://localhost:8091/'+props.ad.pathes_to_photo[0].PhotoUrl : '';
 
 	return (
 		<div
@@ -146,13 +147,13 @@ const Add5 = props => {
 							color: 'color: rgb(180, 180,180)',
 						}}
 					>
-						{!props.anonymous ? (
+						{!props.ad.anonymous ? (
 							<Avatar
 								style={{
 									padding: '4px',
 								}}
 								size={36}
-								src={props.ava}
+								src={props.ad.author.photo_url}
 							/>
 						) : (
 							<div />
@@ -167,14 +168,14 @@ const Add5 = props => {
 									color: 'white',
 								}}
 							>
-								{!props.anonymous ? props.username : ''}
+								{!props.ad.anonymous ? props.ad.author.name+' '+props.ad.author.surname : ''}
 							</div>
 							<div
 								style={{
 									color: 'rgb(200,200,200)',
 								}}
 							>
-								{props.date}
+								{props.ad.date}
 							</div>
 						</div>
 						<PanelHeaderButton
@@ -196,12 +197,12 @@ const Add5 = props => {
 									</ActionSheet>
 								);
 							}}
-							disabled={props.status !== 'offer'}
+							disabled={props.ad.status !== 'offer'}
 						>
 							<Icon28SettingsOutline fill="white" />
 						</PanelHeaderButton>
 					</div>
-					<InfoRow style={{ color: 'white' }}> {shortText(props.name, 300)} </InfoRow>
+					<InfoRow style={{ color: 'white' }}> {shortText(props.ad.header, 300)} </InfoRow>
 
 					<div
 						style={{
@@ -216,7 +217,7 @@ const Add5 = props => {
 								fontStyle: 'italic',
 							}}
 						>
-							<Icon16Place /> {props.location}
+							<Icon16Place /> {props.ad.region+', '+props.ad.district}
 						</div>
 					</div>
 				</div>
@@ -228,10 +229,10 @@ const Add5 = props => {
 							mode="secondary"
 							style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
 							size="m"
-							disabled={props.status !== 'offer'}
+							disabled={props.ad.status !== 'offer'}
 						>
 							<Avatar style={{ background: 'rgba(0,0,0,0.7)' }} size={32}>
-								{getFeedback(props.pm, props.comments)}
+								{getFeedback(props.ad.feedback_type == 'ls', props.ad.feedback_type == 'comments')}
 							</Avatar>
 						</PanelHeaderButton>
 						<PanelHeaderButton
