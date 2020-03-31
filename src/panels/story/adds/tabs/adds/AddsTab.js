@@ -15,13 +15,13 @@ import useAdSearch from './useAdSearch';
 import Error from './../../../../placeholders/error';
 import AdNotFound from './../../../../placeholders/adNotFound';
 
-import Man from "./../../../../../img/man.jpeg"
-import Cat from "./../../../../../img/cat.jpg"
-import Kitten from "./../../../../../img/kitten.jpeg"
-import Jins from "./../../../../../img/jins.jpg"
-import Tea from "./../../../../../img/tea.jpg"
-import Playstein from "./../../../../../img/playstein.jpg"
-import Bb from "./../../../../../img/bb.jpg"
+import Man from './../../../../../img/man.jpeg';
+import Cat from './../../../../../img/cat.jpg';
+import Kitten from './../../../../../img/kitten.jpeg';
+import Jins from './../../../../../img/jins.jpg';
+import Tea from './../../../../../img/tea.jpg';
+import Playstein from './../../../../../img/playstein.jpg';
+import Bb from './../../../../../img/bb.jpg';
 
 const addsArrDD = [
 	{
@@ -41,7 +41,7 @@ const addsArrDD = [
 			vk_id: 1,
 			name: 'Семен',
 			surname: 'ефимов',
-			ava: Man
+			photo_url: Man,
 		},
 	},
 	{
@@ -61,7 +61,7 @@ const addsArrDD = [
 			vk_id: 2,
 			name: 'Алёна',
 			surname: 'Чернышева',
-			ava: Man,
+			photo_url: Man,
 		},
 	},
 	{
@@ -72,7 +72,7 @@ const addsArrDD = [
 		text:
 			'Отдам за сахар и растительное масло все вещи в хорошем состоянии. Джинсы размер 27, лосины размер 44, брюки размер 46, кофта размер М, Игрушки отдам за растительное масло. Не бронирую пишите кто действительно будет забирать.',
 		creation_date: '14.12.2012',
-		
+
 		category: 'clothers',
 		pm: false,
 		feedback_type: 's',
@@ -84,7 +84,7 @@ const addsArrDD = [
 			vk_id: 3,
 			name: 'Иришка',
 			surname: 'Воронина',
-			ava: Man,
+			photo_url: Man,
 		},
 	},
 	{
@@ -115,7 +115,7 @@ const addsArrDD = [
 			vk_id: 4,
 			name: 'Ирина',
 			surname: 'Черыжкина',
-			ava: Man,
+			photo_url: Man,
 		},
 	},
 	{
@@ -137,7 +137,7 @@ const addsArrDD = [
 			vk_id: 5,
 			name: 'Нурмухаммед',
 			surname: 'Нурдаулет',
-			ava: Man,
+			photo_url: Man,
 		},
 	},
 	{
@@ -157,7 +157,7 @@ const addsArrDD = [
 			vk_id: 6,
 			name: 'Петя',
 			surname: 'Сидоров',
-			ava: Man,
+			photo_url: Man,
 		},
 	},
 ];
@@ -190,7 +190,30 @@ const AddsTab = props => {
 		setSearch(e.target.value);
 		setPageNumber(1);
 		props.setPopout(null);
-  }
+	}
+
+	function Ad(ad) {
+		return (
+			<Add5
+				openAd={() => props.openAd(ad)}
+				category={ad.category}
+				name={ad.header}
+				photos={ad.photos ? ad.photos : []}
+				description={ad.text}
+				date={ad.creation_date}
+				pm={ad.feedback_type == 'ls'}
+				comments={ad.feedback_type == 'comments'}
+				comments_counter={!ad.comments_counter ? 0 : ad.comments_counter}
+				contacts={ad.extra_field}
+				location={ad.location}
+				username={ad.author.name + ' ' + ad.author.surname}
+				ava={ad.author.photo_url}
+				status={ad.status}
+				anonymous={ad.anonymous}
+				setPopout={props.setPopout}
+			/>
+		);
+	}
 
 	return (
 		<>
@@ -200,71 +223,22 @@ const AddsTab = props => {
 					ads.map((ad, index) => {
 						if (ads.length === index + 1) {
 							return (
-                <div 
-                key={ad.ad_id} ref={lastAdElementRef}>
-									<Add
-										category={ad.category}
-										name={ad.header}
-										description={ad.text}
-										date={ad.creation_date}
-										pm={ad.feedback_type == 'ls'}
-										comments={ad.feedback_type == 'comments'}
-										comments_counter={!ad.comments_counter ? 0 : ad.comments_counter}
-										contacts={ad.extra_field}
-										location={ad.location}
-										username={ad.author.name + ' ' + ad.author.surname}
-										ava={ad.author.photo_url}
-										status={ad.status}
-										anonymous={ad.anonymous}
-									/>
+								<div key={ad.ad_id} ref={lastAdElementRef}>
+									{Ad(ad)}
 								</div>
 							);
 						} else {
 							return (
-								<Add
-									key={ad.ad_id}
-									category={ad.category}
-									name={ad.header}
-									description={ad.text}
-									date={ad.creation_date}
-									pm={ad.feedback_type == 'ls'}
-									comments={ad.feedback_type == 'comments'}
-									comments_counter={!ad.comments_counter ? 0 : ad.comments_counter}
-									contacts={ad.extra_field}
-									location={ad.location}
-									username={ad.author.name + ' ' + ad.author.surname}
-									ava={ad.author.photo_url}
-									status={ad.status}
-									anonymous={ad.anonymous}
-								/>
+								<div key={ad.ad_id} ref={lastAdElementRef}>
+									{Ad(ad)}
+								</div>
 							);
 						}
 					})
 				) : error ? (
 					/*<Error />*/
-					addsArrDD.map((ad, index) => {
-						return (
-							<div key={ad.ad_id}>
-								<Add5
-								openAd={()=>props.openAd(ad)}
-									category={ad.category}
-									name={ad.header}
-									photos={ad.photos}
-									description={ad.text}
-									date={ad.creation_date}
-									pm={ad.feedback_type == 'ls'}
-									comments={ad.feedback_type == 'comments'}
-									comments_counter={!ad.comments_counter ? 0 : ad.comments_counter}
-									contacts={ad.extra_field}
-									location={ad.location}
-									username={ad.author.name + ' ' + ad.author.surname}
-									ava={Man}
-									status={ad.status}
-									anonymous={ad.anonymous}
-									setPopout={props.setPopout}
-								/>
-							</div>
-						);
+					addsArrDD.map(ad => {
+						return <div key={ad.ad_id}>{Ad(ad)}</div>;
 					})
 				) : (
 					<AdNotFound dropFilters={props.dropFilters} />
@@ -275,3 +249,4 @@ const AddsTab = props => {
 };
 
 export default AddsTab;
+//283

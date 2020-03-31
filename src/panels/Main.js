@@ -192,7 +192,9 @@ const Main = () => {
 						goSearch={goSearch}
 						setPopout={setPopout}
 						category={category}
-						dropFilters={() => setCategory(CategoryNo)}
+						dropFilters={() => {
+							setCategory(CategoryNo);
+						}}
 						openAd={ad => {
 							setChoosen(ad);
 							console.log('looook:', ad);

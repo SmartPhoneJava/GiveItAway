@@ -222,16 +222,6 @@ const Add5 = props => {
 				</div>
 				<div style={{ display: 'flex', padding: '10px' }}>
 					{/*getFeedback(props.pm, props.comments, props.comments_counter, props.contacts, props.status)*/}
-					<PanelHeaderButton mode="secondary" style={{ margin: '5px', color: 'red' }} size="m">
-						<Avatar style={{ background: 'rgba(230,0,0,0.7)' }} size={32}>
-							<Icon24Delete fill="white" />
-						</Avatar>
-					</PanelHeaderButton>
-					<PanelHeaderButton mode="secondary" style={{ margin: '5px', color: 'red' }} size="m">
-						<Avatar style={{ background: 'rgba(0,0,0,0.7)' }} size={32}>
-							<Icon24Hide fill="white" />
-						</Avatar>
-					</PanelHeaderButton>
 
 					<div style={{ float: 'right', marginLeft: 'auto', alignItems: 'center' }}>
 						<PanelHeaderButton

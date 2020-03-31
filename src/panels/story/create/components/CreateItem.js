@@ -64,8 +64,8 @@ const CreateItem = props => {
 			// Closure to capture the file information.
 			console.log('we are here');
 			reader.onload = (function(theFile) {
-				KEY++;
 				return function(e) {
+					KEY++;
 					setPhotosUrl([...photosUrl, { src: e.target.result, id: KEY, origin: theFile }]);
 				};
 			})(f);
@@ -73,6 +73,35 @@ const CreateItem = props => {
 			reader.readAsDataURL(f);
 		}
 	}
+
+	const loadPhoto = e => {
+		const file = e.target.files[0];
+		console.log('files', e.target.files);
+		console.log('file:', file);
+		const newLength = photosUrl.length + 1;
+		setPhotoText(PHOTO_TEXT + '. Загружено ' + newLength + '/3');
+		props.setItems({
+			name,
+			category: props.category,
+			description: description,
+			photos: [...props.item.photos, file],
+		});
+		handleFileSelect(e);
+		if (newLength == 3) {
+			props.setSnackbar(
+				<Snackbar
+					onClose={() => props.setSnackbar(null)}
+					before={
+						<Avatar size={24} style={{ background: 'orange' }}>
+							<Icon24Favorite fill="#fff" width={14} height={14} />
+						</Avatar>
+					}
+				>
+					Достигнут лимит фотографий. Чтобы загрузить новые, удалите старые.
+				</Snackbar>
+			);
+		}
+	};
 
 	return (
 		<CardGrid>
@@ -152,6 +181,32 @@ const CreateItem = props => {
 						/>
 					</FormLayout>
 				</Div>
+				<Div
+						top="Снимки"
+						style={{
+							display: 'flex',
+							padding: '0px',
+							textAlign: 'center',
+						}}
+					>
+						<File
+							top="Снимки вещей"
+							before={<Icon24Camera />}
+							disabled={photosUrl.length == 3}
+							mode={photosUrl.length == 3 ? 'secondary' : 'primary'}
+							onChange={loadPhoto}
+						>
+							Открыть галерею
+						</File>
+						<InfoRow
+							style={{
+								color: 'grey',
+								marginTop: '6px',
+							}}
+						>
+							{photoText}
+						</InfoRow>
+					</Div>
 				<FormLayout>
 					<Div
 						top="Снимки"
@@ -166,34 +221,7 @@ const CreateItem = props => {
 							before={<Icon24Camera />}
 							disabled={photosUrl.length == 3}
 							mode={photosUrl.length == 3 ? 'secondary' : 'primary'}
-							onChange={e => {
-								const file = e.target.files[0];
-								console.log('files', e.target.files);
-								console.log('file:', file);
-								const newLength = photosUrl.length + 1;
-								setPhotoText(PHOTO_TEXT + '. Загружено ' + newLength + '/3');
-								props.setItems({
-									name,
-									category: props.category,
-									description: description,
-									photos: [...props.item.photos, file],
-								});
-								handleFileSelect(e);
-								if (newLength == 3) {
-									props.setSnackbar(
-										<Snackbar
-											onClose={() => props.setSnackbar(null)}
-											before={
-												<Avatar size={24} style={{ background: 'orange' }}>
-													<Icon24Favorite fill="#fff" width={14} height={14} />
-												</Avatar>
-											}
-										>
-											Достигнут лимит фотографий. Чтобы загрузить новые, удалите старые.
-										</Snackbar>
-									);
-								}
-							}}
+							onChange={loadPhoto}
 						>
 							Открыть галерею
 						</File>
@@ -218,7 +246,7 @@ const CreateItem = props => {
 								{photosUrl.map((img, i) => {
 									return (
 										<div
-											key={img.key}
+											key={img.id}
 											style={{
 												alignItems: 'center',
 												justifyContent: 'center',

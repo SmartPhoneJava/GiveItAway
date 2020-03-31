@@ -25,6 +25,7 @@ import Icon24Notification from '@vkontakte/icons/dist/24/notification';
 import Icon24Phone from '@vkontakte/icons/dist/24/phone';
 import Icon24Mention from '@vkontakte/icons/dist/24/mention';
 import Icon24Info from '@vkontakte/icons/dist/24/info';
+import Icon24Message from '@vkontakte/icons/dist/24/message'
 
 import Icon24Settings from '@vkontakte/icons/dist/24/settings';
 import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
@@ -55,7 +56,7 @@ export const AdDefault = {
 		vk_id: 2,
 		name: 'Алёна',
 		surname: 'Чернышева',
-		ava: Man,
+		photo_url: Man,
 	},
 };
 
@@ -69,6 +70,9 @@ const AddMore = props => {
 	}, [props.ad]);
 
 	function detectContactsType(contacts) {
+		if (!contacts) {
+			return "error"
+		}
 		const ematlRG = '/.+@.+..+/i';
 		if (contacts.match(ematlRG)) {
 			return 'email';
@@ -94,22 +98,11 @@ const AddMore = props => {
 		return <Icon24Info />;
 	}
 
-	function shortText(str, newLength) {
-		if (!str) {
-			return 'error';
-		}
-		if (str.length > newLength) {
-			const s = str.slice(0, newLength);
-			return s + '...';
-		}
-		return str;
-	}
-
 	function getContacts(contacts) {
 		if (contacts != '') {
 			return (
 				<Button mode="overlay_primary" size="m" before={getContactsImage(detectContactsType(contacts))}>
-					{shortText(contacts, 20)}
+					{contacts}
 				</Button>
 			);
 		}
@@ -237,7 +230,7 @@ const AddMore = props => {
 									padding: '4px',
 								}}
 								size={36}
-								src={ad.author.ava}
+								src={ad.author.photo_url}
 							/>
 						) : (
 							<div />
@@ -311,8 +304,8 @@ const AddMore = props => {
 							</PanelHeaderButton>
 						</div>
 					</div>
-					<InfoRow style={{ color: 'white' }}> {shortText(ad.header, 300)} </InfoRow>
-					<InfoRow style={{ color: 'white' }}> {shortText(ad.text, 300)} </InfoRow>
+					<InfoRow style={{ color: 'white' }}> {ad.header} </InfoRow>
+					<InfoRow style={{ color: 'white' }}> {ad.text} </InfoRow>
 
 					<div
 						style={{
@@ -346,32 +339,34 @@ const AddMore = props => {
 					>
 						<HorizontalScroll>
 							<div style={{ display: 'flex' }}>
-								{ad.photos.map((img, i) => {
-									return (
-										<div
-											key={i}
-											style={{
-												alignItems: 'center',
-												justifyContent: 'center',
-												padding: '10px',
-											}}
-										>
-											<Button
-												mode="tertiary"
-												onClick={() => {
-													setPhotoIndex(i);
-												}}
-											>
-												<img
-													src={img}
+								{ad.photos
+									? ad.photos.map((img, i) => {
+											return (
+												<div
+													key={i}
 													style={{
-														height: '50px',
+														alignItems: 'center',
+														justifyContent: 'center',
+														padding: '10px',
 													}}
-												/>
-											</Button>
-										</div>
-									);
-								})}
+												>
+													<Button
+														mode="tertiary"
+														onClick={() => {
+															setPhotoIndex(i);
+														}}
+													>
+														<img
+															src={img}
+															style={{
+																height: '50px',
+															}}
+														/>
+													</Button>
+												</div>
+											);
+									  })
+									: ''}
 							</div>
 						</HorizontalScroll>
 					</div>

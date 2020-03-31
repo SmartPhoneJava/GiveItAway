@@ -3,20 +3,12 @@ import bridge from '@vkontakte/vk-bridge';
 import axios from 'axios';
 import {
 	Button,
-	Textarea,
-	Card,
-	Radio,
 	Group,
 	Header,
-	CardGrid,
-	CellButton,
 	Select,
 	FormLayout,
 	Div,
 	InfoRow,
-	Checkbox,
-	Cell,
-	SelectMimicry,
 	Separator,
 	ScreenSpinner,
 	Snackbar,
@@ -45,6 +37,8 @@ let itemID = 1;
 
 let request_id = 0;
 
+const NoRegion = { id: -1, title: '' };
+
 const CreateAdd = props => {
 	const [items, setItems] = useState([
 		{
@@ -68,13 +62,13 @@ const CreateAdd = props => {
 	const [feedbackType, setFeedbackType] = useState('ls');
 	const [itemDescription, setItemDescription] = useState(false);
 
-	const [countries, setCountries] = useState([{ id: 1, title: '' }]);
-	const [regions, setRegions] = useState([{ id: 1, title: '' }]);
-	const [cities, setCities] = useState([{ id: 1, title: '' }]);
+	const [countries, setCountries] = useState([NoRegion]);
+	const [regions, setRegions] = useState([NoRegion]);
+	const [cities, setCities] = useState([NoRegion]);
 
-	const [city, setCity] = useState({ id: -1, title: '' });
+	const [city, setCity] = useState(NoRegion);
 	const [country, setCountry] = useState({ id: 1, title: 'Россия' });
-	const [region, setRegion] = useState({ id: -1, title: '' });
+	const [region, setRegion] = useState(NoRegion);
 	const [accessToken, setAccessToken] = useState('');
 
 	useEffect(() => {
@@ -116,7 +110,7 @@ const CreateAdd = props => {
 		if (city.id < 0 || region.id < 0) {
 			v = false;
 		}
-		setValid(v);
+		setValid(true);
 	}, [items, props.category, feedbackType, contacts, country, city, region]);
 
 	function updateGeo() {
@@ -201,7 +195,7 @@ const CreateAdd = props => {
 				}}
 				action="Отменить"
 				onActionClick={() => {
-					/* тут запрос на удаление */
+					deleteAd(props.setPopout, id);
 				}}
 				before={
 					<Avatar size={24} style={{ background: 'green' }}>
@@ -248,6 +242,30 @@ const CreateAdd = props => {
 			</Snackbar>
 		);
 	}
+	function deleteAd(setPopout, ad_id) {
+		setPopout(<ScreenSpinner size="large" />);
+		let cancel;
+
+		axios({
+			method: 'post',
+			url: Addr.getState() + 'ad/' + ad_id + '/delete',
+			cancelToken: new axios.CancelToken(c => (cancel = c)),
+		})
+			.then(function(response) {
+				console.log('Вот ответ от бека на запрос удаления объявления ', response);
+				console.log('json json json ', response.data);
+				setPopout(null);
+				if (response.status != 200) {
+					saveFail(response.status + ' - ' + response.statusText, () => deleteAd(setPopout, ad_id));
+				}
+				return response.data;
+			})
+			.catch(function(error) {
+				console.log('Request failed', error);
+				setPopout(null);
+				saveFail('Нет соединения с сервером', () => deleteAd(setPopout, ad_id));
+			});
+	}
 
 	function createAd(setPopout) {
 		if (valid) {
@@ -265,6 +283,8 @@ const CreateAdd = props => {
 				},
 				status: 'offer',
 				category: items[0].category,
+				region: region.title,
+				district: city.title,
 				comments_count: 0,
 			});
 			console.log('loook at me', obj);
@@ -428,9 +448,12 @@ const CreateAdd = props => {
 						placeholder="Россия"
 						onClick={e => {
 							const c = countries[e.target.value];
+							if (!c) {
+								return;
+							}
 							setCountry(c);
-							setRegion({ id: -1, title: '' })
-							setCity({ id: -1, title: '' })
+							setRegion(NoRegion);
+							setCity(NoRegion);
 							updateRegions(c.id, accessToken);
 							updateCities(c.id, null, accessToken);
 						}}
@@ -458,6 +481,10 @@ const CreateAdd = props => {
 						placeholder="Не указан"
 						onClick={e => {
 							const c = regions[e.target.value];
+							if (!c) {
+								setRegion(NoRegion);
+								return;
+							}
 							setRegion(c);
 							updateCities(country.id, c, accessToken);
 						}}
@@ -485,6 +512,10 @@ const CreateAdd = props => {
 						placeholder="Не указан"
 						onClick={e => {
 							const c = cities[e.target.value];
+							if (!c) {
+								setCity(NoRegion);
+								return;
+							}
 							setCity(c);
 						}}
 					>
