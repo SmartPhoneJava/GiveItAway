@@ -1,11 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import bridge from '@vkontakte/vk-bridge';
-import { View, Panel, PanelHeader, Epic, Tabbar, TabbarItem, Placeholder, Button } from '@vkontakte/vkui';
+import {
+	View,
+	Panel,
+	PanelHeader,
+	Epic,
+	Tabbar,
+	PanelHeaderBack,
+	TabbarItem,
+	PanelHeaderButton,
+	PanelHeaderSimple,
+	Placeholder,
+	Button,
+} from '@vkontakte/vkui';
 
 import AddsTabs from './story/adds/AddsTabs';
 import CreateAdd from './story/create/CreateAdd';
 
 import Icon28User from '@vkontakte/icons/dist/28/user';
+import Icon24MoreHorizontal from '@vkontakte/icons/dist/24/more_horizontal';
 import Icon28NewsfeedOutline from '@vkontakte/icons/dist/28/newsfeed_outline';
 import Icon28Add from '@vkontakte/icons/dist/28/add_outline';
 
@@ -13,10 +26,13 @@ import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
 
 import { User } from '../store/user';
 import { VkUser } from '../store/vkUser';
-import { Platform } from '../store/platform';
+
+import AddMore, { AdDefault } from './template/AddMore';
 
 import { Addr } from '../store/addr';
 import { CategoryNo } from './template/Categories';
+
+import Error from './placeholders/error';
 
 import AddsModal, { MODAL_FILTERS, MODAL_CATEGORIES } from './story/adds/AddsModal';
 import CreateModal from './story/create/CreateModal';
@@ -30,7 +46,7 @@ const addText = 'Создать';
 const profile = 'profile';
 const profileText = 'Профиль';
 
-const ApiVersion = "5.5"
+const ApiVersion = '5.5';
 
 const Main = () => {
 	const [popout, setPopout] = useState(null); //<ScreenSpinner size="large" />
@@ -47,6 +63,8 @@ const Main = () => {
 	const [activeModal, setActiveModal] = useState(null);
 	const [activeModal2, setActiveModal2] = useState(null);
 	const [snackbar, setSnackbar] = useState(null);
+
+	const [choosen, setChoosen] = useState(AdDefault);
 
 	const [vkPlatform, setVkPlatform] = useState('no');
 	const [appID, setAppID] = useState(0);
@@ -86,8 +104,6 @@ const Main = () => {
 			}
 
 			const vk_platform = get['vk_platform'];
-			Platform.dispatch({ type: 'set', new_state: vk_platform });
-
 			setVkPlatform(vk_platform);
 			setAppID(parseInt(get['vk_app_id']));
 		}
@@ -177,7 +193,36 @@ const Main = () => {
 						setPopout={setPopout}
 						category={category}
 						dropFilters={() => setCategory(CategoryNo)}
+						openAd={ad => {
+							setChoosen(ad);
+							console.log('looook:', ad);
+							setActivePanel('one-panel');
+						}}
 					/>
+					{snackbar}
+				</Panel>
+				<Panel id="one-panel">
+					<PanelHeaderSimple
+						left={
+							<PanelHeaderBack
+								onClick={() => {
+									setActivePanel('header-search');
+								}}
+							/>
+						}
+						addon={
+							<PanelHeaderButton
+								onClick={() => {
+									setActivePanel('header-search');
+								}}
+							>
+								Назад
+							</PanelHeaderButton>
+						}
+					>
+						{choosen ? choosen.name : 'баг'}
+					</PanelHeaderSimple>
+					{choosen ? <AddMore ad={choosen} setPopout={setPopout} /> : Error}
 					{snackbar}
 				</Panel>
 			</View>

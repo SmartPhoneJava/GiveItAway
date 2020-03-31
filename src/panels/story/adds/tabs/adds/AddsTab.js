@@ -4,6 +4,7 @@ import { Search, Group, Placeholder, Button } from '@vkontakte/vkui';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 
 import Add from './../../../../template/Add';
+import Add5 from './../../../../template/Add5';
 import Add4 from './../../../../template/Add4';
 import Add3 from './../../../../template/Add3';
 import Add2 from './../../../../template/Add2';
@@ -35,11 +36,12 @@ const addsArrDD = [
 		extra_field: '',
 		category: 'animals',
 		location: 'Барнаул, Яблочная улица',
-		photos: [Cat],
+		photos: [Cat, Jins, Tea],
 		author: {
 			vk_id: 1,
 			name: 'Семен',
 			surname: 'ефимов',
+			ava: Man
 		},
 	},
 	{
@@ -54,11 +56,12 @@ const addsArrDD = [
 		category: 'animals',
 		extra_field: '',
 		location: 'Барнаул, Яблочная улица',
-		photos: [Kitten],
+		photos: [Kitten, Jins, Tea],
 		author: {
 			vk_id: 2,
 			name: 'Алёна',
 			surname: 'Чернышева',
+			ava: Man,
 		},
 	},
 	{
@@ -76,11 +79,12 @@ const addsArrDD = [
 		comments_counter: 4,
 		extra_field: 'Звоните по номеру 89268923412',
 		location: 'Ленинский район.',
-		photos: [Jins],
+		photos: [Jins, Jins, Tea],
 		author: {
 			vk_id: 3,
 			name: 'Иришка',
 			surname: 'Воронина',
+			ava: Man,
 		},
 	},
 	{
@@ -106,11 +110,12 @@ const addsArrDD = [
 			'Спрятала огромное полотно текста в контактах. Попробуйте правильно вывести это все. Ахахахахахаххаха. Кто что думает о фильме Джеентельмены? По моему там не хватает экшена :Р',
 		category: 'build',
 		location: 'Могилев, улица строителей',
-		photos: [Bb],
+		photos: [Bb, Jins, Tea],
 		author: {
 			vk_id: 4,
 			name: 'Ирина',
 			surname: 'Черыжкина',
+			ava: Man,
 		},
 	},
 	{
@@ -127,11 +132,12 @@ const addsArrDD = [
 			'договоримся звоните...87479754978, 87075000804...плэйстешн, джостик, 3 диска все в наборе и с пакетом от sony и с чеком',
 		category: 'play',
 		location: 'Алматы',
-		photos: [Playstein],
+		photos: [Playstein, Jins, Tea],
 		author: {
 			vk_id: 5,
 			name: 'Нурмухаммед',
 			surname: 'Нурдаулет',
+			ava: Man,
 		},
 	},
 	{
@@ -145,12 +151,13 @@ const addsArrDD = [
 		feedback_type: 'comments',
 		extra_field: '87016073540',
 		category: 'products, electronics, books, clothers',
-		photos: [Tea],
+		photos: [Tea, Jins, Tea],
 		location: '',
 		author: {
 			vk_id: 6,
 			name: 'Петя',
 			surname: 'Сидоров',
+			ava: Man,
 		},
 	},
 ];
@@ -184,10 +191,6 @@ const AddsTab = props => {
 		setPageNumber(1);
 		props.setPopout(null);
   }
-  
-  useEffect(()=>{
-    console.log("version")
-  },[])
 
 	return (
 		<>
@@ -242,7 +245,8 @@ const AddsTab = props => {
 					addsArrDD.map((ad, index) => {
 						return (
 							<div key={ad.ad_id}>
-								<Add3
+								<Add5
+								openAd={()=>props.openAd(ad)}
 									category={ad.category}
 									name={ad.header}
 									photos={ad.photos}
@@ -257,6 +261,7 @@ const AddsTab = props => {
 									ava={Man}
 									status={ad.status}
 									anonymous={ad.anonymous}
+									setPopout={props.setPopout}
 								/>
 							</div>
 						);

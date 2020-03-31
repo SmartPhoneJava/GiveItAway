@@ -159,7 +159,7 @@ const CreateAdd = props => {
 	}
 
 	async function updateCities(id, rgs, token) {
-		const params = { v: props.apiVersion, access_token: token, country_id: id, need_all: 1 };
+		const params = { v: props.apiVersion, access_token: token, country_id: id };
 		console.log('region', region);
 		// if (rgs) {
 		// 	console.log('region exist', rgs);

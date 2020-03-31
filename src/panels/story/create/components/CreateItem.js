@@ -232,20 +232,20 @@ const CreateItem = props => {
 												}}
 												onClick={() => {
 													console.log('origin', img.origin);
-                          console.log('src', img.src);
-                          console.log('oper', IS_PLATFORM_ANDROID, IS_PLATFORM_IOS);
+													console.log('src', img.src);
+													console.log('oper', IS_PLATFORM_ANDROID, IS_PLATFORM_IOS);
 													let f = String(img.src);
 													if (IS_PLATFORM_ANDROID || IS_PLATFORM_IOS) {
 														// bridge.send('VKWebAppShowImages', {
 														// 	images: [f, f, f],
 														// });
-														bridge.send("VKWebAppShowImages", {
+														bridge.send('VKWebAppShowImages', {
 															images: [
-															  "https://pp.userapi.com/c639229/v639229113/31b31/KLVUrSZwAM4.jpg",
-															  "https://pp.userapi.com/c639229/v639229113/31b94/mWQwkgDjav0.jpg",
-															  "https://pp.userapi.com/c639229/v639229113/31b3a/Lw2it6bdISc.jpg"
-															]
-														  });
+																'https://pp.userapi.com/c639229/v639229113/31b31/KLVUrSZwAM4.jpg',
+																'https://pp.userapi.com/c639229/v639229113/31b94/mWQwkgDjav0.jpg',
+																'https://pp.userapi.com/c639229/v639229113/31b3a/Lw2it6bdISc.jpg',
+															],
+														});
 														return;
 													}
 

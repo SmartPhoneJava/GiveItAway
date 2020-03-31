@@ -1,11 +1,7 @@
 import React from 'react';
-import { Cell, Avatar, Button, Div, Card, PanelHeaderButton, CardGrid, Counter, InfoRow } from '@vkontakte/vkui';
-import validator from 'validator';
+import { Avatar, Button, PanelHeaderButton, Counter, InfoRow } from '@vkontakte/vkui';
 
-import Icon24MoreHorizontal from '@vkontakte/icons/dist/24/more_horizontal';
 import Icon24CommentOutline from '@vkontakte/icons/dist/24/comment_outline';
-import Icon24Chats from '@vkontakte/icons/dist/24/chats';
-import Icon24Live from '@vkontakte/icons/dist/24/live';
 import Icon24Message from '@vkontakte/icons/dist/24/message';
 import Icon16Place from '@vkontakte/icons/dist/16/place';
 import Icon24Delete from '@vkontakte/icons/dist/24/delete';
@@ -19,12 +15,9 @@ import Icon24Phone from '@vkontakte/icons/dist/24/phone';
 import Icon24Mention from '@vkontakte/icons/dist/24/mention';
 import Icon24Info from '@vkontakte/icons/dist/24/info';
 
-import { GetCategoryImage, GetCategoryImageSmall } from './Categories';
-
-import Cat from './../../img/cat.jpg';
 import './addsTab.css';
 
-const Add2 = props => {
+const Add4 = props => {
 	function detectContactsType(contacts) {
 		const ematlRG = '/.+@.+..+/i';
 		if (contacts.match(ematlRG)) {
@@ -201,7 +194,7 @@ const Add2 = props => {
 							</div>
 						</div>
 					</div>
-					<InfoRow style={{ paddingLeft: "5px", color: 'white' }}> {shortText(props.name, 300)} </InfoRow>
+					<InfoRow style={{ paddingLeft: '5px', color: 'white' }}> {shortText(props.name, 300)} </InfoRow>
 
 					<div
 						style={{
@@ -222,16 +215,18 @@ const Add2 = props => {
 				</div>
 				<div
 					style={{
-						paddingRight: "8px",
-						paddingLeft: "8px"
+						paddingRight: '8px',
+						paddingLeft: '8px',
 					}}
 				>
-					<div style={{
-						borderRadius: '10px',
-						height: '200px',
-						backgroundImage: 'url(' + image + ')',
-						backgroundSize: 'cover',
-					}}></div>
+					<div
+						style={{
+							borderRadius: '10px',
+							height: '200px',
+							backgroundImage: 'url(' + image + ')',
+							backgroundSize: 'cover',
+						}}
+					></div>
 				</div>
 				<div style={{ display: 'flex', padding: '10px' }}>
 					<div style={{ display: 'flex' }}>
@@ -273,4 +268,4 @@ const Add2 = props => {
 	);
 };
 
-export default Add2;
+export default Add4;
