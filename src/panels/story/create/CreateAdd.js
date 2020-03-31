@@ -53,8 +53,8 @@ const CreateAdd = props => {
 	const [description, setDescription] = useState('');
 	const [hideGeo, setHideGeo] = useState(false);
 	const [geodata, setGeodata] = useState({
-		long: 0.,
-		lat: 0.,
+		long: -1.,
+		lat: -1.,
 	});
 	const [adress, setAdress] = useState('Не указан');
 	const [valid, setValid] = useState(false);
@@ -276,7 +276,7 @@ const CreateAdd = props => {
 	function createAd(setPopout) {
 		if (valid) {
 			setPopout(<ScreenSpinner size="large" />);
-			const obj = JSON.stringify({
+			const ob = JSON.stringify({
 				author_id: User.getState().vk_id,
 				header: items[0].name,
 				text: items[0].description,
@@ -293,6 +293,13 @@ const CreateAdd = props => {
 				district: city.title,
 				comments_count: 0,
 			});
+			if (geodata.long > 0) {
+				ob.geo_position = {
+					long: geodata.long,
+					lat: geodata.lat,
+				},
+			}
+			const obj = JSON.stringify(ob);
 			console.log('loook at me', obj);
 
 			let cancel;
