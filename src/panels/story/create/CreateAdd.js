@@ -53,8 +53,8 @@ const CreateAdd = props => {
 	const [description, setDescription] = useState('');
 	const [hideGeo, setHideGeo] = useState(false);
 	const [geodata, setGeodata] = useState({
-		long: '0',
-		lat: '0',
+		long: 0.,
+		lat: 0.,
 	});
 	const [adress, setAdress] = useState('Не указан');
 	const [valid, setValid] = useState(false);
@@ -176,6 +176,7 @@ const CreateAdd = props => {
 				const data = new FormData();
 				console.log('fiile', photo);
 				data.append('file', photo);
+				let cancel
 
 				axios.axios({
 					method: 'post',

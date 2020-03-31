@@ -128,7 +128,7 @@ const Add5 = props => {
 			<div
 				style={{
 					borderRadius: '10px',
-					backgroundImage: 'url(' + image + ')',
+					backgroundImage: 'url(' + "http://localhost:8091/upload/ad_2/Picture%20134.jpg" + ')',
 					backgroundSize: 'cover',
 				}}
 			>
