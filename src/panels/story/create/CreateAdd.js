@@ -53,8 +53,8 @@ const CreateAdd = props => {
 	const [description, setDescription] = useState('');
 	const [hideGeo, setHideGeo] = useState(false);
 	const [geodata, setGeodata] = useState({
-		long: -1.,
-		lat: -1.,
+		long: -1,
+		lat: -1,
 	});
 	const [adress, setAdress] = useState('Не указан');
 	const [valid, setValid] = useState(false);
@@ -110,7 +110,7 @@ const CreateAdd = props => {
 		if (city.id < 0 || region.id < 0) {
 			v = false;
 		}
-		setValid(true);
+		setValid(v);
 	}, [items, props.category, feedbackType, contacts, country, city, region]);
 
 	function updateGeo() {
@@ -176,15 +176,16 @@ const CreateAdd = props => {
 				const data = new FormData();
 				console.log('fiile', photo);
 				data.append('file', photo);
-				let cancel
+				let cancel;
 
-				axios.axios({
+				axios({
 					method: 'post',
 					url: Addr.getState() + '/api/ad/' + id + '/upload_image',
 					withCredentials: true,
 					data: data,
 					cancelToken: new axios.CancelToken(c => (cancel = c)),
-				}).then(function(response) {
+				})
+					.then(function(response) {
 						console.log('success uploaded', response);
 					})
 					.catch(function(error) {
@@ -200,7 +201,7 @@ const CreateAdd = props => {
 				}}
 				action="Отменить"
 				onActionClick={() => {
-					deleteAd(props.setPopout, id);
+					deleteAd(props.setPopout, id, props.refresh);
 				}}
 				before={
 					<Avatar size={24} style={{ background: 'green' }}>
@@ -209,26 +210,6 @@ const CreateAdd = props => {
 				}
 			>
 				Объявление создано! Спасибо, что делаете мир лучше :)
-			</Snackbar>
-		);
-	}
-
-	function saveFail(err, repeat) {
-		props.setSnackbar(
-			<Snackbar
-				onClose={() => props.setSnackbar(null)}
-				action="Повторить"
-				onActionClick={() => {
-					props.setSnackbar(null);
-					repeat();
-				}}
-				before={
-					<Avatar size={24} style={{ background: 'red' }}>
-						<Icon24Cancel fill="#fff" width={14} height={14} />
-					</Avatar>
-				}
-			>
-				Произошла ошибка: {err}
 			</Snackbar>
 		);
 	}
@@ -247,57 +228,28 @@ const CreateAdd = props => {
 			</Snackbar>
 		);
 	}
-	function deleteAd(setPopout, ad_id) {
-		setPopout(<ScreenSpinner size="large" />);
-		let cancel;
-
-		axios({
-			method: 'post',
-			withCredentials: true,
-			url: Addr.getState() + 'ad/' + ad_id + '/delete',
-			cancelToken: new axios.CancelToken(c => (cancel = c)),
-		})
-			.then(function(response) {
-				console.log('Вот ответ от бека на запрос удаления объявления ', response);
-				console.log('json json json ', response.data);
-				setPopout(null);
-				if (response.status != 200) {
-					saveFail(response.status + ' - ' + response.statusText, () => deleteAd(setPopout, ad_id));
-				}
-				return response.data;
-			})
-			.catch(function(error) {
-				console.log('Request failed', error);
-				setPopout(null);
-				saveFail('Нет соединения с сервером', () => deleteAd(setPopout, ad_id));
-			});
-	}
 
 	function createAd(setPopout) {
 		if (valid) {
 			setPopout(<ScreenSpinner size="large" />);
-			const ob = JSON.stringify({
+			const ob = {
 				author_id: User.getState().vk_id,
 				header: items[0].name,
 				text: items[0].description,
 				is_auction: false,
 				feedback_type: feedbackType,
 				extra_field: contacts,
-				geo_position: {
-					long: geodata.long,
-					lat: geodata.lat,
-				},
 				status: 'offer',
-				category: items[0].category,
+				category: props.category,
 				region: region.title,
 				district: city.title,
 				comments_count: 0,
-			});
+			};
 			if (geodata.long > 0) {
 				ob.geo_position = {
 					long: geodata.long,
 					lat: geodata.lat,
-				},
+				};
 			}
 			const obj = JSON.stringify(ob);
 			console.log('loook at me', obj);
@@ -318,7 +270,11 @@ const CreateAdd = props => {
 					if (response.status == 201) {
 						saveSuccess(props.goToAds, response.data.ad_id);
 					} else {
-						saveFail(response.status + ' - ' + response.statusText, () => createAd(setPopout));
+						saveFail(
+							response.status + ' - ' + response.statusText,
+							() => createAd(setPopout),
+							props.setSnackbar
+						);
 					}
 					return response.data;
 				})
@@ -331,7 +287,6 @@ const CreateAdd = props => {
 			saveCancel();
 		}
 	}
-
 	return (
 		<div>
 			{/*
@@ -584,5 +539,68 @@ const CreateAdd = props => {
 		</div>
 	);
 };
+
+export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
+	setPopout(<ScreenSpinner size="large" />);
+	let cancel;
+
+	axios({
+		method: 'post',
+		withCredentials: true,
+		url: Addr.getState() + '/api/ad/' + ad_id + '/delete',
+		cancelToken: new axios.CancelToken(c => (cancel = c)),
+	})
+		.then(function(response) {
+			setPopout(null);
+			if (response.status != 200) {
+				saveFail(
+					response.status + ' - ' + response.statusText,
+					() => deleteAd(setPopout, ad_id, setSnackbar, refresh),
+					setSnackbar
+				);
+			} else {
+				setSnackbar(
+					<Snackbar
+						onClose={() => {
+							setSnackbar(null);
+						}}
+						before={
+							<Avatar size={24} style={{ background: 'green' }}>
+								<Icon24DoneOutline fill="#fff" width={14} height={14} />
+							</Avatar>
+						}
+					>
+						Объявление удалено!
+					</Snackbar>
+				);
+			}
+			return response.data;
+		})
+		.catch(function(error) {
+			console.log('Request failed', error);
+			setPopout(null);
+			saveFail('Нет соединения с сервером', () => deleteAd(setPopout, ad_id, setSnackbar, refresh), setSnackbar);
+		});
+};
+
+function saveFail(err, repeat, setSnackbar) {
+	setSnackbar(
+		<Snackbar
+			onClose={() => setSnackbar(null)}
+			action="Повторить"
+			onActionClick={() => {
+				setSnackbar(null);
+				repeat();
+			}}
+			before={
+				<Avatar size={24} style={{ background: 'red' }}>
+					<Icon24Cancel fill="#fff" width={14} height={14} />
+				</Avatar>
+			}
+		>
+			Произошла ошибка: {err}
+		</Snackbar>
+	);
+}
 
 export default CreateAdd;

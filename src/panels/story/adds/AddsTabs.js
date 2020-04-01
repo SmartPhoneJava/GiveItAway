@@ -90,8 +90,11 @@ const AddsTabs = props => {
 				dropFilters={props.dropFilters}
 				category={props.category}
 				mode={mode}
+				refreshList={props.refreshList}
+				refresh={props.refresh}
 				setPopout={props.setPopout}
 				onFiltersClick={props.onFiltersClick}
+				setSnackbar={props.setSnackbar}
 			></AddsTab>
 		</React.Fragment>
 	);

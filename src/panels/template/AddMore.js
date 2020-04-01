@@ -25,7 +25,7 @@ import Icon24Notification from '@vkontakte/icons/dist/24/notification';
 import Icon24Phone from '@vkontakte/icons/dist/24/phone';
 import Icon24Mention from '@vkontakte/icons/dist/24/mention';
 import Icon24Info from '@vkontakte/icons/dist/24/info';
-import Icon24Message from '@vkontakte/icons/dist/24/message'
+import Icon24Message from '@vkontakte/icons/dist/24/message';
 
 import Icon24Settings from '@vkontakte/icons/dist/24/settings';
 import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
@@ -75,7 +75,7 @@ const AddMore = props => {
 
 	function detectContactsType(contacts) {
 		if (!contacts) {
-			return "error"
+			return 'error';
 		}
 		const ematlRG = '/.+@.+..+/i';
 		if (contacts.match(ematlRG)) {
@@ -103,7 +103,7 @@ const AddMore = props => {
 	}
 
 	function getContacts(contacts) {
-		if (contacts != '') {
+		if (contacts && contacts != '') {
 			return (
 				<Button mode="overlay_primary" size="m" before={getContactsImage(detectContactsType(contacts))}>
 					{contacts}
@@ -192,7 +192,7 @@ const AddMore = props => {
 		return;
 	}
 
-	const image = ad.photos ? ad.photos[photoIndex] : '';
+	const image = ad.pathes_to_photo ? ad.pathes_to_photo[photoIndex].PhotoUrl : '';
 
 	return (
 		<div
@@ -208,7 +208,7 @@ const AddMore = props => {
 				style={{
 					borderTopLeftRadius: '10px',
 					borderTopRightRadius: '10px',
-					backgroundImage: 'url(' + image + ')',
+					backgroundImage: 'url(' + encodeURI(image) + ')',
 					backgroundSize: 'cover',
 				}}
 			>
@@ -324,7 +324,7 @@ const AddMore = props => {
 								fontStyle: 'italic',
 							}}
 						>
-							<Icon16Place /> {ad.location}
+							<Icon16Place /> {props.ad.region + ', ' + props.ad.district}
 						</div>
 					</div>
 				</div>
@@ -343,11 +343,11 @@ const AddMore = props => {
 					>
 						<HorizontalScroll>
 							<div style={{ display: 'flex' }}>
-								{ad.photos
-									? ad.photos.map((img, i) => {
+								{ad.pathes_to_photo
+									? ad.pathes_to_photo.map((img, i) => {
 											return (
 												<div
-													key={i}
+													key={img.AdPhotoId}
 													style={{
 														alignItems: 'center',
 														justifyContent: 'center',
@@ -361,7 +361,7 @@ const AddMore = props => {
 														}}
 													>
 														<img
-															src={img}
+															src={img.PhotoUrl}
 															style={{
 																height: '50px',
 															}}

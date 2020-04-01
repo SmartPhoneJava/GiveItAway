@@ -14,7 +14,8 @@ export default function useAdSearch(
   category,
   mode,
   pageNumber,
-  rowsPerPage
+  rowsPerPage,
+  needUpdate
 ) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -76,5 +77,5 @@ export default function useAdSearch(
     return () => cancel();
   }, [category, mode, query, pageNumber]);
 
-  return { newPage: pageNumber, loading, error, ads, hasMore };
+  return { newPage: pageNumber, loading, error, ads, hasMore, needUpdate };
 }

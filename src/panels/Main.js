@@ -69,6 +69,8 @@ const Main = () => {
 	const [vkPlatform, setVkPlatform] = useState('no');
 	const [appID, setAppID] = useState(0);
 
+	const [refreshList, setRefreshList] = useState(1);
+
 	function goSearch() {
 		setActivePanel('search');
 	}
@@ -78,6 +80,12 @@ const Main = () => {
 		if (snack != undefined) {
 			setSnackbar(snack);
 		}
+	}
+
+	function refresh() {
+		setActiveStory(profile);
+		setRefreshList(refreshList + 1);
+		setActiveStory(ads);
 	}
 
 	useEffect(() => {
@@ -103,7 +111,8 @@ const Main = () => {
 				}
 			}
 
-			const vk_platform = get['vk_platform'];
+			const reg = /[\r\n]+/g;
+			const vk_platform = get['vk_platform'].replace(reg, '\n');
 			setVkPlatform(vk_platform);
 			setAppID(parseInt(get['vk_app_id']));
 		}
@@ -191,7 +200,10 @@ const Main = () => {
 						onFiltersClick={() => setActiveModal(MODAL_FILTERS)}
 						goSearch={goSearch}
 						setPopout={setPopout}
+						setSnackbar={setSnackbar}
 						category={category}
+						refreshList={refreshList}
+						refresh={refresh}
 						dropFilters={() => {
 							setCategory(CategoryNo);
 						}}
@@ -222,7 +234,7 @@ const Main = () => {
 							</PanelHeaderButton>
 						}
 					>
-						{choosen ? choosen.name : 'баг'}
+						{choosen ? choosen.header : 'баг'}
 					</PanelHeaderSimple>
 					{choosen ? <AddMore ad={choosen} setPopout={setPopout} /> : Error}
 					{snackbar}
@@ -254,6 +266,7 @@ const Main = () => {
 						setSnackbar={setSnackbar}
 						category={category2}
 						VkUser={VkUser}
+						refresh={refresh}
 						chooseCategory={() => setActiveModal2(MODAL_CATEGORIES)}
 					/>
 					{snackbar}

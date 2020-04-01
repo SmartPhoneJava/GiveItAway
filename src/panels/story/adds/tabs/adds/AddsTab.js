@@ -193,7 +193,14 @@ const AddsTab = props => {
 
 	const [pageNumber, setPageNumber] = useState(1);
 
-	const { loading, error, ads, hasMore, newPage } = useAdSearch(search, props.category, props.mode, pageNumber, 5);
+	const { loading, error, ads, hasMore, newPage } = useAdSearch(
+		search,
+		props.category,
+		props.mode,
+		pageNumber,
+		5,
+		props.refreshList
+	);
 
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
@@ -217,7 +224,15 @@ const AddsTab = props => {
 	}
 
 	function Ad(ad) {
-		return <Add5 openAd={() => props.openAd(ad)} ad={ad} setPopout={props.setPopout} />;
+		return (
+			<Add5
+				openAd={() => props.openAd(ad)}
+				ad={ad}
+				setPopout={props.setPopout}
+				setSnackbar={props.setSnackbar}
+				refresh={props.refresh}
+			/>
+		);
 	}
 
 	return (
@@ -241,11 +256,11 @@ const AddsTab = props => {
 						}
 					})
 				) : error ? (
-					/*<Error />*/
-					addsArrDD.map(ad => {
-						return <div key={ad.ad_id}>{Ad(ad)}</div>;
-					})
+					<Error />
 				) : (
+					// addsArrDD.map(ad => {
+					// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
+					// })
 					<AdNotFound dropFilters={props.dropFilters} />
 				)}
 			</Group>

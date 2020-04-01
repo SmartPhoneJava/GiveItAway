@@ -17,6 +17,8 @@ import Icon24Info from '@vkontakte/icons/dist/24/info';
 import Icon24Settings from '@vkontakte/icons/dist/24/settings';
 import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 
+import { deleteAd } from './../story/create/CreateAdd';
+
 import './addsTab.css';
 
 const Add5 = props => {
@@ -112,8 +114,7 @@ const Add5 = props => {
 		return;
 	}
 
-	console.log("props.ad.pathes_to_photo", 'http://localhost:8091/'+props.ad.pathes_to_photo[0].PhotoUrl)
-	const image = props.ad.pathes_to_photo ? 'http://localhost:8091/'+props.ad.pathes_to_photo[0].PhotoUrl : '';
+	const image = props.ad.pathes_to_photo ? props.ad.pathes_to_photo[0].PhotoUrl : '';
 
 	return (
 		<div
@@ -128,7 +129,7 @@ const Add5 = props => {
 			<div
 				style={{
 					borderRadius: '10px',
-					backgroundImage: 'url(' + "http://localhost:8091/upload/ad_2/Picture%20134.jpg" + ')',
+					backgroundImage: 'url(' + encodeURI(image) + ')',
 					backgroundSize: 'cover',
 				}}
 			>
@@ -168,7 +169,7 @@ const Add5 = props => {
 									color: 'white',
 								}}
 							>
-								{!props.ad.anonymous ? props.ad.author.name+' '+props.ad.author.surname : ''}
+								{!props.ad.anonymous ? props.ad.author.name + ' ' + props.ad.author.surname : ''}
 							</div>
 							<div
 								style={{
@@ -185,8 +186,31 @@ const Add5 = props => {
 							onClick={() => {
 								props.setPopout(
 									<ActionSheet onClose={() => props.setPopout(null)}>
-										<ActionSheetItem autoclose>Объявить завершенным</ActionSheetItem>
-										<ActionSheetItem autoclose mode="destructive">
+										<ActionSheetItem
+											autoclose
+											onClick={() => {
+												deleteAd(
+													props.setPopout,
+													props.ad.ad_id,
+													props.setSnackbar,
+													props.refresh
+												);
+											}}
+										>
+											Объявить завершенным
+										</ActionSheetItem>
+										<ActionSheetItem
+											autoclose
+											mode="destructive"
+											onClick={() => {
+												deleteAd(
+													props.setPopout,
+													props.ad.ad_id,
+													props.setSnackbar,
+													props.refresh
+												);
+											}}
+										>
 											Удалить
 										</ActionSheetItem>
 										{osname === IOS && (
@@ -217,7 +241,7 @@ const Add5 = props => {
 								fontStyle: 'italic',
 							}}
 						>
-							<Icon16Place /> {props.ad.region+', '+props.ad.district}
+							<Icon16Place /> {props.ad.region + ', ' + props.ad.district}
 						</div>
 					</div>
 				</div>
