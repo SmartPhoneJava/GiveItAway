@@ -40,6 +40,8 @@ import Tea from './../../img/tea.jpg';
 import Playstein from './../../img/playstein.jpg';
 import Bb from './../../img/bb.jpg';
 
+import OpenActions from "./components/actions"
+
 export const AdDefault = {
 	ad_id: -1,
 	status: 'offer',
@@ -286,19 +288,7 @@ const AddMore = props => {
 								style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
 								size="m"
 								onClick={() => {
-									props.setPopout(
-										<ActionSheet onClose={() => props.setPopout(null)}>
-											<ActionSheetItem autoclose>Объявить завершенным</ActionSheetItem>
-											<ActionSheetItem autoclose mode="destructive">
-												Удалить
-											</ActionSheetItem>
-											{osname === IOS && (
-												<ActionSheetItem autoclose mode="cancel">
-													Отменить
-												</ActionSheetItem>
-											)}
-										</ActionSheet>
-									);
+									OpenActions(props.setPopout, props.setSnackbar, props.refresh, props.ad.ad_id);
 								}}
 								disabled={ad.status !== 'offer'}
 							>

@@ -4,8 +4,6 @@ import { Avatar, PanelHeaderButton, ActionSheet, ActionSheetItem, InfoRow, osnam
 import Icon24CommentOutline from '@vkontakte/icons/dist/24/comment_outline';
 import Icon24Chats from '@vkontakte/icons/dist/24/chats';
 import Icon16Place from '@vkontakte/icons/dist/16/place';
-import Icon24Delete from '@vkontakte/icons/dist/24/delete';
-import Icon24Hide from '@vkontakte/icons/dist/24/hide';
 
 import Icon24ShareOutline from '@vkontakte/icons/dist/24/share_outline';
 import Icon24LikeOutline from '@vkontakte/icons/dist/24/like_outline';
@@ -17,7 +15,7 @@ import Icon24Info from '@vkontakte/icons/dist/24/info';
 import Icon24Settings from '@vkontakte/icons/dist/24/settings';
 import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 
-import { deleteAd } from './../story/create/CreateAdd';
+import OpenActions from "./components/actions"
 
 import './addsTab.css';
 
@@ -184,42 +182,7 @@ const Add5 = props => {
 							style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
 							size="m"
 							onClick={() => {
-								props.setPopout(
-									<ActionSheet onClose={() => props.setPopout(null)}>
-										<ActionSheetItem
-											autoclose
-											onClick={() => {
-												deleteAd(
-													props.setPopout,
-													props.ad.ad_id,
-													props.setSnackbar,
-													props.refresh
-												);
-											}}
-										>
-											Объявить завершенным
-										</ActionSheetItem>
-										<ActionSheetItem
-											autoclose
-											mode="destructive"
-											onClick={() => {
-												deleteAd(
-													props.setPopout,
-													props.ad.ad_id,
-													props.setSnackbar,
-													props.refresh
-												);
-											}}
-										>
-											Удалить
-										</ActionSheetItem>
-										{osname === IOS && (
-											<ActionSheetItem autoclose mode="cancel">
-												Отменить
-											</ActionSheetItem>
-										)}
-									</ActionSheet>
-								);
+								OpenActions(props.setPopout, props.setSnackbar, props.refresh, props.ad.ad_id);
 							}}
 							disabled={props.ad.status !== 'offer'}
 						>

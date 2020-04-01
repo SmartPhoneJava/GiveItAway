@@ -236,7 +236,19 @@ const Main = () => {
 					>
 						{choosen ? choosen.header : 'баг'}
 					</PanelHeaderSimple>
-					{choosen ? <AddMore ad={choosen} setPopout={setPopout} /> : Error}
+					{choosen ? (
+						<AddMore
+							refresh={id => {
+								setActivePanel('header-search');
+								SetDeleteID(id);
+							}}
+							ad={choosen}
+							setPopout={setPopout}
+							setSnackbar={setSnackbar}
+						/>
+					) : (
+						Error
+					)}
 					{snackbar}
 				</Panel>
 			</View>
@@ -266,7 +278,9 @@ const Main = () => {
 						setSnackbar={setSnackbar}
 						category={category2}
 						VkUser={VkUser}
-						refresh={SetDeleteID}
+						refresh={id => {
+							SetDeleteID(id);
+						}}
 						chooseCategory={() => setActiveModal2(MODAL_CATEGORIES)}
 					/>
 					{snackbar}
