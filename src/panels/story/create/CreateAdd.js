@@ -192,7 +192,6 @@ const CreateAdd = props => {
 				};
 			}
 			const obj = JSON.stringify(ob);
-			console.log('loook at me', obj);
 
 			let cancel;
 
@@ -204,8 +203,6 @@ const CreateAdd = props => {
 				cancelToken: new axios.CancelToken(c => (cancel = c)),
 			})
 				.then(function(response) {
-					console.log('Вот ответ от бека на запрос создания объявления ', response);
-					console.log('json json json ', response.data);
 					setPopout(null);
 					if (response.status == 201) {
 						saveSuccess(props.goToAds, response.data.ad_id);

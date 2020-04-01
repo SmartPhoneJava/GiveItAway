@@ -1,5 +1,5 @@
 import React from 'react';
-import { ModalRoot, ModalPage } from '@vkontakte/vkui';
+import { ModalRoot, ModalPage, Group, Header, FormLayout, FormLayoutGroup, Radio } from '@vkontakte/vkui';
 
 import { CategoriesRB, CategoriesLabel } from './../../template/Categories';
 
@@ -34,6 +34,58 @@ const AddsModal = props => {
 					props.city,
 					props.setCity
 				)}
+				<Group separator="show" header={<Header mode="secondary">Отсортировтаь по</Header>}>
+					{props.sort == 'time' ? (
+						<div>
+							{' '}
+							<Radio
+								key="1"
+								value="time"
+								name="sort"
+								defaultChecked
+								onClick={e => {
+									props.setSort(e.currentTarget.value);
+								}}
+							>
+								По времени
+							</Radio>
+							<Radio
+								key="2"
+								value="geo"
+								name="sort"
+								onClick={e => {
+									props.setSort(e.currentTarget.value);
+								}}
+							>
+								По близости
+							</Radio>
+						</div>
+					) : (
+						<div>
+							<Radio
+								key="3"
+								value="time"
+								name="sort"
+								onClick={e => {
+									props.setSort(e.currentTarget.value);
+								}}
+							>
+								По времени
+							</Radio>
+							<Radio
+								key="4"
+								value="geo"
+								name="sort"
+								defaultChecked
+								onClick={e => {
+									props.setSort(e.currentTarget.value);
+								}}
+							>
+								По близости
+							</Radio>
+						</div>
+					)}
+				</Group>
 			</ModalPage>
 			<ModalPage
 				id={MODAL_CATEGORIES}

@@ -8,26 +8,21 @@ import { User } from './AddsTab/../../../../../../store/user';
 import { CategoryNo } from './../../../../template/Categories';
 import { NoRegion } from '../../../../template/Location';
 
-let prevCategory = '';
-let prevDeleteID = '';
-
-export default function useAdSearch(query, category, mode, pageNumber, rowsPerPage, deleteID, city, region) {
+export default function useAdSearch(query, category, mode, pageNumber, rowsPerPage, deleteID, city, region, sort) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
 	const [ads, setAds] = useState([]);
 	const [hasMore, setHasMore] = useState(false);
 
 	useEffect(() => {
-    setAds([]);
-    pageNumber = 1
-	}, [category, mode, query, city, region]);
+		setAds([]);
+		pageNumber = 1;
+	}, [category, mode, query, city, region, sort]);
 
 	useEffect(() => {
-		console.log('deleteID:', deleteID);
 		if (deleteID > 0) {
 			setAds(
 				ads.filter(x => {
-					console.log('x.ad_id', x.ad_id, x.ad_id != deleteID);
 					return x.ad_id != deleteID;
 				})
 			);
@@ -39,31 +34,30 @@ export default function useAdSearch(query, category, mode, pageNumber, rowsPerPa
 		setError(false);
 		let cancel;
 
-		if (prevCategory != category) {
-			pageNumber = 1;
-		}
-		console.log('prevCategory:', prevCategory, category, pageNumber);
-		prevCategory = category;
+		// if (prevCategory != category) {
+		// 	pageNumber = 1;
+		// }
+		// console.log('prevCategory:', prevCategory, category, pageNumber);
+		// prevCategory = category;
 
 		let params = {
 			rows_per_page: rowsPerPage,
 			page: pageNumber,
 			category: category,
+			sort_by: sort,
 		};
 		if (category == '' || category == CategoryNo) {
 			params = {
 				rows_per_page: rowsPerPage,
 				page: pageNumber,
 			};
-    }
-    if (region && region != NoRegion) {
-      console.log("regionregion", region)
-      params.region=region.title
-    }
-    if (city && city != NoRegion) {
-      console.log("citycity", city)
-      params.district=city.title
-    }
+		}
+		if (region && region != NoRegion) {
+			params.region = region.title;
+		}
+		if (city && city != NoRegion) {
+			params.district = city.title;
+		}
 		if (mode != 'all') {
 			params.author_id = User.getState().vk_id;
 		}
@@ -91,8 +85,7 @@ export default function useAdSearch(query, category, mode, pageNumber, rowsPerPa
 				}
 			});
 		return () => cancel();
-	}, [category, mode, query, pageNumber, city, region]);
+	}, [category, mode, query, pageNumber, city, region, sort]);
 
-	console.log('aaaaaaaaaaaaaaaaaaa', ads);
 	return { newPage: pageNumber, ads, loading, error, hasMore };
 }

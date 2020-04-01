@@ -207,18 +207,9 @@ const AddsTab = props => {
 		5,
 		props.deleteID,
 		props.city,
-		props.region
+		props.region,
+		props.sort
 	);
-
-	// useEffect(() => {
-	// 	console.log('deleteID:', props.deleteID);
-	// 	if (props.deleteID > 0) {
-	// 		ads = ads.filter(x => {
-	// 			x.ad_id != props.deleteID
-	// 			console.log('x.ad_id', x.ad_id, x.ad_id != props.deleteID);
-	// 		});
-	// 	}
-	// }, [props.deleteID]);
 
 	const observer = useRef();
 	const lastAdElementRef = useCallback(

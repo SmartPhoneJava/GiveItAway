@@ -64,7 +64,6 @@ const CreateItem = props => {
 			}
 			var reader = new FileReader();
 			// Closure to capture the file information.
-			console.log('we are here');
 			reader.onload = (function(theFile) {
 				return function(e) {
 					KEY++;
@@ -78,8 +77,6 @@ const CreateItem = props => {
 
 	const loadPhoto = e => {
 		const file = e.target.files[0];
-		console.log('files', e.target.files);
-		console.log('file:', file);
 		const newLength = photosUrl.length + 1;
 		setPhotoText(PHOTO_TEXT + '. Загружено ' + newLength + '/3');
 		props.setItems({

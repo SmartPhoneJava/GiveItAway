@@ -97,6 +97,8 @@ const AddsTabs = props => {
 				city={props.city}
 				region={props.region}
 				country={props.country}
+
+				sort={props.sort}
 				
 				refresh={props.refresh}
 				setPopout={props.setPopout}

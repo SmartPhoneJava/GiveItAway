@@ -34,7 +34,7 @@ import { CategoryNo } from './template/Categories';
 
 import Error from './placeholders/error';
 
-import {NoRegion} from './template/Location'
+import { NoRegion } from './template/Location';
 
 import AddsModal, { MODAL_FILTERS, MODAL_CATEGORIES } from './story/adds/AddsModal';
 import CreateModal from './story/create/CreateModal';
@@ -76,6 +76,8 @@ const Main = () => {
 	const [city, setCity] = useState(NoRegion);
 	const [country, setCountry] = useState({ id: 1, title: 'Россия' });
 	const [region, setRegion] = useState(NoRegion);
+
+	const [sort, setSort] = useState('time');
 
 	function goSearch() {
 		setActivePanel('search');
@@ -139,13 +141,11 @@ const Main = () => {
 				credentials: 'include',
 			})
 				.then(function(response) {
-					console.log('Вот ответ от бека на запрос регистрации ', response);
 					return response.json();
 				})
 				.then(function(data) {
 					User.dispatch({ type: 'set', new_state: data });
 					console.log('Request successful', data.name, data.surname, data.photo_url, data.carma);
-					console.log('loook at me', User.getState());
 					return data;
 				})
 				.catch(function(error) {
@@ -206,6 +206,8 @@ const Main = () => {
 						setCity={setCity}
 						setCountry={setCountry}
 						setRegion={setRegion}
+						sort={sort}
+						setSort={setSort}
 					/>
 				}
 				header={false}
@@ -222,11 +224,12 @@ const Main = () => {
 						city={city}
 						country={country}
 						region={region}
+						sort={sort}
 						dropFilters={() => {
 							setCategory(CategoryNo);
-							setCity(NoRegion)
-							setCountry(NoRegion)
-							setRegion(NoRegion)
+							setCity(NoRegion);
+							setCountry(NoRegion);
+							setRegion(NoRegion);
 						}}
 						openAd={ad => {
 							setChoosen(ad);

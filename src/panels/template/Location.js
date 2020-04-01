@@ -19,7 +19,6 @@ async function updateCities(apiVersion, setCities, id, rgs, token) {
 	});
 
 	request_id++;
-	console.log('cities:', ci);
 	setCities(ci.response.items);
 }
 
@@ -31,7 +30,6 @@ async function updateRegions(apiVersion, setRegions, id, token) {
 	});
 
 	request_id++;
-	console.log('regions:', rgs);
 	setRegions(rgs.response.items);
 }
 
@@ -43,7 +41,6 @@ export const Location = (appID, apiVersion, vkPlatform, country, setCountry, reg
 	const [accessToken, setAccessToken] = useState('');
 
 	useEffect(() => {
-		console.log('appID', appID);
 		async function loadDatabaseInfo() {
 			const el = await bridge.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' });
 			setAccessToken(el.access_token);
