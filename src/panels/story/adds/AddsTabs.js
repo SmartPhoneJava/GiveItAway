@@ -90,7 +90,7 @@ const AddsTabs = props => {
 				dropFilters={props.dropFilters}
 				category={props.category}
 				mode={mode}
-				refreshList={props.refreshList}
+				deleteID={props.deleteID}
 				refresh={props.refresh}
 				setPopout={props.setPopout}
 				onFiltersClick={props.onFiltersClick}

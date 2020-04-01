@@ -193,14 +193,24 @@ const AddsTab = props => {
 
 	const [pageNumber, setPageNumber] = useState(1);
 
-	const { loading, error, ads, hasMore, newPage } = useAdSearch(
+	let { loading, ads, error, hasMore, newPage } = useAdSearch(
 		search,
 		props.category,
 		props.mode,
 		pageNumber,
 		5,
-		props.refreshList
+		props.deleteID
 	);
+
+	// useEffect(() => {
+	// 	console.log('deleteID:', props.deleteID);
+	// 	if (props.deleteID > 0) {
+	// 		ads = ads.filter(x => {
+	// 			x.ad_id != props.deleteID
+	// 			console.log('x.ad_id', x.ad_id, x.ad_id != props.deleteID);
+	// 		});
+	// 	}
+	// }, [props.deleteID]);
 
 	const observer = useRef();
 	const lastAdElementRef = useCallback(

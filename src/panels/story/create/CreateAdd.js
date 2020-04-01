@@ -559,6 +559,8 @@ export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
 					setSnackbar
 				);
 			} else {
+				refresh(ad_id)
+				console.log("i set", ad_id)
 				setSnackbar(
 					<Snackbar
 						onClose={() => {

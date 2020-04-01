@@ -69,7 +69,7 @@ const Main = () => {
 	const [vkPlatform, setVkPlatform] = useState('no');
 	const [appID, setAppID] = useState(0);
 
-	const [refreshList, setRefreshList] = useState(1);
+	const [deleteID, SetDeleteID] = useState(-1);
 
 	function goSearch() {
 		setActivePanel('search');
@@ -202,8 +202,8 @@ const Main = () => {
 						setPopout={setPopout}
 						setSnackbar={setSnackbar}
 						category={category}
-						refreshList={refreshList}
-						refresh={refresh}
+						refresh={SetDeleteID}
+						deleteID={deleteID}
 						dropFilters={() => {
 							setCategory(CategoryNo);
 						}}
@@ -266,7 +266,7 @@ const Main = () => {
 						setSnackbar={setSnackbar}
 						category={category2}
 						VkUser={VkUser}
-						refresh={refresh}
+						refresh={SetDeleteID}
 						chooseCategory={() => setActiveModal2(MODAL_CATEGORIES)}
 					/>
 					{snackbar}
