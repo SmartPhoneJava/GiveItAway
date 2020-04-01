@@ -34,6 +34,8 @@ import { CategoryNo } from './template/Categories';
 
 import Error from './placeholders/error';
 
+import {NoRegion} from './template/Location'
+
 import AddsModal, { MODAL_FILTERS, MODAL_CATEGORIES } from './story/adds/AddsModal';
 import CreateModal from './story/create/CreateModal';
 
@@ -70,6 +72,10 @@ const Main = () => {
 	const [appID, setAppID] = useState(0);
 
 	const [deleteID, SetDeleteID] = useState(-1);
+
+	const [city, setCity] = useState(NoRegion);
+	const [country, setCountry] = useState({ id: 1, title: 'Россия' });
+	const [region, setRegion] = useState(NoRegion);
 
 	function goSearch() {
 		setActivePanel('search');
@@ -187,10 +193,19 @@ const Main = () => {
 				activePanel={activePanel}
 				modal={
 					<AddsModal
+						appID={appID}
+						apiVersion={ApiVersion}
+						vkPlatform={vkPlatform}
 						activeModal={activeModal}
 						setActiveModal={setActiveModal}
 						category={category}
 						setCategory={setCategory}
+						city={city}
+						country={country}
+						region={region}
+						setCity={setCity}
+						setCountry={setCountry}
+						setRegion={setRegion}
 					/>
 				}
 				header={false}
@@ -204,6 +219,9 @@ const Main = () => {
 						category={category}
 						refresh={SetDeleteID}
 						deleteID={deleteID}
+						city={city}
+						country={country}
+						region={region}
 						dropFilters={() => {
 							setCategory(CategoryNo);
 						}}

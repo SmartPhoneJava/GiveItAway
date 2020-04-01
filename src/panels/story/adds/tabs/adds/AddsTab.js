@@ -199,7 +199,9 @@ const AddsTab = props => {
 		props.mode,
 		pageNumber,
 		5,
-		props.deleteID
+		props.deleteID,
+		props.city,
+		props.region
 	);
 
 	// useEffect(() => {

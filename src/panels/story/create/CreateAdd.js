@@ -5,8 +5,6 @@ import {
 	Button,
 	Group,
 	Header,
-	Select,
-	FormLayout,
 	Div,
 	InfoRow,
 	Separator,
@@ -18,7 +16,6 @@ import {
 import Geocoder from 'react-native-geocoding';
 
 import CreateItem from './components/CreateItem';
-import ChooseAddType from './components/ChooseType';
 import ChooseFeedback from './components/ChooseFeedback';
 
 import Icon24Add from '@vkontakte/icons/dist/24/add';
@@ -31,13 +28,9 @@ import { Addr } from '../../../store/addr';
 
 import { CategoryNo } from './../../template/Categories';
 
-import Icon24Locate from '@vkontakte/icons/dist/32/place';
+import {Location, NoRegion} from "./../../template/Location"
 
 let itemID = 1;
-
-let request_id = 0;
-
-const NoRegion = { id: -1, title: '' };
 
 const CreateAdd = props => {
 	const [items, setItems] = useState([
@@ -56,40 +49,17 @@ const CreateAdd = props => {
 		long: -1,
 		lat: -1,
 	});
+	
 	const [adress, setAdress] = useState('Не указан');
 	const [valid, setValid] = useState(false);
 	const [contacts, setContacts] = useState('');
 	const [feedbackType, setFeedbackType] = useState('ls');
 	const [itemDescription, setItemDescription] = useState(false);
 
-	const [countries, setCountries] = useState([NoRegion]);
-	const [regions, setRegions] = useState([NoRegion]);
-	const [cities, setCities] = useState([NoRegion]);
-
 	const [city, setCity] = useState(NoRegion);
 	const [country, setCountry] = useState({ id: 1, title: 'Россия' });
 	const [region, setRegion] = useState(NoRegion);
-	const [accessToken, setAccessToken] = useState('');
 
-	useEffect(() => {
-		console.log('appID', props.appID);
-		async function loadDatabaseInfo() {
-			const el = await bridge.send('VKWebAppGetAuthToken', { app_id: props.appID, scope: '' });
-			setAccessToken(el.access_token);
-			const ctrs = await bridge.send('VKWebAppCallAPIMethod', {
-				method: 'database.getCountries',
-				request_id: 'api' + request_id,
-				params: { v: props.apiVersion, access_token: el.access_token },
-			});
-
-			console.log('el.access_token', el.access_token);
-			request_id++;
-			setCountries(ctrs.response.items);
-			updateRegions(1, el.access_token);
-			updateCities(1, null, el.access_token);
-		}
-		loadDatabaseInfo();
-	}, []);
 	useEffect(() => {
 		let v = true;
 		items.forEach(val => {
@@ -139,36 +109,6 @@ const CreateAdd = props => {
 	useEffect(() => {
 		updateGeo();
 	}, []);
-
-	async function updateRegions(id, token) {
-		const rgs = await bridge.send('VKWebAppCallAPIMethod', {
-			method: 'database.getRegions',
-			request_id: 'region' + request_id,
-			params: { v: props.apiVersion, access_token: token, country_id: id },
-		});
-
-		request_id++;
-		console.log('regions:', rgs);
-		setRegions(rgs.response.items);
-	}
-
-	async function updateCities(id, rgs, token) {
-		const params = { v: props.apiVersion, access_token: token, country_id: id };
-		console.log('region', region);
-		// if (rgs) {
-		// 	console.log('region exist', rgs);
-		// 	params.region_id = rgs.id;
-		// }
-		const ci = await bridge.send('VKWebAppCallAPIMethod', {
-			method: 'database.getCities',
-			request_id: 'city' + request_id,
-			params: params,
-		});
-
-		request_id++;
-		console.log('cities:', ci);
-		setCities(ci.response.items);
-	}
 
 	function saveSuccess(goToAds, id) {
 		items.forEach(item => {
@@ -405,106 +345,17 @@ const CreateAdd = props => {
 				</Cell>
 			</Div>
 			*/}
-			<Div
-				style={{
-					display: props.vkPlatform == 'desktop_web' ? 'flex' : 'block',
-					padding: '0px',
-				}}
-			>
-				<FormLayout>
-					<Select
-						top="Страна"
-						placeholder="Россия"
-						onClick={e => {
-							const c = countries[e.target.value];
-							if (!c) {
-								return;
-							}
-							setCountry(c);
-							setRegion(NoRegion);
-							setCity(NoRegion);
-							updateRegions(c.id, accessToken);
-							updateCities(c.id, null, accessToken);
-						}}
-					>
-						{countries.map((v, i) => {
-							if (v == country) {
-								return (
-									<option key={v.id} value={i} defaultChecked>
-										{v.title}
-									</option>
-								);
-							}
-							return (
-								<option key={v.id} value={i}>
-									{v.title}
-								</option>
-							);
-						})}
-					</Select>
-				</FormLayout>
-
-				<FormLayout>
-					<Select
-						top="Регион"
-						placeholder="Не указан"
-						onClick={e => {
-							const c = regions[e.target.value];
-							if (!c) {
-								setRegion(NoRegion);
-								return;
-							}
-							setRegion(c);
-							updateCities(country.id, c, accessToken);
-						}}
-					>
-						{regions.map((v, i) => {
-							if (v == region) {
-								return (
-									<option key={v.id} value={i} defaultChecked>
-										{v.title}
-									</option>
-								);
-							}
-							return (
-								<option key={v.id} value={i}>
-									{v.title}
-								</option>
-							);
-						})}
-					</Select>
-				</FormLayout>
-
-				<FormLayout>
-					<Select
-						top="Город"
-						placeholder="Не указан"
-						onClick={e => {
-							const c = cities[e.target.value];
-							if (!c) {
-								setCity(NoRegion);
-								return;
-							}
-							setCity(c);
-						}}
-					>
-						{cities.map((v, i) => {
-							if (v == city) {
-								return (
-									<option key={v.id} value={i} defaultChecked>
-										{v.title}
-									</option>
-								);
-							}
-							return (
-								<option key={v.id} value={i}>
-									{v.title}
-								</option>
-							);
-						})}
-					</Select>
-				</FormLayout>
-			</Div>
+			{Location(
+				props.appID,
+				props.apiVersion,
+				props.vkPlatform,
+				country,
+				setCountry,
+				region,
+				setRegion,
+				city,
+				setCity
+			)}
 			<Separator />
 			<ChooseFeedback
 				setFeedbackType={setFeedbackType}
@@ -606,3 +457,5 @@ function saveFail(err, repeat, setSnackbar) {
 }
 
 export default CreateAdd;
+
+// 609 -> 462

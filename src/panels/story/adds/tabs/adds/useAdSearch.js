@@ -6,27 +6,29 @@ import { Addr } from './../../../../../store/addr';
 import { User } from './AddsTab/../../../../../../store/user';
 
 import { CategoryNo } from './../../../../template/Categories';
+import { NoRegion } from '../../../../template/Location';
 
 let prevCategory = '';
 let prevDeleteID = '';
 
-export default function useAdSearch(query, category, mode, pageNumber, rowsPerPage, deleteID) {
+export default function useAdSearch(query, category, mode, pageNumber, rowsPerPage, deleteID, city, region) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
 	const [ads, setAds] = useState([]);
 	const [hasMore, setHasMore] = useState(false);
 
 	useEffect(() => {
-		setAds([]);
-	}, [category, mode, query]);
+    setAds([]);
+    pageNumber = 1
+	}, [category, mode, query, city, region]);
 
 	useEffect(() => {
 		console.log('deleteID:', deleteID);
 		if (deleteID > 0) {
 			setAds(
 				ads.filter(x => {
-          console.log('x.ad_id', x.ad_id, x.ad_id != deleteID);
-          return x.ad_id != deleteID;
+					console.log('x.ad_id', x.ad_id, x.ad_id != deleteID);
+					return x.ad_id != deleteID;
 				})
 			);
 		}
@@ -53,7 +55,15 @@ export default function useAdSearch(query, category, mode, pageNumber, rowsPerPa
 				rows_per_page: rowsPerPage,
 				page: pageNumber,
 			};
-		}
+    }
+    if (region && region != NoRegion) {
+      console.log("regionregion", region)
+      params.region=region.title
+    }
+    if (city && city != NoRegion) {
+      console.log("citycity", city)
+      params.district=city.title
+    }
 		if (mode != 'all') {
 			params.author_id = User.getState().vk_id;
 		}
@@ -81,8 +91,8 @@ export default function useAdSearch(query, category, mode, pageNumber, rowsPerPa
 				}
 			});
 		return () => cancel();
-	}, [category, mode, query, pageNumber]);
+	}, [category, mode, query, pageNumber, city, region]);
 
 	console.log('aaaaaaaaaaaaaaaaaaa', ads);
-	return { newPage: pageNumber, ads, loading, error, hasMore, deleteID };
+	return { newPage: pageNumber, ads, loading, error, hasMore };
 }
