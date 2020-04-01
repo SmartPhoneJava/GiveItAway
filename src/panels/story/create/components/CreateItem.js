@@ -23,6 +23,8 @@ import Icon24Camera from '@vkontakte/icons/dist/24/camera';
 import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 import Icon24Delete from '@vkontakte/icons/dist/24/delete';
 
+import Man from './../../../../img/man.jpeg';
+
 const nameLabel = 'Название';
 const categoryLabel = 'Категория';
 const descriptionLabel = 'Описание';
@@ -238,35 +240,26 @@ const CreateItem = props => {
 													height: '120px',
 												}}
 												onClick={() => {
-													console.log('origin', img.origin);
-													console.log('src', img.src);
-													console.log('oper', IS_PLATFORM_ANDROID, IS_PLATFORM_IOS);
-													let f = String(img.src);
-													if (IS_PLATFORM_ANDROID || IS_PLATFORM_IOS) {
-														// bridge.send('VKWebAppShowImages', {
-														// 	images: [f, f, f],
-														// });
+													if (props.vkPlatform != 'desktop_web') {
 														bridge.send('VKWebAppShowImages', {
-															images: [
-																'https://pp.userapi.com/c639229/v639229113/31b31/KLVUrSZwAM4.jpg',
-																'https://pp.userapi.com/c639229/v639229113/31b94/mWQwkgDjav0.jpg',
-																'https://pp.userapi.com/c639229/v639229113/31b3a/Lw2it6bdISc.jpg',
-															],
+															images: photosUrl.map(v => v.src),
 														});
-														return;
-													}
+													} else {
+														var image = new Image();
+														image.src = img.src;
 
-													window.open(f, 'Image');
+														var w = window.open('');
+														w.document.write(image.outerHTML);
+													}
 												}}
-												before={
-													<img
-														src={img.src}
-														style={{
-															height: '120px',
-														}}
-													/>
-												}
-											></Button>
+											>
+												<img
+													src={img.src}
+													style={{
+														height: '120px',
+													}}
+												/>
+											</Button>
 
 											<Button
 												before={<Icon24Delete />}

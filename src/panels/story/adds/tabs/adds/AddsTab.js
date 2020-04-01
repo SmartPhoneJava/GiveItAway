@@ -35,7 +35,8 @@ const addsArrDD = [
 		feedback_type: 'comments',
 		extra_field: '',
 		category: 'animals',
-		location: 'Барнаул, Яблочная улица',
+		district: 'Яблочная улица',
+		region: 'Барнаул',
 		pathes_to_photo: [
 			{ AdPhotoId: 1, PhotoUrl: Cat },
 			{ AdPhotoId: 2, PhotoUrl: Bb },
@@ -59,7 +60,8 @@ const addsArrDD = [
 		feedback_type: 'ls',
 		category: 'animals',
 		extra_field: '',
-		location: 'Барнаул, Яблочная улица',
+		district: 'Гусевский переулок',
+		region: 'Екатеринбург',
 		pathes_to_photo: [
 			{ AdPhotoId: 1, PhotoUrl: Kitten },
 			{ AdPhotoId: 2, PhotoUrl: Bb },
@@ -80,13 +82,13 @@ const addsArrDD = [
 		text:
 			'Отдам за сахар и растительное масло все вещи в хорошем состоянии. Джинсы размер 27, лосины размер 44, брюки размер 46, кофта размер М, Игрушки отдам за растительное масло. Не бронирую пишите кто действительно будет забирать.',
 		creation_date: '14.12.2012',
-
 		category: 'clothers',
 		pm: false,
 		feedback_type: 's',
 		comments_counter: 4,
 		extra_field: 'Звоните по номеру 89268923412',
-		location: 'Ленинский район.',
+		district: 'Ленинский район',
+		region: 'Урюпинск',
 		pathes_to_photo: [
 			{ AdPhotoId: 1, PhotoUrl: Jins },
 			{ AdPhotoId: 2, PhotoUrl: Bb },
@@ -121,7 +123,8 @@ const addsArrDD = [
 		extra_field:
 			'Спрятала огромное полотно текста в контактах. Попробуйте правильно вывести это все. Ахахахахахаххаха. Кто что думает о фильме Джеентельмены? По моему там не хватает экшена :Р',
 		category: 'build',
-		location: 'Могилев, улица строителей',
+		district: 'Улица строителей',
+		region: 'Могилев',
 		pathes_to_photo: [
 			{ AdPhotoId: 1, PhotoUrl: Bb },
 			{ AdPhotoId: 2, PhotoUrl: Jins },
@@ -147,7 +150,8 @@ const addsArrDD = [
 		extra_field:
 			'договоримся звоните...87479754978, 87075000804...плэйстешн, джостик, 3 диска все в наборе и с пакетом от sony и с чеком',
 		category: 'play',
-		location: 'Алматы',
+		district: 'Алматы',
+		region: 'Алматы',
 		pathes_to_photo: [
 			{ AdPhotoId: 1, PhotoUrl: Playstein },
 			{ AdPhotoId: 2, PhotoUrl: Jins },
@@ -177,6 +181,8 @@ const addsArrDD = [
 			{ AdPhotoId: 3, PhotoUrl: Tea },
 		],
 		location: '',
+		district: '',
+		region: '',
 		author: {
 			vk_id: 6,
 			name: 'Петя',
@@ -268,7 +274,10 @@ const AddsTab = props => {
 						}
 					})
 				) : error ? (
-					<Error />
+					//<Error />
+					addsArrDD.map(ad => {
+						return <div key={ad.ad_id}>{Ad(ad)}</div>;
+					})
 				) : (
 					// addsArrDD.map(ad => {
 					// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;

@@ -264,6 +264,7 @@ const CreateAdd = props => {
 							items[i] = newItem;
 							setItems([...items]);
 						}}
+						vkPlatform={props.vkPlatform}
 						category={props.category}
 						description={item.description}
 					/>

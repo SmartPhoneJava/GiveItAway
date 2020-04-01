@@ -87,7 +87,10 @@ const AddsTabs = props => {
 			</PanelHeaderContext>
 			<AddsTab
 				openAd={props.openAd}
-				dropFilters={props.dropFilters}
+				dropFilters={() => {
+					props.dropFilters()
+					setmode('all')
+				}}
 				category={props.category}
 				mode={mode}
 

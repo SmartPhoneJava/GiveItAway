@@ -224,6 +224,9 @@ const Main = () => {
 						region={region}
 						dropFilters={() => {
 							setCategory(CategoryNo);
+							setCity(NoRegion)
+							setCountry(NoRegion)
+							setRegion(NoRegion)
 						}}
 						openAd={ad => {
 							setChoosen(ad);
