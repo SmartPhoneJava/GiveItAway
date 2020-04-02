@@ -75,7 +75,7 @@ const Main = () => {
 
 	const [city, setCity] = useState(NoRegion);
 	const [country, setCountry] = useState({ id: 1, title: 'Россия' });
-	const [region, setRegion] = useState(NoRegion);
+	// const [region, setRegion] = useState(NoRegion);
 
 	const [sort, setSort] = useState('time');
 
@@ -202,10 +202,10 @@ const Main = () => {
 						setCategory={setCategory}
 						city={city}
 						country={country}
-						region={region}
+						// region={region}
 						setCity={setCity}
 						setCountry={setCountry}
-						setRegion={setRegion}
+						// setRegion={setRegion}
 						sort={sort}
 						setSort={setSort}
 					/>
@@ -223,13 +223,13 @@ const Main = () => {
 						deleteID={deleteID}
 						city={city}
 						country={country}
-						region={region}
+						// region={region}
 						sort={sort}
 						dropFilters={() => {
 							setCategory(CategoryNo);
 							setCity(NoRegion);
 							setCountry(NoRegion);
-							setRegion(NoRegion);
+							// setRegion(NoRegion);
 						}}
 						openAd={ad => {
 							setChoosen(ad);

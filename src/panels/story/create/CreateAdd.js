@@ -1,17 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import bridge from '@vkontakte/vk-bridge';
 import axios from 'axios';
-import {
-	Button,
-	Group,
-	Header,
-	Div,
-	InfoRow,
-	Separator,
-	ScreenSpinner,
-	Snackbar,
-	Avatar,
-} from '@vkontakte/vkui';
+import { Button, Group, Header, Div, InfoRow, Separator, ScreenSpinner, Snackbar, Avatar } from '@vkontakte/vkui';
 
 import Geocoder from 'react-native-geocoding';
 
@@ -28,7 +18,7 @@ import { Addr } from '../../../store/addr';
 
 import { CategoryNo } from './../../template/Categories';
 
-import {Location, NoRegion} from "./../../template/Location"
+import { Location, NoRegion } from './../../template/Location';
 
 let itemID = 1;
 
@@ -49,8 +39,7 @@ const CreateAdd = props => {
 		long: -1,
 		lat: -1,
 	});
-	
-	const [adress, setAdress] = useState('Не указан');
+
 	const [valid, setValid] = useState(false);
 	const [contacts, setContacts] = useState('');
 	const [feedbackType, setFeedbackType] = useState('ls');
@@ -58,7 +47,7 @@ const CreateAdd = props => {
 
 	const [city, setCity] = useState(NoRegion);
 	const [country, setCountry] = useState({ id: 1, title: 'Россия' });
-	const [region, setRegion] = useState(NoRegion);
+	// const [region, setRegion] = useState(NoRegion);
 
 	useEffect(() => {
 		let v = true;
@@ -77,19 +66,17 @@ const CreateAdd = props => {
 		if (feedbackType == 'other' && contacts == '') {
 			v = false;
 		}
-		if (city.id < 0 || region.id < 0) {
+		if (city.id < 0 || country.id < 0) {
 			v = false;
 		}
 		setValid(v);
-	}, [items, props.category, feedbackType, contacts, country, city, region]);
+	}, [items, props.category, feedbackType, contacts, country, city]);
 
 	function updateGeo() {
 		async function fetchData() {
 			const value = await bridge.send('VKWebAppGetGeodata');
 			setGeodata(value);
 
-			console.log('geodata:', value);
-			setAdress(Math.floor(value.long) + ':' + Math.floor(value.lat));
 			/*
       Geocoder.init("no_code_here");
       Geocoder.from(value.lat, value.long)
@@ -181,7 +168,7 @@ const CreateAdd = props => {
 				extra_field: contacts,
 				status: 'offer',
 				category: props.category,
-				region: region.title,
+				region: country.title,
 				district: city.title,
 				comments_count: 0,
 			};
@@ -343,17 +330,7 @@ const CreateAdd = props => {
 				</Cell>
 			</Div>
 			*/}
-			{Location(
-				props.appID,
-				props.apiVersion,
-				props.vkPlatform,
-				country,
-				setCountry,
-				region,
-				setRegion,
-				city,
-				setCity
-			)}
+			{Location(props.appID, props.apiVersion, props.vkPlatform, country, setCountry, city, setCity, true)}
 			<Separator />
 			<ChooseFeedback
 				setFeedbackType={setFeedbackType}

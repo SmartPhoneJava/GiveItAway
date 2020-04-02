@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import bridge from '@vkontakte/vk-bridge';
 import { Div, Select, FormLayout } from '@vkontakte/vkui';
 
@@ -20,44 +20,123 @@ async function updateCities(apiVersion, setCities, id, rgs, token) {
 
 	request_id++;
 	setCities(ci.response.items);
+	return ci.response.items;
 }
 
-async function updateRegions(apiVersion, setRegions, id, token) {
-	const rgs = await bridge.send('VKWebAppCallAPIMethod', {
-		method: 'database.getRegions',
-		request_id: 'region' + request_id,
-		params: { v: apiVersion, access_token: token, country_id: id },
-	});
+// async function updateRegions(apiVersion, setRegions, id, token) {
+// 	const rgs = await bridge.send('VKWebAppCallAPIMethod', {
+// 		method: 'database.getRegions',
+// 		request_id: 'region' + request_id,
+// 		params: { v: apiVersion, access_token: token, country_id: id },
+// 	});
 
-	request_id++;
-	setRegions(rgs.response.items);
-}
+// 	request_id++;
+// 	setRegions(rgs.response.items);
+// 	return rgs.response.items;
+// }
 
-export const Location = (appID, apiVersion, vkPlatform, country, setCountry, region, setRegion, city, setCity) => {
+export const Location = (
+	appID,
+	apiVersion,
+	vkPlatform,
+	country,
+	setCountry,
+	// region,
+	// setRegion,
+	city,
+	setCity,
+	setDefault
+) => {
 	const [countries, setCountries] = useState([NoRegion]);
-	const [regions, setRegions] = useState([NoRegion]);
+	// const [regions, setRegions] = useState([NoRegion]);
 	const [cities, setCities] = useState([NoRegion]);
+
+	const [countryID, setCountryID] = useState(country.id);
+	// const [regionID, setRegionID] = useState(1);
+	const [cityID, setCityID] = useState(city.id);
 
 	const [accessToken, setAccessToken] = useState('');
 
-	useEffect(() => {
-		async function loadDatabaseInfo() {
-			const el = await bridge.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' });
-			setAccessToken(el.access_token);
-			const ctrs = await bridge.send('VKWebAppCallAPIMethod', {
-				method: 'database.getCountries',
-				request_id: 'api' + request_id,
-				params: { v: apiVersion, access_token: el.access_token },
-			});
+	async function getUserLocation() {
+		console.log('VKWebAppGetUserInfo:');
+		const data = await bridge.send('VKWebAppGetUserInfo', {});
 
-			console.log('el.access_token', el.access_token);
-			request_id++;
-			setCountries(ctrs.response.items);
-			updateRegions(apiVersion, setRegions, 1, el.access_token);
-			updateCities(apiVersion, setCities, 1, null, el.access_token);
+		if (country == NoRegion) {
+			setCountry(data.country);
+			setCountryID(data.country.id);
 		}
-		loadDatabaseInfo();
+		console.log('data.city.title', data.city.title);
+		if (city == NoRegion) {
+			setCity(data.city);
+			setCityID(data.city.id);
+		}
+	}
+
+	async function setLocationInfo() {
+		const el = await bridge.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' });
+		setAccessToken(el.access_token);
+		const vkctrs = await bridge.send('VKWebAppCallAPIMethod', {
+			method: 'database.getCountries',
+			request_id: 'api' + request_id,
+			params: { v: apiVersion, access_token: el.access_token },
+		});
+
+		const ctrs = vkctrs.response.items;
+
+		console.log('ctrsctrs', ctrs);
+		request_id++;
+		setCountries(ctrs);
+		// const rgs = updateRegions(apiVersion, setRegions, 1, el.access_token);
+		const cts = await updateCities(apiVersion, setCities, 1, null, el.access_token);
+		return { ctrs, cts };
+	}
+
+	async function init(appID) {
+		if (appID == 0) {
+			return;
+		}
+		let { ctrs, cts } = await setLocationInfo();
+
+		console.log('setDefault', setDefault);
+		if (setDefault) {
+			getUserLocation();
+		}
+	}
+
+	function chooseCountry(e) {
+		if (e.target.value == -1) {
+			setCountry(NoRegion);
+			return;
+		}
+		const c = countries.filter(v => v.id == e.target.value)[0];
+		setCountry(c);
+
+		// setRegion(NoRegion);
+		// setRegionID(-1);
+
+		setCity(NoRegion);
+		setCityID(-1);
+
+		// updateRegions(apiVersion, setRegions, c.id, accessToken);
+		updateCities(apiVersion, setCities, c.id, null, accessToken);
+	}
+
+	useEffect(() => {
+		init(appID);
 	}, [appID]);
+
+	useEffect(() => {
+		setCityID(city.id);
+	}, [city]);
+
+	useEffect(() => {
+		setCountryID(country.id);
+	}, [country]);
+
+	console.log('country!!', country);
+	console.log('city!!', city);
+	// setCountryID(countries.map(v => v.title).indexOf(country));
+	// setCityID(cities.map(v => v.title).indexOf(city));
 
 	return (
 		<Div
@@ -67,42 +146,26 @@ export const Location = (appID, apiVersion, vkPlatform, country, setCountry, reg
 			}}
 		>
 			<FormLayout>
-				<Select
-					top="Страна"
-					placeholder="Россия"
-					onClick={e => {
-						const c = countries[e.target.value];
-						if (!c || e.target.value.length == 0) {
-							return;
-						}
-						setCountry(c);
-						setRegion(NoRegion);
-						setCity(NoRegion);
-						updateRegions(apiVersion, setRegions, c.id, accessToken);
-						updateCities(apiVersion, setCities, c.id, null, accessToken);
-					}}
-				>
-					{countries.map((v, i) => {
-						if (v == country) {
+				<Select top="Страна" value={countryID} onChange={chooseCountry}>
+					{[
+						<option key={-112} value={-1}>
+							Не определена
+						</option>,
+						...countries.map((v, i) => {
 							return (
-								<option key={v.id} value={i} defaultChecked>
+								<option key={v.id} value={v.id}>
 									{v.title}
 								</option>
 							);
-						}
-						return (
-							<option key={v.id} value={i}>
-								{v.title}
-							</option>
-						);
-					})}
+						}),
+					]}
 				</Select>
 			</FormLayout>
 
-			<FormLayout>
+			{/* <FormLayout>
 				<Select
 					top="Регион"
-					placeholder="Не указан"
+					value={regionID}
 					onClick={e => {
 						const c = regions[e.target.value];
 						if (!c || e.target.value.length == 0) {
@@ -113,51 +176,44 @@ export const Location = (appID, apiVersion, vkPlatform, country, setCountry, reg
 						updateCities(apiVersion, setCities, country.id, c, accessToken);
 					}}
 				>
+					<option key={-1} value={-1}>
+						Не определен
+					</option>
 					{regions.map((v, i) => {
-						if (v == region) {
-							return (
-								<option key={v.id} value={i} defaultChecked>
-									{v.title}
-								</option>
-							);
-						}
 						return (
-							<option key={v.id} value={i}>
+							<option key={v.id} value={v.id}>
 								{v.title}
 							</option>
 						);
 					})}
 				</Select>
-			</FormLayout>
+			</FormLayout> */}
 
 			<FormLayout>
 				<Select
 					top="Город"
-					placeholder="Не указан"
-					onClick={e => {
-						console.log('cities[e.target.value]', e.target.value,"!", e.target.value.length == 0);
-						const c = cities[e.target.value];
-						if (!c || e.target.value.length == 0) {
+					value={cityID}
+					onChange={e => {
+						if (e.target.value == -1) {
 							setCity(NoRegion);
 							return;
 						}
+						const c = cities.filter(v => v.id == e.target.value)[0];
 						setCity(c);
 					}}
 				>
-					{cities.map((v, i) => {
-						if (v == city) {
+					{[
+						<option key={-122323} value={-1}>
+							Не определен
+						</option>,
+						...cities.map((v, i) => {
 							return (
-								<option key={v.id} value={i} defaultChecked>
+								<option key={v.id} value={v.id}>
 									{v.title}
 								</option>
 							);
-						}
-						return (
-							<option key={v.id} value={i}>
-								{v.title}
-							</option>
-						);
-					})}
+						}),
+					]}
 				</Select>
 			</FormLayout>
 		</Div>

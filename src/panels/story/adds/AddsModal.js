@@ -29,10 +29,9 @@ const AddsModal = props => {
 					props.vkPlatform,
 					props.country,
 					props.setCountry,
-					props.region,
-					props.setRegion,
 					props.city,
-					props.setCity
+					props.setCity, 
+					false
 				)}
 				<Group separator="show" header={<Header mode="secondary">Отсортировтаь по</Header>}>
 					{props.sort == 'time' ? (

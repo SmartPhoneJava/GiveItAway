@@ -8,7 +8,7 @@ import { User } from './AddsTab/../../../../../../store/user';
 import { CategoryNo } from './../../../../template/Categories';
 import { NoRegion } from '../../../../template/Location';
 
-export default function useAdSearch(query, category, mode, pageNumber, rowsPerPage, deleteID, city, region, sort) {
+export default function useAdSearch(query, category, mode, pageNumber, rowsPerPage, deleteID, city, country, sort) {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
 	const [ads, setAds] = useState([]);
@@ -17,9 +17,10 @@ export default function useAdSearch(query, category, mode, pageNumber, rowsPerPa
 	useEffect(() => {
 		setAds([]);
 		pageNumber = 1;
-	}, [category, mode, query, city, region, sort]);
+	}, [category, mode, query, city, country, sort]);
 
 	useEffect(() => {
+		console.log('deleteID', deleteID);
 		if (deleteID > 0) {
 			setAds(
 				ads.filter(x => {
@@ -52,12 +53,16 @@ export default function useAdSearch(query, category, mode, pageNumber, rowsPerPa
 				page: pageNumber,
 			};
 		}
-		if (region && region != NoRegion) {
-			params.region = region.title;
-		}
-		if (city && city != NoRegion) {
+
+		if (city && city.id != -1) {
 			params.district = city.title;
 		}
+
+		console.log("before check", country)
+		if (country && country.id != -1) {
+			params.region = country.title;
+		}
+
 		if (mode != 'all') {
 			params.author_id = User.getState().vk_id;
 		}
@@ -85,7 +90,7 @@ export default function useAdSearch(query, category, mode, pageNumber, rowsPerPa
 				}
 			});
 		return () => cancel();
-	}, [category, mode, query, pageNumber, city, region, sort]);
+	}, [category, mode, query, pageNumber, city, country, sort]);
 
 	return { newPage: pageNumber, ads, loading, error, hasMore };
 }

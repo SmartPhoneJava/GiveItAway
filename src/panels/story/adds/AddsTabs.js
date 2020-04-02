@@ -94,8 +94,10 @@ const AddsTabs = props => {
 				category={props.category}
 				mode={mode}
 
+				deleteID={props.deleteID}
+
 				city={props.city}
-				region={props.region}
+				// region={props.region}
 				country={props.country}
 
 				sort={props.sort}

@@ -207,7 +207,7 @@ const AddsTab = props => {
 		5,
 		props.deleteID,
 		props.city,
-		props.region,
+		props.country,
 		props.sort
 	);
 
@@ -258,7 +258,7 @@ const AddsTab = props => {
 							);
 						} else {
 							return (
-								<div key={ad.ad_id} ref={lastAdElementRef}>
+								<div key={ad.ad_id}>
 									{Ad(ad)}
 								</div>
 							);

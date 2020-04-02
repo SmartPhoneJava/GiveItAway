@@ -112,6 +112,12 @@ const Add5 = props => {
 		return;
 	}
 
+	// if (props.ad.pathes_to_photo != undefined) {
+	// 	//console.log("success", pprops.ad.pathes_to_photo[0].PhotoUrl)
+	// } else {
+	// 	//console.log("image fail", props.ad.pathes_to_photo)
+	// }
+	
 	const image = props.ad.pathes_to_photo ? props.ad.pathes_to_photo[0].PhotoUrl : '';
 
 	return (
@@ -135,7 +141,7 @@ const Add5 = props => {
 					style={{
 						borderRadius: '10px',
 						padding: '10px',
-						backgroundColor: 'rgba(0,0,0,.5)',
+						backgroundColor: 'rgba(0,0,0,.6)',
 					}}
 				>
 					<div

@@ -1,6 +1,6 @@
 import {createStore} from 'redux';
 // http://localhost:8091
-// http://35.223.136.32:8091
+// https://giveitaway.site
 const reducer = (state="http://localhost:8091", action) => {
   switch (action.type) {
     case 'set':
