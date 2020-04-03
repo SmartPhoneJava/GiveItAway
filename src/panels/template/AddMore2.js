@@ -38,7 +38,7 @@ import Icon24Settings from '@vkontakte/icons/dist/24/settings';
 import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 import Icon24Place from '@vkontakte/icons/dist/24/place';
 
-import { subscribe, getDetails } from './../../requests';
+import { subscribe, getDetails, getSubscribers } from './../../requests';
 
 import './addsTab.css';
 
@@ -84,6 +84,8 @@ const AddMore2 = props => {
 
 	const [photoIndex, setPhotoIndex] = useState(0);
 
+	const [subs, setSubs] = useState(0);
+
 	useEffect(() => {
 		async function init() {
 			const id = props.ad ? props.ad.ad_id : -1;
@@ -93,6 +95,13 @@ const AddMore2 = props => {
 				let { details, err } = await getDetails(props.setPopout, props.setSnackbar, id);
 				if (!err) {
 					setAd(details);
+
+					let { subscribers, err } = await getSubscribers(props.setPopout, props.setSnackbar, id);
+					subscribers = subscribers || [];
+					console.log('subscribers', subscribers);
+					if (!err) {
+						setSubs(subscribers);
+					}
 				}
 			}
 		}
@@ -313,22 +322,14 @@ const AddMore2 = props => {
 							stretched
 							size="xl"
 							mode="primary"
+							onClick={() => {
+								subscribe(props.setPopout, props.setSnackbar, ad.ad_id);
+							}}
 							before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
 						>
 							Откликнуться
 						</Button>
 					)}
-					<Button
-						stretched
-						size="xl"
-						mode="primary"
-						onClick={() => {
-							subscribe(props.setPopout, props.setSnackbar, ad.ad_id);
-						}}
-						before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
-					>
-						Откликнуться
-					</Button>
 				</div>
 			</div>
 			<Separator />
@@ -355,6 +356,10 @@ const AddMore2 = props => {
 						<td>{ad.views_count}</td>
 					</tr>
 					<tr>
+						<td className="first">Отклинулось</td>
+						<td>{subs.length}</td>
+					</tr>
+					<tr>
 						<td className="first">Размещено</td>
 						<td>{ad.creation_date}</td>
 					</tr>
@@ -363,54 +368,29 @@ const AddMore2 = props => {
 
 			{isAuthor() ? (
 				<Group header={<Header mode="secondary">Откликнулись</Header>}>
-					<Cell
-						before={
-							<Avatar
-								style={{
-									padding: '4px',
-								}}
-								size={36}
-								src={ad.author.photo_url}
-							/>
-						}
-					>
-						{ad.author.name + ' ' + ad.author.surname}
-					</Cell>
-					<Cell
-						before={
-							<Avatar
-								style={{
-									padding: '4px',
-								}}
-								size={36}
-								src={ad.author.photo_url}
-							/>
-						}
-					>
-						{ad.author.name + ' ' + ad.author.surname}
-					</Cell>
-					<Cell
-						before={
-							<Avatar
-								style={{
-									padding: '4px',
-								}}
-								size={36}
-								src={ad.author.photo_url}
-							/>
-						}
-					>
-						{ad.author.name + ' ' + ad.author.surname}
-					</Cell>
+					{subs.length > 0 ? (
+						subs.map(v => (
+							<Cell
+								key={v.vk_id}
+								before={
+									<Avatar
+										size={36}
+										src={v.photo_url}
+									/>
+								}
+							>
+								{v.name + ' ' + v.surname}
+							</Cell>
+						))
+					) : (
+						<InfoRow style={{ paddingLeft: '16px' }}> пусто</InfoRow>
+					)}
 				</Group>
 			) : (
 				<Group header={<Header mode="secondary">Автор</Header>}>
 					<Cell
 						before={
 							<Avatar
-								style={{
-									padding: '4px',
-								}}
 								size={36}
 								src={ad.author.photo_url}
 							/>

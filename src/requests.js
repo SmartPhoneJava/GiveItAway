@@ -41,27 +41,32 @@ export async function getDetails(setPopout, setSnackbar, ad_id) {
 	return { details: data, err };
 }
 
-export function subscribe(setPopout, setSnackbar, ad_id) {
+export async function getSubscribers(setPopout, setSnackbar, ad_id) {
 	setPopout(<ScreenSpinner size="large" />);
-	[err, setErr] = useState(false);
+	let err = false;
 	let cancel;
-	axios({
-		method: 'post',
+	const subscribers = await axios({
+		method: 'get',
 		withCredentials: true,
-		url: Addr.getState() + '/api/ad/' + ad_id + '/subscribe',
+		params: { page: 1, rows_per_page: 1000 }, // todo поправить
+		url: Addr.getState() + '/api/ad/' + ad_id + '/subscribers',
 		cancelToken: new axios.CancelToken(c => (cancel = c)),
 	})
 		.then(function(response) {
 			setPopout(null);
-			console.log('response from subscribe:', response);
+			console.log('response from getSubscribes:', response);
+			if (response.status != 404 && response.status != 200) {
+				err = true;
+			}
 			return response.data;
 		})
 		.catch(function(error) {
-			setErr(true);
-			fail('Нет соединения с сервером', () => {}, setSnackbar);
+			if (err) {
+				fail('Нет соединения с сервером', () => {}, setSnackbar);
+			}
 			setPopout(null);
 		});
-	return err;
+	return { subscribers, err };
 }
 
 function fail(err, repeat, setSnackbar) {
@@ -84,23 +89,21 @@ function fail(err, repeat, setSnackbar) {
 	);
 }
 
-function sucess(etSnackbar) {
+function sucess(setSnackbar, cancelMe, text) {
 	setSnackbar(
 		<Snackbar
 			onClose={() => {
 				props.setSnackbar(null);
 			}}
 			action="Отменить"
-			onActionClick={() => {
-				// отписаться
-			}}
+			onActionClick={cancelMe}
 			before={
 				<Avatar size={24} style={{ background: 'green' }}>
 					<Icon24DoneOutline fill="#fff" width={14} height={14} />
 				</Avatar>
 			}
 		>
-			Объявление создано! Спасибо, что делаете мир лучше :)
+			{text}
 		</Snackbar>
 	);
 }
