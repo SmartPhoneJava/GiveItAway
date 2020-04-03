@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { ScreenSpinner } from '@vkontakte/vkui';
+import { ScreenSpinner, Snackbar, Avatar } from '@vkontakte/vkui';
 
 import bridge from '@vkontakte/vk-bridge';
 import axios from 'axios';
 
-import {Addr} from './store/addr'
+import { Addr } from './store/addr';
 
 import Icon24Add from '@vkontakte/icons/dist/24/add';
 import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
 
-export async function getDetails(setPopout, ad_id) {
+export async function getDetails(setPopout, setSnackbar, ad_id) {
 	setPopout(<ScreenSpinner size="large" />);
+	let err = false;
 	let cancel;
 	const data = await axios({
 		method: 'get',
@@ -26,14 +27,23 @@ export async function getDetails(setPopout, ad_id) {
 			return response.data;
 		})
 		.catch(function(error) {
-			fail('Нет соединения с сервером', () => {}, setSnackbar);
+			err = true;
+			fail(
+				'Нет соединения с сервером',
+				() => {
+					getDetails(setPopout, setSnackbar, ad_id);
+				},
+				setSnackbar
+			);
 			setPopout(null);
 		});
-	return data;
+
+	return { details: data, err };
 }
 
-export function subscribe(setPopout, ad_id) {
+export function subscribe(setPopout, setSnackbar, ad_id) {
 	setPopout(<ScreenSpinner size="large" />);
+	[err, setErr] = useState(false);
 	let cancel;
 	axios({
 		method: 'post',
@@ -47,9 +57,11 @@ export function subscribe(setPopout, ad_id) {
 			return response.data;
 		})
 		.catch(function(error) {
+			setErr(true);
 			fail('Нет соединения с сервером', () => {}, setSnackbar);
 			setPopout(null);
 		});
+	return err;
 }
 
 function fail(err, repeat, setSnackbar) {

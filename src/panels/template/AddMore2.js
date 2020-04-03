@@ -80,19 +80,20 @@ export const AdDefault = {
 };
 
 const AddMore2 = props => {
-	const [ad, setAd] = useState(props.ad);
+	const [ad, setAd] = useState(props.ad || AdDefault);
 
 	const [photoIndex, setPhotoIndex] = useState(0);
 
 	useEffect(() => {
 		async function init() {
 			const id = props.ad ? props.ad.ad_id : -1;
-			console.log('props.ad', props.ad, id);
 			if (id < 0) {
 				setAd(AdDefault);
 			} else {
-				const details = await getDetails(props.setPopout, id);
-				setAd(details);
+				let { details, err } = await getDetails(props.setPopout, props.setSnackbar, id);
+				if (!err) {
+					setAd(details);
+				}
 			}
 		}
 		init();
@@ -322,7 +323,7 @@ const AddMore2 = props => {
 						size="xl"
 						mode="primary"
 						onClick={() => {
-							subscribe(props.setPopout);
+							subscribe(props.setPopout, props.setSnackbar, ad.ad_id);
 						}}
 						before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
 					>
