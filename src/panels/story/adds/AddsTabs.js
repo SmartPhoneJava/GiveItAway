@@ -95,6 +95,7 @@ const AddsTabs = props => {
 				mode={mode}
 
 				deleteID={props.deleteID}
+				myID={props.myID}
 
 				city={props.city}
 				// region={props.region}

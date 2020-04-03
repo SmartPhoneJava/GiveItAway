@@ -43,9 +43,9 @@ const addsArrDD = [
 			{ AdPhotoId: 3, PhotoUrl: Tea },
 		],
 		author: {
-			vk_id: 1,
+			vk_id: 45863670,
 			name: 'Семен',
-			surname: 'ефимов',
+			surname: 'Eфимов',
 			photo_url: Man,
 		},
 	},
@@ -240,6 +240,7 @@ const AddsTab = props => {
 				setPopout={props.setPopout}
 				setSnackbar={props.setSnackbar}
 				refresh={props.refresh}
+				myID={props.myID}
 			/>
 		);
 	}

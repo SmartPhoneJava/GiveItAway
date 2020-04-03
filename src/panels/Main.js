@@ -14,6 +14,9 @@ import {
 	Button,
 } from '@vkontakte/vkui';
 
+import Icon28ArrowLeftOutline from '@vkontakte/icons/dist/28/arrow_left_outline';
+import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
+
 import AddsTabs from './story/adds/AddsTabs';
 import CreateAdd from './story/create/CreateAdd';
 
@@ -28,6 +31,7 @@ import { User } from '../store/user';
 import { VkUser } from '../store/vkUser';
 
 import AddMore, { AdDefault } from './template/AddMore';
+import AddMore2 from './template/AddMore2';
 
 import { Addr } from '../store/addr';
 import { CategoryNo } from './template/Categories';
@@ -78,6 +82,8 @@ const Main = () => {
 	// const [region, setRegion] = useState(NoRegion);
 
 	const [sort, setSort] = useState('time');
+
+	const [myID, setMyID] = useState(0);
 
 	function goSearch() {
 		setActivePanel('search');
@@ -157,6 +163,7 @@ const Main = () => {
 		async function fetchData() {
 			const us = await bridge.send('VKWebAppGetUserInfo');
 			VkUser.dispatch({ type: 'set', new_state: us });
+			setMyID(us.id)
 			checkMe(us);
 		}
 
@@ -223,6 +230,7 @@ const Main = () => {
 						deleteID={deleteID}
 						city={city}
 						country={country}
+						myID={myID}
 						// region={region}
 						sort={sort}
 						dropFilters={() => {
@@ -248,20 +256,11 @@ const Main = () => {
 								}}
 							/>
 						}
-						addon={
-							<PanelHeaderButton
-								onClick={() => {
-									setActivePanel('header-search');
-								}}
-							>
-								Назад
-							</PanelHeaderButton>
-						}
 					>
 						{choosen ? choosen.header : 'баг'}
 					</PanelHeaderSimple>
 					{choosen ? (
-						<AddMore
+						<AddMore2
 							refresh={id => {
 								setActivePanel('header-search');
 								SetDeleteID(id);
@@ -269,6 +268,8 @@ const Main = () => {
 							ad={choosen}
 							setPopout={setPopout}
 							setSnackbar={setSnackbar}
+							VkUser={VkUser}
+							vkPlatform={vkPlatform}
 						/>
 					) : (
 						Error

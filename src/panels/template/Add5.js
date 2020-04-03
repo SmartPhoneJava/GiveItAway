@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, PanelHeaderButton, ActionSheet, ActionSheetItem, InfoRow, osname, IOS } from '@vkontakte/vkui';
+import { Avatar, PanelHeaderButton, InfoRow } from '@vkontakte/vkui';
 
 import Icon24CommentOutline from '@vkontakte/icons/dist/24/comment_outline';
 import Icon24Chats from '@vkontakte/icons/dist/24/chats';
@@ -15,7 +15,7 @@ import Icon24Info from '@vkontakte/icons/dist/24/info';
 import Icon24Settings from '@vkontakte/icons/dist/24/settings';
 import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 
-import OpenActions from "./components/actions"
+import OpenActions from './components/actions';
 
 import './addsTab.css';
 
@@ -117,7 +117,7 @@ const Add5 = props => {
 	// } else {
 	// 	//console.log("image fail", props.ad.pathes_to_photo)
 	// }
-	
+
 	const image = props.ad.pathes_to_photo ? props.ad.pathes_to_photo[0].PhotoUrl : '';
 
 	return (
@@ -183,17 +183,21 @@ const Add5 = props => {
 								{props.ad.date}
 							</div>
 						</div>
-						<PanelHeaderButton
-							mode="primary"
-							style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
-							size="m"
-							onClick={() => {
-								OpenActions(props.setPopout, props.setSnackbar, props.refresh, props.ad.ad_id);
-							}}
-							disabled={props.ad.status !== 'offer'}
-						>
-							<Icon28SettingsOutline fill="white" />
-						</PanelHeaderButton>
+						{props.myID == props.ad.author.vk_id ? (
+							<PanelHeaderButton
+								mode="primary"
+								style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
+								size="m"
+								onClick={() => {
+									OpenActions(props.setPopout, props.setSnackbar, props.refresh, props.ad.ad_id);
+								}}
+								disabled={props.ad.status !== 'offer'}
+							>
+								<Icon28SettingsOutline fill="white" />
+							</PanelHeaderButton>
+						) : (
+							''
+						)}
 					</div>
 					<InfoRow style={{ color: 'white' }}> {shortText(props.ad.header, 300)} </InfoRow>
 
