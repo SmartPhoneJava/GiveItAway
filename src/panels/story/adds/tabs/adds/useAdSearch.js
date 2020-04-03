@@ -71,6 +71,7 @@ export default function useAdSearch(query, category, mode, pageNumber, rowsPerPa
 			method: 'GET',
 			url: Addr.getState() + '/api/ad/find',
 			params,
+			withCredentials: true,
 			cancelToken: new axios.CancelToken(c => (cancel = c)),
 		})
 			.then(res => {

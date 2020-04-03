@@ -38,6 +38,8 @@ import Icon24Settings from '@vkontakte/icons/dist/24/settings';
 import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 import Icon24Place from '@vkontakte/icons/dist/24/place';
 
+import { subscribe, getDetails } from './../../requests';
+
 import './addsTab.css';
 
 import './styles.css';
@@ -62,6 +64,7 @@ export const AdDefault = {
 	feedback_type: 'ls',
 	category: 'animals',
 	extra_field: '',
+	views_count: '87',
 	location: 'Барнаул, Яблочная улица',
 	pathes_to_photo: [
 		{ AdPhotoId: 1, PhotoUrl: Kitten },
@@ -82,7 +85,17 @@ const AddMore2 = props => {
 	const [photoIndex, setPhotoIndex] = useState(0);
 
 	useEffect(() => {
-		setAd(props.ad);
+		async function init() {
+			const id = props.ad ? props.ad.ad_id : -1;
+			console.log('props.ad', props.ad, id);
+			if (id < 0) {
+				setAd(AdDefault);
+			} else {
+				const details = await getDetails(props.setPopout, id);
+				setAd(details);
+			}
+		}
+		init();
 	}, [props.ad]);
 
 	function detectContactsType(contacts) {
@@ -196,6 +209,7 @@ const AddMore2 = props => {
 		return props.VkUser.getState().id == ad.author.vk_id;
 	}
 
+	console.log('adadadad', ad);
 	const image = ad.pathes_to_photo ? ad.pathes_to_photo[photoIndex].PhotoUrl : '';
 
 	return (
@@ -303,6 +317,17 @@ const AddMore2 = props => {
 							Откликнуться
 						</Button>
 					)}
+					<Button
+						stretched
+						size="xl"
+						mode="primary"
+						onClick={() => {
+							subscribe(props.setPopout);
+						}}
+						before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
+					>
+						Откликнуться
+					</Button>
 				</div>
 			</div>
 			<Separator />
@@ -326,7 +351,7 @@ const AddMore2 = props => {
 					</tr>
 					<tr>
 						<td className="first">Просмотров</td>
-						<td>87</td>
+						<td>{ad.views_count}</td>
 					</tr>
 					<tr>
 						<td className="first">Размещено</td>
