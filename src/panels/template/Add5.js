@@ -191,7 +191,7 @@ const Add5 = props => {
 								onClick={() => {
 									OpenActions(props.setPopout, props.setSnackbar, props.refresh, props.ad.ad_id);
 								}}
-								disabled={props.ad.status !== 'offer'}
+								disabled={props.ad.status !== 'offer' && props.ad.status !== 'chosen'}
 							>
 								<Icon28SettingsOutline fill="white" />
 							</PanelHeaderButton>

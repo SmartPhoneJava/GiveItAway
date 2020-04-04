@@ -29,7 +29,7 @@ export async function getDeal(setSnackbar, ad_id) {
 		})
 		.catch(function (error) {
 			err = true;
-			fail('Нет соединения с сервером', () => {}, setSnackbar);
+			
 		});
 	return {deal, err};
 }
@@ -37,7 +37,7 @@ export async function getDeal(setSnackbar, ad_id) {
 export async function denyDeal(setSnackbar, deal_id) {
 	let err = false;
 	let cancel;
-	console.log("deal info", deal_id)
+
 	await axios({
 		method: 'post',
 		withCredentials: true,
@@ -55,11 +55,32 @@ export async function denyDeal(setSnackbar, deal_id) {
 	return err;
 }
 
+export async function acceptDeal(setSnackbar, deal_id) {
+	let err = false;
+	let cancel;
+
+	await axios({
+		method: 'post',
+		withCredentials: true,
+		url: Addr.getState() + '/api/deal/' + deal_id + '/fullfill',
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(function (response) {
+			console.log('response from acceptDeal:', response);
+			return response.data;
+		})
+		.catch(function (error) {
+			err = true;
+			fail('Нет соединения с сервером', () => {}, setSnackbar);
+		});
+	return err;
+}
+
 export async function CancelClose(setPopout, setSnackbar, ad_id) {
 	setPopout(<ScreenSpinner size="large" />);
 	
 	let {deal, err} =  await getDeal(setSnackbar, ad_id)
-	console.log("we get deal", deal.deal_id, err)
+	console.log("we get deal", deal, err)
 	if (!err) {
 		err = await denyDeal(setSnackbar, deal.deal_id)
 		

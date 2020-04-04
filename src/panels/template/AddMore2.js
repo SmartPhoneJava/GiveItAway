@@ -40,7 +40,7 @@ import Icon24Settings from '@vkontakte/icons/dist/24/settings';
 import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 import Icon24Place from '@vkontakte/icons/dist/24/place';
 
-import { subscribe, unsubscribe, getDetails, getSubscribers } from './../../requests';
+import { subscribe, unsubscribe, getDetails, getSubscribers, getDeal, acceptDeal, denyDeal } from './../../requests';
 
 import './addsTab.css';
 
@@ -89,7 +89,9 @@ const AddMore2 = (props) => {
 	const [subs, setSubs] = useState(0);
 
 	const [isSub, setIsSub] = useState(false);
+	const [isDealer, setIsDealer] = useState(false);
 	const [isClosing, setIsClosing] = useState(false);
+	const [Deal, setDeal] = useState({});
 
 	async function initSubscribers(id) {
 		let { subscribers, err } = await getSubscribers(props.setPopout, props.setSnackbar, id);
@@ -111,10 +113,18 @@ const AddMore2 = (props) => {
 				let { details, err } = await getDetails(props.setPopout, props.setSnackbar, id);
 				if (!err) {
 					setAd(details);
-					initSubscribers(id);
-					console.log('detailed look', details);
-					setIsClosing(details.status == 'chosen');
 				}
+				// вернуть все в if выше
+
+				initSubscribers(id);
+				console.log('detailed look', details);
+				setIsClosing(props.ad.status == 'chosen');
+
+				let { deal } = await getDeal(props.setSnackbar, props.ad.ad_id);
+
+				console.log('isDealer', deal.subscriber_id, props.VkUser.getState().id);
+				setIsDealer(deal.subscriber_id == props.VkUser.getState().id);
+				setDeal(deal);
 			}
 		}
 		init();
@@ -261,7 +271,7 @@ const AddMore2 = (props) => {
 		} else if (ad.feedback_type == 'comments') {
 			return <CellButton>Комментарии</CellButton>;
 		}
-		return <Cell>ad.extra_field</Cell>;
+		return <Cell>{ad.extra_field}</Cell>;
 	}
 
 	console.log('adadadad', ad);
@@ -305,7 +315,7 @@ const AddMore2 = (props) => {
 					</PanelHeaderButton>
 				</div>
 			</div>
-			{ad.pathes_to_photo.length <= 1 ? (
+			{!ad.pathes_to_photo || ad.pathes_to_photo.length <= 1 ? (
 				''
 			) : (
 				<HorizontalScroll>
@@ -380,7 +390,35 @@ const AddMore2 = (props) => {
 					) : (
 						<>
 							<Group header={<Header mode="secondary">Связь с автором</Header>}>{feedbackText()}</Group>
-							{isSub ? (
+							{isDealer ? (
+								<div style={{ display: 'flex' }}>
+									<Button
+										stretched
+										size="l"
+										mode="commerce"
+										onClick={() => {
+											acceptDeal(props.setSnackbar, Deal.deal_id);
+										}}
+										style
+										style={{ marginRight: 8 }}
+										before={<Icon24Cancel />}
+									>
+										Подтвердить
+									</Button>
+									<Button
+										stretched
+										size="l"
+										mode="destructive"
+										onClick={() => {
+											denyDeal(props.setSnackbar, Deal.deal_id);
+										}}
+										style={{ marginRight: 8 }}
+										before={<Icon24Cancel />}
+									>
+										Отклонить
+									</Button>
+								</div>
+							) : isSub ? (
 								<Button
 									stretched
 									size="xl"
