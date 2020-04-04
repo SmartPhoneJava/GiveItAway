@@ -295,6 +295,8 @@ const Main = () => {
 					<PanelHeader>{addText}</PanelHeader>
 					<CreateAdd
 						vkPlatform={vkPlatform}
+						myID={myID}
+
 						appID={appID}
 						apiVersion={ApiVersion}
 						setPopout={setPopout}
@@ -302,7 +304,6 @@ const Main = () => {
 						snackbar={snackbar}
 						setSnackbar={setSnackbar}
 						category={category2}
-						VkUser={VkUser}
 						refresh={id => {
 							SetDeleteID(id);
 						}}

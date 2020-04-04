@@ -20,9 +20,11 @@ import { CategoryNo } from './../../template/Categories';
 
 import { Location, NoRegion } from './../../template/Location';
 
+import { canWritePrivateMessage } from './../../../requests';
+
 let itemID = 1;
 
-const CreateAdd = props => {
+const CreateAdd = (props) => {
 	const [items, setItems] = useState([
 		{
 			id: itemID,
@@ -49,9 +51,22 @@ const CreateAdd = props => {
 	const [country, setCountry] = useState({ id: 1, title: 'Россия' });
 	// const [region, setRegion] = useState(NoRegion);
 
+	const [pmOpen, setPmOpen] = useState(true);
+
+	useEffect(() => {
+		async function fetch() {
+			const canPM = await canWritePrivateMessage(props.myID, props.appID, props.apiVersion);
+			console.log("setPM", canPM)
+			if (canPM != undefined) {
+				setPmOpen(canPM);
+			}
+		}
+		fetch();
+	}, [props.myID, props.appID]);
+
 	useEffect(() => {
 		let v = true;
-		items.forEach(val => {
+		items.forEach((val) => {
 			console.log('item!!!!', val, props.category);
 			if (val.name === undefined || val.name.length == 0) {
 				v = false;
@@ -98,8 +113,8 @@ const CreateAdd = props => {
 	}, []);
 
 	function saveSuccess(goToAds, id) {
-		items.forEach(item => {
-			item.photos.forEach(photo => {
+		items.forEach((item) => {
+			item.photos.forEach((photo) => {
 				const data = new FormData();
 				console.log('fiile', photo);
 				data.append('file', photo);
@@ -110,12 +125,12 @@ const CreateAdd = props => {
 					url: Addr.getState() + '/api/ad/' + id + '/upload_image',
 					withCredentials: true,
 					data: data,
-					cancelToken: new axios.CancelToken(c => (cancel = c)),
+					cancelToken: new axios.CancelToken((c) => (cancel = c)),
 				})
-					.then(function(response) {
+					.then(function (response) {
 						console.log('success uploaded', response);
 					})
-					.catch(function(error) {
+					.catch(function (error) {
 						console.log('failed uploaded', error);
 					});
 			});
@@ -187,9 +202,9 @@ const CreateAdd = props => {
 				url: Addr.getState() + '/api/ad/create',
 				withCredentials: true,
 				data: obj,
-				cancelToken: new axios.CancelToken(c => (cancel = c)),
+				cancelToken: new axios.CancelToken((c) => (cancel = c)),
 			})
-				.then(function(response) {
+				.then(function (response) {
 					setPopout(null);
 					if (response.status == 201) {
 						saveSuccess(props.goToAds, response.data.ad_id);
@@ -202,7 +217,7 @@ const CreateAdd = props => {
 					}
 					return response.data;
 				})
-				.catch(function(error) {
+				.catch(function (error) {
 					console.log('Request failed', error);
 					setPopout(null);
 					saveFail('Нет соединения с сервером', () => createAd(setPopout));
@@ -243,7 +258,7 @@ const CreateAdd = props => {
 						choose={props.chooseCategory}
 						amount={item.amount}
 						name={item.name}
-						setItems={newItem => {
+						setItems={(newItem) => {
 							newItem.id = items[i].id;
 							items[i] = newItem;
 							setItems([...items]);
@@ -337,6 +352,8 @@ const CreateAdd = props => {
 				feedbackType={feedbackType}
 				setContacts={setContacts}
 				contacts={contacts}
+				setSnackbar={props.setSnackbar}
+				pmOpen={pmOpen}
 			/>
 			{valid ? (
 				''
@@ -374,9 +391,9 @@ export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
 		method: 'post',
 		withCredentials: true,
 		url: Addr.getState() + '/api/ad/' + ad_id + '/delete',
-		cancelToken: new axios.CancelToken(c => (cancel = c)),
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
-		.then(function(response) {
+		.then(function (response) {
 			setPopout(null);
 			if (response.status != 200) {
 				saveFail(
@@ -404,7 +421,7 @@ export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
 			}
 			return response.data;
 		})
-		.catch(function(error) {
+		.catch(function (error) {
 			console.log('Request failed', error);
 			setPopout(null);
 			saveFail('Нет соединения с сервером', () => deleteAd(setPopout, ad_id, setSnackbar, refresh), setSnackbar);

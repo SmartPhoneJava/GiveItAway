@@ -81,7 +81,7 @@ export const AdDefault = {
 	},
 };
 
-const AddMore2 = props => {
+const AddMore2 = (props) => {
 	const [ad, setAd] = useState(props.ad || AdDefault);
 
 	const [photoIndex, setPhotoIndex] = useState(0);
@@ -233,7 +233,7 @@ const AddMore2 = props => {
 			!isAuthor() &&
 			subscribers &&
 			subscribers.length > 0 &&
-			subscribers.filter(v => v.vk_id == props.VkUser.getState().id).length > 0
+			subscribers.filter((v) => v.vk_id == props.VkUser.getState().id).length > 0
 		);
 	}
 
@@ -249,6 +249,15 @@ const AddMore2 = props => {
 		if (!err) {
 			setIsSub(true);
 		}
+	}
+
+	function feedbackText() {
+		if (ad.feedback_type == "ls") {
+			return <CellButton>Личные сообщения</CellButton>
+		} else if (ad.feedback_type == "comments") {
+			return <CellButton>Комментарии</CellButton>
+		}
+		return <Cell>ad.extra_field</Cell>
 	}
 
 	console.log('adadadad', ad);
@@ -349,28 +358,29 @@ const AddMore2 = props => {
 					)}
 				</div>
 				<div style={{ padding: '8px' }}>
-					{isAuthor() ? (
-						<CellButton>Связаться с автором</CellButton>
-					) : isSub ? (
-						<Button
-							stretched
-							size="xl"
-							mode="destructive"
-							onClick={unsub}
-							before={<Icon24Cancel />}
-						>
+					{isSub ? (
+						<Button stretched size="xl" mode="destructive" onClick={unsub} before={<Icon24Cancel />}>
 							Отказаться
 						</Button>
 					) : (
-						<Button
-							stretched
-							size="xl"
-							mode="primary"
-							onClick={sub}
-							before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
-						>
-							Откликнуться
-						</Button>
+						<>
+							<Button
+								stretched
+								size="xl"
+								mode="primary"
+								onClick={sub}
+								before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
+							>
+								Откликнуться
+							</Button>
+						</>
+					)}
+					{isAuthor() ? (
+						''
+					) : (
+						<Group header={<Header mode="secondary">Связь с автором</Header>}>
+							{feedbackText()}
+						</Group>
 					)}
 				</div>
 			</div>
@@ -410,7 +420,7 @@ const AddMore2 = props => {
 			{isAuthor() ? (
 				<Group header={<Header mode="secondary">Откликнулись</Header>}>
 					{subs.length > 0 ? (
-						subs.map(v => (
+						subs.map((v) => (
 							<Cell key={v.vk_id} before={<Avatar size={36} src={v.photo_url} />}>
 								{v.name + ' ' + v.surname}
 							</Cell>

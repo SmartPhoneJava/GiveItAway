@@ -12,9 +12,7 @@ import {
 	File,
 	HorizontalScroll,
 	Avatar,
-	Snackbar,
-	IS_PLATFORM_ANDROID,
-	IS_PLATFORM_IOS,
+	Snackbar
 } from '@vkontakte/vkui';
 
 import { CategoriesLabel } from './../../../template/Categories';
