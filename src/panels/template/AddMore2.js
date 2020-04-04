@@ -252,12 +252,12 @@ const AddMore2 = (props) => {
 	}
 
 	function feedbackText() {
-		if (ad.feedback_type == "ls") {
-			return <CellButton>Личные сообщения</CellButton>
-		} else if (ad.feedback_type == "comments") {
-			return <CellButton>Комментарии</CellButton>
+		if (ad.feedback_type == 'ls') {
+			return <CellButton>Личные сообщения</CellButton>;
+		} else if (ad.feedback_type == 'comments') {
+			return <CellButton>Комментарии</CellButton>;
 		}
-		return <Cell>ad.extra_field</Cell>
+		return <Cell>ad.extra_field</Cell>;
 	}
 
 	console.log('adadadad', ad);
@@ -345,7 +345,13 @@ const AddMore2 = (props) => {
 							mode="primary"
 							size="l"
 							onClick={() => {
-								OpenActions(props.setPopout, props.setSnackbar, props.refresh, props.ad.ad_id);
+								OpenActions(
+									props.setPopout,
+									props.setSnackbar,
+									props.refresh,
+									props.ad.ad_id,
+									props.onCloseClick
+								);
 							}}
 							disabled={ad.status !== 'offer'}
 						>
@@ -358,29 +364,35 @@ const AddMore2 = (props) => {
 					)}
 				</div>
 				<div style={{ padding: '8px' }}>
-					{isSub ? (
-						<Button stretched size="xl" mode="destructive" onClick={unsub} before={<Icon24Cancel />}>
-							Отказаться
-						</Button>
-					) : (
-						<>
-							<Button
-								stretched
-								size="xl"
-								mode="primary"
-								onClick={sub}
-								before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
-							>
-								Откликнуться
-							</Button>
-						</>
-					)}
 					{isAuthor() ? (
 						''
 					) : (
-						<Group header={<Header mode="secondary">Связь с автором</Header>}>
-							{feedbackText()}
-						</Group>
+						<>
+							<Group header={<Header mode="secondary">Связь с автором</Header>}>{feedbackText()}</Group>
+							{isSub ? (
+								<Button
+									stretched
+									size="xl"
+									mode="destructive"
+									onClick={unsub}
+									before={<Icon24Cancel />}
+								>
+									Отказаться
+								</Button>
+							) : (
+								<>
+									<Button
+										stretched
+										size="xl"
+										mode="primary"
+										onClick={sub}
+										before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
+									>
+										Откликнуться
+									</Button>
+								</>
+							)}
+						</>
 					)}
 				</div>
 			</div>

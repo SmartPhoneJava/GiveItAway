@@ -40,7 +40,7 @@ import Error from './placeholders/error';
 
 import { NoRegion } from './template/Location';
 
-import AddsModal, { MODAL_FILTERS, MODAL_CATEGORIES } from './story/adds/AddsModal';
+import AddsModal, { MODAL_FILTERS, MODAL_CATEGORIES, MODAL_SUBS } from './story/adds/AddsModal';
 import CreateModal from './story/create/CreateModal';
 
 const ads = 'ads';
@@ -61,7 +61,7 @@ const Main = () => {
 	const [category, setCategory] = useState(CategoryNo);
 	const [category2, setCategory2] = useState(CategoryNo);
 
-	const onStoryChange = e => {
+	const onStoryChange = (e) => {
 		setActiveStory(e.currentTarget.dataset.story);
 	};
 
@@ -84,6 +84,9 @@ const Main = () => {
 	const [sort, setSort] = useState('time');
 
 	const [myID, setMyID] = useState(0);
+
+	const [subs, setSubs] = useState([]);
+	const [sub, setSub] = useState();
 
 	function goSearch() {
 		setActivePanel('search');
@@ -146,15 +149,15 @@ const Main = () => {
 				}),
 				credentials: 'include',
 			})
-				.then(function(response) {
+				.then(function (response) {
 					return response.json();
 				})
-				.then(function(data) {
+				.then(function (data) {
 					User.dispatch({ type: 'set', new_state: data });
 					console.log('Request successful', data.name, data.surname, data.photo_url, data.carma);
 					return data;
 				})
-				.catch(function(error) {
+				.catch(function (error) {
 					console.log('Request failed', error);
 				});
 			setPopout(null);
@@ -163,7 +166,7 @@ const Main = () => {
 		async function fetchData() {
 			const us = await bridge.send('VKWebAppGetUserInfo');
 			VkUser.dispatch({ type: 'set', new_state: us });
-			setMyID(us.id)
+			setMyID(us.id);
 			checkMe(us);
 		}
 
@@ -215,6 +218,14 @@ const Main = () => {
 						// setRegion={setRegion}
 						sort={sort}
 						setSort={setSort}
+						subs={subs}
+						sub={sub}
+						setSub={setSub}
+
+						setPopout={setPopout}
+						setSnackbar={setSnackbar}
+
+						ad={choosen}
 					/>
 				}
 				header={false}
@@ -222,7 +233,9 @@ const Main = () => {
 				<Panel id="header-search" separator={false}>
 					<AddsTabs
 						onFiltersClick={() => setActiveModal(MODAL_FILTERS)}
+						onCloseClick={()=>setActiveModal(MODAL_SUBS)}
 						goSearch={goSearch}
+						
 						setPopout={setPopout}
 						setSnackbar={setSnackbar}
 						category={category}
@@ -239,11 +252,14 @@ const Main = () => {
 							setCountry(NoRegion);
 							// setRegion(NoRegion);
 						}}
-						openAd={ad => {
+						openAd={(ad) => {
 							setChoosen(ad);
 							console.log('looook:', ad);
 							setActivePanel('one-panel');
 						}}
+						subs={subs}
+						sub={sub}
+						setSubs={setSubs}
 					/>
 					{snackbar}
 				</Panel>
@@ -261,7 +277,7 @@ const Main = () => {
 					</PanelHeaderSimple>
 					{choosen ? (
 						<AddMore2
-							refresh={id => {
+							refresh={(id) => {
 								setActivePanel('header-search');
 								SetDeleteID(id);
 							}}
@@ -270,6 +286,12 @@ const Main = () => {
 							setSnackbar={setSnackbar}
 							VkUser={VkUser}
 							vkPlatform={vkPlatform}
+
+							onCloseClick={()=>setActiveModal(MODAL_SUBS)}
+
+							subs={subs}
+							sub={sub}
+							setSubs={setSubs}
 						/>
 					) : (
 						Error
@@ -288,6 +310,9 @@ const Main = () => {
 						setActiveModal={setActiveModal2}
 						category={category2}
 						setCategory={setCategory2}
+						subs={subs}
+						sub={sub}
+						setSub={setSub}
 					/>
 				}
 			>
@@ -296,7 +321,6 @@ const Main = () => {
 					<CreateAdd
 						vkPlatform={vkPlatform}
 						myID={myID}
-
 						appID={appID}
 						apiVersion={ApiVersion}
 						setPopout={setPopout}
@@ -304,7 +328,7 @@ const Main = () => {
 						snackbar={snackbar}
 						setSnackbar={setSnackbar}
 						category={category2}
-						refresh={id => {
+						refresh={(id) => {
 							SetDeleteID(id);
 						}}
 						chooseCategory={() => setActiveModal2(MODAL_CATEGORIES)}

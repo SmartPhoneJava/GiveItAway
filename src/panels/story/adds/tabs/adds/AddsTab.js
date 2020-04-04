@@ -242,6 +242,10 @@ const AddsTab = props => {
 				setSnackbar={props.setSnackbar}
 				refresh={props.refresh}
 				myID={props.myID}
+				
+				subs={props.subs}
+				sub={props.sub}
+				setSubs={props.setSubs}
 			/>
 		);
 	}

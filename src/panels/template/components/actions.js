@@ -3,14 +3,12 @@ import { ActionSheet, ActionSheetItem, osname, IOS } from '@vkontakte/vkui';
 
 import { deleteAd } from './../../story/create/CreateAdd';
 
-function OpenActions(setPopout, setSnackbar, refresh, ad_id) {
+function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick) {
 	setPopout(
 		<ActionSheet onClose={() => setPopout(null)}>
 			<ActionSheetItem
 				autoclose
-				onClick={() => {
-					deleteAd(setPopout, ad_id, setSnackbar, refresh);
-				}}
+				onClick={onCloseClick}
 			>
 				Объявить завершенным
 			</ActionSheetItem>

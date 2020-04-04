@@ -7,10 +7,13 @@ import { ModalHeader } from './../../headers/modal';
 
 import { Location } from './../../template/Location';
 
+import { PeopleRB }from "./../../template/People"
+
 export const MODAL_FILTERS = 'filters';
 export const MODAL_CATEGORIES = 'categories';
+export const MODAL_SUBS = 'subs';
 
-const AddsModal = props => {
+const AddsModal = (props) => {
 	function hideModal() {
 		props.setActiveModal(null);
 	}
@@ -30,7 +33,7 @@ const AddsModal = props => {
 					props.country,
 					props.setCountry,
 					props.city,
-					props.setCity, 
+					props.setCity,
 					false
 				)}
 				<Group separator="show" header={<Header mode="secondary">Отсортировтаь по</Header>}>
@@ -42,7 +45,7 @@ const AddsModal = props => {
 								value="time"
 								name="sort"
 								defaultChecked
-								onClick={e => {
+								onClick={(e) => {
 									props.setSort(e.currentTarget.value);
 								}}
 							>
@@ -52,7 +55,7 @@ const AddsModal = props => {
 								key="2"
 								value="geo"
 								name="sort"
-								onClick={e => {
+								onClick={(e) => {
 									props.setSort(e.currentTarget.value);
 								}}
 							>
@@ -65,7 +68,7 @@ const AddsModal = props => {
 								key="3"
 								value="time"
 								name="sort"
-								onClick={e => {
+								onClick={(e) => {
 									props.setSort(e.currentTarget.value);
 								}}
 							>
@@ -76,7 +79,7 @@ const AddsModal = props => {
 								value="geo"
 								name="sort"
 								defaultChecked
-								onClick={e => {
+								onClick={(e) => {
 									props.setSort(e.currentTarget.value);
 								}}
 							>
@@ -90,13 +93,27 @@ const AddsModal = props => {
 				id={MODAL_CATEGORIES}
 				onClose={() => props.setActiveModal(MODAL_FILTERS)}
 				header={<ModalHeader name="Выберите категорию" back={() => props.setActiveModal(MODAL_FILTERS)} />}
-				settlingHeight={80}
 			>
 				<CategoriesRB
 					category={props.category}
-					choose={cat => {
+					choose={(cat) => {
 						props.setCategory(cat);
 						props.setActiveModal(MODAL_FILTERS);
+					}}
+				/>
+			</ModalPage>
+			<ModalPage
+				id={MODAL_SUBS}
+				onClose={() => props.setActiveModal(null)}
+				header={<ModalHeader name="Выберите человека" back={() => props.setActiveModal(null)} />}
+				dynamicContentHeight
+			>
+				<PeopleRB
+					setPopout={props.setPopout}
+					setSnackbar={props.setSnackbar}
+					ad_id={props.ad.ad_id}
+					back={(s) => {
+						props.setActiveModal(null);
 					}}
 				/>
 			</ModalPage>
