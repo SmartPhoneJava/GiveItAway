@@ -31,6 +31,8 @@ import Icon24Mention from '@vkontakte/icons/dist/24/mention';
 import Icon24Info from '@vkontakte/icons/dist/24/info';
 import Icon24Message from '@vkontakte/icons/dist/24/message';
 
+import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
+
 import Icon28ArrowLeftOutline from '@vkontakte/icons/dist/28/arrow_left_outline';
 import Icon28ArrowRightOutline from '@vkontakte/icons/dist/28/arrow_right_outline';
 
@@ -38,7 +40,7 @@ import Icon24Settings from '@vkontakte/icons/dist/24/settings';
 import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 import Icon24Place from '@vkontakte/icons/dist/24/place';
 
-import { subscribe, getDetails, getSubscribers } from './../../requests';
+import { subscribe, unsubscribe, getDetails, getSubscribers } from './../../requests';
 
 import './addsTab.css';
 
@@ -86,6 +88,18 @@ const AddMore2 = props => {
 
 	const [subs, setSubs] = useState(0);
 
+	const [isSub, setIsSub] = useState(false);
+
+	async function initSubscribers(id) {
+		let { subscribers, err } = await getSubscribers(props.setPopout, props.setSnackbar, id);
+		subscribers = subscribers || [];
+		console.log('subscribers', subscribers);
+		if (!err) {
+			setSubs(subscribers);
+		}
+		return err;
+	}
+
 	useEffect(() => {
 		async function init() {
 			const id = props.ad ? props.ad.ad_id : -1;
@@ -95,18 +109,19 @@ const AddMore2 = props => {
 				let { details, err } = await getDetails(props.setPopout, props.setSnackbar, id);
 				if (!err) {
 					setAd(details);
-
-					let { subscribers, err } = await getSubscribers(props.setPopout, props.setSnackbar, id);
-					subscribers = subscribers || [];
-					console.log('subscribers', subscribers);
-					if (!err) {
-						setSubs(subscribers);
-					}
 				}
 			}
 		}
 		init();
 	}, [props.ad]);
+
+	useEffect(() => {
+		const id = props.ad ? props.ad.ad_id : -1;
+		if (id < 0) {
+			return;
+		}
+		initSubscribers(id);
+	}, [props.ad, isSub]);
 
 	function detectContactsType(contacts) {
 		if (!contacts) {
@@ -219,6 +234,12 @@ const AddMore2 = props => {
 		return props.VkUser.getState().id == ad.author.vk_id;
 	}
 
+	function isSubscriber() {
+		return (
+			!isAuthor() && subs && subs.length > 0 && subs.filter(v => v.vk_id == props.VkUser.getState().id).length > 0
+		);
+	}
+
 	console.log('adadadad', ad);
 	const image = ad.pathes_to_photo ? ad.pathes_to_photo[photoIndex].PhotoUrl : '';
 
@@ -317,13 +338,31 @@ const AddMore2 = props => {
 				<div style={{ padding: '8px' }}>
 					{isAuthor() ? (
 						<CellButton>Связаться с автором</CellButton>
+					) : isSub ? (
+						<Button
+							stretched
+							size="xl"
+							mode="destructive"
+							onClick={() => {
+								const err = unsubscribe(props.setPopout, props.setSnackbar, ad.ad_id);
+								if (!err) {
+									setIsSub(false);
+								}
+							}}
+							before={<Icon24Cancel />}
+						>
+							Отказаться
+						</Button>
 					) : (
 						<Button
 							stretched
 							size="xl"
 							mode="primary"
 							onClick={() => {
-								subscribe(props.setPopout, props.setSnackbar, ad.ad_id);
+								const err = subscribe(props.setPopout, props.setSnackbar, ad.ad_id);
+								if (!err) {
+									setIsSub(true);
+								}
 							}}
 							before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
 						>
@@ -370,15 +409,7 @@ const AddMore2 = props => {
 				<Group header={<Header mode="secondary">Откликнулись</Header>}>
 					{subs.length > 0 ? (
 						subs.map(v => (
-							<Cell
-								key={v.vk_id}
-								before={
-									<Avatar
-										size={36}
-										src={v.photo_url}
-									/>
-								}
-							>
+							<Cell key={v.vk_id} before={<Avatar size={36} src={v.photo_url} />}>
 								{v.name + ' ' + v.surname}
 							</Cell>
 						))
@@ -388,14 +419,7 @@ const AddMore2 = props => {
 				</Group>
 			) : (
 				<Group header={<Header mode="secondary">Автор</Header>}>
-					<Cell
-						before={
-							<Avatar
-								size={36}
-								src={ad.author.photo_url}
-							/>
-						}
-					>
+					<Cell before={<Avatar size={36} src={ad.author.photo_url} />}>
 						{ad.author.name + ' ' + ad.author.surname}
 					</Cell>
 				</Group>

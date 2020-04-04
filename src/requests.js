@@ -11,6 +11,53 @@ import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
 
+export function subscribe(setPopout, setSnackbar, ad_id) {
+	setPopout(<ScreenSpinner size="large" />);
+	let err = false;
+	let cancel;
+	axios({
+		method: 'post',
+		withCredentials: true,
+		url: Addr.getState() + '/api/ad/' + ad_id + '/subscribe',
+		cancelToken: new axios.CancelToken(c => (cancel = c)),
+	})
+		.then(function(response) {
+			setPopout(null);
+			console.log('response from subscribe:', response);
+			return response.data;
+		})
+		.catch(function(error) {
+			err = true;
+			fail('Нет соединения с сервером', () => {}, setSnackbar);
+			setPopout(null);
+		});
+	return err;
+}
+
+export function unsubscribe(setPopout, setSnackbar, ad_id) {
+	setPopout(<ScreenSpinner size="large" />);
+	let err = false;
+	let cancel;
+	axios({
+		method: 'post',
+		withCredentials: true,
+		url: Addr.getState() + '/api/ad/' + ad_id + '/unsubscribe',
+		cancelToken: new axios.CancelToken(c => (cancel = c)),
+	})
+		.then(function(response) {
+			setPopout(null);
+			console.log('response from unsubscribe:', response);
+			return response.data;
+		})
+		.catch(function(error) {
+			err = true;
+			fail('Нет соединения с сервером', () => {}, setSnackbar);
+			setPopout(null);
+		});
+	return err;
+}
+
+
 export async function getDetails(setPopout, setSnackbar, ad_id) {
 	setPopout(<ScreenSpinner size="large" />);
 	let err = false;
@@ -23,7 +70,7 @@ export async function getDetails(setPopout, setSnackbar, ad_id) {
 	})
 		.then(function(response) {
 			setPopout(null);
-			console.log('response from subscribe:', response);
+			console.log('response from getDetails:', response);
 			return response.data;
 		})
 		.catch(function(error) {
