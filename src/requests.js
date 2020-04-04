@@ -11,7 +11,7 @@ import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
 
-export function subscribe(setPopout, setSnackbar, ad_id) {
+export function subscribe(setPopout, setSnackbar, ad_id, clCancel) {
 	setPopout(<ScreenSpinner size="large" />);
 	let err = false;
 	let cancel;
@@ -24,6 +24,7 @@ export function subscribe(setPopout, setSnackbar, ad_id) {
 		.then(function(response) {
 			setPopout(null);
 			console.log('response from subscribe:', response);
+			sucess('Теперь вы будете получать уведомления, связанные с этим постом', clCancel, setSnackbar);
 			return response.data;
 		})
 		.catch(function(error) {
@@ -34,7 +35,7 @@ export function subscribe(setPopout, setSnackbar, ad_id) {
 	return err;
 }
 
-export function unsubscribe(setPopout, setSnackbar, ad_id) {
+export function unsubscribe(setPopout, setSnackbar, ad_id, clCancel) {
 	setPopout(<ScreenSpinner size="large" />);
 	let err = false;
 	let cancel;
@@ -47,6 +48,7 @@ export function unsubscribe(setPopout, setSnackbar, ad_id) {
 		.then(function(response) {
 			setPopout(null);
 			console.log('response from unsubscribe:', response);
+			sucess('Больше вы не будете получать связанные с этим постом уведомления', clCancel, setSnackbar);
 			return response.data;
 		})
 		.catch(function(error) {
@@ -56,7 +58,6 @@ export function unsubscribe(setPopout, setSnackbar, ad_id) {
 		});
 	return err;
 }
-
 
 export async function getDetails(setPopout, setSnackbar, ad_id) {
 	setPopout(<ScreenSpinner size="large" />);
@@ -136,11 +137,11 @@ function fail(err, repeat, setSnackbar) {
 	);
 }
 
-function sucess(setSnackbar, cancelMe, text) {
+function sucess(text, cancelMe, setSnackbar) {
 	setSnackbar(
 		<Snackbar
 			onClose={() => {
-				props.setSnackbar(null);
+				setSnackbar(null);
 			}}
 			action="Отменить"
 			onActionClick={cancelMe}

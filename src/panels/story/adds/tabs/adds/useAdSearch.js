@@ -1,14 +1,28 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+
+import { ScreenSpinner } from '@vkontakte/vkui';
+
 
 import { Addr } from './../../../../../store/addr';
 
 import { User } from './AddsTab/../../../../../../store/user';
 
 import { CategoryNo } from './../../../../template/Categories';
-import { NoRegion } from '../../../../template/Location';
 
-export default function useAdSearch(query, category, mode, pageNumber, rowsPerPage, deleteID, city, country, sort) {
+export default function useAdSearch(
+	setPopout,
+	query,
+	category,
+	mode,
+	pageNumber,
+	rowsPerPage,
+	deleteID,
+	city,
+	country,
+	sort
+) {
+	const [inited, setInited] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
 	const [ads, setAds] = useState([]);
@@ -31,8 +45,10 @@ export default function useAdSearch(query, category, mode, pageNumber, rowsPerPa
 	}, [deleteID]);
 
 	useEffect(() => {
+		setPopout(<ScreenSpinner size="large" />);
 		setLoading(true);
 		setError(false);
+		setInited(false)
 		let cancel;
 
 		// if (prevCategory != category) {
@@ -58,7 +74,7 @@ export default function useAdSearch(query, category, mode, pageNumber, rowsPerPa
 			params.district = city.title;
 		}
 
-		console.log("before check", country)
+		console.log('before check', country);
 		if (country && country.id != -1) {
 			params.region = country.title;
 		}
@@ -82,6 +98,8 @@ export default function useAdSearch(query, category, mode, pageNumber, rowsPerPa
 				});
 				setHasMore(newAds.length > 0);
 				setLoading(false);
+				setPopout(null);
+				setInited(true);
 			})
 			.catch(e => {
 				console.log('fail', e);
@@ -89,9 +107,11 @@ export default function useAdSearch(query, category, mode, pageNumber, rowsPerPa
 				if (('' + e).indexOf('404') == -1) {
 					setError(true);
 				}
+				setPopout(null);
+				setInited(true);
 			});
 		return () => cancel();
 	}, [category, mode, query, pageNumber, city, country, sort]);
 
-	return { newPage: pageNumber, ads, loading, error, hasMore };
+	return { inited, newPage: pageNumber, ads, loading, error, hasMore };
 }

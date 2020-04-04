@@ -199,7 +199,8 @@ const AddsTab = props => {
 
 	const [pageNumber, setPageNumber] = useState(1);
 
-	let { loading, ads, error, hasMore, newPage } = useAdSearch(
+	let { inited, loading, ads, error, hasMore, newPage } = useAdSearch(
+		props.setPopout,
 		search,
 		props.category,
 		props.mode,
@@ -245,6 +246,8 @@ const AddsTab = props => {
 		);
 	}
 
+	console.log("loading", loading)
+
 	return (
 		<>
 			<Search value={search} onChange={handleSearch} icon={<Icon24Filter />} onIconClick={props.onFiltersClick} />
@@ -258,11 +261,7 @@ const AddsTab = props => {
 								</div>
 							);
 						} else {
-							return (
-								<div key={ad.ad_id}>
-									{Ad(ad)}
-								</div>
-							);
+							return <div key={ad.ad_id}>{Ad(ad)}</div>;
 						}
 					})
 				) : error ? (
@@ -270,10 +269,12 @@ const AddsTab = props => {
 					addsArrDD.map(ad => {
 						return <div key={ad.ad_id}>{Ad(ad)}</div>;
 					})
+				) : // addsArrDD.map(ad => {
+				// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
+				// })
+				!inited ? (
+					''
 				) : (
-					// addsArrDD.map(ad => {
-					// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
-					// })
 					<AdNotFound dropFilters={props.dropFilters} />
 				)}
 			</Group>

@@ -96,8 +96,9 @@ const AddMore2 = props => {
 		console.log('subscribers', subscribers);
 		if (!err) {
 			setSubs(subscribers);
+			setIsSub(isSubscriber(subscribers));
 		}
-		return err;
+		return { subscribers, err };
 	}
 
 	useEffect(() => {
@@ -109,19 +110,12 @@ const AddMore2 = props => {
 				let { details, err } = await getDetails(props.setPopout, props.setSnackbar, id);
 				if (!err) {
 					setAd(details);
+					initSubscribers(id);
 				}
 			}
 		}
 		init();
 	}, [props.ad]);
-
-	useEffect(() => {
-		const id = props.ad ? props.ad.ad_id : -1;
-		if (id < 0) {
-			return;
-		}
-		initSubscribers(id);
-	}, [props.ad, isSub]);
 
 	function detectContactsType(contacts) {
 		if (!contacts) {
@@ -234,10 +228,27 @@ const AddMore2 = props => {
 		return props.VkUser.getState().id == ad.author.vk_id;
 	}
 
-	function isSubscriber() {
+	function isSubscriber(subscribers) {
 		return (
-			!isAuthor() && subs && subs.length > 0 && subs.filter(v => v.vk_id == props.VkUser.getState().id).length > 0
+			!isAuthor() &&
+			subscribers &&
+			subscribers.length > 0 &&
+			subscribers.filter(v => v.vk_id == props.VkUser.getState().id).length > 0
 		);
+	}
+
+	function unsub() {
+		const err = unsubscribe(props.setPopout, props.setSnackbar, ad.ad_id, sub);
+		if (!err) {
+			setIsSub(false);
+		}
+	}
+
+	function sub() {
+		const err = subscribe(props.setPopout, props.setSnackbar, ad.ad_id, unsub);
+		if (!err) {
+			setIsSub(true);
+		}
 	}
 
 	console.log('adadadad', ad);
@@ -256,7 +267,6 @@ const AddMore2 = props => {
 			>
 				
 			</div> */}
-
 			<div
 				style={{
 					position: 'relative',
@@ -282,39 +292,42 @@ const AddMore2 = props => {
 					</PanelHeaderButton>
 				</div>
 			</div>
-
-			<HorizontalScroll>
-				<div style={{ display: 'flex' }}>
-					{ad.pathes_to_photo
-						? ad.pathes_to_photo.map((img, i) => {
-								return (
-									<div
-										key={img.AdPhotoId}
-										style={{
-											borderRadius: '10px',
-											alignItems: 'center',
-											justifyContent: 'center',
-											padding: '1px',
-										}}
-									>
-										<Button
-											mode="tertiary"
+			{ad.pathes_to_photo.length <= 1 ? (
+				''
+			) : (
+				<HorizontalScroll>
+					<div style={{ display: 'flex' }}>
+						{ad.pathes_to_photo
+							? ad.pathes_to_photo.map((img, i) => {
+									return (
+										<div
+											key={img.AdPhotoId}
 											style={{
-												padding: '0px',
 												borderRadius: '10px',
-											}}
-											onClick={() => {
-												setPhotoIndex(i);
+												alignItems: 'center',
+												justifyContent: 'center',
+												padding: '1px',
 											}}
 										>
-											<img src={img.PhotoUrl} className="small_img" />
-										</Button>
-									</div>
-								);
-						  })
-						: ''}
-				</div>
-			</HorizontalScroll>
+											<Button
+												mode="tertiary"
+												style={{
+													padding: '0px',
+													borderRadius: '10px',
+												}}
+												onClick={() => {
+													setPhotoIndex(i);
+												}}
+											>
+												<img src={img.PhotoUrl} className="small_img" />
+											</Button>
+										</div>
+									);
+							  })
+							: ''}
+					</div>
+				</HorizontalScroll>
+			)}
 			<div style={{ padding: '16px' }}>
 				<div style={{ display: 'flex', alignItems: 'center' }}>
 					<div className="CellLeft__head">{ad.header}</div>
@@ -343,12 +356,7 @@ const AddMore2 = props => {
 							stretched
 							size="xl"
 							mode="destructive"
-							onClick={() => {
-								const err = unsubscribe(props.setPopout, props.setSnackbar, ad.ad_id);
-								if (!err) {
-									setIsSub(false);
-								}
-							}}
+							onClick={unsub}
 							before={<Icon24Cancel />}
 						>
 							Отказаться
@@ -358,12 +366,7 @@ const AddMore2 = props => {
 							stretched
 							size="xl"
 							mode="primary"
-							onClick={() => {
-								const err = subscribe(props.setPopout, props.setSnackbar, ad.ad_id);
-								if (!err) {
-									setIsSub(true);
-								}
-							}}
+							onClick={sub}
 							before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
 						>
 							Откликнуться
@@ -404,7 +407,6 @@ const AddMore2 = props => {
 					</tr>
 				</tbody>
 			</table>
-
 			{isAuthor() ? (
 				<Group header={<Header mode="secondary">Откликнулись</Header>}>
 					{subs.length > 0 ? (
