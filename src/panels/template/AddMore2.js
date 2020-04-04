@@ -89,6 +89,7 @@ const AddMore2 = (props) => {
 	const [subs, setSubs] = useState(0);
 
 	const [isSub, setIsSub] = useState(false);
+	const [isClosing, setIsClosing] = useState(false);
 
 	async function initSubscribers(id) {
 		let { subscribers, err } = await getSubscribers(props.setPopout, props.setSnackbar, id);
@@ -111,10 +112,13 @@ const AddMore2 = (props) => {
 				if (!err) {
 					setAd(details);
 					initSubscribers(id);
+					console.log('detailed look', details);
+					setIsClosing(details.status == 'chosen');
 				}
 			}
 		}
 		init();
+		console.log('need refresh catched');
 	}, [props.ad]);
 
 	function detectContactsType(contacts) {
@@ -350,10 +354,17 @@ const AddMore2 = (props) => {
 									props.setSnackbar,
 									props.refresh,
 									props.ad.ad_id,
-									props.onCloseClick
+									() => {
+										props.onCloseClick();
+										setIsClosing(true);
+									},
+									() => {
+										setIsClosing(false);
+									},
+									isClosing
 								);
 							}}
-							disabled={ad.status !== 'offer'}
+							disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
 						>
 							<Avatar style={{ background: 'white' }} size={40}>
 								<Icon28SettingsOutline fill="var(--black)" />

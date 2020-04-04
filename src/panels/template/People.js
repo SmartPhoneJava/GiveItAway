@@ -4,7 +4,7 @@ import { withModalRootContext } from '@vkontakte/vkui';
 
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 
-import { getSubscribers } from './../../requests';
+import { getSubscribers, Close } from './../../requests';
 
 export const PeopleList = (subs) => {
 	{
@@ -33,6 +33,9 @@ export const PeopleRB = withModalRootContext((props) => {
 				setSubs(subscribers);
 			}
 			props.updateModalHeight();
+			// if (err || subscribers.length == 0) {
+			//     props.back();
+			// }
 			return { subscribers, err };
 		}
 		get();
@@ -45,9 +48,11 @@ export const PeopleRB = withModalRootContext((props) => {
 					<Radio
 						key={i}
 						name="sub"
-						value={v}
+						value={v.vk_id}
 						onClick={(e) => {
-							const { _, value } = e.currentTarget;
+                            const { _, value } = e.currentTarget;
+                            console.log("value", value)
+							Close(props.setPopout, props.setSnackbar, props.ad_id, value);
 							props.back();
 						}}
 					>

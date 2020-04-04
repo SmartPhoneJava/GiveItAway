@@ -3,15 +3,32 @@ import { ActionSheet, ActionSheetItem, osname, IOS } from '@vkontakte/vkui';
 
 import { deleteAd } from './../../story/create/CreateAdd';
 
-function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick) {
+import { CancelClose } from './../../../requests';
+
+function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, onUnCloseClick, isClosing) {
 	setPopout(
 		<ActionSheet onClose={() => setPopout(null)}>
-			<ActionSheetItem
-				autoclose
-				onClick={onCloseClick}
-			>
-				Объявить завершенным
-			</ActionSheetItem>
+			{isClosing ? (
+				<ActionSheetItem
+					autoclose
+					onClick={() => {
+						CancelClose(setPopout, setSnackbar, ad_id);
+						onUnCloseClick();
+					}}
+				>
+					Отменить запрос подтверждения
+				</ActionSheetItem>
+			) : (
+				<ActionSheetItem
+					autoclose
+					onClick={() => {
+						onCloseClick();
+					}}
+				>
+					Объявить завершенным
+				</ActionSheetItem>
+			)}
+
 			<ActionSheetItem
 				autoclose
 				mode="destructive"
@@ -28,6 +45,6 @@ function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick) {
 			)}
 		</ActionSheet>
 	);
-};
+}
 
 export default OpenActions;

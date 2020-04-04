@@ -13,6 +13,92 @@ import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
 
 let request_id = 0;
 
+export async function getDeal(setSnackbar, ad_id) {
+	let err = false;
+	let cancel;
+	const deal = await axios({
+		method: 'get',
+		withCredentials: true,
+		url: Addr.getState() + '/api/ad/' + ad_id + '/deal',
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(function (response) {
+			console.log('response from getDeal:', response);
+			
+			return response.data;
+		})
+		.catch(function (error) {
+			err = true;
+			fail('Нет соединения с сервером', () => {}, setSnackbar);
+		});
+	return {deal, err};
+}
+
+export async function denyDeal(setSnackbar, deal_id) {
+	let err = false;
+	let cancel;
+	console.log("deal info", deal_id)
+	await axios({
+		method: 'post',
+		withCredentials: true,
+		url: Addr.getState() + '/api/deal/' + deal_id + '/cancel',
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(function (response) {
+			console.log('response from denyDeal:', response);
+			return response.data;
+		})
+		.catch(function (error) {
+			err = true;
+			fail('Нет соединения с сервером', () => {}, setSnackbar);
+		});
+	return err;
+}
+
+export async function CancelClose(setPopout, setSnackbar, ad_id) {
+	setPopout(<ScreenSpinner size="large" />);
+	
+	let {deal, err} =  await getDeal(setSnackbar, ad_id)
+	console.log("we get deal", deal.deal_id, err)
+	if (!err) {
+		err = await denyDeal(setSnackbar, deal.deal_id)
+		
+	}
+	if (!err) {
+		sucessNoCancel("Запрос успешно отменен!", setSnackbar)
+	} else {
+		fail('Ошибка на стороне сервера', () => {}, setSnackbar);
+	}
+	setPopout(null);
+	return err;
+}
+
+export function Close(setPopout, setSnackbar, ad_id, subscriber_id) {
+	setPopout(<ScreenSpinner size="large" />);
+	let err = false;
+	let cancel;
+	console.log("close info", ad_id, subscriber_id)
+	axios({
+		method: 'put',
+		withCredentials: true,
+		params:{subscriber_id: subscriber_id},
+		url: Addr.getState() + '/api/ad/' + ad_id + '/make_deal',
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(function (response) {
+			setPopout(null);
+			console.log('response from Close:', response);
+			sucess('Спасибо, что делаете других людей счастливыми :) Ждем подтверждения от второй стороны!', ()=>{}, setSnackbar);
+			return response.data;
+		})
+		.catch(function (error) {
+			err = true;
+			fail('Нет соединения с сервером', () => {}, setSnackbar);
+			setPopout(null);
+		});
+	return err;
+}
+
 export function subscribe(setPopout, setSnackbar, ad_id, clCancel) {
 	setPopout(<ScreenSpinner size="large" />);
 	let err = false;
@@ -172,6 +258,23 @@ function sucess(text, cancelMe, setSnackbar) {
 			}}
 			action="Отменить"
 			onActionClick={cancelMe}
+			before={
+				<Avatar size={24} style={{ background: 'green' }}>
+					<Icon24DoneOutline fill="#fff" width={14} height={14} />
+				</Avatar>
+			}
+		>
+			{text}
+		</Snackbar>
+	);
+}
+
+function sucessNoCancel(text, setSnackbar) {
+	setSnackbar(
+		<Snackbar
+			onClose={() => {
+				setSnackbar(null);
+			}}
 			before={
 				<Avatar size={24} style={{ background: 'green' }}>
 					<Icon24DoneOutline fill="#fff" width={14} height={14} />
