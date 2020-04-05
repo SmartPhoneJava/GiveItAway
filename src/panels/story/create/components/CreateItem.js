@@ -154,7 +154,7 @@ const CreateItem = props => {
 									photos: props.item.photos,
 								});
 							}}
-							status={name ? 'valid' : 'error'}
+							status={name && name.length < 100? 'valid' : 'error'}
 						/>
 					</FormLayout>
 				</div>
@@ -179,7 +179,7 @@ const CreateItem = props => {
 									photos: props.item.photos,
 								});
 							}}
-							status={description ? 'valid' : 'error'}
+							status={description && description.length < 1500 ? 'valid' : 'error'}
 						/>
 					</FormLayout>
 				</Div>

@@ -93,6 +93,8 @@ const AddMore2 = (props) => {
 	const [isClosing, setIsClosing] = useState(false);
 	const [Deal, setDeal] = useState({});
 
+	const [request, setRequest] = useState('no');
+
 	async function initSubscribers(id) {
 		let { subscribers, err } = await getSubscribers(props.setPopout, props.setSnackbar, id);
 		subscribers = subscribers || [];
@@ -113,23 +115,22 @@ const AddMore2 = (props) => {
 				let { details, err } = await getDetails(props.setPopout, props.setSnackbar, id);
 				if (!err) {
 					setAd(details);
+					initSubscribers(id);
+					console.log('detailed look', details);
+					setIsClosing(details.status == 'chosen');
+
+					let { deal, err } = await getDeal(props.setSnackbar, details.ad_id);
+					if (!err) {
+						console.log('isDealer', deal.subscriber_id, props.VkUser.getState().id);
+						setIsDealer(deal.subscriber_id == props.VkUser.getState().id);
+						setDeal(deal);
+					}
 				}
-				// вернуть все в if выше
-
-				initSubscribers(id);
-				console.log('detailed look', details);
-				setIsClosing(props.ad.status == 'chosen');
-
-				let { deal } = await getDeal(props.setSnackbar, props.ad.ad_id);
-
-				console.log('isDealer', deal.subscriber_id, props.VkUser.getState().id);
-				setIsDealer(deal.subscriber_id == props.VkUser.getState().id);
-				setDeal(deal);
 			}
 		}
 		init();
 		console.log('need refresh catched');
-	}, [props.ad]);
+	}, [props.ad, request]);
 
 	function detectContactsType(contacts) {
 		if (!contacts) {
@@ -366,12 +367,13 @@ const AddMore2 = (props) => {
 									props.ad.ad_id,
 									() => {
 										props.onCloseClick();
-										setIsClosing(true);
+										setRequest('CLOSE');
 									},
 									() => {
-										setIsClosing(false);
+										setRequest('CANCEL_CLOSE');
 									},
-									isClosing
+									isClosing,
+									props.ad.hidden
 								);
 							}}
 							disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
@@ -391,33 +393,40 @@ const AddMore2 = (props) => {
 						<>
 							<Group header={<Header mode="secondary">Связь с автором</Header>}>{feedbackText()}</Group>
 							{isDealer ? (
-								<div style={{ display: 'flex' }}>
-									<Button
-										stretched
-										size="l"
-										mode="commerce"
-										onClick={() => {
-											acceptDeal(props.setSnackbar, Deal.deal_id);
-										}}
-										style
-										style={{ marginRight: 8 }}
-										before={<Icon24Cancel />}
-									>
-										Подтвердить
-									</Button>
-									<Button
-										stretched
-										size="l"
-										mode="destructive"
-										onClick={() => {
-											denyDeal(props.setSnackbar, Deal.deal_id);
-										}}
-										style={{ marginRight: 8 }}
-										before={<Icon24Cancel />}
-									>
-										Отклонить
-									</Button>
-								</div>
+								<>
+									<InfoRow style={{ padding: '10px', color: 'grey', textAlign: 'center' }}>
+										Подтвердите получение вещи:
+									</InfoRow>
+									<div style={{ display: 'flex' }}>
+										<Button
+											stretched
+											size="l"
+											mode="commerce"
+											onClick={() => {
+												acceptDeal(props.setSnackbar, Deal.deal_id);
+												props.back();
+											}}
+											style
+											style={{ marginRight: 8 }}
+											before={<Icon24Cancel />}
+										>
+											Подтвердить
+										</Button>
+										<Button
+											stretched
+											size="l"
+											mode="destructive"
+											onClick={() => {
+												denyDeal(props.setSnackbar, Deal.deal_id);
+												props.back();
+											}}
+											style={{ marginRight: 8 }}
+											before={<Icon24Cancel />}
+										>
+											Отклонить
+										</Button>
+									</div>
+								</>
 							) : isSub ? (
 								<Button
 									stretched

@@ -106,11 +106,9 @@ const AddsTabs = props => {
 				refresh={props.refresh}
 				setPopout={props.setPopout}
 				onFiltersClick={props.onFiltersClick}
+				onCloseClick={props.onCloseClick}
 				setSnackbar={props.setSnackbar}
-
-				subs={props.subs}
-				sub={props.sub}
-				setSubs={props.setSubs}
+				chooseAdd={props.chooseAdd}
 			></AddsTab>
 		</React.Fragment>
 	);

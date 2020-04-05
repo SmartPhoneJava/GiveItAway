@@ -68,17 +68,17 @@ const CreateAdd = (props) => {
 		let v = true;
 		items.forEach((val) => {
 			console.log('item!!!!', val, props.category);
-			if (val.name === undefined || val.name.length == 0) {
+			if (val.name === undefined || val.name.length == 0 || val.name.length > 100) {
 				v = false;
 			}
-			if (val.description === undefined || val.description.length == 0) {
+			if (val.description === undefined || val.description.length == 0 || val.name.description > 1500) {
 				v = false;
 			}
 			if (props.category === undefined || props.category.length == 0 || props.category == CategoryNo) {
 				v = false;
 			}
 		});
-		if (feedbackType == 'other' && contacts == '') {
+		if (feedbackType == 'other' && (contacts == '' || contacts.length > 100)) {
 			v = false;
 		}
 		if (city.id < 0 || country.id < 0) {
@@ -116,7 +116,6 @@ const CreateAdd = (props) => {
 		items.forEach((item) => {
 			item.photos.forEach((photo) => {
 				const data = new FormData();
-				console.log('fiile', photo);
 				data.append('file', photo);
 				let cancel;
 
@@ -197,7 +196,7 @@ const CreateAdd = (props) => {
 
 			let cancel;
 
-			axios({
+			 axios({
 				method: 'post',
 				url: Addr.getState() + '/api/ad/create',
 				withCredentials: true,

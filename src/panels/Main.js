@@ -78,15 +78,12 @@ const Main = () => {
 	const [deleteID, SetDeleteID] = useState(-1);
 
 	const [city, setCity] = useState(NoRegion);
-	const [country, setCountry] = useState({ id: 1, title: 'Россия' });
+	const [country, setCountry] = useState(NoRegion);
 	// const [region, setRegion] = useState(NoRegion);
 
 	const [sort, setSort] = useState('time');
 
 	const [myID, setMyID] = useState(0);
-
-	const [subs, setSubs] = useState([]);
-	const [sub, setSub] = useState();
 
 	function goSearch() {
 		setActivePanel('search');
@@ -218,13 +215,8 @@ const Main = () => {
 						// setRegion={setRegion}
 						sort={sort}
 						setSort={setSort}
-						subs={subs}
-						sub={sub}
-						setSub={setSub}
-
 						setPopout={setPopout}
 						setSnackbar={setSnackbar}
-
 						ad={choosen}
 					/>
 				}
@@ -233,9 +225,8 @@ const Main = () => {
 				<Panel id="header-search" separator={false}>
 					<AddsTabs
 						onFiltersClick={() => setActiveModal(MODAL_FILTERS)}
-						onCloseClick={()=>setActiveModal(MODAL_SUBS)}
+						onCloseClick={() => setActiveModal(MODAL_SUBS)}
 						goSearch={goSearch}
-						
 						setPopout={setPopout}
 						setSnackbar={setSnackbar}
 						category={category}
@@ -252,14 +243,14 @@ const Main = () => {
 							setCountry(NoRegion);
 							// setRegion(NoRegion);
 						}}
+						chooseAdd={ad=>{
+							setChoosen(ad);
+						}}
 						openAd={(ad) => {
 							setChoosen(ad);
 							console.log('looook:', ad);
 							setActivePanel('one-panel');
 						}}
-						subs={subs}
-						sub={sub}
-						setSubs={setSubs}
 					/>
 					{snackbar}
 				</Panel>
@@ -281,17 +272,15 @@ const Main = () => {
 								setActivePanel('header-search');
 								SetDeleteID(id);
 							}}
+							back={(id) => {
+								setActivePanel('header-search');
+							}}
 							ad={choosen}
 							setPopout={setPopout}
 							setSnackbar={setSnackbar}
 							VkUser={VkUser}
 							vkPlatform={vkPlatform}
-
-							onCloseClick={()=>setActiveModal(MODAL_SUBS)}
-
-							subs={subs}
-							sub={sub}
-							setSubs={setSubs}
+							onCloseClick={() => setActiveModal(MODAL_SUBS)}
 						/>
 					) : (
 						Error
@@ -310,9 +299,6 @@ const Main = () => {
 						setActiveModal={setActiveModal2}
 						category={category2}
 						setCategory={setCategory2}
-						subs={subs}
-						sub={sub}
-						setSub={setSub}
 					/>
 				}
 			>

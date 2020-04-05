@@ -192,7 +192,7 @@ const addsArrDD = [
 	},
 ];
 
-const AddsTab = props => {
+const AddsTab = (props) => {
 	const [search, setSearch] = useState('');
 
 	const [items, setItems] = useState([]);
@@ -214,12 +214,12 @@ const AddsTab = props => {
 
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
-		node => {
+		(node) => {
 			if (loading) return;
 			if (observer.current) observer.current.disconnect();
-			observer.current = new IntersectionObserver(entries => {
+			observer.current = new IntersectionObserver((entries) => {
 				if (entries[0].isIntersecting && hasMore) {
-					setPageNumber(prevPageNumber => newPage + 1);
+					setPageNumber((prevPageNumber) => newPage + 1);
 				}
 			});
 			if (node) observer.current.observe(node);
@@ -242,35 +242,35 @@ const AddsTab = props => {
 				setSnackbar={props.setSnackbar}
 				refresh={props.refresh}
 				myID={props.myID}
-				
-				subs={props.subs}
-				sub={props.sub}
-				setSubs={props.setSubs}
+				onCloseClick={props.onCloseClick}
+				chooseAdd={props.chooseAdd}
 			/>
 		);
 	}
 
-	console.log("loading", loading)
+	console.log('loading', loading);
 
 	return (
 		<>
 			<Search value={search} onChange={handleSearch} icon={<Icon24Filter />} onIconClick={props.onFiltersClick} />
 			<Group>
 				{ads.length > 0 ? (
-					ads.map((ad, index) => {
-						if (ads.length === index + 1) {
-							return (
-								<div key={ad.ad_id} ref={lastAdElementRef}>
-									{Ad(ad)}
-								</div>
-							);
-						} else {
-							return <div key={ad.ad_id}>{Ad(ad)}</div>;
-						}
-					})
+					ads
+						.filter((v) => v.status != 'closed' && v.status != 'aborted')
+						.map((ad, index) => {
+							if (ads.length === index + 1) {
+								return (
+									<div key={ad.ad_id} ref={lastAdElementRef}>
+										{Ad(ad)}
+									</div>
+								);
+							} else {
+								return <div key={ad.ad_id}>{Ad(ad)}</div>;
+							}
+						})
 				) : error ? (
 					//<Error />
-					addsArrDD.map(ad => {
+					addsArrDD.map((ad) => {
 						return <div key={ad.ad_id}>{Ad(ad)}</div>;
 					})
 				) : // addsArrDD.map(ad => {

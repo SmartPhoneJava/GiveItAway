@@ -13,6 +13,54 @@ import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
 
 let request_id = 0;
 
+export async function adHide(setPopout, setSnackbar, ad_id) {
+	setPopout(<ScreenSpinner size="large" />);
+	let err = false;
+	let cancel;
+
+	await axios({
+		method: 'post',
+		withCredentials: true,
+		url: Addr.getState() + '/api/ad/' + ad_id + '/set_hidden',
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(function (response) {
+			setPopout(null)
+			console.log('response from adHide:', response);
+			return response.data;
+		})
+		.catch(function (error) {
+			err = true;
+			fail('Нет соединения с сервером', () => {}, setSnackbar);
+			setPopout(null)
+		});
+	return err;
+}
+
+export async function adVisible(setPopout, setSnackbar, ad_id) {
+	setPopout(<ScreenSpinner size="large" />);
+	let err = false;
+	let cancel;
+
+	await axios({
+		method: 'post',
+		withCredentials: true,
+		url: Addr.getState() + '/api/ad/' + ad_id + '/set_visible',
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(function (response) {
+			setPopout(null)
+			console.log('response from adVisible:', response);
+			return response.data;
+		})
+		.catch(function (error) {
+			err = true;
+			fail('Нет соединения с сервером', () => {}, setSnackbar);
+			setPopout(null)
+		});
+	return err;
+}
+
 export async function getDeal(setSnackbar, ad_id) {
 	let err = false;
 	let cancel;
@@ -62,7 +110,7 @@ export async function acceptDeal(setSnackbar, deal_id) {
 	await axios({
 		method: 'post',
 		withCredentials: true,
-		url: Addr.getState() + '/api/deal/' + deal_id + '/fullfill',
+		url: Addr.getState() + '/api/deal/' + deal_id + '/fulfill',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {

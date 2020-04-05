@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Avatar, PanelHeaderButton, InfoRow } from '@vkontakte/vkui';
 
 import Icon24CommentOutline from '@vkontakte/icons/dist/24/comment_outline';
@@ -19,7 +19,10 @@ import OpenActions from './components/actions';
 
 import './addsTab.css';
 
-const Add5 = props => {
+const Add5 = (props) => {
+	const [isClosing, setIsClosing] = useState(false);
+	const [request, setRequest] = useState('no');
+
 	function detectContactsType(contacts) {
 		const ematlRG = '/.+@.+..+/i';
 		if (contacts.match(ematlRG)) {
@@ -189,7 +192,22 @@ const Add5 = props => {
 								style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
 								size="m"
 								onClick={() => {
-									OpenActions(props.setPopout, props.setSnackbar, props.refresh, props.ad.ad_id);
+									props.chooseAdd(props.ad)
+									OpenActions(
+										props.setPopout,
+										props.setSnackbar,
+										props.refresh,
+										props.ad.ad_id,
+										() => {
+											props.onCloseClick();
+											setRequest('CLOSE');
+										},
+										() => {
+											setRequest('CANCEL_CLOSE');
+										},
+										isClosing,
+										props.ad.hidden
+									);
 								}}
 								disabled={props.ad.status !== 'offer' && props.ad.status !== 'chosen'}
 							>

@@ -3,9 +3,10 @@ import { ActionSheet, ActionSheetItem, osname, IOS } from '@vkontakte/vkui';
 
 import { deleteAd } from './../../story/create/CreateAdd';
 
-import { CancelClose } from './../../../requests';
+import { CancelClose, adVisible, adHide } from './../../../requests';
 
-function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, onUnCloseClick, isClosing) {
+function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, onUnCloseClick, isClosing, hidden) {
+	console.log("props.ad.ad_id", ad_id,)
 	setPopout(
 		<ActionSheet onClose={() => setPopout(null)}>
 			{isClosing ? (
@@ -26,6 +27,25 @@ function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, onUnC
 					}}
 				>
 					Объявить завершенным
+				</ActionSheetItem>
+			)}
+			{hidden ? (
+				<ActionSheetItem
+					autoclose
+					onClick={() => {
+						adVisible(setPopout, setSnackbar, ad_id);
+					}}
+				>
+					Сделать видимым
+				</ActionSheetItem>
+			) : (
+				<ActionSheetItem
+					autoclose
+					onClick={() => {
+						adHide(setPopout, setSnackbar, ad_id);
+					}}
+				>
+					Скрыть
 				</ActionSheetItem>
 			)}
 
