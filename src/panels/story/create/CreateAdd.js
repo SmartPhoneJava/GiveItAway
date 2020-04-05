@@ -13,6 +13,8 @@ import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
 
+import { CreateAd } from './../../../requests';
+
 import { User } from '../../../store/user';
 import { Addr } from '../../../store/addr';
 
@@ -56,7 +58,7 @@ const CreateAdd = (props) => {
 	useEffect(() => {
 		async function fetch() {
 			const canPM = await canWritePrivateMessage(props.myID, props.appID, props.apiVersion);
-			console.log("setPM", canPM)
+			console.log('setPM', canPM);
 			if (canPM != undefined) {
 				setPmOpen(canPM);
 			}
@@ -112,49 +114,6 @@ const CreateAdd = (props) => {
 		updateGeo();
 	}, []);
 
-	function saveSuccess(goToAds, id) {
-		items.forEach((item) => {
-			item.photos.forEach((photo) => {
-				const data = new FormData();
-				data.append('file', photo);
-				let cancel;
-
-				axios({
-					method: 'post',
-					url: Addr.getState() + '/api/ad/' + id + '/upload_image',
-					withCredentials: true,
-					data: data,
-					cancelToken: new axios.CancelToken((c) => (cancel = c)),
-				})
-					.then(function (response) {
-						console.log('success uploaded', response);
-					})
-					.catch(function (error) {
-						console.log('failed uploaded', error);
-					});
-			});
-		});
-
-		goToAds(
-			<Snackbar
-				onClose={() => {
-					props.setSnackbar(null);
-				}}
-				action="Отменить"
-				onActionClick={() => {
-					deleteAd(props.setPopout, id, props.setSnackbar, props.refresh);
-				}}
-				before={
-					<Avatar size={24} style={{ background: 'green' }}>
-						<Icon24DoneOutline fill="#fff" width={14} height={14} />
-					</Avatar>
-				}
-			>
-				Объявление создано! Спасибо, что делаете мир лучше :)
-			</Snackbar>
-		);
-	}
-
 	function saveCancel() {
 		props.setSnackbar(
 			<Snackbar
@@ -194,33 +153,7 @@ const CreateAdd = (props) => {
 			}
 			const obj = JSON.stringify(ob);
 
-			let cancel;
-
-			 axios({
-				method: 'post',
-				url: Addr.getState() + '/api/ad/create',
-				withCredentials: true,
-				data: obj,
-				cancelToken: new axios.CancelToken((c) => (cancel = c)),
-			})
-				.then(function (response) {
-					setPopout(null);
-					if (response.status == 201) {
-						saveSuccess(props.goToAds, response.data.ad_id);
-					} else {
-						saveFail(
-							response.status + ' - ' + response.statusText,
-							() => createAd(setPopout),
-							props.setSnackbar
-						);
-					}
-					return response.data;
-				})
-				.catch(function (error) {
-					console.log('Request failed', error);
-					setPopout(null);
-					saveFail('Нет соединения с сервером', () => createAd(setPopout));
-				});
+			CreateAd(obj, items, props.goToAds, props.setSnackbar, props.setPopout);
 		} else {
 			saveCancel();
 		}

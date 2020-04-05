@@ -4,7 +4,6 @@ import { Search, Group, Placeholder, Button } from '@vkontakte/vkui';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 
 import Add from './../../../../template/Add';
-import Add6x from './../../../../template/Add6x';
 import Add6 from './../../../../template/Add6';
 import Add5 from './../../../../template/Add5';
 import Add4 from './../../../../template/Add4';

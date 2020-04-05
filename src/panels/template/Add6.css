@@ -75,6 +75,25 @@ img.tiled {
 	background: rgba(215, 125, 49, 0.9);
 }
 
+.hidden2 {
+    border-radius: 5px;
+	position: absolute;
+	top: 35px;
+	left: 0px;
+    width: 120px;
+	background: rgba(215, 125, 49, 0.9);
+}
+
+.deal {
+    border-radius: 5px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+    width: 120px;
+	background: rgba(0, 50, 0, 0.6);
+}
+
+
 .button {
 	float: right;
 }

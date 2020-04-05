@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { ModalRoot, ModalPage, Group, Header, FormLayout, FormLayoutGroup, Radio } from '@vkontakte/vkui';
 
 import { CategoriesRB, CategoriesLabel } from './../../template/Categories';
@@ -14,6 +14,7 @@ export const MODAL_CATEGORIES = 'categories';
 export const MODAL_SUBS = 'subs';
 
 const AddsModal = (props) => {
+
 	function hideModal() {
 		props.setActiveModal(null);
 	}

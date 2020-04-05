@@ -21,7 +21,6 @@ import './addsTab.css';
 
 const Add5 = (props) => {
 	const [isClosing, setIsClosing] = useState(false);
-	const [request, setRequest] = useState('no');
 
 	function detectContactsType(contacts) {
 		const ematlRG = '/.+@.+..+/i';
@@ -198,13 +197,7 @@ const Add5 = (props) => {
 										props.setSnackbar,
 										props.refresh,
 										props.ad.ad_id,
-										() => {
-											props.onCloseClick();
-											setRequest('CLOSE');
-										},
-										() => {
-											setRequest('CANCEL_CLOSE');
-										},
+										props.onCloseClick,
 										isClosing,
 										props.ad.hidden
 									);

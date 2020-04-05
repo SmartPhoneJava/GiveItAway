@@ -206,7 +206,9 @@ const Main = () => {
 						<Panel id="header-search" separator={false}>
 							<AddsTabs
 								onFiltersClick={() => setActiveModal(MODAL_FILTERS)}
-								onCloseClick={() => setActiveModal(MODAL_SUBS)}
+								onCloseClick={(act) => {
+									setActiveModal(MODAL_SUBS) 
+								 }}
 								goSearch={goSearch}
 								setPopout={setPopout}
 								setSnackbar={setSnackbar}

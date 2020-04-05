@@ -58,7 +58,7 @@ const CreateItem = props => {
 		for (var i = 0, f; (f = files[i]); i++) {
 			// Only process image files.
 			if (!f.type.match('image.*')) {
-				alert('Image only please....');
+				alert('Пожалйста загружайте только изображения');
 			}
 			var reader = new FileReader();
 			// Closure to capture the file information.

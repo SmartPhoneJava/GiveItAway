@@ -4,6 +4,8 @@ import { withModalRootContext } from '@vkontakte/vkui';
 
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 
+import {Draft} from './../../store/draft'
+
 import { getSubscribers, Close } from './../../requests';
 
 export const PeopleList = (subs) => {
@@ -22,7 +24,6 @@ export const PeopleList = (subs) => {
 
 export const PeopleRB = withModalRootContext((props) => {
 	const [subs, setSubs] = useState([]);
-	const [sub, setSub] = useState({});
 
 	useEffect(() => {
 		async function get() {
@@ -39,6 +40,7 @@ export const PeopleRB = withModalRootContext((props) => {
 			return { subscribers, err };
 		}
 		get();
+		
 	}, [props.ad_id]);
 
 	return (
@@ -50,10 +52,12 @@ export const PeopleRB = withModalRootContext((props) => {
 						name="sub"
 						value={v.vk_id}
 						onClick={(e) => {
-                            const { _, value } = e.currentTarget;
+							
+                            const { value } = e.currentTarget;
                             console.log("value", value)
 							Close(props.setPopout, props.setSnackbar, props.ad_id, value);
 							props.back();
+							Draft.dispatch({type:"set",new_state:"CLOSE"})
 						}}
 					>
 						<Cell key={v.vk_id} before={<Avatar size={36} src={v.photo_url} />}>
