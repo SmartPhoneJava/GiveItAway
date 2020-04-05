@@ -4,6 +4,8 @@ import { Search, Group, Placeholder, Button } from '@vkontakte/vkui';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 
 import Add from './../../../../template/Add';
+import Add6x from './../../../../template/Add6x';
+import Add6 from './../../../../template/Add6';
 import Add5 from './../../../../template/Add5';
 import Add4 from './../../../../template/Add4';
 import Add3 from './../../../../template/Add3';
@@ -235,7 +237,7 @@ const AddsTab = (props) => {
 
 	function Ad(ad) {
 		return (
-			<Add5
+			<Add6
 				openAd={() => props.openAd(ad)}
 				ad={ad}
 				setPopout={props.setPopout}
@@ -251,7 +253,7 @@ const AddsTab = (props) => {
 	console.log('loading', loading);
 
 	return (
-		<>
+		<div style={{ background: '#F7F7F7' }}>
 			<Search value={search} onChange={handleSearch} icon={<Icon24Filter />} onIconClick={props.onFiltersClick} />
 			<Group>
 				{ads.length > 0 ? (
@@ -282,7 +284,7 @@ const AddsTab = (props) => {
 					<AdNotFound dropFilters={props.dropFilters} />
 				)}
 			</Group>
-		</>
+		</div>
 	);
 };
 

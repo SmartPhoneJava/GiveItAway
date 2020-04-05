@@ -1,0 +1,80 @@
+.container {
+	position: relative;
+}
+
+.image-wrapper {
+	position: relative;
+	display: inline-block;
+	background-size: cover;
+}
+
+.tweetty {
+	overflow: auto;
+	top: 0;
+	left: 0;
+}
+.image-vest {
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: #00f;
+	width: 220px;
+	height: 300px;
+	opacity: 0.4;
+	color: #fff;
+}
+
+.tile {
+	border-radius: 20px;
+	padding: 4px;
+
+	background: white;
+	border-style: solid;
+	border-width: 1px;
+	border-color: rgb(200, 200, 200);
+}
+
+.main {
+	display: flex;
+}
+
+img.tiled {
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	border-radius: 10px;
+	object-fit: cover;
+	width: 120px;
+	height: 120px;
+}
+
+.settings {
+	position: absolute;
+	top: 0;
+	left: 0;
+	margin: 5px;
+	float: right;
+	margin-left: auto;
+}
+
+.city {
+	position: absolute;
+	top: 90px;
+	left: 0px;
+	width: 120px;
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.hidden {
+    border-radius: 5px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+    width: 120px;
+	background: rgba(215, 125, 49, 0.9);
+}
+
+.button {
+	float: right;
+}

@@ -5,6 +5,7 @@ import bridge from '@vkontakte/vk-bridge';
 import axios from 'axios';
 
 import { Addr } from './store/addr';
+import { User } from './store/user';
 
 import Icon24Add from '@vkontakte/icons/dist/24/add';
 import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
@@ -25,14 +26,14 @@ export async function adHide(setPopout, setSnackbar, ad_id) {
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
-			setPopout(null)
+			setPopout(null);
 			console.log('response from adHide:', response);
 			return response.data;
 		})
 		.catch(function (error) {
 			err = true;
 			fail('Нет соединения с сервером', () => {}, setSnackbar);
-			setPopout(null)
+			setPopout(null);
 		});
 	return err;
 }
@@ -49,14 +50,14 @@ export async function adVisible(setPopout, setSnackbar, ad_id) {
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
-			setPopout(null)
+			setPopout(null);
 			console.log('response from adVisible:', response);
 			return response.data;
 		})
 		.catch(function (error) {
 			err = true;
 			fail('Нет соединения с сервером', () => {}, setSnackbar);
-			setPopout(null)
+			setPopout(null);
 		});
 	return err;
 }
@@ -72,14 +73,13 @@ export async function getDeal(setSnackbar, ad_id) {
 	})
 		.then(function (response) {
 			console.log('response from getDeal:', response);
-			
+
 			return response.data;
 		})
 		.catch(function (error) {
 			err = true;
-			
 		});
-	return {deal, err};
+	return { deal, err };
 }
 
 export async function denyDeal(setSnackbar, deal_id) {
@@ -126,15 +126,14 @@ export async function acceptDeal(setSnackbar, deal_id) {
 
 export async function CancelClose(setPopout, setSnackbar, ad_id) {
 	setPopout(<ScreenSpinner size="large" />);
-	
-	let {deal, err} =  await getDeal(setSnackbar, ad_id)
-	console.log("we get deal", deal, err)
+
+	let { deal, err } = await getDeal(setSnackbar, ad_id);
+	console.log('we get deal', deal, err);
 	if (!err) {
-		err = await denyDeal(setSnackbar, deal.deal_id)
-		
+		err = await denyDeal(setSnackbar, deal.deal_id);
 	}
 	if (!err) {
-		sucessNoCancel("Запрос успешно отменен!", setSnackbar)
+		sucessNoCancel('Запрос успешно отменен!', setSnackbar);
 	} else {
 		fail('Ошибка на стороне сервера', () => {}, setSnackbar);
 	}
@@ -146,18 +145,22 @@ export function Close(setPopout, setSnackbar, ad_id, subscriber_id) {
 	setPopout(<ScreenSpinner size="large" />);
 	let err = false;
 	let cancel;
-	console.log("close info", ad_id, subscriber_id)
+	console.log('close info', ad_id, subscriber_id);
 	axios({
 		method: 'put',
 		withCredentials: true,
-		params:{subscriber_id: subscriber_id},
+		params: { subscriber_id: subscriber_id },
 		url: Addr.getState() + '/api/ad/' + ad_id + '/make_deal',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
 			setPopout(null);
 			console.log('response from Close:', response);
-			sucess('Спасибо, что делаете других людей счастливыми :) Ждем подтверждения от второй стороны!', ()=>{}, setSnackbar);
+			sucess(
+				'Спасибо, что делаете других людей счастливыми :) Ждем подтверждения от второй стороны!',
+				() => {},
+				setSnackbar
+			);
 			return response.data;
 		})
 		.catch(function (error) {
@@ -275,7 +278,7 @@ export async function getSubscribers(setPopout, setSnackbar, ad_id) {
 }
 
 export async function canWritePrivateMessage(id, appID, apiVersion) {
-	apiVersion = "5.00"
+	apiVersion = '5.00';
 	console.log('before userdata', id, appID, apiVersion);
 	const el = await bridge.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' });
 
@@ -283,7 +286,12 @@ export async function canWritePrivateMessage(id, appID, apiVersion) {
 		.send('VKWebAppCallAPIMethod', {
 			method: 'users.get',
 			request_id: 'canWritePrivateMessage' + request_id,
-			params: { v: apiVersion, user_ids: id, fields: 'can_write_private_message', access_token: '5e8cd08d5e8cd08d5e8cd08d8b5efc9eac55e8c5e8cd08d00e2599e1626b258c28f29dd' },
+			params: {
+				v: apiVersion,
+				user_ids: id,
+				fields: 'can_write_private_message',
+				access_token: '5e8cd08d5e8cd08d5e8cd08d8b5efc9eac55e8c5e8cd08d00e2599e1626b258c28f29dd',
+			},
 		})
 		.then(function (response) {
 			console.log('success canWritePrivateMessage:', response);
@@ -299,24 +307,75 @@ export async function canWritePrivateMessage(id, appID, apiVersion) {
 	return userdata;
 }
 
+export async function Auth(user, setSnackbar, setPopout) {
+	setPopout(<ScreenSpinner size="large" />);
+	console.log('secret:', window.location.href);
+	console.log('user:', user);
+	let cancel;
+	const getUser = await axios({
+		method: 'post',
+		withCredentials: true,
+		data: JSON.stringify({
+			vk_id: user.id,
+			Url: window.location.href,
+			name: user.first_name,
+			surname: user.last_name,
+			photo_url: user.photo_100,
+		}),
+		url: Addr.getState() + '/api/user/auth',
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(function (response) {
+			console.log("we get response", response)
+			return response.data;
+		})
+		.then(function (data) {
+			console.log("we get response2", data)
+			setPopout(null);
+			User.dispatch({ type: 'set', new_state: data });
+			return data;
+		})
+		.catch(function (error) {
+			setPopout(null);
+			console.log('Request failed', error);
+			fail('Не удалось авторизоваться', null, setSnackbar);
+		});
+	return getUser;
+}
+
 function fail(err, repeat, setSnackbar) {
-	setSnackbar(
-		<Snackbar
-			onClose={() => setSnackbar(null)}
-			action="Повторить"
-			onActionClick={() => {
-				setSnackbar(null);
-				repeat();
-			}}
-			before={
-				<Avatar size={24} style={{ background: 'red' }}>
-					<Icon24Cancel fill="#fff" width={14} height={14} />
-				</Avatar>
-			}
-		>
-			Произошла ошибка: {err}
-		</Snackbar>
-	);
+	{
+		repeat
+			? setSnackbar(
+					<Snackbar
+						onClose={() => setSnackbar(null)}
+						action="Повторить"
+						onActionClick={() => {
+							setSnackbar(null);
+							repeat();
+						}}
+						before={
+							<Avatar size={24} style={{ background: 'red' }}>
+								<Icon24Cancel fill="#fff" width={14} height={14} />
+							</Avatar>
+						}
+					>
+						Произошла ошибка: {err}
+					</Snackbar>
+			  )
+			: setSnackbar(
+					<Snackbar
+						onClose={() => setSnackbar(null)}
+						before={
+							<Avatar size={24} style={{ background: 'red' }}>
+								<Icon24Cancel fill="#fff" width={14} height={14} />
+							</Avatar>
+						}
+					>
+						Произошла ошибка: {err}
+					</Snackbar>
+			  );
+	}
 }
 
 function sucess(text, cancelMe, setSnackbar) {

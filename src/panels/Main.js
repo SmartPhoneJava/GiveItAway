@@ -27,14 +27,14 @@ import Icon28Add from '@vkontakte/icons/dist/28/add_outline';
 
 import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
 
-import { User } from '../store/user';
 import { VkUser } from '../store/vkUser';
 
 import AddMore, { AdDefault } from './template/AddMore';
 import AddMore2 from './template/AddMore2';
 
-import { Addr } from '../store/addr';
 import { CategoryNo } from './template/Categories';
+
+import { Auth } from './../requests';
 
 import Error from './placeholders/error';
 
@@ -56,6 +56,7 @@ const ApiVersion = '5.5';
 
 const Main = () => {
 	const [popout, setPopout] = useState(null); //<ScreenSpinner size="large" />
+	const [inited, setInited] = useState(false);
 
 	const [activeStory, setActiveStory] = useState(ads);
 	const [category, setCategory] = useState(CategoryNo);
@@ -96,12 +97,6 @@ const Main = () => {
 		}
 	}
 
-	function refresh() {
-		setActiveStory(profile);
-		setRefreshList(refreshList + 1);
-		setActiveStory(ads);
-	}
-
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data } }) => {
 			if (type === 'VKWebAppUpdateConfig') {
@@ -131,40 +126,14 @@ const Main = () => {
 			setAppID(parseInt(get['vk_app_id']));
 		}
 
-		async function checkMe(user) {
-			console.log('secret:', window.location.href);
-			console.log('user user:', user);
-			fetch(Addr.getState() + `/api/user/auth`, {
-				method: 'post',
-				mode: 'cors',
-				body: JSON.stringify({
-					vk_id: user.id,
-					Url: window.location.href,
-					name: user.first_name,
-					surname: user.last_name,
-					photo_url: user.photo_100,
-				}),
-				credentials: 'include',
-			})
-				.then(function (response) {
-					return response.json();
-				})
-				.then(function (data) {
-					User.dispatch({ type: 'set', new_state: data });
-					console.log('Request successful', data.name, data.surname, data.photo_url, data.carma);
-					return data;
-				})
-				.catch(function (error) {
-					console.log('Request failed', error);
-				});
-			setPopout(null);
-		}
-
 		async function fetchData() {
 			const us = await bridge.send('VKWebAppGetUserInfo');
 			VkUser.dispatch({ type: 'set', new_state: us });
 			setMyID(us.id);
-			checkMe(us);
+			const result = await Auth(us, setSnackbar, setPopout);
+			if (result) {
+				setInited(true);
+			}
 		}
 
 		getInputData();
@@ -172,176 +141,194 @@ const Main = () => {
 	}, []);
 
 	return (
-		<Epic
-			activeStory={activeStory}
-			tabbar={
-				<Tabbar>
-					<TabbarItem onClick={onStoryChange} selected={activeStory === ads} data-story={ads} text={adsText}>
-						<Icon28NewsfeedOutline />
-					</TabbarItem>
+		<>
+			{inited ? (
+				<Epic
+					activeStory={activeStory}
+					tabbar={
+						<Tabbar>
+							<TabbarItem
+								onClick={onStoryChange}
+								selected={activeStory === ads}
+								data-story={ads}
+								text={adsText}
+							>
+								<Icon28NewsfeedOutline />
+							</TabbarItem>
 
-					<TabbarItem onClick={onStoryChange} selected={activeStory === add} data-story={add} text={addText}>
-						<Icon28Add />
-					</TabbarItem>
-					<TabbarItem
-						onClick={onStoryChange}
-						selected={activeStory === profile}
-						data-story={profile}
-						text={profileText}
+							<TabbarItem
+								onClick={onStoryChange}
+								selected={activeStory === add}
+								data-story={add}
+								text={addText}
+							>
+								<Icon28Add />
+							</TabbarItem>
+							<TabbarItem
+								onClick={onStoryChange}
+								selected={activeStory === profile}
+								data-story={profile}
+								text={profileText}
+							>
+								<Icon28User />
+							</TabbarItem>
+						</Tabbar>
+					}
+				>
+					<View
+						popout={popout}
+						id={ads}
+						activePanel={activePanel}
+						modal={
+							<AddsModal
+								appID={appID}
+								apiVersion={ApiVersion}
+								vkPlatform={vkPlatform}
+								activeModal={activeModal}
+								setActiveModal={setActiveModal}
+								category={category}
+								setCategory={setCategory}
+								city={city}
+								country={country}
+								// region={region}
+								setCity={setCity}
+								setCountry={setCountry}
+								// setRegion={setRegion}
+								sort={sort}
+								setSort={setSort}
+								setPopout={setPopout}
+								setSnackbar={setSnackbar}
+								ad={choosen}
+							/>
+						}
+						header={false}
 					>
-						<Icon28User />
-					</TabbarItem>
-				</Tabbar>
-			}
-		>
-			<View
-				popout={popout}
-				id={ads}
-				activePanel={activePanel}
-				modal={
-					<AddsModal
-						appID={appID}
-						apiVersion={ApiVersion}
-						vkPlatform={vkPlatform}
-						activeModal={activeModal}
-						setActiveModal={setActiveModal}
-						category={category}
-						setCategory={setCategory}
-						city={city}
-						country={country}
-						// region={region}
-						setCity={setCity}
-						setCountry={setCountry}
-						// setRegion={setRegion}
-						sort={sort}
-						setSort={setSort}
-						setPopout={setPopout}
-						setSnackbar={setSnackbar}
-						ad={choosen}
-					/>
-				}
-				header={false}
-			>
-				<Panel id="header-search" separator={false}>
-					<AddsTabs
-						onFiltersClick={() => setActiveModal(MODAL_FILTERS)}
-						onCloseClick={() => setActiveModal(MODAL_SUBS)}
-						goSearch={goSearch}
-						setPopout={setPopout}
-						setSnackbar={setSnackbar}
-						category={category}
-						refresh={SetDeleteID}
-						deleteID={deleteID}
-						city={city}
-						country={country}
-						myID={myID}
-						// region={region}
-						sort={sort}
-						dropFilters={() => {
-							setCategory(CategoryNo);
-							setCity(NoRegion);
-							setCountry(NoRegion);
-							// setRegion(NoRegion);
-						}}
-						chooseAdd={ad=>{
-							setChoosen(ad);
-						}}
-						openAd={(ad) => {
-							setChoosen(ad);
-							console.log('looook:', ad);
-							setActivePanel('one-panel');
-						}}
-					/>
-					{snackbar}
-				</Panel>
-				<Panel id="one-panel">
-					<PanelHeaderSimple
-						left={
-							<PanelHeaderBack
-								onClick={() => {
-									setActivePanel('header-search');
+						<Panel id="header-search" separator={false}>
+							<AddsTabs
+								onFiltersClick={() => setActiveModal(MODAL_FILTERS)}
+								onCloseClick={() => setActiveModal(MODAL_SUBS)}
+								goSearch={goSearch}
+								setPopout={setPopout}
+								setSnackbar={setSnackbar}
+								category={category}
+								refresh={SetDeleteID}
+								deleteID={deleteID}
+								city={city}
+								country={country}
+								myID={myID}
+								// region={region}
+								sort={sort}
+								dropFilters={() => {
+									setCategory(CategoryNo);
+									setCity(NoRegion);
+									setCountry(NoRegion);
+									// setRegion(NoRegion);
 								}}
+								chooseAdd={(ad) => {
+									setChoosen(ad);
+								}}
+								openAd={(ad) => {
+									setChoosen(ad);
+									console.log('looook:', ad);
+									setActivePanel('one-panel');
+								}}
+							/>
+							{snackbar}
+						</Panel>
+						<Panel id="one-panel">
+							<PanelHeaderSimple
+								left={
+									<PanelHeaderBack
+										onClick={() => {
+											setActivePanel('header-search');
+										}}
+									/>
+								}
+							>
+								{choosen ? choosen.header : 'баг'}
+							</PanelHeaderSimple>
+							{choosen ? (
+								<AddMore2
+									refresh={(id) => {
+										setActivePanel('header-search');
+										SetDeleteID(id);
+									}}
+									back={(id) => {
+										setActivePanel('header-search');
+									}}
+									ad={choosen}
+									setPopout={setPopout}
+									setSnackbar={setSnackbar}
+									VkUser={VkUser}
+									vkPlatform={vkPlatform}
+									onCloseClick={() => setActiveModal(MODAL_SUBS)}
+								/>
+							) : (
+								Error
+							)}
+							{snackbar}
+						</Panel>
+					</View>
+
+					<View
+						id={add}
+						activePanel={add}
+						popout={popout}
+						modal={
+							<CreateModal
+								activeModal={activeModal2}
+								setActiveModal={setActiveModal2}
+								category={category2}
+								setCategory={setCategory2}
 							/>
 						}
 					>
-						{choosen ? choosen.header : 'баг'}
-					</PanelHeaderSimple>
-					{choosen ? (
-						<AddMore2
-							refresh={(id) => {
-								setActivePanel('header-search');
-								SetDeleteID(id);
-							}}
-							back={(id) => {
-								setActivePanel('header-search');
-							}}
-							ad={choosen}
-							setPopout={setPopout}
-							setSnackbar={setSnackbar}
-							VkUser={VkUser}
-							vkPlatform={vkPlatform}
-							onCloseClick={() => setActiveModal(MODAL_SUBS)}
-						/>
-					) : (
-						Error
-					)}
-					{snackbar}
-				</Panel>
-			</View>
-
-			<View
-				id={add}
-				activePanel={add}
-				popout={popout}
-				modal={
-					<CreateModal
-						activeModal={activeModal2}
-						setActiveModal={setActiveModal2}
-						category={category2}
-						setCategory={setCategory2}
-					/>
-				}
-			>
-				<Panel id={add}>
-					<PanelHeader>{addText}</PanelHeader>
-					<CreateAdd
-						vkPlatform={vkPlatform}
-						myID={myID}
-						appID={appID}
-						apiVersion={ApiVersion}
-						setPopout={setPopout}
-						goToAds={goToAds}
-						snackbar={snackbar}
-						setSnackbar={setSnackbar}
-						category={category2}
-						refresh={(id) => {
-							SetDeleteID(id);
-						}}
-						chooseCategory={() => setActiveModal2(MODAL_CATEGORIES)}
-					/>
-					{snackbar}
-				</Panel>
-			</View>
-			<View id={profile} activePanel={profile} popout={popout}>
-				<Panel id={profile}>
-					<PanelHeader>{profileText} </PanelHeader>
-					<Placeholder
-						icon={<Icon56UsersOutline />}
-						header="В разработке. Загляните позже &#128522;"
-						action={
-							<Button onClick={() => setActiveStory(ads)} size="l">
-								Вернуться к ленте объявлений
-							</Button>
-						}
-						stretched={true}
-					>
-						Мы упорно трудимся над вашим профилем!
-					</Placeholder>
-					{snackbar}
-				</Panel>
-			</View>
-		</Epic>
+						<Panel id={add}>
+							<PanelHeader>{addText}</PanelHeader>
+							<CreateAdd
+								vkPlatform={vkPlatform}
+								myID={myID}
+								appID={appID}
+								apiVersion={ApiVersion}
+								setPopout={setPopout}
+								goToAds={goToAds}
+								snackbar={snackbar}
+								setSnackbar={setSnackbar}
+								category={category2}
+								refresh={(id) => {
+									SetDeleteID(id);
+								}}
+								chooseCategory={() => setActiveModal2(MODAL_CATEGORIES)}
+							/>
+							{snackbar}
+						</Panel>
+					</View>
+					<View id={profile} activePanel={profile} popout={popout}>
+						<Panel id={profile}>
+							<PanelHeader>{profileText} </PanelHeader>
+							<Placeholder
+								icon={<Icon56UsersOutline />}
+								header="В разработке. Загляните позже &#128522;"
+								action={
+									<Button onClick={() => setActiveStory(ads)} size="l">
+										Вернуться к ленте объявлений
+									</Button>
+								}
+								stretched={true}
+							>
+								Мы упорно трудимся над вашим профилем!
+							</Placeholder>
+							{snackbar}
+						</Panel>
+					</View>
+				</Epic>
+			) : (
+				''
+			)}
+		</>
 	);
 };
 
 export default Main;
+
+// 349 -> 334

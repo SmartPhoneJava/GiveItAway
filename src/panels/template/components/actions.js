@@ -1,12 +1,12 @@
 import React from 'react';
-import { ActionSheet, ActionSheetItem, osname, IOS } from '@vkontakte/vkui';
+import { ActionSheet, ActionSheetItem, osname, IOS, Cell, Switch } from '@vkontakte/vkui';
 
 import { deleteAd } from './../../story/create/CreateAdd';
 
 import { CancelClose, adVisible, adHide } from './../../../requests';
 
 function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, onUnCloseClick, isClosing, hidden) {
-	console.log("props.ad.ad_id", ad_id,)
+	console.log('props.ad.ad_id', ad_id);
 	setPopout(
 		<ActionSheet onClose={() => setPopout(null)}>
 			{isClosing ? (
@@ -29,6 +29,7 @@ function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, onUnC
 					Объявить завершенным
 				</ActionSheetItem>
 			)}
+
 			{hidden ? (
 				<ActionSheetItem
 					autoclose
@@ -36,6 +37,7 @@ function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, onUnC
 						adVisible(setPopout, setSnackbar, ad_id);
 					}}
 				>
+					<Switch />
 					Сделать видимым
 				</ActionSheetItem>
 			) : (
