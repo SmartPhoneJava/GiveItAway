@@ -383,10 +383,10 @@ export async function Auth(user, setSnackbar, setPopout) {
 	return getUser;
 }
 
-export async function CreateImages(items, id) {
+export async function CreateImages(items, id, goToAds, setSnackbar) {
 	let err = false;
-	items.forEach((item) => {
-		item.photos.forEach((photo) => {
+	items.forEach((item, l) => {
+		item.photos.forEach(async (photo, i) => {
 			const data = new FormData();
 			data.append('file', photo);
 			let cancel;
@@ -400,6 +400,26 @@ export async function CreateImages(items, id) {
 			})
 				.then(function (response) {
 					console.log('success uploaded', response);
+					if (i == item.photos.length - 1 && l == items.length - 1) {
+						goToAds(
+							<Snackbar
+								onClose={() => {
+									setSnackbar(null);
+								}}
+								action="Отменить"
+								onActionClick={() => {
+									deleteAd(setPopout, id, setSnackbar, refresh);
+								}}
+								before={
+									<Avatar size={24} style={{ background: 'green' }}>
+										<Icon24DoneOutline fill="#fff" width={14} height={14} />
+									</Avatar>
+								}
+							>
+								Объявление создано! Спасибо, что делаете мир лучше :)
+							</Snackbar>
+						);
+					}
 				})
 				.catch(function (error) {
 					console.log('failed uploaded', error);
@@ -418,40 +438,22 @@ export async function CreateImages(items, id) {
 export async function CreateAd(obj, items, goToAds, setSnackbar, setPopout) {
 	setPopout(<ScreenSpinner size="large" />);
 	let cancel;
-	axios({
+	await axios({
 		method: 'post',
 		url: Addr.getState() + '/api/ad/create',
 		withCredentials: true,
 		data: obj,
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
-		.then(function (response) {
+		.then(async function (response) {
 			setPopout(null);
 			if (response.status != 201) {
 				throw new Error('Не тот код!');
 			}
-			await CreateImages(items, response.data.ad_id);
+			await CreateImages(items, response.data.ad_id, goToAds, setSnackbar);
 			return response;
 		})
 		.then(function (response) {
-			goToAds(
-				<Snackbar
-					onClose={() => {
-						setSnackbar(null);
-					}}
-					action="Отменить"
-					onActionClick={() => {
-						deleteAd(setPopout, id, setSnackbar, refresh);
-					}}
-					before={
-						<Avatar size={24} style={{ background: 'green' }}>
-							<Icon24DoneOutline fill="#fff" width={14} height={14} />
-						</Avatar>
-					}
-				>
-					Объявление создано! Спасибо, что делаете мир лучше :)
-				</Snackbar>
-			);
 			return response;
 		})
 		.catch(function (error) {
