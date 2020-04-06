@@ -17,6 +17,8 @@ import Icon24Info from '@vkontakte/icons/dist/24/info';
 import Icon24Hide from '@vkontakte/icons/dist/24/hide';
 
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';
+import Icon16CheckCircle from '@vkontakte/icons/dist/16/check_circle';
+import Icon16Clear from '@vkontakte/icons/dist/16/clear';
 
 import Icon24Settings from '@vkontakte/icons/dist/24/settings';
 import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
@@ -40,7 +42,7 @@ const Add6 = (props) => {
 	const [Deal, setDeal] = useState({ id: -1 });
 	const [haveDeal, setHaveDeal] = useState(false);
 	const [isClosing, setIsClosing] = useState(false);
-	const [isVisible, setIsVisible] = useState(false);
+	const [isVisible, setIsVisible] = useState(true);
 
 	const [dealer, setDealer] = useState({});
 
@@ -60,7 +62,7 @@ const Add6 = (props) => {
 		if (!err) {
 			setSubs(subscribers);
 			setIsSub(isSubscriber(subscribers));
-			setSubsLength(subscribers.length)
+			setSubsLength(subscribers.length);
 		}
 		return { subscribers, err };
 	}
@@ -201,7 +203,7 @@ const Add6 = (props) => {
 			<PanelHeaderButton
 				mode="primary"
 				size="m"
-				style={{ padding: '0px' }}
+				className="button"
 				onClick={openSettings}
 				disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
 			>
@@ -252,7 +254,7 @@ const Add6 = (props) => {
 
 	function commonActions() {
 		return (
-			<div style={{ float: 'right', marginLeft: 'auto', alignItems: 'center' }}>
+			<div style={{ marginLeft: 'auto' }}>
 				<PanelHeaderButton mode="secondary" className="button" size="m" disabled={ad.status !== 'offer'}>
 					{getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
 				</PanelHeaderButton>
@@ -270,36 +272,14 @@ const Add6 = (props) => {
 		);
 	}
 	return (
-		<div
-			style={{
-				padding: '5px',
-				paddingLeft: '2%',
-				paddingRight: '2%',
-				verticalAlign: 'bottom',
-			}}
-		>
-			<div className="tile">
-				{/* <div style={{ width: '50%' }}>
-					<div
-						style={{
-							borderRadius: '10px',
-							backgroundImage: 'url(' + encodeURI(image) + ')',
-							backgroundSize: 'contain',
-							backgroundRepeat: 'no-repeat',
-						}}
-					>
-						<div style={{ height: '150px', width: '150px' }}> </div>
-					</div>
-				</div> */}
-				<div className="main">
-					<div
-						style={{
-							position: 'relative',
-							display: 'inline-block',
-							marginRight: '120px',
-							marginBottom: '120px',
-						}}
-					>
+		<div className="outter">
+			<div className= {ad.status == 'aborted' ? "tile tile-failed" : 
+			ad.status == 'closed' ? "tile tile-success" : 
+			ad.status == 'chosen' ? "tile tile-chosen" : 
+			ad.status == 'offer' ? "tile" : 
+		'tile'}>
+				<div onClick={props.openAd} className="main">
+					<div className="main-left">
 						<img src={image} className="tiled" />
 						<div className="city">
 							<div
@@ -309,7 +289,27 @@ const Add6 = (props) => {
 							</div>
 						</div>
 
-						{isAuthor() && haveDeal ? (
+						{ad.status == 'aborted' ? (
+							<div className="failed">
+								<div className="on-img-text">
+									<Icon16Clear style={{ marginRight: '5px' }} />
+									Отменено
+								</div>
+							</div>
+						) : (
+							''
+						)}
+						{ad.status == 'closed' ? (
+							<div className="success">
+								<div className="on-img-text">
+									<Icon16CheckCircle style={{ marginRight: '5px' }} />
+									Вещь отдана
+								</div>
+							</div>
+						) : (
+							''
+						)}
+						{ad.status == 'chosen' && isAuthor() && haveDeal ? (
 							<div className="deal">
 								<div style={{ color: 'rgb(220,220,220)', fontSize: '12px', padding: '2px' }}>
 									Ожидание ответа от
@@ -344,7 +344,7 @@ const Add6 = (props) => {
 								</div>
 							) : (
 								<div className="hidden">
-									<div style={{ display: 'flex', color: 'white', fontSize: '12px', padding: '2px' }}>
+									<div className="on-img-text">
 										<Icon12Lock />
 										Видно только вам
 									</div>

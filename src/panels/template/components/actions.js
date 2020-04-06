@@ -1,13 +1,11 @@
 import React from 'react';
 import { ActionSheet, ActionSheetItem, osname, IOS, Snackbar, Avatar } from '@vkontakte/vkui';
 
-import { deleteAd } from './../../story/create/CreateAdd';
-
 import { Draft } from './../../../store/draft';
 
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
-import { CancelClose, adVisible, adHide } from './../../../requests';
+import { CancelClose, adVisible, adHide, deleteAd } from './../../../requests';
 
 function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClosing, hidden, subs_length) {
 	console.log('props.ad.ad_id', ad_id);
@@ -27,10 +25,11 @@ function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClo
 				<ActionSheetItem
 					autoclose
 					onClick={() => {
-						console.log("subs_length", subs_length)
+						console.log('subs_length', subs_length);
 						if (subs_length == 0) {
 							setSnackbar(
 								<Snackbar
+									duration="1500"
 									onClose={() => {
 										setSnackbar(null);
 									}}
@@ -40,10 +39,11 @@ function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClo
 										</Avatar>
 									}
 								>
-									Невозможно выбрать человека для завершения, так как никто ещё не откликнулся на ваше объявление.
+									Невозможно выбрать человека для завершения, так как никто ещё не откликнулся на ваше
+									объявление.
 								</Snackbar>
 							);
-							return
+							return;
 						}
 						onCloseClick();
 					}}

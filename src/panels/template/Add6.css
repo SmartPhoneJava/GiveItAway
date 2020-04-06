@@ -34,6 +34,21 @@
 	border-color: rgb(200, 200, 200);
 }
 
+.tile-success {
+	border-width: 1px;
+	border-color: rgba(0, 100, 0, 0.9);
+}
+
+.tile-failed {
+	border-width: 1px;
+	border-color: rgba(100, 0, 0, 0.9);
+}
+
+.tile-chosen {
+	border-width: 1px;
+	border-color: rgba(0, 0, 100, 0.9);
+}
+
 .main {
 	display: flex;
 }
@@ -66,34 +81,74 @@ img.tiled {
 	background: rgba(0, 0, 0, 0.5);
 }
 
-.hidden {
-    border-radius: 5px;
+.success {
+	border-radius: 5px;
 	position: absolute;
 	top: 0px;
 	left: 0px;
-    width: 120px;
+	width: 120px;
+	background: rgba(0, 100, 0, 0.9);
+}
+
+.failed {
+	border-radius: 5px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 120px;
+	background: rgba(100, 0, 0, 0.9);
+}
+
+.hidden {
+	border-radius: 5px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 120px;
 	background: rgba(215, 125, 49, 0.9);
 }
 
 .hidden2 {
-    border-radius: 5px;
+	border-radius: 5px;
 	position: absolute;
 	top: 35px;
 	left: 0px;
-    width: 120px;
+	width: 120px;
 	background: rgba(215, 125, 49, 0.9);
 }
 
 .deal {
-    border-radius: 5px;
+	border-radius: 5px;
 	position: absolute;
 	top: 0px;
 	left: 0px;
-    width: 120px;
-	background: rgba(0, 50, 0, 0.6);
+	width: 120px;
+	background: rgba(0, 0, 100, 0.9);
 }
 
+.main-left {
+	position: relative;
+	display: inline-block;
+	margin-right: 120px;
+	margin-bottom: 120px;
+}
 
 .button {
 	float: right;
+	padding: 5px;
+}
+
+.outter {
+	padding: 5px;
+	padding-left: 2%;
+	padding-right: 2%;
+	vertical-align: bottom;
+}
+
+.on-img-text {
+	display: flex;
+	color: white;
+	font-size: 12px;
+	padding: 2px;
+	align-items: center;
 }

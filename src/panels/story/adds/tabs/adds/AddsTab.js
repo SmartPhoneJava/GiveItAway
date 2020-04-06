@@ -257,7 +257,6 @@ const AddsTab = (props) => {
 			<Group>
 				{ads.length > 0 ? (
 					ads
-						.filter((v) => v.status != 'closed' && v.status != 'aborted')
 						.map((ad, index) => {
 							if (ads.length === index + 1) {
 								return (

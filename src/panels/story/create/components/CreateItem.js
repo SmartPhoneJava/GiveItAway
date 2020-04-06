@@ -12,7 +12,7 @@ import {
 	File,
 	HorizontalScroll,
 	Avatar,
-	Snackbar
+	Snackbar,
 } from '@vkontakte/vkui';
 
 import { CategoriesLabel } from './../../../template/Categories';
@@ -46,7 +46,7 @@ const images = [
 
 let KEY = 0;
 
-const CreateItem = props => {
+const CreateItem = (props) => {
 	const [photoText, setPhotoText] = useState(PHOTO_TEXT);
 	const [name, setName] = useState(props.name);
 	const [description, setDescription] = useState('');
@@ -62,8 +62,8 @@ const CreateItem = props => {
 			}
 			var reader = new FileReader();
 			// Closure to capture the file information.
-			reader.onload = (function(theFile) {
-				return function(e) {
+			reader.onload = (function (theFile) {
+				return function (e) {
 					KEY++;
 					setPhotosUrl([...photosUrl, { src: e.target.result, id: KEY, origin: theFile }]);
 				};
@@ -73,8 +73,11 @@ const CreateItem = props => {
 		}
 	}
 
-	const loadPhoto = e => {
+	const loadPhoto = (e) => {
 		const file = e.target.files[0];
+		if (!file) {
+			return;
+		}
 		const newLength = photosUrl.length + 1;
 		setPhotoText(PHOTO_TEXT + '. Загружено ' + newLength + '/3');
 		props.setItems({
@@ -87,6 +90,7 @@ const CreateItem = props => {
 		if (newLength == 3) {
 			props.setSnackbar(
 				<Snackbar
+					duration="1200"
 					onClose={() => props.setSnackbar(null)}
 					before={
 						<Avatar size={24} style={{ background: 'orange' }}>
@@ -99,6 +103,14 @@ const CreateItem = props => {
 			);
 		}
 	};
+
+	function shortText(str, newLength) {
+		if (str.length > newLength) {
+			const s = str.slice(0, newLength);
+			return s + '...';
+		}
+		return str;
+	}
 
 	return (
 		<CardGrid>
@@ -144,7 +156,7 @@ const CreateItem = props => {
 							size="50"
 							placeholder="футбольный мяч"
 							value={name}
-							onChange={e => {
+							onChange={(e) => {
 								const { _, value } = e.currentTarget;
 								setName(value);
 								props.setItems({
@@ -154,7 +166,7 @@ const CreateItem = props => {
 									photos: props.item.photos,
 								});
 							}}
-							status={name && name.length < 100? 'valid' : 'error'}
+							status={name && name.length < 100 ? 'valid' : 'error'}
 						/>
 					</FormLayout>
 				</div>
@@ -169,7 +181,7 @@ const CreateItem = props => {
 							name={descriptionLabel}
 							placeholder="Количество, состояние, габариты, дата покупки, особенности и т.д."
 							value={description}
-							onChange={e => {
+							onChange={(e) => {
 								const { _, value } = e.currentTarget;
 								setDescription(value);
 								props.setItems({
@@ -237,7 +249,7 @@ const CreateItem = props => {
 												onClick={() => {
 													if (props.vkPlatform != 'desktop_web') {
 														bridge.send('VKWebAppShowImages', {
-															images: photosUrl.map(v => v.src),
+															images: photosUrl.map((v) => v.src),
 														});
 													} else {
 														var image = new Image();

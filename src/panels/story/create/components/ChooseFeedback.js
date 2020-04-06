@@ -18,6 +18,7 @@ const ChooseFeedback = (props) => {
 						} else {
 							props.setSnackbar(
 								<Snackbar
+									duration="1500"
 									onClose={() => props.setSnackbar(null)}
 									before={
 										<Avatar size={24} style={{ background: 'orange' }}>
@@ -45,8 +46,8 @@ const ChooseFeedback = (props) => {
 					onClick={() => {
 						props.setFeedbackType('comments');
 					}}
-          description="Пользователи оставляют комментарии к вашему объявлению"
-          defaultChecked
+					description="Пользователи оставляют комментарии к вашему объявлению"
+					defaultChecked
 				>
 					Комментарии
 				</Radio>

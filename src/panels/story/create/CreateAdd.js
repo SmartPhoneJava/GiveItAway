@@ -117,6 +117,7 @@ const CreateAdd = (props) => {
 	function saveCancel() {
 		props.setSnackbar(
 			<Snackbar
+				duration="1500"
 				onClose={() => props.setSnackbar(null)}
 				before={
 					<Avatar size={24} style={{ background: 'orange' }}>
@@ -315,71 +316,6 @@ const CreateAdd = (props) => {
 	);
 };
 
-export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
-	setPopout(<ScreenSpinner size="large" />);
-	let cancel;
-
-	axios({
-		method: 'post',
-		withCredentials: true,
-		url: Addr.getState() + '/api/ad/' + ad_id + '/delete',
-		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-	})
-		.then(function (response) {
-			setPopout(null);
-			if (response.status != 200) {
-				saveFail(
-					response.status + ' - ' + response.statusText,
-					() => deleteAd(setPopout, ad_id, setSnackbar, refresh),
-					setSnackbar
-				);
-			} else {
-				refresh(ad_id);
-				console.log('i set', ad_id);
-				setSnackbar(
-					<Snackbar
-						onClose={() => {
-							setSnackbar(null);
-						}}
-						before={
-							<Avatar size={24} style={{ background: 'green' }}>
-								<Icon24DoneOutline fill="#fff" width={14} height={14} />
-							</Avatar>
-						}
-					>
-						Объявление удалено!
-					</Snackbar>
-				);
-			}
-			return response.data;
-		})
-		.catch(function (error) {
-			console.log('Request failed', error);
-			setPopout(null);
-			saveFail('Нет соединения с сервером', () => deleteAd(setPopout, ad_id, setSnackbar, refresh), setSnackbar);
-		});
-};
-
-function saveFail(err, repeat, setSnackbar) {
-	setSnackbar(
-		<Snackbar
-			onClose={() => setSnackbar(null)}
-			action="Повторить"
-			onActionClick={() => {
-				setSnackbar(null);
-				repeat();
-			}}
-			before={
-				<Avatar size={24} style={{ background: 'red' }}>
-					<Icon24Cancel fill="#fff" width={14} height={14} />
-				</Avatar>
-			}
-		>
-			Произошла ошибка: {err}
-		</Snackbar>
-	);
-}
-
 export default CreateAdd;
 
-// 609 -> 462
+// 609 -> 462 -> 321

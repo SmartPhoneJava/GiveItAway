@@ -174,6 +174,14 @@ export const categories = [
   CategoryAnother
 ];
 
+function shortText(str, newLength) {
+  if (str.length > newLength) {
+    const s = str.slice(0, newLength);
+    return s + '...';
+  }
+  return str;
+}
+
 export const CategoriesLabel = props => {
   return (
     <Div
@@ -188,7 +196,7 @@ export const CategoriesLabel = props => {
       <FormLayout>
         <SelectMimicry
           top="Категория"
-          placeholder={GetCategoryText(props.category)}
+          placeholder={shortText(GetCategoryText(props.category), 20)}
           onClick={() => props.open()}
         />
       </FormLayout>

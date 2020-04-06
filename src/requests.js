@@ -31,12 +31,14 @@ export async function adHide(setPopout, setSnackbar, ad_id, callback) {
 		})
 		.then(function (response) {
 			setPopout(null);
+			sucessNoCancel('Объявление скрыто', setSnackbar);
 			callback(response);
 			return response;
 		})
 		.catch(function (error) {
 			err = true;
 			fail('Нет соединения с сервером', adHide(setPopout, setSnackbar, ad_id, callback), setSnackbar);
+
 			setPopout(null);
 		});
 	return err;
@@ -59,6 +61,7 @@ export async function adVisible(setPopout, setSnackbar, ad_id, callback) {
 		})
 		.then(function (response) {
 			setPopout(null);
+			sucessNoCancel('Объявление открыто для просмотра', setSnackbar);
 			callback(response);
 			return response;
 		})
@@ -102,6 +105,7 @@ export async function denyDeal(setSnackbar, deal_id) {
 	})
 		.then(function (response) {
 			console.log('response from denyDeal:', response);
+			sucessNoCancel('Ваш отказ принят!', setSnackbar);
 			return response.data;
 		})
 		.catch(function (error) {
@@ -129,6 +133,7 @@ export async function acceptDeal(setSnackbar, deal_id) {
 	})
 		.then(function (response) {
 			console.log('response from acceptDeal:', response);
+			sucessNoCancel('Автор благодарит вас за подтверждение!', setSnackbar);
 			return response.data;
 		})
 		.catch(function (error) {
@@ -403,6 +408,7 @@ export async function CreateImages(items, id, goToAds, setSnackbar) {
 					if (i == item.photos.length - 1 && l == items.length - 1) {
 						goToAds(
 							<Snackbar
+								duration="1500"
 								onClose={() => {
 									setSnackbar(null);
 								}}
@@ -486,6 +492,7 @@ export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
 				console.log('i set', ad_id);
 				setSnackbar(
 					<Snackbar
+						duration="1500"
 						onClose={() => {
 							setSnackbar(null);
 						}}
@@ -513,6 +520,7 @@ function fail(err, repeat, setSnackbar) {
 		repeat
 			? setSnackbar(
 					<Snackbar
+						duration="1500"
 						onClose={() => setSnackbar(null)}
 						action="Повторить"
 						onActionClick={() => {
@@ -530,6 +538,7 @@ function fail(err, repeat, setSnackbar) {
 			  )
 			: setSnackbar(
 					<Snackbar
+						duration="1500"
 						onClose={() => setSnackbar(null)}
 						before={
 							<Avatar size={24} style={{ background: 'red' }}>
@@ -546,6 +555,7 @@ function fail(err, repeat, setSnackbar) {
 function sucess(text, cancelMe, setSnackbar) {
 	setSnackbar(
 		<Snackbar
+			duration="1500"
 			onClose={() => {
 				setSnackbar(null);
 			}}
@@ -565,6 +575,7 @@ function sucess(text, cancelMe, setSnackbar) {
 function sucessNoCancel(text, setSnackbar) {
 	setSnackbar(
 		<Snackbar
+			duration="1500"
 			onClose={() => {
 				setSnackbar(null);
 			}}
