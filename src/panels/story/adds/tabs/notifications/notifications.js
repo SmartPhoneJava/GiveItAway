@@ -1,17 +1,7 @@
-import React, { useState } from 'react';
-import {
-	PanelHeaderSimple,
-	Link,
-	Avatar,
-	Button,
-	Cell,
-	Header,
-	Group,
-	PanelHeaderButton,
-	PanelHeaderContext,
-	TabsItem,
-	Tabs,
-} from '@vkontakte/vkui';
+import React, { useState, useRef, useCallback } from 'react';
+import { Header, Group } from '@vkontakte/vkui';
+
+import useNotificationsGet from './useNotificationsGet';
 
 import Man from './../../../../../img/man.jpeg';
 import Cat from './../../../../../img/cat.jpg';
@@ -31,7 +21,7 @@ import Notification, {
 	NotificationStatistics,
 } from './Notification';
 
-const NT_CLOSE = 'close'; // приходит выбранному автором пользователю
+const NT_CLOSE = 'ad_close'; // приходит выбранному автором пользователю
 const NT_RESPOND = 'respond'; // приходит автору
 const NT_FULFILL = 'fulfill'; // приходит автору
 const NT_STATISTICS = 'statistics'; // приходит автору
@@ -202,34 +192,85 @@ const arr = [
 	},
 ];
 
-function getNotifications(arr) {
-	return arr.map((v) => {
+function getNotifications(arr, lastAdElementRef) {
+	return arr.map((v, index) => {
+		let inner = <Notification key={v.id} notification={v} />;
 		switch (v.notification_type) {
 			case NT_STATISTICS:
-				return <NotificationStatistics key={v.id} notification={v} />;
+				inner = <NotificationStatistics notification={v} />;
+				break;
 			case NT_STATUS:
-				return <NotificationStatus key={v.id} notification={v} />;
+				inner = <NotificationStatus notification={v} />;
+				break;
 			case NT_CLOSE:
-				return <NotificationClose key={v.id} notification={v} />;
+				inner = <NotificationClose notification={v} />;
+				break;
 			case NT_DELETED:
-				return <NotificationDeleted key={v.id} notification={v} />;
+				inner = <NotificationDeleted notification={v} />;
+				break;
 			case NT_RESPOND:
-				return <NotificationRespond key={v.id} notification={v} />;
+				inner = <NotificationRespond notification={v} />;
+				break;
 			case NT_FULFILL:
-				return <NotificationFulFill key={v.id} notification={v} />;
+				inner = <NotificationFulFill notification={v} />;
+				break;
 		}
-		return <Notification key={v.id} notification={v} />;
+		if (arr.length === index + 1) {
+			return (
+				<div key={v.id} ref={lastAdElementRef}>
+					{inner}
+				</div>
+			);
+		} else {
+			return <div key={v.id}>{inner}</div>;
+		}
 	});
 }
 
 const Notifications = (props) => {
-	const arrNotRead = arr.filter((v) => !v.is_read);
-	const arrRead = arr.filter((v) => v.is_read);
+	const [search, setSearch] = useState('');
+	const [pageNumber, setPageNumber] = useState(1);
+	let { inited, loading, nots, error, hasMore, newPage } = useNotificationsGet(
+		props.setPopout,
+		search,
+		pageNumber,
+		5
+	);
+
+	const observer = useRef();
+	const lastAdElementRef = useCallback(
+		(node) => {
+			if (loading) return;
+			if (observer.current) observer.current.disconnect();
+			observer.current = new IntersectionObserver((entries) => {
+				if (entries[0].isIntersecting && hasMore) {
+					setPageNumber((prevPageNumber) => newPage + 1);
+				}
+			});
+			if (node) observer.current.observe(node);
+		},
+		[loading, hasMore]
+	);
+
+	const arrNotRead = nots.filter((v) => !v.is_read);
+	const arrRead = nots.filter((v) => v.is_read);
 
 	return (
 		<div style={{ background: '#F7F7F7' }}>
-			<Group header={<Header mode="secondary">Непрочитанные</Header>}>{getNotifications(arrNotRead)}</Group>
-			<Group header={<Header mode="secondary">Прочитанные</Header>}>{getNotifications(arrRead)}</Group>
+			{arrNotRead.length > 0 ? (
+				<Group header={<Header mode="secondary">Непрочитанные</Header>}>
+					{getNotifications(arrNotRead, lastAdElementRef)}
+				</Group>
+			) : (
+				''
+			)}
+			{arrRead.length > 0 ? (
+				<Group header={<Header mode="secondary">Прочитанные</Header>}>
+					{getNotifications(arrRead, lastAdElementRef)}
+				</Group>
+			) : (
+				''
+			)}
 		</div>
 	);
 };

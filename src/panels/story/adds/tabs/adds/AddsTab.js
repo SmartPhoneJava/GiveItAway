@@ -256,18 +256,17 @@ const AddsTab = (props) => {
 			<Search value={search} onChange={handleSearch} icon={<Icon24Filter />} onIconClick={props.onFiltersClick} />
 			<Group>
 				{ads.length > 0 ? (
-					ads
-						.map((ad, index) => {
-							if (ads.length === index + 1) {
-								return (
-									<div key={ad.ad_id} ref={lastAdElementRef}>
-										{Ad(ad)}
-									</div>
-								);
-							} else {
-								return <div key={ad.ad_id}>{Ad(ad)}</div>;
-							}
-						})
+					ads.map((ad, index) => {
+						if (ads.length === index + 1) {
+							return (
+								<div key={ad.ad_id} ref={lastAdElementRef}>
+									{Ad(ad)}
+								</div>
+							);
+						} else {
+							return <div key={ad.ad_id}>{Ad(ad)}</div>;
+						}
+					})
 				) : error ? (
 					//<Error />
 					addsArrDD.map((ad) => {
