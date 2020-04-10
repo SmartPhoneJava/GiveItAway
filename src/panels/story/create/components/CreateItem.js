@@ -27,22 +27,9 @@ const nameLabel = 'Название';
 const categoryLabel = 'Категория';
 const descriptionLabel = 'Описание';
 
-const PHOTO_TEXT = 'Не более трех фотографий (jpeg, png) размером 4мб';
+const MAX_FILE_SIZE = 1024 * 1024 * 4;
 
-const images = [
-	{
-		original: 'https://picsum.photos/id/1018/1000/600/',
-		thumbnail: 'https://picsum.photos/id/1018/250/150/',
-	},
-	{
-		original: 'https://picsum.photos/id/1015/1000/600/',
-		thumbnail: 'https://picsum.photos/id/1015/250/150/',
-	},
-	{
-		original: 'https://picsum.photos/id/1019/1000/600/',
-		thumbnail: 'https://picsum.photos/id/1019/250/150/',
-	},
-];
+const PHOTO_TEXT = 'Не более трех фотографий (jpeg, png) размером 4мб';
 
 let KEY = 0;
 
@@ -52,55 +39,99 @@ const CreateItem = (props) => {
 	const [description, setDescription] = useState('');
 	const [photosUrl, setPhotosUrl] = useState([]);
 
-	function handleFileSelect(evt) {
-		var files = evt.target.files; // FileList object
-		// Loop through the FileList and render image files as thumbnails.
-		for (var i = 0, f; (f = files[i]); i++) {
-			// Only process image files.
-			if (!f.type.match('image.*')) {
-				alert('Пожалйста загружайте только изображения');
-			}
-			var reader = new FileReader();
-			// Closure to capture the file information.
-			reader.onload = (function (theFile) {
-				return function (e) {
-					KEY++;
-					setPhotosUrl([...photosUrl, { src: e.target.result, id: KEY, origin: theFile }]);
-				};
-			})(f);
-			// Read in the image file as a data URL.
-			reader.readAsDataURL(f);
-		}
+	function handleFileSelect(f) {
+		var reader = new FileReader();
+		// Closure to capture the file information.
+		reader.onload = (function (theFile) {
+			return function (e) {
+				KEY++;
+				setPhotosUrl([...photosUrl, { src: e.target.result, id: KEY, origin: theFile }]);
+			};
+		})(f);
+		// Read in the image file as a data URL.
+		reader.readAsDataURL(f);
 	}
 
-	const loadPhoto = (e) => {
-		const file = e.target.files[0];
-		if (!file) {
-			return;
-		}
-		const newLength = photosUrl.length + 1;
-		setPhotoText(PHOTO_TEXT + '. Загружено ' + newLength + '/3');
-		props.setItems({
-			name,
-			category: props.category,
-			description: description,
-			photos: [...props.item.photos, file],
-		});
-		handleFileSelect(e);
-		if (newLength == 3) {
-			props.setSnackbar(
+	function checkFileSize(setSnackbar, file) {
+		const valid = file.size <= MAX_FILE_SIZE;
+		if (!valid) {
+			setSnackbar(
 				<Snackbar
-					duration="1200"
-					onClose={() => props.setSnackbar(null)}
+					duration="2000"
+					onClose={() => setSnackbar(null)}
 					before={
 						<Avatar size={24} style={{ background: 'orange' }}>
 							<Icon24Favorite fill="#fff" width={14} height={14} />
 						</Avatar>
 					}
 				>
-					Достигнут лимит фотографий. Чтобы загрузить новые, удалите старые.
+					Размер файла {(file.size / 1024 / 1024).toFixed(2)}МБ. Максимально допустимый размер:{' '}
+					{(MAX_FILE_SIZE / 1024 / 1024).toFixed(2)} МБ
 				</Snackbar>
 			);
+		}
+		return valid;
+	}
+
+	function checkFileType(setSnackbar, file) {
+		const valid = file.type.match('image.*');
+		if (!valid) {
+			setSnackbar(
+				<Snackbar
+					duration="2000"
+					onClose={() => setSnackbar(null)}
+					before={
+						<Avatar size={24} style={{ background: 'orange' }}>
+							<Icon24Favorite fill="#fff" width={14} height={14} />
+						</Avatar>
+					}
+				>
+					Данный формат не поддержирвается. Используйте изображения формата .png, .jpg, .jpeg
+				</Snackbar>
+			);
+		}
+		return valid;
+	}
+
+	const loadPhoto = (e) => {
+		var files = e.target.files; // FileList object
+		// Loop through the FileList and render image files as thumbnails.
+		for (var i = 0, file; (file = files[i]); i++) {
+			if (!file) {
+				return;
+			}
+			if (!checkFileSize(props.setSnackbar, file)) {
+				return;
+			}
+			if (!checkFileType(props.setSnackbar, file)) {
+				return;
+			}
+
+			const newLength = photosUrl.length + 1;
+			setPhotoText(PHOTO_TEXT + '. Загружено ' + newLength + '/3');
+			props.setItems({
+				name,
+				category: props.category,
+				description: description,
+				photos: [...props.item.photos, file],
+			});
+
+			handleFileSelect(file);
+			if (newLength == 3) {
+				props.setSnackbar(
+					<Snackbar
+						duration="1200"
+						onClose={() => props.setSnackbar(null)}
+						before={
+							<Avatar size={24} style={{ background: 'orange' }}>
+								<Icon24Favorite fill="#fff" width={14} height={14} />
+							</Avatar>
+						}
+					>
+						Достигнут лимит фотографий. Чтобы загрузить новые, удалите старые.
+					</Snackbar>
+				);
+			}
 		}
 	};
 
