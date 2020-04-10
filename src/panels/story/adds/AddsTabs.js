@@ -7,6 +7,8 @@ import Icon28UserCircleOutline from '@vkontakte/icons/dist/28/user_circle_outlin
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 
+import Notifications from './tabs/notifications/notifications';
+
 import AddsTab from './tabs/adds/AddsTab';
 
 const tabAdds = 'adds';
@@ -15,7 +17,7 @@ const tabAddsText = 'Объявления';
 const tabNotification = 'notification';
 const tabNotificationText = 'Уведомления';
 
-const AddsTabs = props => {
+const AddsTabs = (props) => {
 	const [contextOpened, setContextOpened] = useState(false);
 	const [mode, setmode] = useState('all');
 	const [activeTab, setActiveTab] = useState(tabAdds);
@@ -85,31 +87,31 @@ const AddsTabs = props => {
 					</Cell>
 				</List>
 			</PanelHeaderContext>
-			<AddsTab
-				openAd={props.openAd}
-				dropFilters={() => {
-					props.dropFilters()
-					setmode('all')
-				}}
-				category={props.category}
-				mode={mode}
-
-				deleteID={props.deleteID}
-				myID={props.myID}
-
-				city={props.city}
-				// region={props.region}
-				country={props.country}
-
-				sort={props.sort}
-				
-				refresh={props.refresh}
-				setPopout={props.setPopout}
-				onFiltersClick={props.onFiltersClick}
-				onCloseClick={props.onCloseClick}
-				setSnackbar={props.setSnackbar}
-				chooseAdd={props.chooseAdd}
-			></AddsTab>
+			{activeTab === tabNotification ? (
+				<Notifications/>
+			) : (
+				<AddsTab
+					openAd={props.openAd}
+					dropFilters={() => {
+						props.dropFilters();
+						setmode('all');
+					}}
+					category={props.category}
+					mode={mode}
+					deleteID={props.deleteID}
+					myID={props.myID}
+					city={props.city}
+					// region={props.region}
+					country={props.country}
+					sort={props.sort}
+					refresh={props.refresh}
+					setPopout={props.setPopout}
+					onFiltersClick={props.onFiltersClick}
+					onCloseClick={props.onCloseClick}
+					setSnackbar={props.setSnackbar}
+					chooseAdd={props.chooseAdd}
+				></AddsTab>
+			)}
 		</React.Fragment>
 	);
 };

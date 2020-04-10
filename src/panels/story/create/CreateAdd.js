@@ -16,7 +16,6 @@ import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
 import { CreateAd } from './../../../requests';
 
 import { User } from '../../../store/user';
-import { Addr } from '../../../store/addr';
 
 import { CategoryNo } from './../../template/Categories';
 
