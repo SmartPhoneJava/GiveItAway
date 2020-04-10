@@ -252,8 +252,8 @@ const Notifications = (props) => {
 		[loading, hasMore]
 	);
 
-	const arrNotRead = nots.filter((v) => !v.is_read);
-	const arrRead = nots.filter((v) => v.is_read);
+	const arrNotRead = arr.filter((v) => !v.is_read);
+	const arrRead = arr.filter((v) => v.is_read);
 
 	return (
 		<div style={{ background: '#F7F7F7' }}>

@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import bridge from '@vkontakte/vk-bridge';
-import axios from 'axios';
-import { Button, Group, Header, Div, InfoRow, Separator, ScreenSpinner, Snackbar, Avatar } from '@vkontakte/vkui';
+import {
+	Button,
+	Group,
+	Header,
+	Div,
+	InfoRow,
+	FormStatus,
+	Separator,
+	ScreenSpinner,
+	Snackbar,
+	Avatar,
+} from '@vkontakte/vkui';
 
 import Geocoder from 'react-native-geocoding';
 
@@ -36,6 +46,9 @@ const CreateAdd = (props) => {
 		},
 	]);
 
+	const [errorHeader, setErrorHeader] = useState('');
+	const [errorText, setErrorText] = useState('');
+
 	const [description, setDescription] = useState('');
 	const [hideGeo, setHideGeo] = useState(false);
 	const [geodata, setGeodata] = useState({
@@ -69,21 +82,47 @@ const CreateAdd = (props) => {
 		let v = true;
 		items.forEach((val) => {
 			console.log('item!!!!', val, props.category);
-			if (val.name === undefined || val.name.length == 0 || val.name.length > 100) {
+			if (val.name === undefined || val.name.length == 0) {
 				v = false;
+				setErrorHeader('Не задано название предмета');
+				setErrorText('Вы пропустили самый важный пункт!');
+			} else if (val.name.length < 5) {
+				v = false;
+				setErrorHeader('Название предмета слишком короткое');
+				setErrorText('Опишите чуть больше деталей!(минимум: 5 символов)');
+			} else if (val.name.length > 100) {
+				v = false;
+				setErrorHeader('Название предмета слишком длинное');
+				setErrorText('Попробуйте описать ваше объявление в двух словах!(максимум: 100 символов)');
 			}
 			if (val.description === undefined || val.description.length == 0 || val.name.description > 1500) {
 				v = false;
+				setErrorHeader('Не задано описание предмета');
+				setErrorText('Опишите ваши вещи, им будет приятно!');
+			} else if (val.description.length < 10) {
+				v = false;
+				setErrorHeader('Описание предмета слишком короткое');
+				setErrorText('Больше подробностей! (минимум 10 символов)');
+			} else if (val.description.length > 1000) {
+				v = false;
+				setErrorHeader('Название предмета слишком длинное');
+				setErrorText('Краткость сестра таланта!(максимум: 1000 символов)');
 			}
 			if (props.category === undefined || props.category.length == 0 || props.category == CategoryNo) {
 				v = false;
+				setErrorHeader('Категория предмета не указана');
+				setErrorText('Выберите категорию предметов в выпадающем списке в начале страницы');
 			}
 		});
-		if (feedbackType == 'other' && (contacts == '' || contacts.length > 100)) {
+		if (feedbackType == 'other' && (contacts == '' || contacts.length > 1000)) {
 			v = false;
+			setErrorHeader('Контактные данные не указаны');
+			setErrorText('Укажите информацию для связи с вами - максимум 1000 символов.');
 		}
 		if (city.id < 0 || country.id < 0) {
 			v = false;
+			setErrorHeader('Местоположение не указано');
+			setErrorText('Укажите свою страну и город с помощью выпадающих списков выше');
 		}
 		setValid(v);
 	}, [items, props.category, feedbackType, contacts, country, city]);
@@ -290,15 +329,11 @@ const CreateAdd = (props) => {
 			{valid ? (
 				''
 			) : (
-				<InfoRow
-					style={{
-						color: 'grey',
-						margin: '12px',
-					}}
-				>
-					Вы не заполнили некоторые обязательные поля. Проверьте, указаны ли имена, описания и категории
-					предметов.
-				</InfoRow>
+				<div style={{ padding: '10px' }}>
+					<FormStatus header={errorHeader} mode={valid ? 'default' : 'error'}>
+						{errorText}
+					</FormStatus>
+				</div>
 			)}
 			<Div style={{ display: 'flex' }}>
 				<Button

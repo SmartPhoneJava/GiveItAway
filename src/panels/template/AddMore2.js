@@ -373,7 +373,8 @@ const AddMore2 = (props) => {
 										setRequest('CANCEL_CLOSE');
 									},
 									isClosing,
-									props.ad.hidden
+									props.ad.hidden,
+									subs.length
 								);
 							}}
 							disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
