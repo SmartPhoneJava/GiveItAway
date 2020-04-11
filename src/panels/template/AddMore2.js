@@ -484,7 +484,7 @@ const AddMore2 = (props) => {
 				<Button
 					style={{ margin: '8px', marginLeft: 'auto', marginRight: 'auto' }}
 					stretched
-					size="l"
+					size="xl"
 					mode="destructive"
 					onClick={unsub}
 					before={<Icon24Cancel />}
@@ -492,18 +492,16 @@ const AddMore2 = (props) => {
 					Отказаться
 				</Button>
 			) : (
-				<>
 					<Button
 						stretched
-						size="l"
+						size="xl"
 						style={{ margin: '8px', marginLeft: 'auto', marginRight: 'auto' }}
 						mode="primary"
 						onClick={sub}
 						before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
 					>
-						Откликнуться
+						Хочу забрать!
 					</Button>
-				</>
 			)}
 			<div style={{ marginTop: '10px', paddingLeft: '16px', paddingRight: '16px' }}>
 				<div className="CellLeft__block">{ad.text}</div>
@@ -519,10 +517,15 @@ const AddMore2 = (props) => {
 						<td className="first">Просмотров</td>
 						<td>{ad.views_count}</td>
 					</tr>
-					<tr>
-						<td className="first">Отклинулось</td>
-						<td>{subs.length}</td>
-					</tr>
+					{status != 'closed' && status != 'aborted' ? (
+						<tr>
+							<td className="first">Отклинулось</td>
+							<td>{subs.length}</td>
+						</tr>
+					) : (
+						''
+					)}
+
 					<tr>
 						<td className="first">Размещено</td>
 						<td>{ad.creation_date}</td>
@@ -530,17 +533,21 @@ const AddMore2 = (props) => {
 				</tbody>
 			</table>
 			{isAuthor() ? (
-				<Group header={<Header mode="secondary">Откликнулись</Header>}>
-					{subs.length > 0 ? (
-						subs.map((v) => (
-							<Cell key={v.vk_id} before={<Avatar size={36} src={v.photo_url} />}>
-								{v.name + ' ' + v.surname}
-							</Cell>
-						))
-					) : (
-						<InfoRow style={{ paddingLeft: '16px' }}> пусто</InfoRow>
-					)}
-				</Group>
+				status != 'closed' && status != 'aborted' ? (
+					<Group header={<Header mode="secondary">Откликнулись</Header>}>
+						{subs.length > 0 ? (
+							subs.map((v) => (
+								<Cell key={v.vk_id} before={<Avatar size={36} src={v.photo_url} />}>
+									{v.name + ' ' + v.surname}
+								</Cell>
+							))
+						) : (
+							<InfoRow style={{ paddingLeft: '16px' }}> пусто</InfoRow>
+						)}
+					</Group>
+				) : (
+					''
+				)
 			) : (
 				<Group header={<Header mode="secondary">Автор</Header>}>
 					<Cell
