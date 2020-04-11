@@ -31,6 +31,7 @@ import { VkUser } from '../store/vkUser';
 
 import AddMore, { AdDefault } from './template/AddMore';
 import AddMore2 from './template/AddMore2';
+import Comments from './story/adds/tabs/comments/comments';
 
 import { CategoryNo } from './template/Categories';
 
@@ -207,8 +208,8 @@ const Main = () => {
 							<AddsTabs
 								onFiltersClick={() => setActiveModal(MODAL_FILTERS)}
 								onCloseClick={(act) => {
-									setActiveModal(MODAL_SUBS) 
-								 }}
+									setActiveModal(MODAL_SUBS);
+								}}
 								goSearch={goSearch}
 								setPopout={setPopout}
 								setSnackbar={setSnackbar}
@@ -258,12 +259,43 @@ const Main = () => {
 									back={(id) => {
 										setActivePanel('header-search');
 									}}
+									commentsOpen={() => {
+										setActivePanel('comments');
+									}}
 									ad={choosen}
 									setPopout={setPopout}
 									setSnackbar={setSnackbar}
 									VkUser={VkUser}
 									vkPlatform={vkPlatform}
 									onCloseClick={() => setActiveModal(MODAL_SUBS)}
+								/>
+							) : (
+								Error
+							)}
+							{snackbar}
+						</Panel>
+						<Panel id="comments">
+							<PanelHeaderSimple
+								left={
+									<PanelHeaderBack
+										onClick={() => {
+											setActivePanel('one-panel');
+										}}
+									/>
+								}
+							>
+								Комментарии
+							</PanelHeaderSimple>
+							{choosen ? (
+								<Comments
+									back={(id) => {
+										setActivePanel('one-panel');
+									}}
+									ad={choosen}
+									setPopout={setPopout}
+									setSnackbar={setSnackbar}
+									VkUser={VkUser}
+									vkPlatform={vkPlatform}
 								/>
 							) : (
 								Error

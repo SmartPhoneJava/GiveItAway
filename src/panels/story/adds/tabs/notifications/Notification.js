@@ -48,7 +48,7 @@ function getImage(props) {
 		return '';
 	}
 	const photoURL = props.notification.payload.ad.pathes_to_photo[0].PhotoUrl;
-	return <Avatar className="tiled" src={photoURL} />;
+	return <Avatar size={48} src={photoURL} />;
 }
 
 function getAuthorHref(props) {

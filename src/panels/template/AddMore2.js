@@ -197,6 +197,7 @@ const AddMore2 = (props) => {
 				>
 					<Button
 						size="m"
+						onClick={props.commentsOpen}
 						after={<Counter mode="secondary">{comments_counter}</Counter>}
 						mode="overlay_primary"
 						before={<Icon24CommentOutline />}
@@ -297,6 +298,15 @@ const AddMore2 = (props) => {
 					display: 'inline-block',
 				}}
 			>
+				<Button
+					size="m"
+					onClick={props.commentsOpen}
+					after={<Counter mode="secondary">0</Counter>}
+					mode="overlay_primary"
+					before={<Icon24CommentOutline />}
+				>
+					Комментарии
+				</Button>
 				<img
 					srcSet={image}
 					style={{
