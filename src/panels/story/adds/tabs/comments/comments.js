@@ -3,7 +3,7 @@ import {
 	Header,
 	Group,
 	Input,
-	Textarea,
+	Snackbar,
 	ActionSheet,
 	ActionSheetItem,
 	PanelHeaderButton,
@@ -23,6 +23,7 @@ import Playstein from './../../../../../img/playstein.jpg';
 import Bb from './../../../../../img/bb.jpg';
 
 import Icon24Send from '@vkontakte/icons/dist/24/send';
+import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
 import { postComment, deleteComment, editComment } from './requests';
 
@@ -219,6 +220,7 @@ const NO_ID = -1;
 const Comments = (props) => {
 	const [text, setText] = useState('');
 	const [search, setSearch] = useState('');
+	const [hide, setHide] = useState(false);
 
 	const [editableID, setEditableID] = useState(NO_ID);
 
@@ -231,7 +233,6 @@ const Comments = (props) => {
 		props.ad.ad_id
 	);
 
-	const commentText = useRef();
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
 		(node) => {
@@ -261,53 +262,82 @@ const Comments = (props) => {
 				setEditableID
 			)}
 
-			<Input
-				className="write"
-				placeholder="Комментарий"
-				value={text}
-				onChange={(e) => {
-					const { _, value } = e.currentTarget;
-					setText(value);
-				}}
-			/>
+			{hide || props.hide ? (
+				''
+			) : (
+				<Input
+					className="write"
+					placeholder="Комментарий"
+					value={text}
+					onChange={(e) => {
+						const { _, value } = e.currentTarget;
+						setText(value);
+					}}
+				/>
+			)}
 
-			<PanelHeaderButton
-				style={{
-					background: '#F2F3F5',
-					position: 'fixed',
-					marginBottom: '13%',
-					marginRight: '5%',
-					bottom: '0',
-					right: '0',
-					zIndex: '100',
-				}}
-				onClick={async () => {
-					console.log('editableIDeditableID', editableID);
-					if (editableID != NO_ID) {
-						const comment = nots.filter((v) => v.comment_id == editableID)[0];
-						comment.text = text;
-						const obj = JSON.stringify({
-							comment_id: comment.comment_id,
-							author_id: props.myID,
-							text: text,
-						});
-						await editComment(props.setPopout, props.setSnackbar, comment.comment_id, obj);
-						setEditableID(NO_ID);
-					} else {
-						const obj = JSON.stringify({
-							author_id: props.myID,
-							text: text,
-						});
-						await postComment(props.setPopout, props.setSnackbar, props.ad.ad_id, obj);
-						setSearch(text);
-					}
-					setText('');
-				}}
-			>
-				<Avatar size="20">
-					<Icon24Send style={{ color: '#0071B8' }} size="24" background="red" />
-				</Avatar>
-			</PanelHeaderButton>
+			{hide || props.hide ? (
+				''
+			) : (
+				<PanelHeaderButton
+					style={{
+						background: '#F2F3F5',
+						position: 'fixed',
+						marginBottom: '13%',
+						marginRight: '5%',
+						bottom: '0',
+						right: '0',
+						zIndex: '100',
+					}}
+					onClick={async () => {
+						console.log('editableIDeditableID', editableID);
+						if (editableID != NO_ID) {
+							const comment = nots.filter((v) => v.comment_id == editableID)[0];
+							comment.text = text;
+							const obj = JSON.stringify({
+								comment_id: comment.comment_id,
+								author_id: props.myID,
+								text: text,
+							});
+							await editComment(props.setPopout, props.setSnackbar, comment.comment_id, obj);
+							setEditableID(NO_ID);
+						} else {
+							if (text.length == 0) {
+								setHide(true);
+								props.setSnackbar(
+									<Snackbar
+										duration="2000"
+										onClose={() => {
+											props.setSnackbar(null);
+											setHide(false);
+										}}
+										before={
+											<Avatar size={24} style={{ background: 'red' }}>
+												<Icon24Cancel fill="#fff" width={14} height={14} />
+											</Avatar>
+										}
+									>
+										Нельзя отправить комментарий без текста
+									</Snackbar>
+								);
+
+								return;
+							}
+							const obj = JSON.stringify({
+								author_id: props.myID,
+								text: text,
+							});
+							await postComment(props.setPopout, props.setSnackbar, props.ad.ad_id, obj);
+							setSearch(text);
+						}
+						setText('');
+					}}
+				>
+					<Avatar size="20">
+						<Icon24Send style={{ color: '#0071B8' }} size="24" />
+					</Avatar>
+				</PanelHeaderButton>
+			)}
 		</div>
 	);
 };

@@ -90,6 +90,7 @@ const AddMore2 = (props) => {
 	const [photoIndex, setPhotoIndex] = useState(0);
 
 	const [subs, setSubs] = useState(0);
+	const [hide, setHide] = useState(false);
 
 	const [isSub, setIsSub] = useState(false);
 	const [isDealer, setIsDealer] = useState(false);
@@ -364,6 +365,7 @@ const AddMore2 = (props) => {
 							mode="primary"
 							size="l"
 							onClick={() => {
+								setHide(true)
 								OpenActions(
 									props.setPopout,
 									props.setSnackbar,
@@ -372,13 +374,14 @@ const AddMore2 = (props) => {
 									() => {
 										props.onCloseClick();
 										setRequest('CLOSE');
-									},
-									() => {
-										setRequest('CANCEL_CLOSE');
+										
 									},
 									isClosing,
 									props.ad.hidden,
-									subs.length
+									subs.length,
+									() => {
+										setHide(false)
+									}
 								);
 							}}
 							disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
@@ -529,6 +532,7 @@ const AddMore2 = (props) => {
 
 			{ad.feedback_type == 'comments' ? (
 				<Comments
+					hide={hide}
 					ad={ad}
 					setPopout={props.setPopout}
 					setSnackbar={props.setSnackbar}

@@ -7,8 +7,8 @@ import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
 import { CancelClose, adVisible, adHide, deleteAd } from './../../../requests';
 
-function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClosing, hidden, subs_length) {
-	console.log('props.ad.ad_id', ad_id);
+function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClosing, hidden, subs_length, failedOpen) {
+	console.log('isClosingisClosing', ad_id, isClosing);
 	setPopout(
 		<ActionSheet onClose={() => setPopout(null)}>
 			{isClosing ? (
@@ -29,9 +29,12 @@ function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClo
 						if (subs_length == 0) {
 							setSnackbar(
 								<Snackbar
-									duration="1500"
+									duration="2000"
 									onClose={() => {
 										setSnackbar(null);
+										if (failedOpen) {
+											failedOpen();
+										}
 									}}
 									before={
 										<Avatar size={24} style={{ background: 'red' }}>
@@ -43,6 +46,7 @@ function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClo
 									объявление.
 								</Snackbar>
 							);
+
 							return;
 						}
 						onCloseClick();

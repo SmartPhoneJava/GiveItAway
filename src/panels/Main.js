@@ -122,7 +122,7 @@ const Main = () => {
 			}
 
 			const reg = /[\r\n]+/g;
-			const vk_platform = get['vk_platform'].replace(reg, '\n');
+			const vk_platform = get['vk_platform'] ? get['vk_platform'].replace(reg, '\n') : 'desktop';
 			setVkPlatform(vk_platform);
 			setAppID(parseInt(get['vk_app_id']));
 		}

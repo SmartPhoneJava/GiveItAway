@@ -58,7 +58,7 @@ const CreateAdd = (props) => {
 
 	const [valid, setValid] = useState(false);
 	const [contacts, setContacts] = useState('');
-	const [feedbackType, setFeedbackType] = useState('ls');
+	const [feedbackType, setFeedbackType] = useState('comments');
 	const [itemDescription, setItemDescription] = useState(false);
 
 	const [city, setCity] = useState(NoRegion);

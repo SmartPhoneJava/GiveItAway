@@ -4,14 +4,12 @@ import { Textarea, Radio, Group, Header, Avatar, Snackbar, FormLayout } from '@v
 import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 
 const ChooseFeedback = (props) => {
-	const [ft, setFt] = useState('Личные сообщения');
-	console.log('props.pmOpenprops.pmOpen', props.pmOpen);
 	return (
 		<Group separator="show" header={<Header mode="secondary">Тип фидбека</Header>}>
 			<div>
 				<Radio
 					name="radio"
-					value={ft}
+					value="ls"
 					onClick={() => {
 						if (props.pmOpen) {
 							props.setFeedbackType('ls');
@@ -42,7 +40,7 @@ const ChooseFeedback = (props) => {
 				</Radio>
 				<Radio
 					name="radio"
-					value={ft}
+					value="comments"
 					onClick={() => {
 						props.setFeedbackType('comments');
 					}}
@@ -53,7 +51,7 @@ const ChooseFeedback = (props) => {
 				</Radio>
 				<Radio
 					name="radio"
-					value={ft}
+					value="other"
 					onClick={() => {
 						props.setFeedbackType('other');
 					}}
