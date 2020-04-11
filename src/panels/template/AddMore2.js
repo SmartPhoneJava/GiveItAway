@@ -33,6 +33,7 @@ import Icon24Info from '@vkontakte/icons/dist/24/info';
 import Icon24Message from '@vkontakte/icons/dist/24/message';
 
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
+import Icon24Done from '@vkontakte/icons/dist/24/done';
 
 import Icon28ArrowLeftOutline from '@vkontakte/icons/dist/28/arrow_left_outline';
 import Icon28ArrowRightOutline from '@vkontakte/icons/dist/28/arrow_right_outline';
@@ -58,6 +59,10 @@ import Bb from './../../img/bb.jpg';
 import Comments from './../story/adds/tabs/comments/comments';
 
 import OpenActions from './components/actions';
+
+const COLOR_DEFAULT = 'rgba(0,0,0,0.6)';
+const COLOR_DONE = 'rgba(0,125,0,0.6)';
+const COLOR_CANCEL = 'rgba(125,0,0,0.6)';
 
 export const AdDefault = {
 	ad_id: -1,
@@ -94,7 +99,8 @@ const AddMore2 = (props) => {
 
 	const [isSub, setIsSub] = useState(false);
 	const [isDealer, setIsDealer] = useState(false);
-	const [isClosing, setIsClosing] = useState(false);
+	const [status, setStatus] = useState('unknown');
+
 	const [Deal, setDeal] = useState({});
 
 	const [request, setRequest] = useState('no');
@@ -121,7 +127,8 @@ const AddMore2 = (props) => {
 					setAd(details);
 					initSubscribers(id);
 					console.log('detailed look', details);
-					setIsClosing(details.status == 'chosen');
+					console.log('i seeet', details.status);
+					setStatus(details.status);
 
 					let { deal, err } = await getDeal(props.setSnackbar, details.ad_id);
 					if (!err) {
@@ -155,6 +162,119 @@ const AddMore2 = (props) => {
 		/**  */
 	}
 
+	function statusWrapper(block, color) {
+		color = color || COLOR_DEFAULT;
+		return (
+			<div
+				style={{
+					background: color,
+					padding: '8px',
+					position: 'absolute',
+					widht: '100%',
+					left: 0,
+					right: 0,
+					top: '0px',
+				}}
+			>
+				{block}
+			</div>
+		);
+	}
+
+	function showClosed() {
+		if (isAuthor()) {
+			return statusWrapper(
+				<InfoRow className="status-text">Спасибо за помощь другим людям!</InfoRow>,
+				COLOR_DONE
+			);
+		}
+		if (isDealer) {
+			return statusWrapper(<InfoRow className="status-text">Вещь перешла в ваше владение!</InfoRow>, COLOR_DONE);
+		}
+		return statusWrapper(<InfoRow className="status-text">Отдано!</InfoRow>, COLOR_DONE);
+	}
+
+	function showAborted() {
+		if (isAuthor()) {
+			return statusWrapper(
+				<InfoRow className="status-text">Вторая сторона отказалась от сделки</InfoRow>,
+				COLOR_CANCEL
+			);
+		}
+		if (isDealer) {
+			return statusWrapper(<InfoRow className="status-text">Вы прервали сделку</InfoRow>, COLOR_CANCEL);
+		}
+		return statusWrapper(<InfoRow className="status-text">Передача не состоялась</InfoRow>, COLOR_CANCEL);
+	}
+
+	function showChosen() {
+		console.log('showOffer', isDealer, !isAuthor());
+		if (isDealer && !isAuthor()) {
+			return statusWrapper(
+				<>
+					<InfoRow style={{ padding: '10px', color: 'rgb(200,200,200)', textAlign: 'center' }}>
+						Подтвердите получение вещи:
+					</InfoRow>
+					<div style={{ display: 'flex' }}>
+						<Button
+							stretched
+							size="xl"
+							mode="commerce"
+							onClick={() => {
+								acceptDeal(props.setSnackbar, Deal.deal_id);
+								props.back();
+							}}
+							style
+							style={{ marginRight: 8 }}
+							before={<Icon24Done />}
+						>
+							Подтвердить
+						</Button>
+						<Button
+							stretched
+							size="xl"
+							mode="destructive"
+							onClick={() => {
+								denyDeal(props.setSnackbar, Deal.deal_id);
+								props.back();
+							}}
+							style={{ marginRight: 8 }}
+							before={<Icon24Cancel />}
+						>
+							Отклонить
+						</Button>
+					</div>
+				</>,
+				COLOR_DEFAULT
+			);
+		}
+		return statusWrapper(
+			<InfoRow
+				style={{
+					padding: '10px',
+					color: 'rgb(200,200,200)',
+					textAlign: 'center',
+				}}
+			>
+				Автор назначил человека для передачи вещи
+			</InfoRow>,
+			COLOR_DEFAULT
+		);
+	}
+
+	function showStatus() {
+		console.log('statusstatus', status);
+		switch (status) {
+			case 'chosen':
+				return showChosen();
+			case 'closed':
+				return showClosed();
+			case 'aborted':
+				return showAborted();
+		}
+		return '';
+	}
+
 	function getContactsImage(type) {
 		switch (type) {
 			case 'email':
@@ -165,54 +285,6 @@ const AddMore2 = (props) => {
 		return <Icon24Info />;
 	}
 
-	function getContacts(contacts) {
-		if (contacts && contacts != '') {
-			return (
-				<Button mode="overlay_primary" size="m" before={getContactsImage(detectContactsType(contacts))}>
-					{contacts}
-				</Button>
-			);
-		}
-		return <div></div>;
-	}
-
-	function getPM(pm) {
-		if (pm) {
-			return (
-				<Button mode="overlay_primary" size="m" before={<Icon24Message />}>
-					Личные сообщения
-				</Button>
-			);
-		}
-		return <div></div>;
-	}
-
-	function getComments(comments, comments_counter) {
-		if (!comments_counter) {
-			comments_counter = 0;
-		}
-		if (comments) {
-			return (
-				<div
-					style={{
-						display: 'flex',
-						marginLeft: 'auto',
-					}}
-				>
-					<Button
-						size="m"
-						onClick={props.commentsOpen}
-						after={<Counter mode="secondary">{comments_counter}</Counter>}
-						mode="overlay_primary"
-						before={<Icon24CommentOutline />}
-					>
-						Комментарии
-					</Button>
-				</div>
-			);
-		}
-		return <div></div>;
-	}
 	function getFeedback(pm, comments) {
 		if (pm) {
 			return (
@@ -302,6 +374,7 @@ const AddMore2 = (props) => {
 					display: 'inline-block',
 				}}
 			>
+				{showStatus()}
 				<img
 					srcSet={image}
 					style={{
@@ -309,7 +382,7 @@ const AddMore2 = (props) => {
 						objectFit: 'cover',
 					}}
 				/>
-				<div style={{ right: '10px', position: 'absolute', top: '10px' }}>
+				{/* <div style={{ right: '10px', position: 'absolute', top: '10px' }}>
 					<PanelHeaderButton
 						mode="secondary"
 						style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
@@ -319,7 +392,7 @@ const AddMore2 = (props) => {
 							<Icon24VideoFill fill="var(--white)" />
 						</Avatar>
 					</PanelHeaderButton>
-				</div>
+				</div> */}
 			</div>
 			{!ad.pathes_to_photo || ad.pathes_to_photo.length <= 1 ? (
 				''
@@ -365,7 +438,7 @@ const AddMore2 = (props) => {
 							mode="primary"
 							size="l"
 							onClick={() => {
-								setHide(true)
+								setHide(true);
 								OpenActions(
 									props.setPopout,
 									props.setSnackbar,
@@ -374,13 +447,12 @@ const AddMore2 = (props) => {
 									() => {
 										props.onCloseClick();
 										setRequest('CLOSE');
-										
 									},
-									isClosing,
+									status == 'chosen',
 									props.ad.hidden,
 									subs.length,
 									() => {
-										setHide(false)
+										setHide(false);
 									}
 								);
 							}}
@@ -394,86 +466,49 @@ const AddMore2 = (props) => {
 						''
 					)}
 				</div>
-				<div style={{ padding: '8px' }}>
-					{isAuthor() ? (
-						''
-					) : (
-						<>
-							{isDealer ? (
-								<>
-									<InfoRow style={{ padding: '10px', color: 'grey', textAlign: 'center' }}>
-										Подтвердите получение вещи:
-									</InfoRow>
-									<div style={{ display: 'flex' }}>
-										<Button
-											stretched
-											size="l"
-											mode="commerce"
-											onClick={() => {
-												acceptDeal(props.setSnackbar, Deal.deal_id);
-												props.back();
-											}}
-											style
-											style={{ marginRight: 8 }}
-											before={<Icon24Cancel />}
-										>
-											Подтвердить
-										</Button>
-										<Button
-											stretched
-											size="l"
-											mode="destructive"
-											onClick={() => {
-												denyDeal(props.setSnackbar, Deal.deal_id);
-												props.back();
-											}}
-											style={{ marginRight: 8 }}
-											before={<Icon24Cancel />}
-										>
-											Отклонить
-										</Button>
-									</div>
-								</>
-							) : isSub ? (
-								<Button
-									stretched
-									size="xl"
-									mode="destructive"
-									onClick={unsub}
-									before={<Icon24Cancel />}
-								>
-									Отказаться
-								</Button>
-							) : (
-								<>
-									<Button
-										stretched
-										size="xl"
-										mode="primary"
-										onClick={sub}
-										before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
-									>
-										Откликнуться
-									</Button>
-								</>
-							)}
-						</>
-					)}
-				</div>
 			</div>
 			<Separator />
 			<div
 				style={{
 					display: 'flex',
 					paddingLeft: '16px',
+					margin: '0px',
 				}}
 			>
 				<Cell before={<Icon24Place />}>{props.ad.region + ', ' + props.ad.district}</Cell>
 			</div>
-			<Separator style={{ margin: '12px 0' }} />
-			<div style={{ paddingLeft: '16px', paddingRight: '16px' }}>
+			<Separator />
+			{isDealer || status == 'closed' || status == 'aborted' ? (
+				''
+			) : isSub ? (
+				<Button
+					style={{ margin: '8px', marginLeft: 'auto', marginRight: 'auto' }}
+					stretched
+					size="l"
+					mode="destructive"
+					onClick={unsub}
+					before={<Icon24Cancel />}
+				>
+					Отказаться
+				</Button>
+			) : (
+				<>
+					<Button
+						stretched
+						size="l"
+						style={{ margin: '8px', marginLeft: 'auto', marginRight: 'auto' }}
+						mode="primary"
+						onClick={sub}
+						before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
+					>
+						Откликнуться
+					</Button>
+				</>
+			)}
+			<div style={{ marginTop: '10px', paddingLeft: '16px', paddingRight: '16px' }}>
 				<div className="CellLeft__block">{ad.text}</div>
 			</div>
+
 			<table>
 				<tbody>
 					<tr>

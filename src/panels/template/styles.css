@@ -50,25 +50,31 @@ td {
 }
 
 .imgblock3 {
-    position: relative;
-    display: inline-block;
-    width: '10px';
+	position: relative;
+	display: inline-block;
+	width: '10px';
 }
 .imgblock3 img {
-    width: '10px';
-    object-fit: 'cover';
+	width: '10px';
+	object-fit: 'cover';
 }
-.imgblock3  span {
-    left: 10px;
-    position: absolute;
-    top: 10px;
-    width: 100%;
+.imgblock3 span {
+	left: 10px;
+	position: absolute;
+	top: 10px;
+	width: 100%;
 }
 .imgblock3 span b {
-    background: #222;
-    color: #fff;
-    font: 16px/34px arial;
-    padding: 6px 10px;
-    white-space: nowrap;
-    border-radius: 3px;
+	background: #222;
+	color: #fff;
+	font: 16px/34px arial;
+	padding: 6px 10px;
+	white-space: nowrap;
+	border-radius: 3px;
+}
+
+.status-text {
+	padding: 10px;
+	color: rgb(200, 200, 200);
+	text-align: center;
 }
