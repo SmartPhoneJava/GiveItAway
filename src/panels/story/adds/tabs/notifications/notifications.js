@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Header, Group } from '@vkontakte/vkui';
+import { Header, Group, Placeholder, Button } from '@vkontakte/vkui';
 
 import useNotificationsGet from './useNotificationsGet';
 
@@ -10,6 +10,8 @@ import Jins from './../../../../../img/jins.jpg';
 import Tea from './../../../../../img/tea.jpg';
 import Playstein from './../../../../../img/playstein.jpg';
 import Bb from './../../../../../img/bb.jpg';
+
+import Icon56ErrorOutline from '@vkontakte/icons/dist/56/error_outline';
 
 import './notification.css';
 import Notification, {
@@ -271,6 +273,17 @@ const Notifications = (props) => {
 			) : (
 				''
 			)}
+			{arrNotRead.length+arrRead.length== 0 ?  <Placeholder
+      icon={<Icon56ErrorOutline />}
+      header="Пусто"
+      action={
+        <Button onClick={() => props.goToAds()} size="l">
+         Вернуться в ленту обьявлений
+        </Button>
+      }
+    >
+      Вы еще не получили ни одного уведомления
+    </Placeholder> : ""}
 		</div>
 	);
 };

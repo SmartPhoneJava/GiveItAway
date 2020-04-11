@@ -88,7 +88,12 @@ const AddsTabs = (props) => {
 				</List>
 			</PanelHeaderContext>
 			{activeTab === tabNotification ? (
-				<Notifications setPopout={props.setPopout}/>
+				<Notifications
+					goToAds={() => {
+						setActiveTab(tabAdds);
+					}}
+					setPopout={props.setPopout}
+				/>
 			) : (
 				<AddsTab
 					openAd={props.openAd}
