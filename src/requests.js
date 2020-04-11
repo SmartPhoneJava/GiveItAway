@@ -515,7 +515,7 @@ export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
 		});
 };
 
-function fail(err, repeat, setSnackbar) {
+export function fail(err, repeat, setSnackbar) {
 	{
 		repeat
 			? setSnackbar(
@@ -552,7 +552,7 @@ function fail(err, repeat, setSnackbar) {
 	}
 }
 
-function sucess(text, cancelMe, setSnackbar) {
+export function sucess(text, cancelMe, setSnackbar) {
 	setSnackbar(
 		<Snackbar
 			duration="1500"
@@ -572,7 +572,7 @@ function sucess(text, cancelMe, setSnackbar) {
 	);
 }
 
-function sucessNoCancel(text, setSnackbar) {
+export function sucessNoCancel(text, setSnackbar) {
 	setSnackbar(
 		<Snackbar
 			duration="1500"

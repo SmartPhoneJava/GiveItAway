@@ -35,16 +35,18 @@ export default function useCommentsGet(setPopout, query, pageNumber, rowsPerPage
 
 		axios({
 			method: 'GET',
-			url: Addr.getState() + '/api/ad'+ad_id+'/comments',
+			url: Addr.getState() + '/api/ad/' + ad_id + '/comments',
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
 		})
 			.then((res) => {
-				console.log('sucess', res);
+				console.log('sucess comments', res);
 				const newNots = res.data;
+				
 				setNots((prev) => {
-					return [...new Set([...prev, ...newNots])];
+					const v = [...new Set([...prev, ...newNots])];
+					return v
 				});
 				setHasMore(newNots.length > 0);
 				setLoading(false);
@@ -52,14 +54,21 @@ export default function useCommentsGet(setPopout, query, pageNumber, rowsPerPage
 				setInited(true);
 			})
 			.catch((e) => {
-				console.log('fail', e);
+				console.log('fail comments', e);
 				if (axios.isCancel(e)) return;
-				
+
 				setPopout(null);
 				setInited(true);
 			});
 		return () => cancel();
 	}, [query, pageNumber]);
 
-	return { inited, newPage: pageNumber, nots, loading, error, hasMore };
+	return {
+		inited,
+		newPage: pageNumber,
+		nots: nots,
+		loading,
+		error,
+		hasMore,
+	};
 }

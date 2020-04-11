@@ -54,6 +54,8 @@ import Tea from './../../img/tea.jpg';
 import Playstein from './../../img/playstein.jpg';
 import Bb from './../../img/bb.jpg';
 
+import Comments from './../story/adds/tabs/comments/comments';
+
 import OpenActions from './components/actions';
 
 export const AdDefault = {
@@ -298,15 +300,6 @@ const AddMore2 = (props) => {
 					display: 'inline-block',
 				}}
 			>
-				<Button
-					size="m"
-					onClick={props.commentsOpen}
-					after={<Counter mode="secondary">0</Counter>}
-					mode="overlay_primary"
-					before={<Icon24CommentOutline />}
-				>
-					Комментарии
-				</Button>
 				<img
 					srcSet={image}
 					style={{
@@ -517,6 +510,12 @@ const AddMore2 = (props) => {
 					</Cell>
 				</Group>
 			)}
+			<Comments
+				ad={ad}
+				setPopout={props.setPopout}
+				setSnackbar={props.setSnackbar}
+				myID={props.VkUser.getState().id}
+			/>
 		</div>
 	);
 };

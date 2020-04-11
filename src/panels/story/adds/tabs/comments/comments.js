@@ -1,5 +1,16 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Header, Group, Input } from '@vkontakte/vkui';
+import {
+	Header,
+	Group,
+	Input,
+	Textarea,
+	ActionSheet,
+	ActionSheetItem,
+	PanelHeaderButton,
+	osname,
+	IOS,
+	Avatar,
+} from '@vkontakte/vkui';
 
 import useCommentsGet from './useCommentsGet';
 
@@ -11,13 +22,17 @@ import Tea from './../../../../../img/tea.jpg';
 import Playstein from './../../../../../img/playstein.jpg';
 import Bb from './../../../../../img/bb.jpg';
 
+import Icon24Send from '@vkontakte/icons/dist/24/send';
+
+import { postComment, deleteComment, editComment } from './requests';
+
 import './comment.css';
 import Comment from './comment';
 
 const arr = [
 	{
 		comment_id: 1,
-		creation_date: '01.02.2006 15:04',
+		creation_date_time: '01.02.2006 15:04',
 		author: {
 			vk_id: 23232,
 			carma: 0,
@@ -29,7 +44,7 @@ const arr = [
 	},
 	{
 		comment_id: 1,
-		creation_date: '01.02.2006 15:04',
+		creation_date_time: '01.02.2006 15:04',
 		author: {
 			vk_id: 23232,
 			carma: 0,
@@ -41,7 +56,7 @@ const arr = [
 	},
 	{
 		comment_id: 1,
-		creation_date: '01.02.2006 15:04',
+		creation_date_time: '01.02.2006 15:04',
 		author: {
 			vk_id: 23232,
 			carma: 0,
@@ -53,7 +68,7 @@ const arr = [
 	},
 	{
 		comment_id: 1,
-		creation_date: '01.02.2006 15:04',
+		creation_date_time: '01.02.2006 15:04',
 		author: {
 			vk_id: 23232,
 			carma: 0,
@@ -65,7 +80,7 @@ const arr = [
 	},
 	{
 		comment_id: 1,
-		creation_date: '01.02.2006 15:04',
+		creation_date_time: '01.02.2006 15:04',
 		author: {
 			vk_id: 23232,
 			carma: 0,
@@ -77,7 +92,7 @@ const arr = [
 	},
 	{
 		comment_id: 1,
-		creation_date: '01.02.2006 15:04',
+		creation_date_time: '01.02.2006 15:04',
 		author: {
 			vk_id: 23232,
 			carma: 0,
@@ -89,7 +104,7 @@ const arr = [
 	},
 	{
 		comment_id: 1,
-		creation_date: '01.02.2006 15:04',
+		creation_date_time: '01.02.2006 15:04',
 		author: {
 			vk_id: 23232,
 			carma: 0,
@@ -101,7 +116,7 @@ const arr = [
 	},
 	{
 		comment_id: 1,
-		creation_date: '01.02.2006 15:04',
+		creation_date_time: '01.02.2006 15:04',
 		author: {
 			vk_id: 23232,
 			carma: 0,
@@ -113,7 +128,7 @@ const arr = [
 	},
 	{
 		comment_id: 1,
-		creation_date: '01.02.2006 15:04',
+		creation_date_time: '01.02.2006 15:04',
 		author: {
 			vk_id: 23232,
 			carma: 0,
@@ -125,7 +140,7 @@ const arr = [
 	},
 	{
 		comment_id: 1,
-		creation_date: '01.02.2006 15:04',
+		creation_date_time: '01.02.2006 15:04',
 		author: {
 			vk_id: 23232,
 			carma: 0,
@@ -137,11 +152,86 @@ const arr = [
 	},
 ];
 
-const Comments = (props) => {
-	const [search, setSearch] = useState('');
-	const [pageNumber, setPageNumber] = useState(1);
-	let { inited, loading, nots, error, hasMore, newPage } = useCommentsGet(props.setPopout, search, pageNumber, 5);
+function showComments(setPopout, setSnackbar, nots, lastAdElementRef, myID, setText, setSearch, setEditableID) {
+	return (
+		<div style={{ marginBottom: '15%' }}>
+			<Group header={<Header mode="secondary">{'комментариев ' + nots.length}</Header>}>
+				{nots.map((v, index) => {
+					let inner = (
+						<Comment
+							onClick={() => {
+								console.log('compare', v.author.vk_id, myID);
+								if (v.author.vk_id != myID) {
+									return;
+								}
 
+								setPopout(
+									<ActionSheet onClose={() => setPopout(null)}>
+										<ActionSheetItem
+											autoclose
+											onClick={() => {
+												setText(v.text);
+												setEditableID(v.comment_id);
+												setSearch('' + v.comment_id + v.text);
+											}}
+										>
+											Редактировать
+										</ActionSheetItem>
+										<ActionSheetItem
+											autoclose
+											mode="destructive"
+											onClick={async () => {
+												await deleteComment(setPopout, setSnackbar, v);
+												setSearch('' + v.comment_id + 'deleted');
+											}}
+										>
+											Удалить
+										</ActionSheetItem>
+										{osname === IOS && (
+											<ActionSheetItem autoclose mode="cancel">
+												Отменить
+											</ActionSheetItem>
+										)}
+									</ActionSheet>
+								);
+							}}
+							v={v}
+						/>
+					);
+
+					if (nots.length === index + 1) {
+						return (
+							<div key={v.comment_id} ref={lastAdElementRef}>
+								{inner}
+							</div>
+						);
+					} else {
+						return <div key={v.comment_id}>{inner}</div>;
+					}
+				})}
+			</Group>
+		</div>
+	);
+}
+
+const NO_ID = -1;
+
+const Comments = (props) => {
+	const [text, setText] = useState('');
+	const [search, setSearch] = useState('');
+
+	const [editableID, setEditableID] = useState(NO_ID);
+
+	const [pageNumber, setPageNumber] = useState(1);
+	let { inited, loading, nots, error, hasMore, newPage } = useCommentsGet(
+		props.setPopout,
+		search,
+		pageNumber,
+		5,
+		props.ad.ad_id
+	);
+
+	const commentText = useRef();
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
 		(node) => {
@@ -159,26 +249,65 @@ const Comments = (props) => {
 
 	return (
 		<div>
-			<div style={{ background: '#F7F7F7', paddingBottom: '200px' }}>
-				<Group header={<Header mode="secondary">{'комментариев ' + arr.length}</Header>}>
-					{arr.map((v, index) => {
-						let inner = <Comment key={v.id} v={v} />;
+			{/* <div style={{ background: '#F7F7F7', paddingBottom: '200px' }}></div> */}
+			{showComments(
+				props.setPopout,
+				props.setSnackbar,
+				nots,
+				lastAdElementRef,
+				props.myID,
+				setText,
+				setSearch,
+				setEditableID
+			)}
 
-						if (arr.length === index + 1) {
-							return (
-								<div key={v.id} ref={lastAdElementRef}>
-									{inner}
-								</div>
-							);
-						} else {
-							return <div key={v.id}>{inner}</div>;
-						}
-					})}
-				</Group>
-			</div>
-			<div style={{ margin: '4px', position: 'fixed', marginBottom: '15%', bottom: '0', width: '100%' }}>
-				<Input top="Имя" placeholder="Комментарий" />
-			</div>
+			<Input
+				className="write"
+				placeholder="Комментарий"
+				value={text}
+				onChange={(e) => {
+					const { _, value } = e.currentTarget;
+					setText(value);
+				}}
+			/>
+
+			<PanelHeaderButton
+				style={{
+					background: '#F2F3F5',
+					position: 'fixed',
+					marginBottom: '13%',
+					marginRight: '5%',
+					bottom: '0',
+					right: '0',
+					zIndex: '100',
+				}}
+				onClick={async () => {
+					console.log('editableIDeditableID', editableID);
+					if (editableID != NO_ID) {
+						const comment = nots.filter((v) => v.comment_id == editableID)[0];
+						comment.text = text;
+						const obj = JSON.stringify({
+							comment_id: comment.comment_id,
+							author_id: props.myID,
+							text: text,
+						});
+						await editComment(props.setPopout, props.setSnackbar, comment.comment_id, obj);
+						setEditableID(NO_ID);
+					} else {
+						const obj = JSON.stringify({
+							author_id: props.myID,
+							text: text,
+						});
+						await postComment(props.setPopout, props.setSnackbar, props.ad.ad_id, obj);
+						setSearch(text);
+					}
+					setText('');
+				}}
+			>
+				<Avatar size="20">
+					<Icon24Send style={{ color: '#0071B8' }} size="24" background="red" />
+				</Avatar>
+			</PanelHeaderButton>
 		</div>
 	);
 };

@@ -57,12 +57,13 @@ function getAuthorHref(props) {
 const Comment = (props) => {
 	return (
 		<Cell
+			onClick={props.onClick}
 			className="block_in"
 			size="l"
 			multiline="true"
 			description={
 				<div style={{ display: 'flex', marginTop: '2px' }}>
-					<div style={{ marginRight: '4px' }}>вчера в 19:31 </div>
+					<div style={{ marginRight: '4px' }}>{props.v.creation_date_time} </div>
 				</div>
 			}
 			before={getImage(props)}
