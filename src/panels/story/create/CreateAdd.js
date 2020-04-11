@@ -124,6 +124,11 @@ const CreateAdd = (props) => {
 			setErrorHeader('Местоположение не указано');
 			setErrorText('Укажите свою страну и город с помощью выпадающих списков выше');
 		}
+		if (items[0].photos.length == 0)  {
+			v = false;
+			setErrorHeader('Не загружено ни одной фотографии');
+			setErrorText('Загрузите от 1 до 3 фотографий предмета!');
+		}
 		setValid(v);
 	}, [items, props.category, feedbackType, contacts, country, city]);
 

@@ -10,6 +10,7 @@ import {
 	InfoRow,
 	HorizontalScroll,
 	Cell,
+	Link,
 	Separator,
 } from '@vkontakte/vkui';
 
@@ -395,7 +396,6 @@ const AddMore2 = (props) => {
 						''
 					) : (
 						<>
-							<Group header={<Header mode="secondary">Связь с автором</Header>}>{feedbackText()}</Group>
 							{isDealer ? (
 								<>
 									<InfoRow style={{ padding: '10px', color: 'grey', textAlign: 'center' }}>
@@ -505,17 +505,41 @@ const AddMore2 = (props) => {
 				</Group>
 			) : (
 				<Group header={<Header mode="secondary">Автор</Header>}>
-					<Cell before={<Avatar size={36} src={ad.author.photo_url} />}>
-						{ad.author.name + ' ' + ad.author.surname}
+					<Cell
+						before={<Avatar size={36} src={ad.author.photo_url} />}
+						description={ad.extra_field ? ad.extra_field : ''}
+					>
+						<div style={{ display: 'flex' }}>
+							{ad.author.name + ' ' + ad.author.surname}{' '}
+							{ad.feedback_type == 'ls' ? (
+								<Link
+									style={{ marginLeft: '15px' }}
+									href={'https://vk.com/im?sel=' + ad.author.vk_id}
+									target="_blank"
+								>
+									Написать
+								</Link>
+							) : (
+								''
+							)}
+						</div>
 					</Cell>
 				</Group>
 			)}
-			<Comments
-				ad={ad}
-				setPopout={props.setPopout}
-				setSnackbar={props.setSnackbar}
-				myID={props.VkUser.getState().id}
-			/>
+
+			{ad.feedback_type == 'comments' ? (
+				<Comments
+					ad={ad}
+					setPopout={props.setPopout}
+					setSnackbar={props.setSnackbar}
+					myID={props.VkUser.getState().id}
+				/>
+			) : (
+				<Cell>
+					{' '}
+					<div style={{ color: 'grey' }}>Комментарии закрыты </div>
+				</Cell>
+			)}
 		</div>
 	);
 };
