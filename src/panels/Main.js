@@ -41,6 +41,8 @@ import Error from './placeholders/error';
 
 import { NoRegion } from './template/Location';
 
+import Profile from './story/profile/Profile';
+
 import AddsModal, { MODAL_FILTERS, MODAL_CATEGORIES, MODAL_SUBS } from './story/adds/AddsModal';
 import CreateModal from './story/create/CreateModal';
 
@@ -340,7 +342,14 @@ const Main = () => {
 					<View id={profile} activePanel={profile} popout={popout}>
 						<Panel id={profile}>
 							<PanelHeader>{profileText} </PanelHeader>
-							<Placeholder
+							<Profile
+								setPopout={setPopout}
+								setSnackbar={setSnackbar}
+								myID={myID}
+								appID={appID}
+								apiVersion={ApiVersion}
+							/>
+							{/* <Placeholder
 								icon={<Icon56UsersOutline />}
 								header="В разработке. Загляните позже &#128522;"
 								action={
@@ -351,7 +360,7 @@ const Main = () => {
 								stretched={true}
 							>
 								Мы упорно трудимся над вашим профилем!
-							</Placeholder>
+							</Placeholder> */}
 							{snackbar}
 						</Panel>
 					</View>

@@ -16,6 +16,8 @@ import Icon24Info from '@vkontakte/icons/dist/24/info';
 
 import Icon24Hide from '@vkontakte/icons/dist/24/hide';
 
+import Icon20ArticleBoxOutline from '@vkontakte/icons/dist/20/article_box_outline';
+
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';
 import Icon16CheckCircle from '@vkontakte/icons/dist/16/check_circle';
 import Icon16Clear from '@vkontakte/icons/dist/16/clear';
@@ -31,6 +33,62 @@ import { Draft } from './../../store/draft';
 
 import './addsTab.css';
 import './Add6.css';
+
+function shortText(str, newLength) {
+	if (str.length > newLength) {
+		const s = str.slice(0, newLength);
+		return s + '...';
+	}
+	return str;
+}
+
+export function AdLight(ad, image, openAd) {
+	return (
+		<div className="light-main-left" onClick={openAd}>
+			<img src={image} className="light-tiled" />
+			<div className="light-name">
+				<div
+					style={{
+						display: 'flex',
+						justifyContent: 'center',
+						alignItems: 'center',
+						padding: '2px',
+					}}
+				>
+					<Icon20ArticleBoxOutline /> {shortText(ad.header, 20)}
+				</div>
+			</div>
+
+			{ad.status == 'aborted' ? (
+				<div className="failed">
+					<div className="on-img-text">
+						<Icon16Clear style={{ marginRight: '5px' }} />
+						Отменено
+					</div>
+				</div>
+			) : (
+				''
+			)}
+			{ad.status == 'closed' ? (
+				<div className="success">
+					<div className="on-img-text">
+						<Icon16CheckCircle style={{ marginRight: '5px' }} />
+						Вещь отдана
+					</div>
+				</div>
+			) : (
+				''
+			)}
+			{ad.status == 'chosen' && isAuthor() ? (
+				<div className="deal">
+					<div style={{ color: 'rgb(220,220,220)', fontSize: '12px', padding: '2px' }}>Ожидание ответа</div>
+				</div>
+			) : (
+				''
+			)}
+		</div>
+	);
+}
 
 const Add6 = (props) => {
 	const [subs, setSubs] = useState([]);
@@ -137,14 +195,6 @@ const Add6 = (props) => {
 				return <Icon24Phone />;
 		}
 		return <Icon24Info />;
-	}
-
-	function shortText(str, newLength) {
-		if (str.length > newLength) {
-			const s = str.slice(0, newLength);
-			return s + '...';
-		}
-		return str;
 	}
 
 	function getFeedback(pm, comments) {
@@ -273,11 +323,19 @@ const Add6 = (props) => {
 	}
 	return (
 		<div className="outter">
-			<div className= {ad.status == 'aborted' ? "tile tile-failed" : 
-			ad.status == 'closed' ? "tile tile-success" : 
-			ad.status == 'chosen' ? "tile tile-chosen" : 
-			ad.status == 'offer' ? "tile" : 
-		'tile'}>
+			<div
+				className={
+					ad.status == 'aborted'
+						? 'tile tile-failed'
+						: ad.status == 'closed'
+						? 'tile tile-success'
+						: ad.status == 'chosen'
+						? 'tile tile-chosen'
+						: ad.status == 'offer'
+						? 'tile'
+						: 'tile'
+				}
+			>
 				<div onClick={props.openAd} className="main">
 					<div className="main-left">
 						<img src={image} className="tiled" />

@@ -63,7 +63,6 @@ img.tiled {
 	width: 120px;
 	height: 120px;
 }
-
 .settings {
 	position: absolute;
 	top: 0;
@@ -79,6 +78,34 @@ img.tiled {
 	left: 0px;
 	width: 120px;
 	background: rgba(0, 0, 0, 0.5);
+}
+
+.light-name {
+	position: absolute;
+	top: 60px;
+	left: 0px;
+	width: 100px;
+	color: rgb(240, 240, 240);
+	font-size: 12px;
+	background: rgba(0, 0, 0, 0.9);
+}
+
+img.light-tiled {
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	border-radius: 10px;
+	object-fit: cover;
+	width: 100px;
+	height: 100px;
+}
+
+.light-main-left {
+	position: relative;
+	display: inline-block;
+	margin-right: 100px;
+	margin-bottom: 100px;
 }
 
 .success {

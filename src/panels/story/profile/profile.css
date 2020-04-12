@@ -1,0 +1,26 @@
+.profile-block {
+    line-height: 1.4;
+    font-size: 14px;
+}
+
+.profile-main-left {
+	position: relative;
+	display: inline-block;
+	margin-right: 120px;
+	margin-bottom: 120px;
+}
+
+.profile-main {
+	display: flex;
+}
+
+img.profile-tiled {
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	border-radius: 10px;
+	object-fit: cover;
+	width: 120px;
+	height: 120px;
+}
