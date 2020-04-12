@@ -330,17 +330,37 @@ const AddMore2 = (props) => {
 	}
 
 	function unsub() {
-		const err = unsubscribe(props.setPopout, props.setSnackbar, ad.ad_id, sub);
-		if (!err) {
-			setIsSub(false);
-		}
+		setHide(true);
+		unsubscribe(
+			props.setPopout,
+			props.setSnackbar,
+			ad.ad_id,
+			sub,
+			(v) => {
+				setIsSub(false);
+			},
+			(e) => {},
+			() => {
+				setHide(false);
+			}
+		);
 	}
 
 	function sub() {
-		const err = subscribe(props.setPopout, props.setSnackbar, ad.ad_id, unsub);
-		if (!err) {
-			setIsSub(true);
-		}
+		setHide(true);
+		subscribe(
+			props.setPopout,
+			props.setSnackbar,
+			ad.ad_id,
+			unsub,
+			(v) => {
+				setIsSub(true);
+			},
+			(e) => {},
+			() => {
+				setHide(false);
+			}
+		);
 	}
 
 	function feedbackText() {
@@ -478,7 +498,7 @@ const AddMore2 = (props) => {
 				<Cell before={<Icon24Place />}>{props.ad.region + ', ' + props.ad.district}</Cell>
 			</div>
 			<Separator />
-			{isDealer || status == 'closed' || status == 'aborted' ? (
+			{isDealer || status == 'closed' || status == 'aborted' || isAuthor() ? (
 				''
 			) : isSub ? (
 				<Button

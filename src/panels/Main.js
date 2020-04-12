@@ -35,7 +35,7 @@ import Comments from './story/adds/tabs/comments/comments';
 
 import { CategoryNo } from './template/Categories';
 
-import { Auth } from './../requests';
+import { Auth, getToken } from './../requests';
 
 import Error from './placeholders/error';
 
@@ -68,15 +68,15 @@ const Main = () => {
 	const [category2, setCategory2] = useState(CategoryNo);
 
 	const onStoryChange = (e) => {
-		console.log("my id is ", myID, e.currentTarget.dataset.story, profileID)
+		console.log('my id is ', myID, e.currentTarget.dataset.story, profileID);
 		setActiveStory(e.currentTarget.dataset.story);
 		if (e.currentTarget.dataset.story == ads) {
 			setActivePanel('header-search');
 		} else if (e.currentTarget.dataset.story == profile) {
-			console.log("i set it ", myID)
+			console.log('i set it ', myID);
 			setProfileID(myID);
 		}
-		scroll()
+		scroll();
 	};
 
 	const [activePanel, setActivePanel] = useState('header-search');
@@ -90,6 +90,8 @@ const Main = () => {
 	const [appID, setAppID] = useState(0);
 
 	const [deleteID, SetDeleteID] = useState(-1);
+
+	const [wsToken, setWsToken] = useState();
 
 	const [city, setCity] = useState(NoRegion);
 	const [country, setCountry] = useState(NoRegion);
@@ -111,10 +113,20 @@ const Main = () => {
 	}
 
 	async function scroll() {
-		const us = await bridge.send('VKWebAppScroll', {"top": 10000, "speed": 600});
-		console.log("usssss", us)
+		const us = await bridge.send('VKWebAppScroll', { top: 10000, speed: 600 });
 		window.scrollTo(0, 0);
 	}
+
+	useEffect(() => {
+		getToken(
+			setSnackbar,
+			(v) => {
+				setWsToken(v);
+				console.log('setWsToken', v.token);
+			},
+			(e) => {}
+		);
+	}, []);
 
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data } }) => {
@@ -149,10 +161,15 @@ const Main = () => {
 			const us = await bridge.send('VKWebAppGetUserInfo');
 			VkUser.dispatch({ type: 'set', new_state: us });
 			setMyID(us.id);
-			const result = await Auth(us, setSnackbar, setPopout);
-			if (result) {
-				setInited(true);
-			}
+			Auth(
+				us,
+				setSnackbar,
+				setPopout,
+				(v) => {
+					setInited(true);
+				},
+				(e) => {}
+			);
 		}
 
 		getInputData();
@@ -227,7 +244,7 @@ const Main = () => {
 								onFiltersClick={() => setActiveModal(MODAL_FILTERS)}
 								onCloseClick={(act) => {
 									setActiveModal(MODAL_SUBS);
-									scroll()
+									scroll();
 								}}
 								goSearch={goSearch}
 								setPopout={setPopout}
@@ -253,7 +270,7 @@ const Main = () => {
 									setChoosen(ad);
 									console.log('looook:', ad);
 									setActivePanel('one-panel');
-									scroll()
+									scroll();
 								}}
 							/>
 							{snackbar}
@@ -264,7 +281,7 @@ const Main = () => {
 									<PanelHeaderBack
 										onClick={() => {
 											setActivePanel('header-search');
-											scroll()
+											scroll();
 										}}
 									/>
 								}
@@ -276,19 +293,19 @@ const Main = () => {
 									refresh={(id) => {
 										setActivePanel('header-search');
 										SetDeleteID(id);
-										scroll()
+										scroll();
 									}}
 									back={(id) => {
 										setActivePanel('header-search');
 									}}
 									commentsOpen={() => {
 										setActivePanel('comments');
-										scroll()
+										scroll();
 									}}
 									openUser={(id) => {
 										setProfileID(id);
 										setActiveStory(profile);
-										scroll()
+										scroll();
 									}}
 									ad={choosen}
 									setPopout={setPopout}
@@ -308,7 +325,7 @@ const Main = () => {
 									<PanelHeaderBack
 										onClick={() => {
 											setActivePanel('one-panel');
-											scroll()
+											scroll();
 										}}
 									/>
 								}
@@ -319,7 +336,7 @@ const Main = () => {
 								<Comments
 									back={(id) => {
 										setActivePanel('one-panel');
-										scroll()
+										scroll();
 									}}
 									ad={choosen}
 									setPopout={setPopout}
@@ -378,19 +395,19 @@ const Main = () => {
 								appID={appID}
 								apiVersion={ApiVersion}
 								goToAdds={() => {
-									setActiveStory(ads)
-									scroll()}
-								}
+									setActiveStory(ads);
+									scroll();
+								}}
 								goToCreate={() => {
-									setActiveStory(add)
-									scroll()
+									setActiveStory(add);
+									scroll();
 								}}
 								openAd={(ad) => {
 									setChoosen(ad);
 									console.log('looook:', ad);
 									setActiveStory(ads);
 									setActivePanel('one-panel');
-									scroll()
+									scroll();
 								}}
 							/>
 							{/* <Placeholder

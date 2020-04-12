@@ -9,7 +9,7 @@
     "build": "webpack --mode production",
     "watch": "webpack --watch",
     "deploy": "vk-miniapps-deploy",
-    "debug":  "cross-env PORT=10888 HTTPS=true react-scripts start"
+    "debug": "cross-env PORT=10888 HTTPS=true react-scripts start"
   },
   "keywords": [],
   "author": "",
@@ -36,6 +36,7 @@
     "@vkontakte/vkui": "^3.4.2",
     "axios": "^0.19.2",
     "babel-eslint": "^10.0.3",
+    "centrifuge": "^2.5.0",
     "chalk": "^2.4.2",
     "core-js": "^3.6.4",
     "css-loader": "^3.4.2",

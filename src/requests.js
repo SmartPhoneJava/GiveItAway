@@ -14,6 +14,31 @@ import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
 
 let request_id = 0;
 
+export async function getToken(setSnackbar, successCallback, failCallBack) {
+	let err = false;
+	let cancel;
+	const deal = await axios({
+		method: 'get',
+		withCredentials: true,
+		url: Addr.getState() + '/api/ws_token',
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(function (response) {
+			console.log('response from getToken:', response);
+
+			return response.data;
+		})
+		.then(function (response) {
+			successCallback(response);
+			return response;
+		})
+		.catch(function (error) {
+			failCallBack(error);
+			err = true;
+		});
+	return { deal, err };
+}
+
 export async function adHide(setPopout, setSnackbar, ad_id, callback) {
 	setPopout(<ScreenSpinner size="large" />);
 	let err = false;
@@ -204,7 +229,7 @@ export function Close(setPopout, setSnackbar, ad_id, subscriber_id) {
 	return err;
 }
 
-export function subscribe(setPopout, setSnackbar, ad_id, clCancel) {
+export function subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallback, failCallback, end) {
 	setPopout(<ScreenSpinner size="large" />);
 	let err = false;
 	let cancel;
@@ -215,26 +240,31 @@ export function subscribe(setPopout, setSnackbar, ad_id, clCancel) {
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
-			setPopout(null);
-			console.log('response from subscribe:', response);
-			sucess('Теперь вы будете получать уведомления, связанные с этим постом', clCancel, setSnackbar);
 			return response.data;
+		})
+		.then(function (response) {
+			setPopout(null);
+			successCallback(response);
+			sucess('Теперь вы будете получать уведомления, связанные с этим постом', clCancel, setSnackbar, end);
+			return response;
 		})
 		.catch(function (error) {
 			err = true;
+			failCallback(error);
 			fail(
 				'Нет соединения с сервером',
 				() => {
 					subscribe(setPopout, setSnackbar, ad_id, clCancel);
 				},
-				setSnackbar
+				setSnackbar,
+				end
 			);
 			setPopout(null);
 		});
 	return err;
 }
 
-export function unsubscribe(setPopout, setSnackbar, ad_id, clCancel) {
+export function unsubscribe(setPopout, setSnackbar, ad_id, clCancel, successCallback, failCallback, end) {
 	setPopout(<ScreenSpinner size="large" />);
 	let err = false;
 	let cancel;
@@ -245,19 +275,24 @@ export function unsubscribe(setPopout, setSnackbar, ad_id, clCancel) {
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
-			setPopout(null);
-			console.log('response from unsubscribe:', response);
-			sucess('Больше вы не будете получать связанные с этим постом уведомления', clCancel, setSnackbar);
 			return response.data;
+		})
+		.then(function (response) {
+			setPopout(null);
+			successCallback(response);
+			sucess('Больше вы не будете получать связанные с этим постом уведомления', clCancel, setSnackbar, end);
+			return response;
 		})
 		.catch(function (error) {
 			err = true;
+			failCallback(error);
 			fail(
 				'Нет соединения с сервером',
 				() => {
 					unsubscribe(setPopout, setSnackbar, ad_id, clCancel);
 				},
-				setSnackbar
+				setSnackbar,
+				end
 			);
 			setPopout(null);
 		});
@@ -352,7 +387,7 @@ export async function canWritePrivateMessage(id, appID, apiVersion) {
 	return userdata;
 }
 
-export async function Auth(user, setSnackbar, setPopout) {
+export async function Auth(user, setSnackbar, setPopout, successCallback, failCallback) {
 	setPopout(<ScreenSpinner size="large" />);
 	console.log('secret:', window.location.href);
 	console.log('user:', user);
@@ -371,18 +406,17 @@ export async function Auth(user, setSnackbar, setPopout) {
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
-			console.log('we get response', response);
 			return response.data;
 		})
 		.then(function (data) {
-			console.log('we get response2', data);
+			successCallback(data);
 			setPopout(null);
 			User.dispatch({ type: 'set', new_state: data });
 			return data;
 		})
 		.catch(function (error) {
 			setPopout(null);
-			console.log('Request failed', error);
+			failCallback(error);
 			fail('Не удалось авторизоваться', null, setSnackbar);
 		});
 	return getUser;
@@ -515,13 +549,18 @@ export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
 		});
 };
 
-export function fail(err, repeat, setSnackbar) {
+export function fail(err, repeat, setSnackbar, end) {
 	{
 		repeat
 			? setSnackbar(
 					<Snackbar
 						duration="1500"
-						onClose={() => setSnackbar(null)}
+						onClose={() => {
+							setSnackbar(null);
+							if (end) {
+								end();
+							}
+						}}
 						action="Повторить"
 						onActionClick={() => {
 							setSnackbar(null);
@@ -552,12 +591,15 @@ export function fail(err, repeat, setSnackbar) {
 	}
 }
 
-export function sucess(text, cancelMe, setSnackbar) {
+export function sucess(text, cancelMe, setSnackbar, end) {
 	setSnackbar(
 		<Snackbar
 			duration="1500"
 			onClose={() => {
 				setSnackbar(null);
+				if (end) {
+					end();
+				}
 			}}
 			action="Отменить"
 			onActionClick={cancelMe}
