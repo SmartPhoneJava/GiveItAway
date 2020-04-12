@@ -61,12 +61,22 @@ const Main = () => {
 	const [popout, setPopout] = useState(null); //<ScreenSpinner size="large" />
 	const [inited, setInited] = useState(false);
 
+	const [profileID, setProfileID] = useState(0);
+
 	const [activeStory, setActiveStory] = useState(ads);
 	const [category, setCategory] = useState(CategoryNo);
 	const [category2, setCategory2] = useState(CategoryNo);
 
 	const onStoryChange = (e) => {
+		console.log("my id is ", myID, e.currentTarget.dataset.story, profileID)
 		setActiveStory(e.currentTarget.dataset.story);
+		if (e.currentTarget.dataset.story == ads) {
+			setActivePanel('header-search');
+		} else if (e.currentTarget.dataset.story == profile) {
+			console.log("i set it ", myID)
+			setProfileID(myID);
+		}
+		scroll()
 	};
 
 	const [activePanel, setActivePanel] = useState('header-search');
@@ -98,6 +108,12 @@ const Main = () => {
 		if (snack != undefined) {
 			setSnackbar(snack);
 		}
+	}
+
+	async function scroll() {
+		const us = await bridge.send('VKWebAppScroll', {"top": 10000, "speed": 600});
+		console.log("usssss", us)
+		window.scrollTo(0, 0);
 	}
 
 	useEffect(() => {
@@ -211,6 +227,7 @@ const Main = () => {
 								onFiltersClick={() => setActiveModal(MODAL_FILTERS)}
 								onCloseClick={(act) => {
 									setActiveModal(MODAL_SUBS);
+									scroll()
 								}}
 								goSearch={goSearch}
 								setPopout={setPopout}
@@ -236,6 +253,7 @@ const Main = () => {
 									setChoosen(ad);
 									console.log('looook:', ad);
 									setActivePanel('one-panel');
+									scroll()
 								}}
 							/>
 							{snackbar}
@@ -246,6 +264,7 @@ const Main = () => {
 									<PanelHeaderBack
 										onClick={() => {
 											setActivePanel('header-search');
+											scroll()
 										}}
 									/>
 								}
@@ -257,12 +276,19 @@ const Main = () => {
 									refresh={(id) => {
 										setActivePanel('header-search');
 										SetDeleteID(id);
+										scroll()
 									}}
 									back={(id) => {
 										setActivePanel('header-search');
 									}}
 									commentsOpen={() => {
 										setActivePanel('comments');
+										scroll()
+									}}
+									openUser={(id) => {
+										setProfileID(id);
+										setActiveStory(profile);
+										scroll()
 									}}
 									ad={choosen}
 									setPopout={setPopout}
@@ -282,6 +308,7 @@ const Main = () => {
 									<PanelHeaderBack
 										onClick={() => {
 											setActivePanel('one-panel');
+											scroll()
 										}}
 									/>
 								}
@@ -292,6 +319,7 @@ const Main = () => {
 								<Comments
 									back={(id) => {
 										setActivePanel('one-panel');
+										scroll()
 									}}
 									ad={choosen}
 									setPopout={setPopout}
@@ -346,8 +374,24 @@ const Main = () => {
 								setPopout={setPopout}
 								setSnackbar={setSnackbar}
 								myID={myID}
+								profileID={profileID}
 								appID={appID}
 								apiVersion={ApiVersion}
+								goToAdds={() => {
+									setActiveStory(ads)
+									scroll()}
+								}
+								goToCreate={() => {
+									setActiveStory(add)
+									scroll()
+								}}
+								openAd={(ad) => {
+									setChoosen(ad);
+									console.log('looook:', ad);
+									setActiveStory(ads);
+									setActivePanel('one-panel');
+									scroll()
+								}}
 							/>
 							{/* <Placeholder
 								icon={<Icon56UsersOutline />}

@@ -65,7 +65,7 @@ const Profile = (props) => {
 		'',
 		'',
 		pageNumber,
-		5,
+		10,
 		'',
 		'',
 		'',
@@ -91,7 +91,7 @@ const Profile = (props) => {
 		getUser(
 			props.setPopout,
 			props.setSnackbar,
-			props.myID,
+			props.profileID,
 			(v) => {
 				setBackUser(v);
 			},
@@ -99,7 +99,7 @@ const Profile = (props) => {
 		);
 
 		getUserVK(
-			props.myID,
+			props.profileID,
 			props.appID,
 			props.apiVersion,
 			(o, s) => {
@@ -108,11 +108,14 @@ const Profile = (props) => {
 			},
 			(e) => {}
 		);
-	}, []);
+		setPageNumber(1)
+	}, [props.profileID]);
 
 	function Ad(ad) {
 		const image = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : '';
-		return AdLight(ad, image, () => {});
+		return AdLight(ad, image, () => {
+			props.openAd(ad)
+		});
 		// <div onClick={()=>{}} className="profile-main">
 		// 	<div className="profile-main-left">
 		// 		<img src={image} className="profile-tiled" />
@@ -176,13 +179,22 @@ const Profile = (props) => {
 					<Placeholder
 						icon={<Icon56DoNotDisturbOutline />}
 						header="Пусто"
-						action={<Button size="l">Получить даром</Button>}
+						action={
+							<Button
+								size="l"
+								onClick={() => {
+									props.goToCreate();
+								}}
+							>
+								Отдать даром
+							</Button>
+						}
 					>
-						Получайте вещи, нажимая "Хочу забрать", в ленте объявлений!
+						Поделитесь с другими людьми!
 					</Placeholder>
 				) : (
 					<Placeholder icon={<Icon56DoNotDisturbOutline />} header="Пусто">
-						Пользователь еще ничего не получал
+						Пользователь еще ничего не отдавал
 					</Placeholder>
 				)}
 			</Group>
@@ -193,7 +205,16 @@ const Profile = (props) => {
 					<Placeholder
 						icon={<Icon56DoNotDisturbOutline />}
 						header="Пусто"
-						action={<Button size="l">Получить даром</Button>}
+						action={
+							<Button
+								size="l"
+								onClick={() => {
+									props.goToAdds();
+								}}
+							>
+								Получить даром
+							</Button>
+						}
 					>
 						Получайте вещи, нажимая "Хочу забрать", в ленте объявлений!
 					</Placeholder>

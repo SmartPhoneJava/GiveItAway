@@ -91,7 +91,7 @@ export default function useAdSearch(
 			cancelToken: new axios.CancelToken(c => (cancel = c)),
 		})
 			.then(res => {
-				console.log('sucess', res);
+				console.log('useAdsearch', res);
 				const newAds = res.data;
 				setAds(prev => {
 					return [...new Set([...prev, ...newAds])];

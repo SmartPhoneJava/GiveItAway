@@ -492,16 +492,16 @@ const AddMore2 = (props) => {
 					Отказаться
 				</Button>
 			) : (
-					<Button
-						stretched
-						size="xl"
-						style={{ margin: '8px', marginLeft: 'auto', marginRight: 'auto' }}
-						mode="primary"
-						onClick={sub}
-						before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
-					>
-						Хочу забрать!
-					</Button>
+				<Button
+					stretched
+					size="xl"
+					style={{ margin: '8px', marginLeft: 'auto', marginRight: 'auto' }}
+					mode="primary"
+					onClick={sub}
+					before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
+				>
+					Хочу забрать!
+				</Button>
 			)}
 			<div style={{ marginTop: '10px', paddingLeft: '16px', paddingRight: '16px' }}>
 				<div className="CellLeft__block">{ad.text}</div>
@@ -551,6 +551,7 @@ const AddMore2 = (props) => {
 			) : (
 				<Group header={<Header mode="secondary">Автор</Header>}>
 					<Cell
+						onClick={() => props.openUser(ad.author.vk_id)}
 						before={<Avatar size={36} src={ad.author.photo_url} />}
 						description={ad.extra_field ? ad.extra_field : ''}
 					>
