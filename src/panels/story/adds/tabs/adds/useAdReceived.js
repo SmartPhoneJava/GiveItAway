@@ -31,7 +31,7 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 
 		axios({
 			method: 'GET',
-			url: Addr.getState() + '/user/' + user_id + '/received',
+			url: Addr.getState() + '/api/user/' + user_id + '/received',
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),

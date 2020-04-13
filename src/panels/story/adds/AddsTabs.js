@@ -34,7 +34,7 @@ const tabNotificationText = 'Уведомления';
 const AddsTabs = (props) => {
 	const [contextOpened, setContextOpened] = useState(false);
 	const [mode, setmode] = useState('all');
-	const [activeTab, setActiveTab] = useState(tabAdds);
+	const [activeTab, setActiveTab] = useState(props.savedAdState == '' ? tabAdds : props.savedAdState);
 
 	function select(e) {
 		setmode(e.currentTarget.dataset.mode);
@@ -108,8 +108,14 @@ const AddsTabs = (props) => {
 			{activeTab === tabNotification ? (
 				<Notifications
 					zeroNots={props.zeroNots}
-					openUser={props.openUser}
-					openAd={props.openAd}
+					openUser={(u) => {
+						props.openUser(u);
+						setActiveTab(tabNotification);
+					}}
+					openAd={(v) => {
+						props.openAd(v);
+						props.setSavedAdState(tabNotification);
+					}}
 					goToAds={() => {
 						setActiveTab(tabAdds);
 					}}
@@ -117,7 +123,10 @@ const AddsTabs = (props) => {
 				/>
 			) : (
 				<AddsTab
-					openAd={props.openAd}
+					openAd={(v) => {
+						props.openAd(v);
+						props.setSavedAdState(tabAdds);
+					}}
 					dropFilters={() => {
 						props.dropFilters();
 						setmode('all');
@@ -128,6 +137,10 @@ const AddsTabs = (props) => {
 					myID={props.myID}
 					city={props.city}
 					openUser={props.openUser}
+					openUser={(u) => {
+						props.openUser(u);
+						setActiveTab(tabAdds);
+					}}
 					// region={props.region}
 					country={props.country}
 					sort={props.sort}

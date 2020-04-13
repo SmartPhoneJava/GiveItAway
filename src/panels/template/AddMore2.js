@@ -90,7 +90,7 @@ export const AdDefault = {
 };
 
 const AddMore2 = (props) => {
-	const [ad, setAd] = useState(props.ad || AdDefault);
+	const [ad, setAd] = useState(AdDefault);
 
 	const [photoIndex, setPhotoIndex] = useState(0);
 
@@ -522,13 +522,13 @@ const AddMore2 = (props) => {
 									props.setPopout,
 									props.setSnackbar,
 									props.refresh,
-									props.ad.ad_id,
+									ad.ad_id,
 									() => {
 										props.onCloseClick();
 										setRequest('CLOSE');
 									},
 									status == 'chosen',
-									props.ad.hidden,
+									ad.hidden,
 									subs.length,
 									() => {
 										setHide(false);
@@ -554,7 +554,7 @@ const AddMore2 = (props) => {
 					margin: '0px',
 				}}
 			>
-				<Cell before={<Icon24Place />}>{props.ad.region + ', ' + props.ad.district}</Cell>
+				<Cell before={<Icon24Place />}>{ad.region + ', ' + ad.district}</Cell>
 			</div>
 			<Separator />
 			{isDealer || status == 'closed' || status == 'aborted' || isAuthor() ? (

@@ -168,6 +168,7 @@ export const NotificationRespond = (props) => {
 export const NotificationFulFill = (props) => {
 	return (
 		<Cell
+			onClick={()=>props.openAd(props.notification.payload.ad)}
 			className="block_in"
 			size="l"
 			multiline="true"
@@ -180,7 +181,7 @@ export const NotificationFulFill = (props) => {
 		>
 			<div className="block">
 				<div>
-					{getAuthorHref(props)} откликнулся в {getHeader(props)}
+					Объявление {getHeader(props)} успешно завершено
 				</div>
 			</div>
 		</Cell>

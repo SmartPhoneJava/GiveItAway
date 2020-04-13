@@ -257,6 +257,7 @@ const Notifications = (props) => {
 	const arrNotRead = nots.filter((v) => !v.is_read);
 	const arrRead = nots.filter((v) => v.is_read);
 
+	console.log("arrRead:", arrRead)
 	props.zeroNots()
 	return (
 		<div style={{ background: '#F7F7F7' }}>
@@ -269,7 +270,7 @@ const Notifications = (props) => {
 			)}
 			{arrRead.length > 0 ? (
 				<Group header={<Header mode="secondary">Прочитанные</Header>}>
-					{getNotifications(arrRead, lastAdElementRef), props.openUser, props.openAd}
+					{getNotifications(arrRead, lastAdElementRef, props.openUser, props.openAd)}
 				</Group>
 			) : (
 				''

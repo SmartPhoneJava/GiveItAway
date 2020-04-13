@@ -32,7 +32,7 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 		
 		axios({
 			method: 'GET',
-			url: Addr.getState() + '/user/'+user_id+'/given',
+			url: Addr.getState() + '/api/user/'+user_id+'/given',
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),

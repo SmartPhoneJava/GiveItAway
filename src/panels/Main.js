@@ -82,6 +82,7 @@ const Main = () => {
 		setActiveStory(e.currentTarget.dataset.story);
 		if (e.currentTarget.dataset.story == ads) {
 			setActivePanel('header-search');
+			setSavedAdState('')
 		} else if (e.currentTarget.dataset.story == profile) {
 			console.log('i set it ', myID);
 			setPrevActiveStory(no_prev);
@@ -112,6 +113,8 @@ const Main = () => {
 
 	const [sort, setSort] = useState('time');
 
+	const [savedAdState, setSavedAdState] = useState('');
+
 	const [myID, setMyID] = useState(0);
 
 	function goSearch() {
@@ -141,7 +144,7 @@ const Main = () => {
 			(v) => {
 				setWsToken(v);
 				console.log('setWsToken', v.token);
-				
+
 				console.log('wsToken success', wsToken);
 				console.log('before setToken', 'user#' + myID);
 				centrifuge.setToken(v.token);
@@ -241,7 +244,7 @@ const Main = () => {
 								data-story={ads}
 								text={adsText}
 								label={notsCounterr == 0 ? null : notsCounterr}
-								after={ <Counter>100</Counter>}
+								after={<Counter>100</Counter>}
 								// after={notsCounter == 0 ? '' : <Counter>notsCounter</Counter>}
 							>
 								<Icon28NewsfeedOutline />
@@ -296,13 +299,17 @@ const Main = () => {
 					>
 						<Panel id="header-search" separator={false}>
 							<AddsTabs
+								setSavedAdState={setSavedAdState}
+								savedAdState={savedAdState}
 								onFiltersClick={() => setActiveModal(MODAL_FILTERS)}
 								onCloseClick={(act) => {
 									setActiveModal(MODAL_SUBS);
 									scroll();
 								}}
 								notsCounter={notsCounterr}
-								zeroNots={()=>{notsCounterr=0}}
+								zeroNots={() => {
+									notsCounterr = 0;
+								}}
 								goSearch={goSearch}
 								setPopout={setPopout}
 								setSnackbar={setSnackbar}
@@ -346,7 +353,6 @@ const Main = () => {
 									<PanelHeaderBack
 										onClick={() => {
 											setActivePanel('header-search');
-											scroll();
 										}}
 									/>
 								}
