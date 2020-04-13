@@ -267,6 +267,9 @@ const Add6 = (props) => {
 	function authorPanel() {
 		return (
 			<div
+				onClick={() => {
+					props.openUser(ad.author.vk_id);
+				}}
 				style={{
 					display: 'flex',
 					paddingBottom: '10px',

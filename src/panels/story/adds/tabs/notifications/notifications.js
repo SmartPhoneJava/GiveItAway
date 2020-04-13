@@ -196,25 +196,25 @@ const arr = [
 
 function getNotifications(arr, lastAdElementRef) {
 	return arr.map((v, index) => {
-		let inner = <Notification key={v.id} notification={v} />;
+		let inner = <Notification openUser={props.openUser} openAd={props.openAd} key={v.id} notification={v} />;
 		switch (v.notification_type) {
 			case NT_STATISTICS:
-				inner = <NotificationStatistics notification={v} />;
+				inner = <NotificationStatistics openUser={props.openUser} openAd={props.openAd} notification={v} />;
 				break;
 			case NT_STATUS:
-				inner = <NotificationStatus notification={v} />;
+				inner = <NotificationStatus openUser={props.openUser} openAd={props.openAd} notification={v} />;
 				break;
 			case NT_CLOSE:
-				inner = <NotificationClose notification={v} />;
+				inner = <NotificationClose openUser={props.openUser} openAd={props.openAd} notification={v} />;
 				break;
 			case NT_DELETED:
-				inner = <NotificationDeleted notification={v} />;
+				inner = <NotificationDeleted openUser={props.openUser} openAd={props.openAd} notification={v} />;
 				break;
 			case NT_RESPOND:
-				inner = <NotificationRespond notification={v} />;
+				inner = <NotificationRespond openUser={props.openUser} openAd={props.openAd} notification={v} />;
 				break;
 			case NT_FULFILL:
-				inner = <NotificationFulFill notification={v} />;
+				inner = <NotificationFulFill openUser={props.openUser} openAd={props.openAd}notification={v} />;
 				break;
 		}
 		if (arr.length === index + 1) {
@@ -273,17 +273,21 @@ const Notifications = (props) => {
 			) : (
 				''
 			)}
-			{arrNotRead.length+arrRead.length== 0 ?  <Placeholder
-      icon={<Icon56ErrorOutline />}
-      header="Пусто"
-      action={
-        <Button onClick={() => props.goToAds()} size="l">
-         Вернуться в ленту обьявлений
-        </Button>
-      }
-    >
-      Вы еще не получили ни одного уведомления
-    </Placeholder> : ""}
+			{arrNotRead.length + arrRead.length == 0 ? (
+				<Placeholder
+					icon={<Icon56ErrorOutline />}
+					header="Пусто"
+					action={
+						<Button onClick={() => props.goToAds()} size="l">
+							Вернуться в ленту обьявлений
+						</Button>
+					}
+				>
+					Вы еще не получили ни одного уведомления
+				</Placeholder>
+			) : (
+				''
+			)}
 		</div>
 	);
 };

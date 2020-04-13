@@ -557,7 +557,11 @@ const AddMore2 = (props) => {
 					<Group header={<Header mode="secondary">Откликнулись</Header>}>
 						{subs.length > 0 ? (
 							subs.map((v) => (
-								<Cell key={v.vk_id} before={<Avatar size={36} src={v.photo_url} />}>
+								<Cell
+									onClick={() => props.openUser(v.vk_id)}
+									key={v.vk_id}
+									before={<Avatar size={36} src={v.photo_url} />}
+								>
 									{v.name + ' ' + v.surname}
 								</Cell>
 							))
@@ -600,6 +604,7 @@ const AddMore2 = (props) => {
 					setPopout={props.setPopout}
 					setSnackbar={props.setSnackbar}
 					myID={props.VkUser.getState().id}
+					openUser={props.openUser}
 				/>
 			) : (
 				<Cell>

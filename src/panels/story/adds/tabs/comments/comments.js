@@ -162,7 +162,8 @@ function showComments(
 	setText,
 	setSearch,
 	setEditableID,
-	setHide
+	setHide,
+	openUser
 ) {
 	return (
 		<div style={{ marginBottom: '15%' }}>
@@ -173,6 +174,7 @@ function showComments(
 							onClick={() => {
 								console.log('compare', v.author.vk_id, myID);
 								if (v.author.vk_id != myID) {
+									openUser(v.author.vk_id)
 									return;
 								}
 
@@ -287,7 +289,8 @@ const Comments = (props) => {
 				setText,
 				setSearch,
 				setEditableID,
-				setHide
+				setHide,
+				props.openUser
 			)}
 
 			{hide || props.hide ? (

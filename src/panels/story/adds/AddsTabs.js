@@ -89,6 +89,8 @@ const AddsTabs = (props) => {
 			</PanelHeaderContext>
 			{activeTab === tabNotification ? (
 				<Notifications
+					openUser={props.openUser}
+					openAd={props.openAd}
 					goToAds={() => {
 						setActiveTab(tabAdds);
 					}}
@@ -106,6 +108,7 @@ const AddsTabs = (props) => {
 					deleteID={props.deleteID}
 					myID={props.myID}
 					city={props.city}
+					openUser={props.openUser}
 					// region={props.region}
 					country={props.country}
 					sort={props.sort}

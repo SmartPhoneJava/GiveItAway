@@ -237,6 +237,7 @@ const AddsTab = (props) => {
 	function Ad(ad) {
 		return (
 			<Add6
+				openUser={props.openUser}
 				openAd={() => props.openAd(ad)}
 				ad={ad}
 				setPopout={props.setPopout}

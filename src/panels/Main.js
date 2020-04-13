@@ -10,7 +10,7 @@ import {
 	TabbarItem,
 	PanelHeaderButton,
 	PanelHeaderSimple,
-	Placeholder,
+	PanelHeaderContent,
 	Button,
 } from '@vkontakte/vkui';
 
@@ -61,6 +61,8 @@ const profileText = 'Профиль';
 
 const ApiVersion = '5.5';
 
+const no_prev = 'no prev';
+
 const addr = AddrWS.getState() + '/connection/websocket';
 let centrifuge = new Centrifuge(addr);
 
@@ -70,6 +72,7 @@ const Main = () => {
 
 	const [profileID, setProfileID] = useState(0);
 
+	const [prevActiveStory, setPrevActiveStory] = useState(no_prev);
 	const [activeStory, setActiveStory] = useState(ads);
 	const [category, setCategory] = useState(CategoryNo);
 	const [category2, setCategory2] = useState(CategoryNo);
@@ -81,6 +84,7 @@ const Main = () => {
 			setActivePanel('header-search');
 		} else if (e.currentTarget.dataset.story == profile) {
 			console.log('i set it ', myID);
+			setPrevActiveStory(no_prev);
 			setProfileID(myID);
 		}
 		scroll();
@@ -278,6 +282,14 @@ const Main = () => {
 								city={city}
 								country={country}
 								myID={myID}
+								openUser={(id) => {
+									setProfileID(id);
+									setActiveStory(profile);
+									setPrevActiveStory('ads');
+									setActivePanel('header-search')
+									setChoosen(AdDefault)
+									scroll();
+								}}
 								// region={region}
 								sort={sort}
 								dropFilters={() => {
@@ -328,6 +340,9 @@ const Main = () => {
 									openUser={(id) => {
 										setProfileID(id);
 										setActiveStory(profile);
+										setPrevActiveStory('ads');
+										setActivePanel('one-panel')
+										setChoosen(choosen)
 										scroll();
 									}}
 									ad={choosen}
@@ -336,36 +351,6 @@ const Main = () => {
 									VkUser={VkUser}
 									vkPlatform={vkPlatform}
 									onCloseClick={() => setActiveModal(MODAL_SUBS)}
-								/>
-							) : (
-								Error
-							)}
-							{snackbar}
-						</Panel>
-						<Panel id="comments">
-							<PanelHeaderSimple
-								left={
-									<PanelHeaderBack
-										onClick={() => {
-											setActivePanel('one-panel');
-											scroll();
-										}}
-									/>
-								}
-							>
-								Комментарии
-							</PanelHeaderSimple>
-							{choosen ? (
-								<Comments
-									back={(id) => {
-										setActivePanel('one-panel');
-										scroll();
-									}}
-									ad={choosen}
-									setPopout={setPopout}
-									setSnackbar={setSnackbar}
-									VkUser={VkUser}
-									vkPlatform={vkPlatform}
 								/>
 							) : (
 								Error
@@ -409,7 +394,20 @@ const Main = () => {
 					</View>
 					<View id={profile} activePanel={profile} popout={popout}>
 						<Panel id={profile}>
-							<PanelHeader>{profileText} </PanelHeader>
+							<PanelHeader
+								left={
+									prevActiveStory == no_prev ? null : (
+										<PanelHeaderBack
+											onClick={() => {
+												console.log('prevActiveStory', prevActiveStory);
+												setActiveStory(prevActiveStory);
+											}}
+										/>
+									)
+								}
+							>
+								{profileText}
+							</PanelHeader>
 							<Profile
 								setPopout={setPopout}
 								setSnackbar={setSnackbar}
@@ -433,18 +431,6 @@ const Main = () => {
 									scroll();
 								}}
 							/>
-							{/* <Placeholder
-								icon={<Icon56UsersOutline />}
-								header="В разработке. Загляните позже &#128522;"
-								action={
-									<Button onClick={() => setActiveStory(ads)} size="l">
-										Вернуться к ленте объявлений
-									</Button>
-								}
-								stretched={true}
-							>
-								Мы упорно трудимся над вашим профилем!
-							</Placeholder> */}
 							{snackbar}
 						</Panel>
 					</View>
