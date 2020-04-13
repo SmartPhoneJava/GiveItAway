@@ -212,7 +212,7 @@ export function Close(setPopout, setSnackbar, ad_id, subscriber_id) {
 		.then(function (response) {
 			setPopout(null);
 			console.log('response from Close:', response);
-			sucess(
+			success(
 				'Спасибо, что делаете других людей счастливыми :) Ждем подтверждения от второй стороны!',
 				() => {
 					CancelClose(setPopout, setSnackbar, ad_id);
@@ -245,7 +245,7 @@ export function subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallba
 		.then(function (response) {
 			setPopout(null);
 			successCallback(response);
-			sucess('Теперь вы будете получать уведомления, связанные с этим постом', clCancel, setSnackbar, end);
+			success('Теперь вы будете получать уведомления, связанные с этим постом', clCancel, setSnackbar, end);
 			return response;
 		})
 		.catch(function (error) {
@@ -280,7 +280,7 @@ export function unsubscribe(setPopout, setSnackbar, ad_id, clCancel, successCall
 		.then(function (response) {
 			setPopout(null);
 			successCallback(response);
-			sucess('Больше вы не будете получать связанные с этим постом уведомления', clCancel, setSnackbar, end);
+			success('Больше вы не будете получать связанные с этим постом уведомления', clCancel, setSnackbar, end);
 			return response;
 		})
 		.catch(function (error) {
@@ -591,7 +591,7 @@ export function fail(err, repeat, setSnackbar, end) {
 	}
 }
 
-export function sucess(text, cancelMe, setSnackbar, end) {
+export function success(text, cancelMe, setSnackbar, end) {
 	setSnackbar(
 		<Snackbar
 			duration="1500"
@@ -602,7 +602,11 @@ export function sucess(text, cancelMe, setSnackbar, end) {
 				}
 			}}
 			action="Отменить"
-			onActionClick={cancelMe}
+			onActionClick={() => {
+				if (cancelMe) {
+					cancelMe();
+				}
+			}}
 			before={
 				<Avatar size={24} style={{ background: 'green' }}>
 					<Icon24DoneOutline fill="#fff" width={14} height={14} />

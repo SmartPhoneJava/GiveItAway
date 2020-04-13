@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
 	Header,
 	Group,
@@ -153,7 +153,17 @@ const arr = [
 	},
 ];
 
-function showComments(setPopout, setSnackbar, nots, lastAdElementRef, myID, setText, setSearch, setEditableID) {
+function showComments(
+	setPopout,
+	setSnackbar,
+	nots,
+	lastAdElementRef,
+	myID,
+	setText,
+	setSearch,
+	setEditableID,
+	setHide
+) {
 	return (
 		<div style={{ marginBottom: '15%' }}>
 			<Group header={<Header mode="secondary">{'комментариев ' + nots.length}</Header>}>
@@ -182,8 +192,19 @@ function showComments(setPopout, setSnackbar, nots, lastAdElementRef, myID, setT
 											autoclose
 											mode="destructive"
 											onClick={async () => {
-												await deleteComment(setPopout, setSnackbar, v);
-												setSearch('' + v.comment_id + 'deleted');
+												setHide(true);
+												deleteComment(
+													setPopout,
+													setSnackbar,
+													v,
+													(vv) => {
+														setSearch('' + v.comment_id + 'deleted');
+													},
+													(e) => {},
+													() => {
+														setHide(false);
+													}
+												);
 											}}
 										>
 											Удалить
@@ -225,13 +246,19 @@ const Comments = (props) => {
 	const [editableID, setEditableID] = useState(NO_ID);
 
 	const [pageNumber, setPageNumber] = useState(1);
-	let { inited, loading, nots, error, hasMore, newPage } = useCommentsGet(
+	let { inited, loading, tnots, error, hasMore, newPage } = useCommentsGet(
 		props.setPopout,
 		search,
 		pageNumber,
 		5,
 		props.ad.ad_id
 	);
+	const [nots, setNots] = useState([]);
+	useEffect(()=>{
+		if (tnots && tnots.length != 0) {
+			setNots(tnots)
+		} 
+	})
 
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
@@ -259,7 +286,8 @@ const Comments = (props) => {
 				props.myID,
 				setText,
 				setSearch,
-				setEditableID
+				setEditableID,
+				setHide
 			)}
 
 			{hide || props.hide ? (
@@ -280,16 +308,9 @@ const Comments = (props) => {
 				''
 			) : (
 				<PanelHeaderButton
-					style={{
-						background: '#F2F3F5',
-						position: 'fixed',
-						marginBottom: '13%',
-						marginRight: '5%',
-						bottom: '0',
-						right: '0',
-						zIndex: '100',
-					}}
-					onClick={async () => {
+					className="write-button"
+					onClick={() => {
+						setHide(true);
 						console.log('editableIDeditableID', editableID);
 						if (editableID != NO_ID) {
 							const comment = nots.filter((v) => v.comment_id == editableID)[0];
@@ -299,11 +320,22 @@ const Comments = (props) => {
 								author_id: props.myID,
 								text: text,
 							});
-							await editComment(props.setPopout, props.setSnackbar, comment.comment_id, obj);
-							setEditableID(NO_ID);
+							editComment(
+								props.setPopout,
+								props.setSnackbar,
+								comment.comment_id,
+								obj,
+								(v) => {
+									setEditableID(NO_ID);
+									setText('');
+								},
+								(e) => {},
+								() => {
+									setHide(false);
+								}
+							);
 						} else {
 							if (text.length == 0) {
-								setHide(true);
 								props.setSnackbar(
 									<Snackbar
 										duration="2000"
@@ -327,10 +359,21 @@ const Comments = (props) => {
 								author_id: props.myID,
 								text: text,
 							});
-							await postComment(props.setPopout, props.setSnackbar, props.ad.ad_id, obj);
-							setSearch(text);
+							postComment(
+								props.setPopout,
+								props.setSnackbar,
+								props.ad.ad_id,
+								obj,
+								(v) => {
+									setSearch(text);
+									setText('');
+								},
+								(e) => {},
+								() => {
+									setHide(false);
+								}
+							);
 						}
-						setText('');
 					}}
 				>
 					<Avatar size="20">

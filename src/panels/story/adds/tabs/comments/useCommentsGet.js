@@ -66,7 +66,7 @@ export default function useCommentsGet(setPopout, query, pageNumber, rowsPerPage
 	return {
 		inited,
 		newPage: pageNumber,
-		nots: nots,
+		tnots: nots,
 		loading,
 		error,
 		hasMore,

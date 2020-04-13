@@ -46,6 +46,10 @@ import Profile from './story/profile/Profile';
 import AddsModal, { MODAL_FILTERS, MODAL_CATEGORIES, MODAL_SUBS } from './story/adds/AddsModal';
 import CreateModal from './story/create/CreateModal';
 
+import { AddrWS } from './../store/addr_ws';
+
+import Centrifuge from 'centrifuge';
+
 const ads = 'ads';
 const adsText = 'Объявления';
 
@@ -56,6 +60,9 @@ const profile = 'profile';
 const profileText = 'Профиль';
 
 const ApiVersion = '5.5';
+
+const addr = AddrWS.getState() + '/connection/websocket';
+let centrifuge = new Centrifuge(addr);
 
 const Main = () => {
 	const [popout, setPopout] = useState(null); //<ScreenSpinner size="large" />
@@ -118,15 +125,31 @@ const Main = () => {
 	}
 
 	useEffect(() => {
+		console.log('tryyyyy', myID);
+		if (myID == 0) {
+			return;
+		}
 		getToken(
 			setSnackbar,
 			(v) => {
 				setWsToken(v);
 				console.log('setWsToken', v.token);
+
+				// const addr = AddrWS.getState() + '/connection/websocket';
+				// console.log('before centrifuge', addr);
+				// let centrifuge = new Centrifuge({ url: addr, token: v.token });
+				console.log('before setToken', 'user#' + myID);
+				centrifuge.setToken(v.token);
+				console.log('we wanna connect', 'user#' + myID);
+				centrifuge.subscribe('user#' + myID, (mes) => {
+					console.log('centrifuge!', mes);
+				});
+				console.log(' connect', 'user#' + myID);
+				centrifuge.connect();
 			},
 			(e) => {}
 		);
-	}, []);
+	}, [myID]);
 
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data } }) => {
@@ -434,5 +457,3 @@ const Main = () => {
 };
 
 export default Main;
-
-// 349 -> 334

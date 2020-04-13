@@ -15,7 +15,7 @@ import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
 
 let request_id = 0;
 
-export async function postComment(setPopout, setSnackbar, ad_id, comment) {
+export async function postComment(setPopout, setSnackbar, ad_id, comment, successCallback, failCallback, end) {
 	setPopout(<ScreenSpinner size="large" />);
 	let err = false;
 	let cancel;
@@ -30,24 +30,31 @@ export async function postComment(setPopout, setSnackbar, ad_id, comment) {
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
-			console.log('response from postComment:', response);
 			return response.data;
 		})
 		.then(function (response) {
 			setPopout(null);
-
+			successCallback(response);
+			success('Комментарий отправлен', null, setSnackbar, end);
 			return response;
 		})
 		.catch(function (error) {
 			err = true;
-			fail('Нет соединения с сервером', postComment(setPopout, setSnackbar, ad_id, comment));
-
+			failCallback(error);
+			fail(
+				'Комментарий не отправлен',
+				() => {
+					postComment(setPopout, setSnackbar, ad_id, comment, successCallback, failCallback, end);
+				},
+				setSnackbar,
+				end
+			);
 			setPopout(null);
 		});
 	return err;
 }
 
-export async function deleteComment(setPopout, setSnackbar, comment) {
+export async function deleteComment(setPopout, setSnackbar, comment, successCallback, failCallback, end) {
 	setPopout(<ScreenSpinner size="large" />);
 	let err = false;
 	let cancel;
@@ -62,24 +69,31 @@ export async function deleteComment(setPopout, setSnackbar, comment) {
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
-			console.log('response from postComment:', response);
 			return response.data;
 		})
 		.then(function (response) {
+			success('Комментарий удален', null, setSnackbar, end);
+			successCallback(response);
 			setPopout(null);
-
 			return response;
 		})
 		.catch(function (error) {
 			err = true;
-			fail('Нет соединения с сервером', postComment(setPopout, setSnackbar, ad_id, comment));
-
+			fail(
+				'Комментарий не удален',
+				() => {
+					deleteComment(setPopout, setSnackbar, comment, successCallback, failCallback, end);
+				},
+				setSnackbar,
+				end
+			);
+			failCallback(error);
 			setPopout(null);
 		});
 	return err;
 }
 
-export async function editComment(setPopout, setSnackbar, id, comment) {
+export async function editComment(setPopout, setSnackbar, id, comment, successCallback, failCallback, end) {
 	setPopout(<ScreenSpinner size="large" />);
 	let err = false;
 	let cancel;
@@ -92,18 +106,25 @@ export async function editComment(setPopout, setSnackbar, id, comment) {
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
-			console.log('response from editComment:', response);
 			return response.data;
 		})
 		.then(function (response) {
+			successCallback(response);
+			success('Комментарий отредактирован', null, setSnackbar, end);
 			setPopout(null);
-
 			return response;
 		})
 		.catch(function (error) {
 			err = true;
-			fail('Нет соединения с сервером', postComment(setPopout, setSnackbar, ad_id, comment));
-
+			failCallback(error);
+			fail(
+				'Комментарий не отредактирован',
+				() => {
+					editComment(setPopout, setSnackbar, id, comment, successCallback, failCallback, end);
+				},
+				setSnackbar,
+				end
+			);
 			setPopout(null);
 		});
 	return err;
