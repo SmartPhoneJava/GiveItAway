@@ -25,7 +25,7 @@ export async function getUser(setPopout, setSnackbar, user_id, successCallback, 
 	await axios({
 		method: 'get',
 		withCredentials: true,
-		url: Addr.getState() + '/api/user/' + user_id,
+		url: Addr.getState() + '/api/user/' + user_id + '/profile',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {

@@ -15,7 +15,8 @@ import {
 
 import { getUser, getUserVK } from './requests';
 
-import useAdSearch from './../adds/tabs/adds/useAdSearch';
+import useAdGiven from './../adds/tabs/adds/useAdGiven';
+import useAdReceived from './../adds/tabs/adds/useAdReceived';
 
 import { AdLight } from './../../template/Add6';
 
@@ -57,34 +58,50 @@ const Profile = (props) => {
 
 	const [items, setItems] = useState([]);
 
-	const [pageNumber, setPageNumber] = useState(1);
-
-	let { inited, loading, ads, error, hasMore, newPage } = useAdSearch(
+	const [givenPageNumber, setGivenPageNumber] = useState(1);
+	let { given_loading, given, given_hasMore, given_newPage } = useAdGiven(
 		props.setPopout,
-		search,
-		'',
-		'',
-		pageNumber,
+		givenPageNumber,
 		10,
-		'',
-		'',
-		'',
-		''
+		props.profileID
 	);
 
-	const observer = useRef();
-	const lastAdElementRef = useCallback(
+	const [receivedPageNumber, setReceivedPageNumber] = useState(1);
+	let { received_loading, received, received_hasMore, received_newPage } = useAdReceived(
+		props.setPopout,
+		receivedPageNumber,
+		10,
+		props.profileID
+	);
+
+	const given_observer = useRef();
+	const givenLastAdElementRef = useCallback(
 		(node) => {
-			if (loading) return;
-			if (observer.current) observer.current.disconnect();
-			observer.current = new IntersectionObserver((entries) => {
-				if (entries[0].isIntersecting && hasMore) {
-					setPageNumber((prevPageNumber) => newPage + 1);
+			if (given_loading) return;
+			if (given_observer.current) given_observer.current.disconnect();
+			given_observer.current = new IntersectionObserver((entries) => {
+				if (entries[0].isIntersecting && given_hasMore) {
+					setGivenPageNumber((prevPageNumber) => given_newPage + 1);
 				}
 			});
-			if (node) observer.current.observe(node);
+			if (node) given_observer.current.observe(node);
 		},
-		[loading, hasMore]
+		[given_loading, given_hasMore]
+	);
+
+	const received_observer = useRef();
+	const receivedLastAdElementRef = useCallback(
+		(node) => {
+			if (received_loading) return;
+			if (received_observer.current) received_observer.current.disconnect();
+			received_observer.current = new IntersectionObserver((entries) => {
+				if (entries[0].isIntersecting && received_hasMore) {
+					setReceivedPageNumber((prevPageNumber) => received_newPage + 1);
+				}
+			});
+			if (node) received_observer.current.observe(node);
+		},
+		[received_loading, received_hasMore]
 	);
 
 	useEffect(() => {
@@ -108,29 +125,25 @@ const Profile = (props) => {
 			},
 			(e) => {}
 		);
-		setPageNumber(1)
+		setGivenPageNumber(1);
+		setReceivedPageNumber(1);
 	}, [props.profileID]);
 
 	function Ad(ad) {
 		const image = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : '';
 		return AdLight(ad, image, () => {
-			props.openAd(ad)
+			props.openAd(ad);
 		});
-		// <div onClick={()=>{}} className="profile-main">
-		// 	<div className="profile-main-left">
-		// 		<img src={image} className="profile-tiled" />
-		// 	</div>
-		// </div>
 	}
 
-	function getAds(ads) {
+	function getGiven() {
 		return (
 			<HorizontalScroll>
 				<div style={{ display: 'flex' }}>
-					{ads.map((ad, index) => {
-						if (ads.length === index + 1) {
+					{given.map((ad, index) => {
+						if (given.length === index + 1) {
 							return (
-								<div style={{ padding: '4px' }} key={ad.ad_id} ref={lastAdElementRef}>
+								<div style={{ padding: '4px' }} key={ad.ad_id} ref={givenLastAdElementRef}>
 									{Ad(ad)}
 								</div>
 							);
@@ -147,8 +160,29 @@ const Profile = (props) => {
 		);
 	}
 
-	const Given = ads;
-	const Taken = [];
+	function getReceived() {
+		return (
+			<HorizontalScroll>
+				<div style={{ display: 'flex' }}>
+					{received.map((ad, index) => {
+						if (received.length === index + 1) {
+							return (
+								<div style={{ padding: '4px' }} key={ad.ad_id} ref={receivedLastAdElementRef}>
+									{Ad(ad)}
+								</div>
+							);
+						} else {
+							return (
+								<div style={{ padding: '4px' }} key={ad.ad_id}>
+									{Ad(ad)}
+								</div>
+							);
+						}
+					})}
+				</div>
+			</HorizontalScroll>
+		);
+	}
 
 	return (
 		<>
@@ -172,9 +206,9 @@ const Profile = (props) => {
 				<Cell indicator={0}>Получено</Cell>
 				<Cell indicator={0}>Потрачено</Cell>
 			</Group>
-			<Group header={<Header mode="secondary">Отдано вещей - {Given.length}</Header>}>
-				{Given.length > 0 ? (
-					getAds(Given)
+			<Group header={<Header mode="secondary">Отдано вещей - {given.length}</Header>}>
+				{given.length > 0 ? (
+					getGiven()
 				) : backuser && props.myID == backuser.vk_id ? (
 					<Placeholder
 						icon={<Icon56DoNotDisturbOutline />}
@@ -198,9 +232,9 @@ const Profile = (props) => {
 					</Placeholder>
 				)}
 			</Group>
-			<Group header={<Header mode="secondary">Получено вещей - {Taken.length}</Header>}>
-				{Taken.length > 0 ? (
-					getAds(Taken)
+			<Group header={<Header mode="secondary">Получено вещей - {received.length}</Header>}>
+				{received.length > 0 ? (
+					getReceived()
 				) : backuser && props.myID == backuser.vk_id ? (
 					<Placeholder
 						icon={<Icon56DoNotDisturbOutline />}

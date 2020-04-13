@@ -118,9 +118,10 @@ export async function getDeal(setSnackbar, ad_id) {
 	return { deal, err };
 }
 
-export async function denyDeal(setSnackbar, deal_id) {
+export async function denyDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end) {
 	let err = false;
 	let cancel;
+	setPopout(<ScreenSpinner size="large" />);
 
 	await axios({
 		method: 'post',
@@ -130,25 +131,34 @@ export async function denyDeal(setSnackbar, deal_id) {
 	})
 		.then(function (response) {
 			console.log('response from denyDeal:', response);
-			sucessNoCancel('Ваш отказ принят!', setSnackbar);
+			sucessNoCancel('Ваш отказ принят!', setSnackbar, end);
 			return response.data;
+		})
+		.then(function (response) {
+			successCallback(response);
+			setPopout(null);
+			return response;
 		})
 		.catch(function (error) {
 			err = true;
 			fail(
 				'Нет соединения с сервером',
 				() => {
-					denyDeal(setSnackbar, deal_id);
+					denyDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end);
 				},
-				setSnackbar
+				setSnackbar, 
+				end
 			);
+			failCallback(error);
+			setPopout(null);
 		});
 	return err;
 }
 
-export async function acceptDeal(setSnackbar, deal_id) {
+export async function acceptDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end) {
 	let err = false;
 	let cancel;
+	setPopout(<ScreenSpinner size="large" />);
 
 	await axios({
 		method: 'post',
@@ -158,18 +168,26 @@ export async function acceptDeal(setSnackbar, deal_id) {
 	})
 		.then(function (response) {
 			console.log('response from acceptDeal:', response);
-			sucessNoCancel('Автор благодарит вас за подтверждение!', setSnackbar);
+			sucessNoCancel('Автор благодарит вас за подтверждение!', setSnackbar, end);
 			return response.data;
+		})
+		.then(function (response) {
+			successCallback(response);
+			setPopout(null);
+			return response;
 		})
 		.catch(function (error) {
 			err = true;
 			fail(
 				'Нет соединения с сервером',
 				() => {
-					acceptDeal(setSnackbar, deal_id);
+					acceptDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end);
 				},
-				setSnackbar
+				setSnackbar,
+				end
 			);
+			failCallback(error);
+			setPopout(null);
 		});
 	return err;
 }
@@ -618,12 +636,15 @@ export function success(text, cancelMe, setSnackbar, end) {
 	);
 }
 
-export function sucessNoCancel(text, setSnackbar) {
+export function sucessNoCancel(text, setSnackbar, end) {
 	setSnackbar(
 		<Snackbar
 			duration="1500"
 			onClose={() => {
 				setSnackbar(null);
+				if (end) {
+					end()
+				}
 			}}
 			before={
 				<Avatar size={24} style={{ background: 'green' }}>

@@ -194,27 +194,27 @@ const arr = [
 	},
 ];
 
-function getNotifications(arr, lastAdElementRef) {
+function getNotifications(arr, lastAdElementRef, openUser, openAd) {
 	return arr.map((v, index) => {
-		let inner = <Notification openUser={props.openUser} openAd={props.openAd} key={v.id} notification={v} />;
+		let inner = <Notification openUser={openUser} openAd={openAd} key={v.id} notification={v} />;
 		switch (v.notification_type) {
 			case NT_STATISTICS:
-				inner = <NotificationStatistics openUser={props.openUser} openAd={props.openAd} notification={v} />;
+				inner = <NotificationStatistics openUser={openUser} openAd={openAd} notification={v} />;
 				break;
 			case NT_STATUS:
-				inner = <NotificationStatus openUser={props.openUser} openAd={props.openAd} notification={v} />;
+				inner = <NotificationStatus openUser={openUser} openAd={openAd} notification={v} />;
 				break;
 			case NT_CLOSE:
-				inner = <NotificationClose openUser={props.openUser} openAd={props.openAd} notification={v} />;
+				inner = <NotificationClose openUser={openUser} openAd={openAd} notification={v} />;
 				break;
 			case NT_DELETED:
-				inner = <NotificationDeleted openUser={props.openUser} openAd={props.openAd} notification={v} />;
+				inner = <NotificationDeleted openUser={openUser} openAd={openAd} notification={v} />;
 				break;
 			case NT_RESPOND:
-				inner = <NotificationRespond openUser={props.openUser} openAd={props.openAd} notification={v} />;
+				inner = <NotificationRespond openUser={openUser} openAd={openAd} notification={v} />;
 				break;
 			case NT_FULFILL:
-				inner = <NotificationFulFill openUser={props.openUser} openAd={props.openAd}notification={v} />;
+				inner = <NotificationFulFill openUser={openUser} openAd={openAd} notification={v} />;
 				break;
 		}
 		if (arr.length === index + 1) {
@@ -257,18 +257,19 @@ const Notifications = (props) => {
 	const arrNotRead = nots.filter((v) => !v.is_read);
 	const arrRead = nots.filter((v) => v.is_read);
 
+	props.zeroNots()
 	return (
 		<div style={{ background: '#F7F7F7' }}>
 			{arrNotRead.length > 0 ? (
 				<Group header={<Header mode="secondary">Непрочитанные</Header>}>
-					{getNotifications(arrNotRead, lastAdElementRef)}
+					{getNotifications(arrNotRead, lastAdElementRef, props.openUser, props.openAd)}
 				</Group>
 			) : (
 				''
 			)}
 			{arrRead.length > 0 ? (
 				<Group header={<Header mode="secondary">Прочитанные</Header>}>
-					{getNotifications(arrRead, lastAdElementRef)}
+					{getNotifications(arrRead, lastAdElementRef), props.openUser, props.openAd}
 				</Group>
 			) : (
 				''

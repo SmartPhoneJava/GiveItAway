@@ -60,7 +60,7 @@ export function AdLight(ad, image, openAd) {
 			</div>
 
 			{ad.status == 'aborted' ? (
-				<div className="failed">
+				<div className="light-failed">
 					<div className="on-img-text">
 						<Icon16Clear style={{ marginRight: '5px' }} />
 						Отменено
@@ -70,7 +70,7 @@ export function AdLight(ad, image, openAd) {
 				''
 			)}
 			{ad.status == 'closed' ? (
-				<div className="success">
+				<div className="light-success">
 					<div className="on-img-text">
 						<Icon16CheckCircle style={{ marginRight: '5px' }} />
 						Вещь отдана
@@ -79,9 +79,19 @@ export function AdLight(ad, image, openAd) {
 			) : (
 				''
 			)}
-			{ad.status == 'chosen' && isAuthor() ? (
-				<div className="deal">
-					<div style={{ color: 'rgb(220,220,220)', fontSize: '12px', padding: '2px' }}>Ожидание ответа</div>
+			{ad.status == 'chosen' ? (
+				<div className="light-deal">
+					<div
+						style={{
+							alignItems: 'center',
+							justifyContent: 'center',
+							color: 'rgb(220,220,220)',
+							fontSize: '12px',
+							padding: '2px',
+						}}
+					>
+						Ожидание ответа
+					</div>
 				</div>
 			) : (
 				''
@@ -267,9 +277,6 @@ const Add6 = (props) => {
 	function authorPanel() {
 		return (
 			<div
-				onClick={() => {
-					props.openUser(ad.author.vk_id);
-				}}
 				style={{
 					display: 'flex',
 					paddingBottom: '10px',
@@ -278,6 +285,9 @@ const Add6 = (props) => {
 			>
 				{!ad.anonymous ? (
 					<Avatar
+						onClick={() => {
+							props.openUser(ad.author.vk_id);
+						}}
 						style={{
 							marginRight: '5px',
 						}}

@@ -11,7 +11,7 @@ import {
 	PanelHeaderButton,
 	PanelHeaderSimple,
 	PanelHeaderContent,
-	Button,
+	Counter,
 } from '@vkontakte/vkui';
 
 import Icon28ArrowLeftOutline from '@vkontakte/icons/dist/28/arrow_left_outline';
@@ -31,8 +31,6 @@ import { VkUser } from '../store/vkUser';
 
 import AddMore, { AdDefault } from './template/AddMore';
 import AddMore2 from './template/AddMore2';
-import Comments from './story/adds/tabs/comments/comments';
-
 import { CategoryNo } from './template/Categories';
 
 import { Auth, getToken } from './../requests';
@@ -66,6 +64,8 @@ const no_prev = 'no prev';
 const addr = AddrWS.getState() + '/connection/websocket';
 let centrifuge = new Centrifuge(addr);
 
+let notsCounterr = 0;
+
 const Main = () => {
 	const [popout, setPopout] = useState(null); //<ScreenSpinner size="large" />
 	const [inited, setInited] = useState(false);
@@ -89,6 +89,8 @@ const Main = () => {
 		}
 		scroll();
 	};
+	const [notsCounter, setNotsCounter] = useState(0);
+	const [count, setCount] = useState(0);
 
 	const [activePanel, setActivePanel] = useState('header-search');
 	const [activeModal, setActiveModal] = useState(null);
@@ -102,7 +104,7 @@ const Main = () => {
 
 	const [deleteID, SetDeleteID] = useState(-1);
 
-	const [wsToken, setWsToken] = useState();
+	const [wsToken, setWsToken] = useState('');
 
 	const [city, setCity] = useState(NoRegion);
 	const [country, setCountry] = useState(NoRegion);
@@ -129,24 +131,27 @@ const Main = () => {
 	}
 
 	useEffect(() => {
-		console.log('tryyyyy', myID);
+		console.log('tryyyyy', myID, count, notsCounterr);
 		if (myID == 0) {
 			return;
 		}
+
 		getToken(
 			setSnackbar,
 			(v) => {
 				setWsToken(v);
 				console.log('setWsToken', v.token);
-
-				// const addr = AddrWS.getState() + '/connection/websocket';
-				// console.log('before centrifuge', addr);
-				// let centrifuge = new Centrifuge({ url: addr, token: v.token });
+				
+				console.log('wsToken success', wsToken);
 				console.log('before setToken', 'user#' + myID);
 				centrifuge.setToken(v.token);
 				console.log('we wanna connect', 'user#' + myID);
 				centrifuge.subscribe('user#' + myID, (mes) => {
-					console.log('centrifuge!', mes);
+					notsCounterr++;
+					setCount(notsCounterr);
+					console.log('tryyyyy', count, notsCounterr);
+					setNotsCounter(10000);
+					console.log('centrifugu', notsCounter, notsCounterr);
 				});
 				console.log(' connect', 'user#' + myID);
 				centrifuge.connect();
@@ -154,6 +159,26 @@ const Main = () => {
 			(e) => {}
 		);
 	}, [myID]);
+
+	// useEffect(()=>{
+	// 	console.log("wsToken", wsToken)
+	// 	if (wsToken == "") {
+	// 		return
+	// 	}
+	// 	console.log("wsToken success", wsToken)
+	// 	console.log('before setToken', 'user#' + myID);
+	// 	centrifuge.setToken(wsToken);
+	// 	console.log('we wanna connect', 'user#' + myID);
+	// 	centrifuge.subscribe('user#' + myID, (mes) => {
+	// 		notsCounterr++
+	// 		setCount(notsCounterr)
+	// 		console.log('tryyyyy', count, notsCounterr);
+	// 		setNotsCounter(10000)
+	// 		console.log('centrifugu', notsCounter, notsCounterr);
+	// 	});
+	// 	console.log(' connect', 'user#' + myID);
+	// 	centrifuge.connect();
+	// },[wsToken])
 
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data } }) => {
@@ -215,6 +240,9 @@ const Main = () => {
 								selected={activeStory === ads}
 								data-story={ads}
 								text={adsText}
+								label={notsCounterr == 0 ? null : notsCounterr}
+								after={ <Counter>100</Counter>}
+								// after={notsCounter == 0 ? '' : <Counter>notsCounter</Counter>}
 							>
 								<Icon28NewsfeedOutline />
 							</TabbarItem>
@@ -273,6 +301,8 @@ const Main = () => {
 									setActiveModal(MODAL_SUBS);
 									scroll();
 								}}
+								notsCounter={notsCounterr}
+								zeroNots={()=>{notsCounterr=0}}
 								goSearch={goSearch}
 								setPopout={setPopout}
 								setSnackbar={setSnackbar}
@@ -286,8 +316,8 @@ const Main = () => {
 									setProfileID(id);
 									setActiveStory(profile);
 									setPrevActiveStory('ads');
-									setActivePanel('header-search')
-									setChoosen(AdDefault)
+									setActivePanel('header-search');
+									setChoosen(AdDefault);
 									scroll();
 								}}
 								// region={region}
@@ -341,8 +371,8 @@ const Main = () => {
 										setProfileID(id);
 										setActiveStory(profile);
 										setPrevActiveStory('ads');
-										setActivePanel('one-panel')
-										setChoosen(choosen)
+										setActivePanel('one-panel');
+										setChoosen(choosen);
 										scroll();
 									}}
 									ad={choosen}

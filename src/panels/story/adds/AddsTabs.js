@@ -1,5 +1,19 @@
 import React, { useState } from 'react';
-import { PanelHeaderSimple, List, Cell, PanelHeaderButton, PanelHeaderContext, TabsItem, Tabs } from '@vkontakte/vkui';
+import {
+	PanelHeaderSimple,
+	List,
+	Counter,
+	Cell,
+	PanelHeaderButton,
+	PanelHeaderContext,
+	TabsItem,
+	Tabs,
+	TabbarItem,
+	Avatar,
+} from '@vkontakte/vkui';
+
+import Icon28Notifications from '@vkontakte/icons/dist/28/notifications';
+import Icon28Notification from '@vkontakte/icons/dist/28/notification';
 
 import Icon28LiveOutline from '@vkontakte/icons/dist/28/live_outline';
 import Icon28UserCircleOutline from '@vkontakte/icons/dist/28/user_circle_outline';
@@ -32,6 +46,7 @@ const AddsTabs = (props) => {
 			<PanelHeaderSimple left={<PanelHeaderButton />} separator={false}>
 				<Tabs>
 					<TabsItem
+						label={100}
 						onClick={() => {
 							if (activeTab === tabAdds) {
 								setContextOpened(!contextOpened);
@@ -52,13 +67,16 @@ const AddsTabs = (props) => {
 						{tabAddsText}
 					</TabsItem>
 					<TabsItem
+						// label={props.notsCounter == 0 ? null : props.notsCounter}
 						onClick={() => {
 							setActiveTab(tabNotification);
 							setContextOpened(false);
 						}}
 						selected={activeTab === tabNotification}
 					>
-						{tabNotificationText}
+						<TabbarItem data-story="feed" label={props.notsCounter == 0 ? null : props.notsCounter}>
+							<Icon28Notifications />
+						</TabbarItem>
 					</TabsItem>
 				</Tabs>
 			</PanelHeaderSimple>
@@ -89,6 +107,7 @@ const AddsTabs = (props) => {
 			</PanelHeaderContext>
 			{activeTab === tabNotification ? (
 				<Notifications
+					zeroNots={props.zeroNots}
 					openUser={props.openUser}
 					openAd={props.openAd}
 					goToAds={() => {

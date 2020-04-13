@@ -108,6 +108,24 @@ img.light-tiled {
 	margin-bottom: 100px;
 }
 
+.light-success {
+	border-radius: 5px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100px;
+	background: rgba(0, 100, 0, 0.9);
+}
+
+.light-failed {
+	border-radius: 5px;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100px;
+	background: rgba(100, 0, 0, 0.9);
+}
+
 .success {
 	border-radius: 5px;
 	position: absolute;
@@ -142,6 +160,16 @@ img.light-tiled {
 	left: 0px;
 	width: 120px;
 	background: rgba(215, 125, 49, 0.9);
+}
+
+.light-deal {
+	border-radius: 5px;
+	position: absolute;
+	top: 0px;
+	width: 100px;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 100, 0.9);
 }
 
 .deal {

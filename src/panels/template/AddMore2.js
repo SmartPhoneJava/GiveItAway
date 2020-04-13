@@ -61,8 +61,8 @@ import Comments from './../story/adds/tabs/comments/comments';
 import OpenActions from './components/actions';
 
 const COLOR_DEFAULT = 'rgba(0,0,0,0.6)';
-const COLOR_DONE = 'rgba(0,125,0,0.6)';
-const COLOR_CANCEL = 'rgba(125,0,0,0.6)';
+const COLOR_DONE = 'rgba(0,75,0,0.8)';
+const COLOR_CANCEL = 'rgba(75,0,0,0.8)';
 
 export const AdDefault = {
 	ad_id: -1,
@@ -181,6 +181,20 @@ const AddMore2 = (props) => {
 		);
 	}
 
+	function getDealer() {
+		if (!subs) {
+			return {
+				vk_id: '',
+				photo_url: '',
+				name: '',
+				surname: '',
+			};
+		}
+		return subs.filter((v) => v.vk_id == Deal.subscriber_id).length > 0
+			? subs.filter((v) => v.vk_id == Deal.subscriber_id)[0]
+			: '';
+	}
+
 	function showClosed() {
 		if (isAuthor()) {
 			return statusWrapper(
@@ -218,11 +232,22 @@ const AddMore2 = (props) => {
 					<div style={{ display: 'flex' }}>
 						<Button
 							stretched
-							size="xl"
+							size="l"
 							mode="commerce"
 							onClick={() => {
-								acceptDeal(props.setSnackbar, Deal.deal_id);
-								props.back();
+								setHide(true)
+								acceptDeal(
+									props.setPopout,
+									props.setSnackbar,
+									Deal.deal_id,
+									(v) => {
+										props.back();
+									},
+									(e) => {},
+									()=>{
+										setHide(false)
+									}
+								);
 							}}
 							style
 							style={{ marginRight: 8 }}
@@ -232,10 +257,22 @@ const AddMore2 = (props) => {
 						</Button>
 						<Button
 							stretched
-							size="xl"
+							size="l"
 							mode="destructive"
 							onClick={() => {
-								denyDeal(props.setSnackbar, Deal.deal_id);
+								setHide(true)
+								denyDeal(
+									props.setPopout,
+									props.setSnackbar,
+									Deal.deal_id,
+									(v) => {
+										props.back();
+									},
+									(e) => {},
+									()=>{
+										setHide(false)
+									}
+								);
 								props.back();
 							}}
 							style={{ marginRight: 8 }}
@@ -248,18 +285,40 @@ const AddMore2 = (props) => {
 				COLOR_DEFAULT
 			);
 		}
-		return statusWrapper(
-			<InfoRow
-				style={{
-					padding: '10px',
-					color: 'rgb(200,200,200)',
-					textAlign: 'center',
-				}}
-			>
-				Автор назначил человека для передачи вещи
-			</InfoRow>,
-			COLOR_DEFAULT
-		);
+		if (!isAuthor()) {
+			return statusWrapper(
+				<InfoRow
+					style={{
+						padding: '10px',
+						color: 'rgb(200,200,200)',
+						textAlign: 'center',
+					}}
+				>
+					Автор назначил человека для передачи вещи
+				</InfoRow>,
+				COLOR_DEFAULT
+			);
+		} else {
+			return statusWrapper(
+				<div style={{ width: '100%', color: 'rgb(220,220,220)', fontSize: '14px', padding: '2px' }}>
+					<div style={{ display: 'flex' }}>
+						Ожидание подтверждения от
+						<div style={{ display: 'flex' }} onClick={() => props.openUser(getDealer().vk_id)}>
+							<Avatar
+								style={{
+									marginLeft: '15px',
+									marginRight: '4px',
+								}}
+								size={16}
+								src={getDealer().photo_url}
+							/>
+							{getDealer().name + ' ' + getDealer().surname + '  '}
+						</div>
+					</div>
+				</div>,
+				COLOR_DEFAULT
+			);
+		}
 	}
 
 	function showStatus() {
