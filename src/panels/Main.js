@@ -8,14 +8,10 @@ import {
 	Tabbar,
 	PanelHeaderBack,
 	TabbarItem,
-	PanelHeaderButton,
 	PanelHeaderSimple,
 	PanelHeaderContent,
 	Counter,
 } from '@vkontakte/vkui';
-
-import Icon28ArrowLeftOutline from '@vkontakte/icons/dist/28/arrow_left_outline';
-import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
 
 import AddsTabs from './story/adds/AddsTabs';
 import CreateAdd from './story/create/CreateAdd';
@@ -24,8 +20,6 @@ import Icon28User from '@vkontakte/icons/dist/28/user';
 import Icon24MoreHorizontal from '@vkontakte/icons/dist/24/more_horizontal';
 import Icon28NewsfeedOutline from '@vkontakte/icons/dist/28/newsfeed_outline';
 import Icon28Add from '@vkontakte/icons/dist/28/add_outline';
-
-import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
 
 import { VkUser } from '../store/vkUser';
 
@@ -40,6 +34,8 @@ import Error from './placeholders/error';
 import { NoRegion } from './template/Location';
 
 import Profile from './story/profile/Profile';
+
+import {setOnline} from './story/profile/requests'
 
 import AddsModal, { MODAL_FILTERS, MODAL_CATEGORIES, MODAL_SUBS } from './story/adds/AddsModal';
 import CreateModal from './story/create/CreateModal';
@@ -82,7 +78,7 @@ const Main = () => {
 		setActiveStory(e.currentTarget.dataset.story);
 		if (e.currentTarget.dataset.story == ads) {
 			setActivePanel('header-search');
-			setSavedAdState('')
+			setSavedAdState('');
 		} else if (e.currentTarget.dataset.story == profile) {
 			console.log('i set it ', myID);
 			setPrevActiveStory(no_prev);
@@ -131,6 +127,12 @@ const Main = () => {
 	async function scroll() {
 		const us = await bridge.send('VKWebAppScroll', { top: 10000, speed: 600 });
 		window.scrollTo(0, 0);
+		setOnline(
+			appID,
+			ApiVersion,
+			(v) => {},
+			(e) => {}
+		);
 	}
 
 	useEffect(() => {

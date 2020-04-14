@@ -11,7 +11,12 @@ import {
 	PanelHeaderContext,
 	Placeholder,
 	HorizontalScroll,
+	Separator,
 } from '@vkontakte/vkui';
+
+import { XYPlot, XAxis, YAxis, HorizontalGridLines, LineSeries, DiscreteColorLegend, RadialChart } from 'react-vis';
+
+// import 'react-vis/dist/style';
 
 import { getUser, getUserVK } from './requests';
 
@@ -139,7 +144,7 @@ const Profile = (props) => {
 	function getGiven() {
 		return (
 			<HorizontalScroll>
-				<div style={{ display: 'flex' }}>
+				<div style={{ marginLeft: '10px', display: 'flex' }}>
 					{given.map((ad, index) => {
 						if (given.length === index + 1) {
 							return (
@@ -163,7 +168,7 @@ const Profile = (props) => {
 	function getReceived() {
 		return (
 			<HorizontalScroll>
-				<div style={{ display: 'flex' }}>
+				<div style={{ marginLeft: '10px', display: 'flex' }}>
 					{received.map((ad, index) => {
 						if (received.length === index + 1) {
 							return (
@@ -183,83 +188,147 @@ const Profile = (props) => {
 			</HorizontalScroll>
 		);
 	}
+	if (backuser) {
+		return (
+			<>
+				<Cell
+					onClick={() => {
+						window.open('https://vk.com/id' + backuser.vk_id, '_blank');
+					}}
+					size="l"
+					multiline="true"
+					before={getImage(backuser)}
+					description={online ? 'online' : ''}
+				>
+					<div className="profile-block">
+						{getAuthorHref(backuser)}
+						<div>{shortText(status, 32)}</div>
+					</div>
+				</Cell>
 
-	return (
-		<>
-			<Cell
-				onClick={() => {
-					window.open('https://vk.com/id' + backuser.vk_id, '_blank');
-				}}
-				size="l"
-				multiline="true"
-				before={getImage(backuser)}
-				description={online ? 'online' : ''}
-			>
-				<div className="profile-block">
-					{getAuthorHref(backuser)}
-					<div>{shortText(status, 32)}</div>
+				<Group header={<Header mode="secondary">Карма - 0</Header>}>
+					<Cell indicator={backuser.frozen_carma}>Заморожено</Cell>
+					<Cell indicator={backuser.total_earned_carma}>Получено</Cell>
+					<Cell indicator={backuser.total_spent_carma}>Потрачено</Cell>
+				</Group>
+
+				<Group header={<Header mode="secondary">Отдано вещей - {backuser.total_given_ads}</Header>}>
+					{backuser.total_given_ads > 0 ? (
+						getGiven()
+					) : backuser && props.myID == backuser.vk_id ? (
+						<Placeholder
+							icon={<Icon56DoNotDisturbOutline />}
+							header="Пусто"
+							action={
+								<Button
+									size="l"
+									onClick={() => {
+										props.goToCreate();
+									}}
+								>
+									Отдать даром
+								</Button>
+							}
+						>
+							Поделитесь с другими людьми!
+						</Placeholder>
+					) : (
+						<Placeholder icon={<Icon56DoNotDisturbOutline />} header="Пусто">
+							Пользователь еще ничего не отдавал
+						</Placeholder>
+					)}
+				</Group>
+				<Group header={<Header mode="secondary">Получено вещей - {backuser.total_received_ads}</Header>}>
+					{backuser.total_received_ads > 0 ? (
+						getReceived()
+					) : backuser && props.myID == backuser.vk_id ? (
+						<Placeholder
+							icon={<Icon56DoNotDisturbOutline />}
+							header="Пусто"
+							action={
+								<Button
+									size="l"
+									onClick={() => {
+										props.goToAdds();
+									}}
+								>
+									Получить даром
+								</Button>
+							}
+						>
+							Получайте вещи, нажимая "Хочу забрать", в ленте объявлений!
+						</Placeholder>
+					) : (
+						<Placeholder icon={<Icon56DoNotDisturbOutline />} header="Пусто">
+							Пользователь еще ничего не получал
+						</Placeholder>
+					)}
+				</Group>
+				<Separator style={{ marginBottom: '10px' }} />
+				<div style={{ display: 'flex', textAlign: 'center' }}>
+					<div style={{ display: 'block', alignItems: 'center', justifyContent: 'center' }}>
+						Вещей
+						<RadialChart
+							data={[
+								{ angle: backuser.total_given_ads, color: '#00CCFF' },
+								{
+									angle: backuser.total_received_ads,
+									color: '#FFCC33',
+								},
+								
+							]}
+							showLabels={true}
+							radius={40}
+							innerRadius={30}
+							width={180}
+							height={100}
+							labelsAboveChildren={false}
+							labelsRadiusMultiplier={2}
+							colorType="literal"
+						/>
+						<div style={{ display: 'flex', paddingLeft: '50px' }}>
+							<Avatar style={{ background: '#00CCFF', marginRight: '3px' }} size={14}></Avatar>
+							<>Отдано</>
+						</div>
+						<div style={{ display: 'flex', paddingLeft: '50px' }}>
+							<Avatar style={{ background: '#FFCC33', marginRight: '3px' }} size={14}></Avatar>
+							<>Получено</>
+						</div>
+					</div>
+					<div style={{ display: 'block' }}>
+						Обменов
+						<RadialChart
+						data={[
+							{ angle: backuser.total_given_ads + backuser.total_received_ads, color: '#00CC66' },
+							{
+								angle: backuser.total_aborted_ads,
+								color: '#FF9933',
+							},
+							
+						]}
+							colorType="literal"
+							showLabels={true}
+							radius={40}
+							innerRadius={30}
+							width={180}
+							height={100}
+							labelsAboveChildren={false}
+							labelsRadiusMultiplier={2}
+						/>
+						<div style={{ display: 'flex', paddingLeft: '50px' }}>
+							<Avatar style={{ background: '#00CC66', marginRight: '3px' }} size={14}></Avatar>
+							<>Проведено</>
+						</div>
+						<div style={{ display: 'flex', paddingLeft: '50px' }}>
+							<Avatar style={{ background: '#FF9933', marginRight: '3px' }} size={14}></Avatar>
+							<>Сорвано</>
+						</div>
+					</div>
 				</div>
-			</Cell>
-
-			<Group header={<Header mode="secondary">Карма - 0</Header>}>
-				<Cell indicator={0}>Заморожено</Cell>
-				<Cell indicator={0}>Получено</Cell>
-				<Cell indicator={0}>Потрачено</Cell>
-			</Group>
-			<Group header={<Header mode="secondary">Отдано вещей - {given.length}</Header>}>
-				{given.length > 0 ? (
-					getGiven()
-				) : backuser && props.myID == backuser.vk_id ? (
-					<Placeholder
-						icon={<Icon56DoNotDisturbOutline />}
-						header="Пусто"
-						action={
-							<Button
-								size="l"
-								onClick={() => {
-									props.goToCreate();
-								}}
-							>
-								Отдать даром
-							</Button>
-						}
-					>
-						Поделитесь с другими людьми!
-					</Placeholder>
-				) : (
-					<Placeholder icon={<Icon56DoNotDisturbOutline />} header="Пусто">
-						Пользователь еще ничего не отдавал
-					</Placeholder>
-				)}
-			</Group>
-			<Group header={<Header mode="secondary">Получено вещей - {received.length}</Header>}>
-				{received.length > 0 ? (
-					getReceived()
-				) : backuser && props.myID == backuser.vk_id ? (
-					<Placeholder
-						icon={<Icon56DoNotDisturbOutline />}
-						header="Пусто"
-						action={
-							<Button
-								size="l"
-								onClick={() => {
-									props.goToAdds();
-								}}
-							>
-								Получить даром
-							</Button>
-						}
-					>
-						Получайте вещи, нажимая "Хочу забрать", в ленте объявлений!
-					</Placeholder>
-				) : (
-					<Placeholder icon={<Icon56DoNotDisturbOutline />} header="Пусто">
-						Пользователь еще ничего не получал
-					</Placeholder>
-				)}
-			</Group>
-		</>
-	);
+			</>
+		);
+	}
+	return <></>;
 };
 
 export default Profile;

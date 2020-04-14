@@ -34,12 +34,12 @@ export async function getUser(setPopout, setSnackbar, user_id, successCallback, 
 		})
 		.then(function (response) {
 			setPopout(null);
-			successCallback(response)
+			successCallback(response);
 			return response;
 		})
 		.catch(function (error) {
 			err = true;
-			failCallback(error)
+			failCallback(error);
 			fail('Нет соединения с сервером', null, setSnackbar);
 			setPopout(null);
 		});
@@ -47,15 +47,12 @@ export async function getUser(setPopout, setSnackbar, user_id, successCallback, 
 }
 
 export async function getUserVK(id, appID, apiVersion, successCallback, failCallback) {
-	apiVersion = '5.00';
-	console.log('before userdata', id, appID, apiVersion);
 	const el = await bridge.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' });
 
-	console.log('elelelel', el)
 	const userdata = await bridge
 		.send('VKWebAppCallAPIMethod', {
 			method: 'users.get',
-			request_id: 'canWritePrivateMessage' + request_id,
+			request_id: 'getUserVK' + request_id,
 			params: {
 				v: apiVersion,
 				user_ids: id,
@@ -64,15 +61,41 @@ export async function getUserVK(id, appID, apiVersion, successCallback, failCall
 			},
 		})
 		.then(function (response) {
-			console.log('success canWritePrivateMessage:', response);
-			successCallback(response.response[0].online, response.response[0].status)
+			successCallback(response.response[0].online, response.response[0].status);
 			return response.response[0];
 		})
 		.catch(function (error) {
-			failCallback(error)
-			console.log('fail canWritePrivateMessage:', error);
+			failCallback(error);
 		});
 	request_id++;
 
 	return userdata;
 }
+
+export async function setOnline(appID, apiVersion, successCallback, failCallback) {
+	/*
+	const el = await bridge.send('VKWebAppGetAuthToken', { app_id: appID, scope: 'offline' });
+
+	const userdata = await bridge
+		.send('VKWebAppCallAPIMethod', {
+			method: 'account.setOnline',
+			request_id: 'setOnline' + request_id,
+			params: {
+				v: apiVersion,
+				access_token: el.access_token,
+			},
+		})
+		.then(function (response) {
+			console.log("setOnline success", response)
+			successCallback(response.response);
+			return response.response;
+		})
+		.catch(function (error) {
+			console.log("setOnline failed", error)
+			failCallback(error);
+		});
+	request_id++;
+
+	return userdata;*/
+}
+
