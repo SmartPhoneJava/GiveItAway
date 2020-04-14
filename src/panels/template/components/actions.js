@@ -5,9 +5,11 @@ import { Draft } from './../../../store/draft';
 
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
+import { getSubscribers } from './../../../requests';
+
 import { CancelClose, adVisible, adHide, deleteAd } from './../../../requests';
 
-function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClosing, hidden, subs_length, failedOpen) {
+function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClosing, hidden, failedOpen) {
 	console.log('isClosingisClosing', ad_id, isClosing);
 	setPopout(
 		<ActionSheet onClose={() => setPopout(null)}>
@@ -25,31 +27,35 @@ function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClo
 				<ActionSheetItem
 					autoclose
 					onClick={() => {
-						console.log('subs_length', subs_length);
-						if (subs_length == 0) {
-							setSnackbar(
-								<Snackbar
-									duration="2000"
-									onClose={() => {
-										setSnackbar(null);
-										if (failedOpen) {
-											failedOpen();
+						getSubscribers(
+							setPopout,
+							setSnackbar,
+							ad_id,
+							(subs) => {
+								onCloseClick();
+							},
+							(e) => {
+								setSnackbar(
+									<Snackbar
+										duration="2000"
+										onClose={() => {
+											setSnackbar(null);
+											if (failedOpen) {
+												failedOpen();
+											}
+										}}
+										before={
+											<Avatar size={24} style={{ background: 'red' }}>
+												<Icon24Cancel fill="#fff" width={14} height={14} />
+											</Avatar>
 										}
-									}}
-									before={
-										<Avatar size={24} style={{ background: 'red' }}>
-											<Icon24Cancel fill="#fff" width={14} height={14} />
-										</Avatar>
-									}
-								>
-									Невозможно выбрать человека для завершения, так как никто ещё не откликнулся на ваше
-									объявление.
-								</Snackbar>
-							);
-
-							return;
-						}
-						onCloseClick();
+									>
+										Невозможно выбрать человека для завершения, так как никто ещё не откликнулся на
+										ваше объявление.
+									</Snackbar>
+								);
+							}
+						);
 					}}
 				>
 					Объявить завершенным

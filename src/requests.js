@@ -317,7 +317,7 @@ export function unsubscribe(setPopout, setSnackbar, ad_id, clCancel, successCall
 	return err;
 }
 
-export async function getDetails(setPopout, setSnackbar, ad_id) {
+export async function getDetails(setPopout, setSnackbar, ad_id, successCallback, failCallback, end) {
 	setPopout(<ScreenSpinner size="large" />);
 	let err = false;
 	let cancel;
@@ -347,7 +347,7 @@ export async function getDetails(setPopout, setSnackbar, ad_id) {
 	return { details: data, err };
 }
 
-export async function getSubscribers(setPopout, setSnackbar, ad_id) {
+export async function getSubscribers(setPopout, setSnackbar, ad_id, successCallback, failCallback) {
 	setPopout(<ScreenSpinner size="large" />);
 	let err = false;
 	let cancel;
@@ -359,17 +359,21 @@ export async function getSubscribers(setPopout, setSnackbar, ad_id) {
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
-			setPopout(null);
 			console.log('response from getSubscribes:', response);
 			if (response.status != 404 && response.status != 200) {
 				err = true;
 			}
 			return response.data;
+		}).then(function (response) {
+			successCallback(response)
+			setPopout(null);
+			return response;
 		})
 		.catch(function (error) {
 			if (err) {
 				fail('Нет соединения с сервером', () => {}, setSnackbar);
 			}
+			failCallback(error)
 			setPopout(null);
 		});
 	return { subscribers, err };

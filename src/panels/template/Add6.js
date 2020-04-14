@@ -27,7 +27,7 @@ import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 
 import OpenActions from './components/actions';
 
-import { getDetails, getDeal, getSubscribers } from './../../requests';
+import { getDetails } from './../../requests';
 
 import { Draft } from './../../store/draft';
 
@@ -101,75 +101,13 @@ export function AdLight(ad, image, openAd) {
 }
 
 const Add6 = (props) => {
-	const [subs, setSubs] = useState([]);
 	const [ad, setAd] = useState(props.ad || AdDefault);
-
-	const [subsLength, setSubsLength] = useState(0);
-	const [isSub, setIsSub] = useState(false);
-	const [isDealer, setIsDealer] = useState(false);
-	const [Deal, setDeal] = useState({ id: -1 });
 	const [haveDeal, setHaveDeal] = useState(false);
-	const [isClosing, setIsClosing] = useState(false);
 	const [isVisible, setIsVisible] = useState(true);
 
-	const [dealer, setDealer] = useState({});
-
-	function isSubscriber(subscribers) {
-		return (
-			!isAuthor() &&
-			subscribers &&
-			subscribers.length > 0 &&
-			subscribers.filter((v) => v.vk_id == props.myID).length > 0
-		);
-	}
-
-	async function initSubscribers(id) {
-		let { subscribers, err } = await getSubscribers(props.setPopout, props.setSnackbar, id);
-		subscribers = subscribers || [];
-		console.log('subscribers', subscribers);
-		if (!err) {
-			setSubs(subscribers);
-			setIsSub(isSubscriber(subscribers));
-			setSubsLength(subscribers.length);
-		}
-		return { subscribers, err };
-	}
-
-	function getDealer() {
-		return subs.filter((v) => v.vk_id == Deal.subscriber_id).length > 0
-			? subs.filter((v) => v.vk_id == Deal.subscriber_id)[0]
-			: '';
-	}
-
 	async function init() {
-		console.log('we called');
-		const id = props.ad ? props.ad.ad_id : -1;
-		if (id < 0) {
-			setAd(AdDefault);
-		} else {
-			let { details, err } = await getDetails(props.setPopout, props.setSnackbar, id);
-			console.log('detailsss', details, err);
-			if (!err) {
-				initSubscribers(id);
-				setIsClosing(details.status == 'chosen');
-				setIsVisible(!details.hidden);
-
-				let { deal, err } = await getDeal(props.setSnackbar, details.ad_id);
-				console.log('dealdeal', deal, err);
-				if (!err) {
-					setIsDealer(deal.subscriber_id == props.myID);
-					setDeal(deal);
-					setHaveDeal(true);
-					setDealer(
-						subs.filter((v) => v.vk_id == Deal.subscriber_id).length > 0
-							? subs.filter((v) => v.vk_id == Deal.subscriber_id)[0]
-							: {}
-					);
-				} else {
-					setHaveDeal(false);
-				}
-			}
-		}
+		setHaveDeal(props.ad.status == 'chosen');
+		setIsVisible(!props.ad.hidden);
 	}
 
 	useEffect(() => {
@@ -178,34 +116,7 @@ const Add6 = (props) => {
 
 	useEffect(() => {
 		init();
-		console.log('need refresh catched');
 	}, [props.ad]);
-
-	function detectContactsType(contacts) {
-		const ematlRG = '/.+@.+..+/i';
-		if (contacts.match(ematlRG)) {
-			return 'email';
-		}
-		if (contacts.indexOf('http')) {
-			return 'web';
-		}
-		// const phoneRG = "/^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$"
-		// if (contacts.match(phoneRG)) {
-		// 	return 'phone';
-		// }
-		return 'no';
-		/**  */
-	}
-
-	function getContactsImage(type) {
-		switch (type) {
-			case 'email':
-				return <Icon24Mention />;
-			case 'phone':
-				return <Icon24Phone />;
-		}
-		return <Icon24Info />;
-	}
 
 	function getFeedback(pm, comments) {
 		if (pm) {
@@ -249,8 +160,7 @@ const Add6 = (props) => {
 			ad.ad_id,
 			props.onCloseClick,
 			haveDeal,
-			!isVisible,
-			subsLength
+			!isVisible
 		);
 	}
 
@@ -383,23 +293,7 @@ const Add6 = (props) => {
 						{ad.status == 'chosen' && isAuthor() && haveDeal ? (
 							<div className="deal">
 								<div style={{ color: 'rgb(220,220,220)', fontSize: '12px', padding: '2px' }}>
-									Ожидание ответа от
-									<div style={{ display: 'flex' }}>
-										<Avatar
-											style={{
-												marginRight: '4px',
-											}}
-											size={16}
-											src={getDealer().photo_url}
-										/>
-										<Link
-											style={{ color: 'white' }}
-											href={'https://vk.com/id' + getDealer().vk_id}
-											target="_blank"
-										>
-											{getDealer().name + ' ' + getDealer().surname + '  '}
-										</Link>
-									</div>
+									Ожидание ответа
 								</div>
 							</div>
 						) : (

@@ -106,14 +106,16 @@ const AddMore2 = (props) => {
 	const [request, setRequest] = useState('no');
 
 	async function initSubscribers(id) {
-		let { subscribers, err } = await getSubscribers(props.setPopout, props.setSnackbar, id);
-		subscribers = subscribers || [];
-		console.log('subscribers', subscribers);
-		if (!err) {
-			setSubs(subscribers);
-			setIsSub(isSubscriber(subscribers));
-		}
-		return { subscribers, err };
+		getSubscribers(
+			props.setPopout,
+			props.setSnackbar,
+			id,
+			(s) => {
+				setSubs(s);
+				setIsSub(isSubscriber(s));
+			},
+			(e) => {}
+		);
 	}
 
 	useEffect(() => {
@@ -235,7 +237,7 @@ const AddMore2 = (props) => {
 							size="l"
 							mode="commerce"
 							onClick={() => {
-								setHide(true)
+								setHide(true);
 								acceptDeal(
 									props.setPopout,
 									props.setSnackbar,
@@ -244,8 +246,8 @@ const AddMore2 = (props) => {
 										props.back();
 									},
 									(e) => {},
-									()=>{
-										setHide(false)
+									() => {
+										setHide(false);
 									}
 								);
 							}}
@@ -260,7 +262,7 @@ const AddMore2 = (props) => {
 							size="l"
 							mode="destructive"
 							onClick={() => {
-								setHide(true)
+								setHide(true);
 								denyDeal(
 									props.setPopout,
 									props.setSnackbar,
@@ -269,8 +271,8 @@ const AddMore2 = (props) => {
 										props.back();
 									},
 									(e) => {},
-									()=>{
-										setHide(false)
+									() => {
+										setHide(false);
 									}
 								);
 								props.back();

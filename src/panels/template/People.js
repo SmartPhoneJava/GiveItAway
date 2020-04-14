@@ -4,7 +4,7 @@ import { withModalRootContext } from '@vkontakte/vkui';
 
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 
-import {Draft} from './../../store/draft'
+import { Draft } from './../../store/draft';
 
 import { getSubscribers, Close } from './../../requests';
 
@@ -26,21 +26,16 @@ export const PeopleRB = withModalRootContext((props) => {
 	const [subs, setSubs] = useState([]);
 
 	useEffect(() => {
-		async function get() {
-			let { subscribers, err } = await getSubscribers(props.setPopout, props.setSnackbar, props.ad_id);
-			subscribers = subscribers || [];
-			console.log('subscribers2', subscribers);
-			if (!err) {
-				setSubs(subscribers);
-			}
-			props.updateModalHeight();
-			// if (err || subscribers.length == 0) {
-			//     props.back();
-			// }
-			return { subscribers, err };
-		}
-		get();
-		
+		getSubscribers(
+			props.setPopout,
+			props.setSnackbar,
+			props.ad_id,
+			(s) => {
+				setSubs(s);
+				props.updateModalHeight();
+			},
+			(e) => {}
+		);
 	}, [props.ad_id]);
 
 	return (
@@ -52,12 +47,11 @@ export const PeopleRB = withModalRootContext((props) => {
 						name="sub"
 						value={v.vk_id}
 						onClick={(e) => {
-							
-                            const { value } = e.currentTarget;
-                            console.log("value", value)
+							const { value } = e.currentTarget;
+							console.log('value', value);
 							Close(props.setPopout, props.setSnackbar, props.ad_id, value);
 							props.back();
-							Draft.dispatch({type:"set",new_state:"CLOSE"})
+							Draft.dispatch({ type: 'set', new_state: 'CLOSE' });
 						}}
 					>
 						<Cell key={v.vk_id} before={<Avatar size={36} src={v.photo_url} />}>
