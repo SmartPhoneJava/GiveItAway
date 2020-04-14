@@ -58,14 +58,12 @@ export const Location = (
 	const [accessToken, setAccessToken] = useState('');
 
 	async function getUserLocation() {
-		console.log('VKWebAppGetUserInfo:');
 		const data = await bridge.send('VKWebAppGetUserInfo', {});
 
 		if (country == NoRegion) {
 			setCountry(data.country);
 			setCountryID(data.country.id);
 		}
-		console.log('data.city.title', data.city.title);
 		if (city == NoRegion) {
 			setCity(data.city);
 			setCityID(data.city.id);
@@ -83,10 +81,8 @@ export const Location = (
 
 		const ctrs = vkctrs.response.items;
 
-		console.log('ctrsctrs', ctrs);
 		request_id++;
 		setCountries(ctrs);
-		// const rgs = updateRegions(apiVersion, setRegions, 1, el.access_token);
 		const cts = await updateCities(apiVersion, setCities, 1, null, el.access_token);
 		return { ctrs, cts };
 	}
@@ -95,9 +91,6 @@ export const Location = (
 		if (appID == 0) {
 			return;
 		}
-		let { ctrs, cts } = await setLocationInfo();
-
-		console.log('setDefault', setDefault);
 		if (setDefault) {
 			getUserLocation();
 		}
@@ -108,7 +101,7 @@ export const Location = (
 			setCountry(NoRegion);
 			return;
 		}
-		const c = countries.filter(v => v.id == e.target.value)[0];
+		const c = countries.filter((v) => v.id == e.target.value)[0];
 		setCountry(c);
 
 		// setRegion(NoRegion);
@@ -133,19 +126,16 @@ export const Location = (
 		setCountryID(country.id);
 	}, [country]);
 
-	console.log('country!!', country);
-	console.log('city!!', city);
-	// setCountryID(countries.map(v => v.title).indexOf(country));
-	// setCityID(cities.map(v => v.title).indexOf(city));
-
+	const width = document.body.clientWidth;
+	//vkPlatform == 'desktop_web'
 	return (
 		<Div
 			style={{
-				display: vkPlatform == 'desktop_web' ? 'flex' : 'block',
+				display: width > 400 ? 'flex' : 'block',
 				padding: '0px',
 			}}
 		>
-			<FormLayout>
+			<FormLayout style={{ flex: 1 }}>
 				<Select top="Страна" value={countryID} onChange={chooseCountry}>
 					{[
 						<option key={-112} value={-1}>
@@ -189,16 +179,16 @@ export const Location = (
 				</Select>
 			</FormLayout> */}
 
-			<FormLayout>
+			<FormLayout style={{ flex: 1 }}>
 				<Select
 					top="Город"
 					value={cityID}
-					onChange={e => {
+					onChange={(e) => {
 						if (e.target.value == -1) {
 							setCity(NoRegion);
 							return;
 						}
-						const c = cities.filter(v => v.id == e.target.value)[0];
+						const c = cities.filter((v) => v.id == e.target.value)[0];
 						setCity(c);
 					}}
 				>

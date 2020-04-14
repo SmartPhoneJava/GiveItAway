@@ -35,7 +35,7 @@ import { NoRegion } from './template/Location';
 
 import Profile from './story/profile/Profile';
 
-import {setOnline} from './story/profile/requests'
+import { setOnline } from './story/profile/requests';
 
 import AddsModal, { MODAL_FILTERS, MODAL_CATEGORIES, MODAL_SUBS } from './story/adds/AddsModal';
 import CreateModal from './story/create/CreateModal';
@@ -61,6 +61,8 @@ const addr = AddrWS.getState() + '/connection/websocket';
 let centrifuge = new Centrifuge(addr);
 
 let notsCounterr = 0;
+
+let oldChoosen = { ad_id: -1 };
 
 const Main = () => {
 	const [popout, setPopout] = useState(null); //<ScreenSpinner size="large" />
@@ -135,6 +137,31 @@ const Main = () => {
 		);
 	}
 
+	// const [wsAdID]
+	// const []
+
+	function turnOnNotifications() {
+		centrifuge.subscribe('user#' + myID, (mes) => {
+			notsCounterr++;
+		});
+	}
+
+	useEffect(() => {
+		console.log("choosen", choosen.ad_id)
+		if (choosen.ad_id == -1) {
+			return
+		}
+		centrifuge.disconnect();
+		turnOnNotifications()
+		
+		oldChoosen = choosen;
+		console.log("connecting", oldChoosen.ad_id)
+		centrifuge.subscribe('ad_' + oldChoosen.ad_id, (note) => {
+			console.log('centrifugu notenote', note);
+		});
+		centrifuge.connect()
+	}, [choosen]);
+
 	useEffect(() => {
 		console.log('tryyyyy', myID, count, notsCounterr);
 		if (myID == 0) {
@@ -145,20 +172,8 @@ const Main = () => {
 			setSnackbar,
 			(v) => {
 				setWsToken(v);
-				console.log('setWsToken', v.token);
-
-				console.log('wsToken success', wsToken);
-				console.log('before setToken', 'user#' + myID);
 				centrifuge.setToken(v.token);
-				console.log('we wanna connect', 'user#' + myID);
-				centrifuge.subscribe('user#' + myID, (mes) => {
-					notsCounterr++;
-					setCount(notsCounterr);
-					console.log('tryyyyy', count, notsCounterr);
-					setNotsCounter(10000);
-					console.log('centrifugu', notsCounter, notsCounterr);
-				});
-				console.log(' connect', 'user#' + myID);
+				turnOnNotifications()
 				centrifuge.connect();
 			},
 			(e) => {}
@@ -249,7 +264,7 @@ const Main = () => {
 								after={<Counter>100</Counter>}
 								// after={notsCounter == 0 ? '' : <Counter>notsCounter</Counter>}
 							>
-								<Icon28NewsfeedOutline />
+								<Icon28NewsfeedOutline onClick={onStoryChange} />
 							</TabbarItem>
 
 							<TabbarItem
@@ -258,7 +273,7 @@ const Main = () => {
 								data-story={add}
 								text={addText}
 							>
-								<Icon28Add />
+								<Icon28Add onClick={onStoryChange} />
 							</TabbarItem>
 							<TabbarItem
 								onClick={onStoryChange}
@@ -266,7 +281,7 @@ const Main = () => {
 								data-story={profile}
 								text={profileText}
 							>
-								<Icon28User />
+								<Icon28User onClick={onStoryChange} />
 							</TabbarItem>
 						</Tabbar>
 					}
@@ -346,6 +361,7 @@ const Main = () => {
 									setActivePanel('one-panel');
 									scroll();
 								}}
+								vkPlatform={vkPlatform}
 							/>
 							{snackbar}
 						</Panel>

@@ -452,6 +452,7 @@ const AddMore2 = (props) => {
 					style={{
 						width: '100%',
 						objectFit: 'cover',
+						maxHeight:'200px'
 					}}
 				/>
 				{/* <div style={{ right: '10px', position: 'absolute', top: '10px' }}>

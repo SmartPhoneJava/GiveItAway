@@ -237,6 +237,7 @@ const AddsTab = (props) => {
 	function Ad(ad) {
 		return (
 			<Add6
+				vkPlatform={props.vkPlatform}
 				openUser={props.openUser}
 				openAd={() => props.openAd(ad)}
 				ad={ad}
@@ -250,6 +251,9 @@ const AddsTab = (props) => {
 		);
 	}
 
+	const width = document.body.clientWidth;
+	console.log('width', width);
+
 	console.log('loading', loading);
 
 	return (
@@ -258,14 +262,49 @@ const AddsTab = (props) => {
 			<Group>
 				{ads.length > 0 ? (
 					ads.map((ad, index) => {
-						if (ads.length === index + 1) {
+						if (!width || width < 500) {
+							if (ads.length === index + 1) {
+								return (
+									<div key={ad.ad_id} ref={lastAdElementRef}>
+										{Ad(ad)}
+									</div>
+								);
+							}
+							return <div key={ad.ad_id}>{Ad(ad)}</div>;
+						}
+						if (index % 2) {
+							const prev = ads[index - 1];
+							const first = (
+								<div style={{ flex: 1 }} key={prev.ad_id}>
+									{Ad(prev)}
+								</div>
+							);
+
+							let second = (
+								<div style={{ flex: 1 }} key={ad.ad_id}>
+									{Ad(ad)}
+								</div>
+							);
+
+							if (ads.length === index + 1) {
+								second = (
+									<div style={{ flex: 1 }} key={ad.ad_id} ref={lastAdElementRef}>
+										{Ad(ad)}
+									</div>
+								);
+							}
+							return (
+								<div style={{ display: 'flex' }}>
+									{first} {second}
+								</div>
+							);
+						}
+						if (index % 2 == 0 && ads.length - 1 == index) {
 							return (
 								<div key={ad.ad_id} ref={lastAdElementRef}>
 									{Ad(ad)}
 								</div>
 							);
-						} else {
-							return <div key={ad.ad_id}>{Ad(ad)}</div>;
 						}
 					})
 				) : error ? (

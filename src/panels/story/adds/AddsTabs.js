@@ -123,6 +123,7 @@ const AddsTabs = (props) => {
 				/>
 			) : (
 				<AddsTab
+					vkPlatform={props.vkPlatform}
 					openAd={(v) => {
 						props.openAd(v);
 						props.setSavedAdState(tabAdds);

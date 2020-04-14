@@ -24,11 +24,11 @@ table {
 	padding-bottom: 12px;
 	border-right: 15px;
 	line-height: 2;
-	border-spacing: 20px 2px;
+	border-spacing: 5px 2px;
 }
 td {
 	text-align: left;
-	width: 10%;
+	padding-left: 20px;
 }
 
 .first {

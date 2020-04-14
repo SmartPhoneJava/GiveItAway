@@ -101,7 +101,7 @@ export function AdLight(ad, image, openAd) {
 }
 
 const Add6 = (props) => {
-	const [ad, setAd] = useState(props.ad || AdDefault);
+	const [ad, setAd] = useState(props.ad);
 	const [haveDeal, setHaveDeal] = useState(false);
 	const [isVisible, setIsVisible] = useState(true);
 
@@ -243,6 +243,10 @@ const Add6 = (props) => {
 				)}
 			</div>
 		);
+	}
+	
+	if (!ad) {
+		return <></>
 	}
 	return (
 		<div className="outter">

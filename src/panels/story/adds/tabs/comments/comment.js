@@ -1,19 +1,9 @@
 import React, { useState } from 'react';
-import {
-	PanelHeaderSimple,
-	Link,
-	Avatar,
-	Button,
-	Cell,
-	CellButton,
-	Group,
-	PanelHeaderButton,
-	PanelHeaderContext,
-	TabsItem,
-	Tabs,
-} from '@vkontakte/vkui';
+import { PanelHeaderSimple, Link, Avatar, Button, Cell } from '@vkontakte/vkui';
 
 import './comment.css';
+
+import {time} from "./../../../../../utils/time"
 
 function shortText(str, newLength) {
 	if (str.length > newLength) {
@@ -63,7 +53,7 @@ const Comment = (props) => {
 			multiline="true"
 			description={
 				<div style={{ display: 'flex', marginTop: '2px' }}>
-					<div style={{ marginRight: '4px' }}>{props.v.creation_date_time} </div>
+					<div style={{ marginRight: '4px' }}>{time(props.v.creation_date_time)} </div>
 				</div>
 			}
 			before={getImage(props)}

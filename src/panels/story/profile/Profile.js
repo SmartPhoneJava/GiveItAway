@@ -1,20 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import {
-	PanelHeaderSimple,
-	Link,
-	Avatar,
-	Button,
-	Cell,
-	Header,
-	Group,
-	PanelHeaderButton,
-	PanelHeaderContext,
-	Placeholder,
-	HorizontalScroll,
-	Separator,
-} from '@vkontakte/vkui';
+import { Avatar, Button, Cell, Header, Group, Placeholder, HorizontalScroll, Separator } from '@vkontakte/vkui';
 
-import { XYPlot, XAxis, YAxis, HorizontalGridLines, LineSeries, DiscreteColorLegend, RadialChart } from 'react-vis';
+import { RadialChart } from 'react-vis';
 
 // import 'react-vis/dist/style';
 
@@ -49,7 +36,6 @@ function getAuthorHref(backuser) {
 	if (!backuser) {
 		return '';
 	}
-	const id = backuser.vk_id;
 	const name = backuser.name + ' ' + backuser.surname;
 	return <div style={{ fontWeight: '600', fontSize: '16px' }}>{name}</div>;
 }
@@ -59,9 +45,7 @@ const Profile = (props) => {
 	const [status, setStatus] = useState('');
 	const [online, setOnline] = useState(false);
 
-	const [search, setSearch] = useState('');
-
-	const [items, setItems] = useState([]);
+	const width = document.body.clientWidth;
 
 	const [givenPageNumber, setGivenPageNumber] = useState(1);
 	let { given_loading, given, given_hasMore, given_newPage } = useAdGiven(
@@ -188,6 +172,7 @@ const Profile = (props) => {
 			</HorizontalScroll>
 		);
 	}
+
 	if (backuser) {
 		return (
 			<>
@@ -207,9 +192,17 @@ const Profile = (props) => {
 				</Cell>
 
 				<Group header={<Header mode="secondary">Карма - 0</Header>}>
-					<Cell indicator={backuser.frozen_carma}>Заморожено</Cell>
-					<Cell indicator={backuser.total_earned_carma}>Получено</Cell>
-					<Cell indicator={backuser.total_spent_carma}>Потрачено</Cell>
+					<div style={{ display: width < 400 ? 'block' : 'flex' }}>
+						<Cell style={{ flex: 1 }} indicator={backuser.frozen_carma}>
+							Заморожено
+						</Cell>
+						<Cell style={{ flex: 1 }} indicator={backuser.total_earned_carma}>
+							Получено
+						</Cell>
+						<Cell style={{ flex: 1 }} indicator={backuser.total_spent_carma}>
+							Потрачено
+						</Cell>
+					</div>
 				</Group>
 
 				<Group header={<Header mode="secondary">Отдано вещей - {backuser.total_given_ads}</Header>}>
@@ -265,9 +258,18 @@ const Profile = (props) => {
 					)}
 				</Group>
 				<Separator style={{ marginBottom: '10px' }} />
-				<div style={{ display: 'flex', textAlign: 'center' }}>
-					<div style={{ display: 'block', alignItems: 'center', justifyContent: 'center' }}>
-						Вещей
+				<div style={{ display: 'flex', alignItems: 'center', textAlign: 'center', justifyContent: 'center' }}>
+					<div
+						style={{
+							display: 'block',
+							flex: 1,
+							alignItems: 'center',
+							justifyContent: 'center',
+							marginLeft: 'auto',
+							marginRight: 'auto',
+						}}
+					>
+						<div>Вещей</div>
 						<RadialChart
 							data={[
 								{ angle: backuser.total_given_ads, color: '#00CCFF' },
@@ -275,51 +277,50 @@ const Profile = (props) => {
 									angle: backuser.total_received_ads,
 									color: '#FFCC33',
 								},
-								
 							]}
 							showLabels={true}
 							radius={40}
 							innerRadius={30}
-							width={180}
+							width={width / 2}
 							height={100}
 							labelsAboveChildren={false}
 							labelsRadiusMultiplier={2}
 							colorType="literal"
 						/>
-						<div style={{ display: 'flex', paddingLeft: '50px' }}>
+
+						<div style={{ display: 'flex', justifyContent: 'center' }}>
 							<Avatar style={{ background: '#00CCFF', marginRight: '3px' }} size={14}></Avatar>
 							<>Отдано</>
 						</div>
-						<div style={{ display: 'flex', paddingLeft: '50px' }}>
+						<div style={{ display: 'flex', paddingLeft: '15px', justifyContent: 'center' }}>
 							<Avatar style={{ background: '#FFCC33', marginRight: '3px' }} size={14}></Avatar>
 							<>Получено</>
 						</div>
 					</div>
-					<div style={{ display: 'block' }}>
+					<div style={{ flex: 1, display: 'block' }}>
 						Обменов
 						<RadialChart
-						data={[
-							{ angle: backuser.total_given_ads + backuser.total_received_ads, color: '#00CC66' },
-							{
-								angle: backuser.total_aborted_ads,
-								color: '#FF9933',
-							},
-							
-						]}
+							data={[
+								{ angle: backuser.total_given_ads + backuser.total_received_ads, color: '#00CC66' },
+								{
+									angle: backuser.total_aborted_ads,
+									color: '#FF9933',
+								},
+							]}
 							colorType="literal"
 							showLabels={true}
 							radius={40}
 							innerRadius={30}
-							width={180}
+							width={width / 2}
 							height={100}
 							labelsAboveChildren={false}
 							labelsRadiusMultiplier={2}
 						/>
-						<div style={{ display: 'flex', paddingLeft: '50px' }}>
+						<div style={{ display: 'flex', paddingLeft: '18px', justifyContent: 'center' }}>
 							<Avatar style={{ background: '#00CC66', marginRight: '3px' }} size={14}></Avatar>
 							<>Проведено</>
 						</div>
-						<div style={{ display: 'flex', paddingLeft: '50px' }}>
+						<div style={{ display: 'flex', justifyContent: 'center' }}>
 							<Avatar style={{ background: '#FF9933', marginRight: '3px' }} size={14}></Avatar>
 							<>Сорвано</>
 						</div>

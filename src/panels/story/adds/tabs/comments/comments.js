@@ -193,7 +193,7 @@ function showComments(
 										<ActionSheetItem
 											autoclose
 											mode="destructive"
-											onClick={async () => {
+											onClick={() => {
 												setHide(true);
 												deleteComment(
 													setPopout,

@@ -12,7 +12,7 @@ export function time(t) {
 	if (get.getDate() == now.getDate() && get.getMonth() == now.getMonth() && now.getFullYear() == get.getFullYear()) {
 		result = 'Сегодня в ' + hAdd + get.getHours() + ':' + miAdd + get.getMinutes();
 	} else {
-		result = get + '!!!' + dAdd + get.getDate() + '.' + moAdd + (get.getMonth() + 1) + '.' + get.getFullYear();
+		result = dAdd + get.getDate() + '.' + moAdd + (get.getMonth() + 1) + '.' + get.getFullYear();
 	}
 
 	return result;
