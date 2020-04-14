@@ -34,7 +34,14 @@ function getHeader(props) {
 		return '';
 	}
 	const header = props.notification.payload.ad.header;
-	return <Link style={{ marginRight: '3px' }}>{shortText(header, 30)}</Link>;
+	return (
+		<span
+			onClick={() => props.openAd(props.notification.payload.ad)}
+			style={{ marginRight: '3px', color: '#2F91FD' }}
+		>
+			{shortText(header, 30)}
+		</span>
+	);
 }
 
 function getImage(props) {
@@ -64,9 +71,12 @@ function getAuthorHref(props) {
 	const id = props.notification.payload.author.vk_id;
 	const name = props.notification.payload.author.name;
 	return (
-		<Link style={{ marginRight: '3px' }} href={'https://vk.com/id' + id}>
+		<span
+			style={{ marginRight: '3px', color: '#2F91FD' }}
+			onClick={() => props.openUser(props.notification.payload.author.vk_id)}
+		>
 			{name}
-		</Link>
+		</span>
 	);
 }
 
@@ -108,18 +118,17 @@ export const NotificationClose = (props) => {
 				</div>
 			}
 			before={getImage(props)}
-			bottomContent={
-				<div style={{ display: 'flex' }}>
-					<Button mode="commerce" style={{ marginRight: '5px' }}>
-						Подтвердить
-					</Button>
-					<Button mode="destructive">Отклонить</Button>
-				</div>
-			}
+			// bottomContent={
+			// 	<div style={{ display: 'flex' }}>
+			// 		<Button mode="commerce" style={{ marginRight: '5px' }}>
+			// 			Подтвердить
+			// 		</Button>
+			// 		<Button mode="destructive">Отклонить</Button>
+			// 	</div>
+			// }
 		>
 			<div className="block">
-				<div> Вы были указаны получателем вещи в</div>
-				{getHeader(props)}
+				Вы были указаны получателем вещи в {getHeader(props)}
 			</div>
 		</Cell>
 	);
@@ -168,7 +177,7 @@ export const NotificationRespond = (props) => {
 export const NotificationFulFill = (props) => {
 	return (
 		<Cell
-			onClick={()=>props.openAd(props.notification.payload.ad)}
+			onClick={() => props.openAd(props.notification.payload.ad)}
 			className="block_in"
 			size="l"
 			multiline="true"
@@ -180,9 +189,7 @@ export const NotificationFulFill = (props) => {
 			before={getImage(props)}
 		>
 			<div className="block">
-				<div>
-					Объявление {getHeader(props)} успешно завершено
-				</div>
+				<div>Объявление {getHeader(props)} успешно завершено</div>
 			</div>
 		</Cell>
 	);
@@ -212,14 +219,12 @@ export const NotificationStatistics = (props) => {
 			className="block_in"
 			size="l"
 			multiline="true"
-			description={
-					<div style={{ marginRight: '4px' }}>{props.notification.creation_date_time} </div>
-			}
+			description={<div style={{ marginRight: '4px' }}>{props.notification.creation_date_time} </div>}
 			before={getImage(props)}
 		>
 			<div className="block">
-					<Link style={{ marginRight: '3px' }}> {getHeader(props)}</Link>
-					просмотрели {props.notification.payload.views} раз
+				<Link style={{ marginRight: '3px' }}> {getHeader(props)}</Link>
+				просмотрели {props.notification.payload.views} раз
 			</div>
 		</Cell>
 	);

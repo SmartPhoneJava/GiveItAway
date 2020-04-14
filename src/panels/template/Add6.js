@@ -267,7 +267,7 @@ const Add6 = (props) => {
 				onClick={openSettings}
 				disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
 			>
-				<Icon28SettingsOutline fill="#305ADF" />
+				<Icon28SettingsOutline fill="#2F91FD" />
 			</PanelHeaderButton>
 		) : (
 			''
