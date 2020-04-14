@@ -174,7 +174,7 @@ function showComments(
 							onClick={() => {
 								console.log('compare', v.author.vk_id, myID);
 								if (v.author.vk_id != myID) {
-									openUser(v.author.vk_id)
+									openUser(v.author.vk_id);
 									return;
 								}
 
@@ -256,11 +256,11 @@ const Comments = (props) => {
 		props.ad.ad_id
 	);
 	const [nots, setNots] = useState([]);
-	useEffect(()=>{
+	useEffect(() => {
 		if (tnots && tnots.length != 0) {
-			setNots(tnots)
-		} 
-	})
+			setNots(tnots);
+		}
+	});
 
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
@@ -276,6 +276,72 @@ const Comments = (props) => {
 		},
 		[loading, hasMore]
 	);
+
+	function sendComment() {
+		setHide(true);
+		if (editableID != NO_ID) {
+			const comment = nots.filter((v) => v.comment_id == editableID)[0];
+			comment.text = text;
+			const obj = JSON.stringify({
+				comment_id: comment.comment_id,
+				author_id: props.myID,
+				text: text,
+			});
+			editComment(
+				props.setPopout,
+				props.setSnackbar,
+				comment.comment_id,
+				obj,
+				(v) => {
+					setEditableID(NO_ID);
+					setText('');
+				},
+				(e) => {},
+				() => {
+					setHide(false);
+				}
+			);
+		} else {
+			if (text.length == 0) {
+				props.setSnackbar(
+					<Snackbar
+						duration="2000"
+						onClose={() => {
+							props.setSnackbar(null);
+							setHide(false);
+						}}
+						before={
+							<Avatar size={24} style={{ background: 'red' }}>
+								<Icon24Cancel fill="#fff" width={14} height={14} />
+							</Avatar>
+						}
+					>
+						Нельзя отправить комментарий без текста
+					</Snackbar>
+				);
+
+				return;
+			}
+			const obj = JSON.stringify({
+				author_id: props.myID,
+				text: text,
+			});
+			postComment(
+				props.setPopout,
+				props.setSnackbar,
+				props.ad.ad_id,
+				obj,
+				(v) => {
+					setSearch(text);
+					setText('');
+				},
+				(e) => {},
+				() => {
+					setHide(false);
+				}
+			);
+		}
+	}
 
 	return (
 		<div>
@@ -296,93 +362,22 @@ const Comments = (props) => {
 			{hide || props.hide ? (
 				''
 			) : (
-				<Input
-					className="write"
-					placeholder="Комментарий"
-					value={text}
-					onChange={(e) => {
-						const { _, value } = e.currentTarget;
-						setText(value);
-					}}
-				/>
-			)}
-
-			{hide || props.hide ? (
-				''
-			) : (
-				<PanelHeaderButton
-					className="write-button"
-					onClick={() => {
-						setHide(true);
-						console.log('editableIDeditableID', editableID);
-						if (editableID != NO_ID) {
-							const comment = nots.filter((v) => v.comment_id == editableID)[0];
-							comment.text = text;
-							const obj = JSON.stringify({
-								comment_id: comment.comment_id,
-								author_id: props.myID,
-								text: text,
-							});
-							editComment(
-								props.setPopout,
-								props.setSnackbar,
-								comment.comment_id,
-								obj,
-								(v) => {
-									setEditableID(NO_ID);
-									setText('');
-								},
-								(e) => {},
-								() => {
-									setHide(false);
-								}
-							);
-						} else {
-							if (text.length == 0) {
-								props.setSnackbar(
-									<Snackbar
-										duration="2000"
-										onClose={() => {
-											props.setSnackbar(null);
-											setHide(false);
-										}}
-										before={
-											<Avatar size={24} style={{ background: 'red' }}>
-												<Icon24Cancel fill="#fff" width={14} height={14} />
-											</Avatar>
-										}
-									>
-										Нельзя отправить комментарий без текста
-									</Snackbar>
-								);
-
-								return;
-							}
-							const obj = JSON.stringify({
-								author_id: props.myID,
-								text: text,
-							});
-							postComment(
-								props.setPopout,
-								props.setSnackbar,
-								props.ad.ad_id,
-								obj,
-								(v) => {
-									setSearch(text);
-									setText('');
-								},
-								(e) => {},
-								() => {
-									setHide(false);
-								}
-							);
-						}
-					}}
-				>
-					<Avatar size="20">
-						<Icon24Send style={{ color: '#0071B8' }} size="24" />
-					</Avatar>
-				</PanelHeaderButton>
+				<div className="write">
+					<Input
+						style={{ paddingRight: '30px' }}
+						placeholder="Комментарий"
+						value={text}
+						onChange={(e) => {
+							const { _, value } = e.currentTarget;
+							setText(value);
+						}}
+					/>
+					<PanelHeaderButton className="write-button" onClick={sendComment}>
+						<Avatar size="20">
+							<Icon24Send style={{ color: '#0071B8' }} size="24" />
+						</Avatar>
+					</PanelHeaderButton>
+				</div>
 			)}
 		</div>
 	);

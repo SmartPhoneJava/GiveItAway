@@ -58,6 +58,7 @@ const AddsTabs = (props) => {
 							<Icon16Dropdown
 								fill="var(--accent)"
 								style={{
+									marginLeft:"15px",
 									transition: '0.3s',
 									transform: `rotate(${contextOpened ? '180deg' : '0'})`,
 								}}

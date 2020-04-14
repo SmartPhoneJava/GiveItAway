@@ -22,16 +22,17 @@ background: '#F2F3F5',
 */
 
 .write {
-	background: #f2f3f5;
+	
 
 	position: fixed;
-	margin-bottom: 50px;
+	margin-bottom: 52px;
 
 	bottom: 0;
 	left: 0;
 	right: 0;
 	z-index: 100;
-	padding-right: 20px;
+	padding-right: 2px;
+	padding-left: 4px;
 	margin-right: 2px;
 
 	border-style: solid;
@@ -42,8 +43,9 @@ background: '#F2F3F5',
 .write-button {
 	background: #f2f3f5;
 	position: fixed;
-	margin-bottom: 48px;
+	margin-bottom: 72px;
 	margin-right: 20px;
+	height: auto;
 	bottom: 0;
 	right: 0;
 	z-index: 101;
