@@ -27,7 +27,7 @@ import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 
 import OpenActions from './components/actions';
 
-import { getDetails } from './../../requests';
+import {time} from "./../../utils/time"
 
 import { Draft } from './../../store/draft';
 
@@ -218,7 +218,7 @@ const Add6 = (props) => {
 							color: 'grey',
 						}}
 					>
-						{ad.creation_date}
+						{time(ad.creation_date)}
 					</div>
 				</div>
 			</div>

@@ -18,14 +18,6 @@ import { GetCategoryText } from './Categories';
 
 import Icon24CommentOutline from '@vkontakte/icons/dist/24/comment_outline';
 import Icon24Chats from '@vkontakte/icons/dist/24/chats';
-import Icon16Place from '@vkontakte/icons/dist/16/place';
-import Icon24Delete from '@vkontakte/icons/dist/24/delete';
-import Icon24Hide from '@vkontakte/icons/dist/24/hide';
-
-import Icon24VideoFill from '@vkontakte/icons/dist/24/video_fill';
-import Icon24ShareOutline from '@vkontakte/icons/dist/24/share_outline';
-import Icon24LikeOutline from '@vkontakte/icons/dist/24/like_outline';
-import Icon24Notification from '@vkontakte/icons/dist/24/notification';
 
 import Icon24Phone from '@vkontakte/icons/dist/24/phone';
 import Icon24Mention from '@vkontakte/icons/dist/24/mention';
@@ -34,9 +26,6 @@ import Icon24Message from '@vkontakte/icons/dist/24/message';
 
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
-
-import Icon28ArrowLeftOutline from '@vkontakte/icons/dist/28/arrow_left_outline';
-import Icon28ArrowRightOutline from '@vkontakte/icons/dist/28/arrow_right_outline';
 
 import Icon24Settings from '@vkontakte/icons/dist/24/settings';
 import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
@@ -59,6 +48,8 @@ import Bb from './../../img/bb.jpg';
 import Comments from './../story/adds/tabs/comments/comments';
 
 import OpenActions from './components/actions';
+
+import {time} from "./../../utils/time"
 
 const COLOR_DEFAULT = 'rgba(0,0,0,0.6)';
 const COLOR_DONE = 'rgba(0,75,0,0.8)';
@@ -609,7 +600,7 @@ const AddMore2 = (props) => {
 
 					<tr>
 						<td className="first">Размещено</td>
-						<td>{ad.creation_date}</td>
+						<td>{time(ad.creation_date)}</td>
 					</tr>
 				</tbody>
 			</table>

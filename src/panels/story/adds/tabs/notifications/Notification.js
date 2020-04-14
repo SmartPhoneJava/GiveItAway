@@ -1,19 +1,9 @@
 import React, { useState } from 'react';
-import {
-	PanelHeaderSimple,
-	Link,
-	Avatar,
-	Button,
-	Cell,
-	Header,
-	Group,
-	PanelHeaderButton,
-	PanelHeaderContext,
-	TabsItem,
-	Tabs,
-} from '@vkontakte/vkui';
+import { PanelHeaderSimple, Link, Avatar, Button, Cell } from '@vkontakte/vkui';
 
 import './notification.css';
+
+import { time } from './../../../../../utils/time';
 
 function shortText(str, newLength) {
 	if (str.length > newLength) {
@@ -114,7 +104,7 @@ export const NotificationClose = (props) => {
 			multiline="true"
 			description={
 				<div style={{ display: 'flex' }}>
-					<div style={{ marginRight: '4px' }}>{props.notification.creation_date_time} </div>
+					<div style={{ marginRight: '4px' }}>{time(props.notification.creation_date_time)} </div>
 				</div>
 			}
 			before={getImage(props)}
@@ -127,9 +117,7 @@ export const NotificationClose = (props) => {
 			// 	</div>
 			// }
 		>
-			<div className="block">
-				Вы были указаны получателем вещи в {getHeader(props)}
-			</div>
+			<div className="block">Вы были указаны получателем вещи в {getHeader(props)}</div>
 		</Cell>
 	);
 };
@@ -142,7 +130,7 @@ export const NotificationStatus = (props) => {
 			multiline="true"
 			description={
 				<div style={{ display: 'flex' }}>
-					<div style={{ marginRight: '4px' }}>{props.notification.creation_date_time} </div>
+					<div style={{ marginRight: '4px' }}>{time(props.notification.creation_date_time)} </div>
 				</div>
 			}
 			before={getImage(props)}
@@ -160,7 +148,7 @@ export const NotificationRespond = (props) => {
 			multiline="true"
 			description={
 				<div style={{ display: 'flex' }}>
-					<div style={{ marginRight: '4px' }}>{props.notification.creation_date_time} </div>
+					<div style={{ marginRight: '4px' }}>{time(props.notification.creation_date_time)} </div>
 				</div>
 			}
 			before={getImage(props)}
@@ -183,7 +171,7 @@ export const NotificationFulFill = (props) => {
 			multiline="true"
 			description={
 				<div style={{ display: 'flex' }}>
-					<div style={{ marginRight: '4px' }}>{props.notification.creation_date_time} </div>
+					<div style={{ marginRight: '4px' }}>{time(props.notification.creation_date_time)} </div>
 				</div>
 			}
 			before={getImage(props)}
@@ -203,7 +191,7 @@ export const NotificationDeleted = (props) => {
 			multiline="true"
 			description={
 				<div style={{ display: 'flex' }}>
-					<div style={{ marginRight: '4px' }}>{props.notification.creation_date_time} </div>
+					<div style={{ marginRight: '4px' }}>{time(props.notification.creation_date_time)} </div>
 				</div>
 			}
 			before={getImage(props)}
@@ -219,7 +207,7 @@ export const NotificationStatistics = (props) => {
 			className="block_in"
 			size="l"
 			multiline="true"
-			description={<div style={{ marginRight: '4px' }}>{props.notification.creation_date_time} </div>}
+			description={<div style={{ marginRight: '4px' }}>{time(props.notification.creation_date_time)} </div>}
 			before={getImage(props)}
 		>
 			<div className="block">
