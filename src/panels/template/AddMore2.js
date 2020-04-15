@@ -430,6 +430,7 @@ const AddMore2 = (props) => {
 	}
 
 	if (ad) {
+		const imgs = ad.pathes_to_photo.map(v=>v.PhotoUrl)
 		return (
 			<div>
 				{request}
@@ -444,7 +445,7 @@ const AddMore2 = (props) => {
 						onClick={() => {
 							bridge
 								.send('VKWebAppShowImages', {
-									images: [ad.pathes_to_photo],
+									images: imgs,
 								})
 								.catch(function (error) {
 									// console.log('failed open vk image', error);
@@ -452,7 +453,7 @@ const AddMore2 = (props) => {
 									// w.document.write("<img src='" + image + "' alt='from old image' />"); //  вставляем картинку
 									// ad.title=""+error //  вставляем картинку
 									// setAd(ad)
-									setRequest(""+  JSON.stringify(error))
+									setRequest('' + JSON.stringify(error));
 								});
 						}}
 						srcSet={image}
