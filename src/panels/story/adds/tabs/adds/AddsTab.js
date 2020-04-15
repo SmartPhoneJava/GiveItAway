@@ -308,10 +308,10 @@ const AddsTab = (props) => {
 						}
 					})
 				) : error ? (
-					//<Error />
-					addsArrDD.map((ad) => {
-						return <div key={ad.ad_id}>{Ad(ad)}</div>;
-					})
+					<Error />
+					// addsArrDD.map((ad) => {
+					// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
+					// })
 				) : // addsArrDD.map(ad => {
 				// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
 				// })

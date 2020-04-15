@@ -13,6 +13,8 @@ import Bb from './../../../../../img/bb.jpg';
 
 import Icon56ErrorOutline from '@vkontakte/icons/dist/56/error_outline';
 
+import Error from './../../../../placeholders/error';
+
 import './notification.css';
 import Notification, {
 	NotificationClose,
@@ -257,41 +259,47 @@ const Notifications = (props) => {
 	const arrNotRead = nots.filter((v) => !v.is_read);
 	const arrRead = nots.filter((v) => v.is_read);
 
-	console.log("arrRead:", arrRead)
-	props.zeroNots()
-	return (
-		<div style={{ background: '#F7F7F7' }}>
-			{arrNotRead.length > 0 ? (
-				<Group header={<Header mode="secondary">Непрочитанные</Header>}>
-					{getNotifications(arrNotRead, lastAdElementRef, props.openUser, props.openAd)}
-				</Group>
-			) : (
-				''
-			)}
-			{arrRead.length > 0 ? (
-				<Group header={<Header mode="secondary">Прочитанные</Header>}>
-					{getNotifications(arrRead, lastAdElementRef, props.openUser, props.openAd)}
-				</Group>
-			) : (
-				''
-			)}
-			{arrNotRead.length + arrRead.length == 0 ? (
-				<Placeholder
-					icon={<Icon56ErrorOutline />}
-					header="Пусто"
-					action={
-						<Button onClick={() => props.goToAds()} size="l">
-							Вернуться в ленту обьявлений
-						</Button>
-					}
-				>
-					Вы еще не получили ни одного уведомления
-				</Placeholder>
-			) : (
-				''
-			)}
-		</div>
-	);
+	console.log('arrRead:', arrRead, error);
+	props.zeroNots();
+	if (error) {
+		return <Error />;
+	}
+	if (inited) {
+		return (
+			<div style={{ background: '#F7F7F7' }}>
+				{arrNotRead.length > 0 ? (
+					<Group header={<Header mode="secondary">Непрочитанные</Header>}>
+						{getNotifications(arrNotRead, lastAdElementRef, props.openUser, props.openAd)}
+					</Group>
+				) : (
+					''
+				)}
+				{arrRead.length > 0 ? (
+					<Group header={<Header mode="secondary">Прочитанные</Header>}>
+						{getNotifications(arrRead, lastAdElementRef, props.openUser, props.openAd)}
+					</Group>
+				) : (
+					''
+				)}
+				{arrNotRead.length + arrRead.length == 0 ? (
+					<Placeholder
+						icon={<Icon56ErrorOutline />}
+						header="Пусто"
+						action={
+							<Button onClick={() => props.goToAds()} size="l">
+								Вернуться в ленту обьявлений
+							</Button>
+						}
+					>
+						Вы еще не получили ни одного уведомления
+					</Placeholder>
+				) : (
+					''
+				)}
+			</div>
+		);
+	}
+	return <></>;
 };
 
 export default Notifications;

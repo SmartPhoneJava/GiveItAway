@@ -1,6 +1,6 @@
 .profile-block {
-    line-height: 1.4;
-    font-size: 14px;
+	line-height: 1.4;
+	font-size: 14px;
 }
 
 .profile-main-left {
@@ -24,3 +24,21 @@ img.profile-tiled {
 	width: 120px;
 	height: 120px;
 }
+
+.profile-carma-label {
+	flex: 1;
+}
+
+.infographics-main {
+	margin-bottom: 10px;
+	display: flex;
+	align-items: center;
+	text-align: center;
+	justify-content: center;
+}
+
+.infographics-column {
+	display: block;
+	flex: 1;
+}
+

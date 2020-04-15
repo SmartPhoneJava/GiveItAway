@@ -53,6 +53,7 @@ export default function useNotificationsGet(setPopout, query, pageNumber, rowsPe
 			})
 			.catch((e) => {
 				console.log('fail', e);
+				setError(true)
 				if (axios.isCancel(e)) return;
 				
 				setPopout(null);

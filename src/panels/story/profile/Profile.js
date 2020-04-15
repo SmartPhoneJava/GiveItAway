@@ -14,6 +14,8 @@ import { AdLight } from './../../template/Add6';
 
 import Icon56DoNotDisturbOutline from '@vkontakte/icons/dist/56/do_not_disturb_outline';
 
+import Error from "./../../placeholders/error"
+
 import './profile.css';
 
 function shortText(str, newLength) {
@@ -44,6 +46,7 @@ const Profile = (props) => {
 	const [backuser, setBackUser] = useState();
 	const [status, setStatus] = useState('');
 	const [online, setOnline] = useState(false);
+	const [failed, setFailed] = useState(false);
 
 	const width = document.body.clientWidth;
 
@@ -101,7 +104,9 @@ const Profile = (props) => {
 			(v) => {
 				setBackUser(v);
 			},
-			(e) => {}
+			(e) => {
+				setFailed(true)
+			}
 		);
 
 		getUserVK(
@@ -193,13 +198,13 @@ const Profile = (props) => {
 
 				<Group header={<Header mode="secondary">Карма - 0</Header>}>
 					<div style={{ display: width < 400 ? 'block' : 'flex' }}>
-						<Cell style={{ flex: 1 }} indicator={backuser.frozen_carma}>
+						<Cell className="profile-carma-label" indicator={backuser.frozen_carma}>
 							Заморожено
 						</Cell>
-						<Cell style={{ flex: 1 }} indicator={backuser.total_earned_carma}>
+						<Cell className="profile-carma-label" indicator={backuser.total_earned_carma}>
 							Получено
 						</Cell>
-						<Cell style={{ flex: 1 }} indicator={backuser.total_spent_carma}>
+						<Cell className="profile-carma-label" indicator={backuser.total_spent_carma}>
 							Потрачено
 						</Cell>
 					</div>
@@ -258,17 +263,8 @@ const Profile = (props) => {
 					)}
 				</Group>
 				<Separator style={{ marginBottom: '10px' }} />
-				<div style={{ display: 'flex', alignItems: 'center', textAlign: 'center', justifyContent: 'center' }}>
-					<div
-						style={{
-							display: 'block',
-							flex: 1,
-							alignItems: 'center',
-							justifyContent: 'center',
-							marginLeft: 'auto',
-							marginRight: 'auto',
-						}}
-					>
+				<div className="infographics-main">
+					<div className="infographics-column">
 						<div>Вещей</div>
 						<RadialChart
 							data={[
@@ -297,7 +293,7 @@ const Profile = (props) => {
 							<>Получено</>
 						</div>
 					</div>
-					<div style={{ flex: 1, display: 'block' }}>
+					<div className="infographics-column">
 						Обменов
 						<RadialChart
 							data={[
@@ -329,7 +325,25 @@ const Profile = (props) => {
 			</>
 		);
 	}
+	if (failed) {
+		return <Error action={()=>{
+			getUser(
+				props.setPopout,
+				props.setSnackbar,
+				props.profileID,
+				(v) => {
+					setBackUser(v);
+					setFailed(false)
+				},
+				(e) => {
+					setFailed(true)
+				}
+			);
+		}}/>
+	}
 	return <></>;
 };
 
 export default Profile;
+
+// 337
