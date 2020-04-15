@@ -136,8 +136,7 @@ const Main = () => {
 		);
 	}
 
-	// const [wsAdID]
-	// const []
+	const [wsNote, setwsNote]=useState({notification_type:"no"})
 
 	function turnOnNotifications() {
 		centrifuge.subscribe('user#' + myID, (mes) => {
@@ -157,6 +156,7 @@ const Main = () => {
 		console.log('connecting', oldChoosen.ad_id);
 		centrifuge.subscribe('ad_' + oldChoosen.ad_id, (note) => {
 			console.log('centrifugu notenote', note);
+			setwsNote(note)
 		});
 		centrifuge.connect();
 	}, [choosen]);
@@ -336,6 +336,7 @@ const Main = () => {
 					</PanelHeaderSimple>
 					{choosen ? (
 						<AddMore2
+							wsNote={wsNote}
 							refresh={(id) => {
 								setActivePanel('header-search');
 								SetDeleteID(id);
