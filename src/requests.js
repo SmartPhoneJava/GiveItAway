@@ -660,3 +660,22 @@ export function sucessNoCancel(text, setSnackbar, end) {
 		</Snackbar>
 	);
 }
+
+export function sendSnack(text, setSnackbar) {
+	setSnackbar(
+		<Snackbar
+			style={{zIndex:"120"}}
+			duration="1500"
+			onClose={() => {
+				setSnackbar(null);
+			}}
+			before={
+				<Avatar size={24} style={{ background: 'green' }}>
+					<Icon24DoneOutline fill="#fff" width={14} height={14} />
+				</Avatar>
+			}
+		>
+			{text}
+		</Snackbar>
+	);
+}

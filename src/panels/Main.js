@@ -9,6 +9,7 @@ import {
 	PanelHeaderBack,
 	TabbarItem,
 	PanelHeaderSimple,
+	Snackbar,
 	ScreenSpinner,
 	Counter,
 } from '@vkontakte/vkui';
@@ -23,6 +24,8 @@ import Icon28Add from '@vkontakte/icons/dist/28/add_outline';
 
 import { VkUser } from '../store/vkUser';
 
+import { handleNotifications }  from "./story/adds/tabs/notifications/notifications"
+
 import AddMore, { AdDefault } from './template/AddMore';
 import AddMore2 from './template/AddMore2';
 import { CategoryNo } from './template/Categories';
@@ -33,9 +36,7 @@ import Error from './placeholders/error';
 
 import { NoRegion } from './template/Location';
 
-import Profile from './story/profile/Profile';
-
-import { setOnline } from './story/profile/requests';
+import Profile from './story/profile/Profile'
 
 import AddsModal, { MODAL_FILTERS, MODAL_CATEGORIES, MODAL_SUBS } from './story/adds/AddsModal';
 import CreateModal from './story/create/CreateModal';
@@ -69,6 +70,8 @@ let oldChoosen = { ad_id: -1 };
 const Main = () => {
 	const [popout, setPopout] = useState(null); //<ScreenSpinner size="large" />
 	const [inited, setInited] = useState(false);
+
+	const [adsMode, setAdsMode] = useState("");
 
 	const [profileID, setProfileID] = useState(0);
 	const [notsCounterr, setNotsCounterr] = useState(notsCounterr);
@@ -139,12 +142,14 @@ const Main = () => {
 
 	const [wsNote, setwsNote] = useState({ notification_type: 'no' });
 
-	function turnOnNotifications() {
-		console.log('user#' + myID);
-		centrifuge.subscribe('user#' + myID, (mes) => {
+	function turnOnNotifications(id) {
+		console.log('user#' + id);
+		centrifuge.subscribe('user#' + id, (note) => {
 			notsCounterrr++;
 			setNotsCounterr(notsCounterrr);
-			console.log('user#' + myID + ' ' + notsCounterr);
+			console.log('user#' + id + ' ' + note);
+			
+			handleNotifications(note, setSnackbar)
 		});
 	}
 
@@ -166,7 +171,7 @@ const Main = () => {
 	// }, [choosen]);
 
 	useEffect(() => {
-		setPopout(<ScreenSpinner size="large" />)
+		setPopout(<ScreenSpinner size="large" />);
 		bridge.subscribe(({ detail: { type, data } }) => {
 			if (type === 'VKWebAppUpdateConfig') {
 				const schemeAttribute = document.createAttribute('scheme');
@@ -193,25 +198,20 @@ const Main = () => {
 				setSnackbar,
 				setPopout,
 				(v) => {
-					console.log('we auth!');
 					setInited(true);
-					if (myID == 0) {
-						return;
-					}
 
 					getToken(
 						setSnackbar,
 						(v) => {
 							setWsToken(v);
 							centrifuge.setToken(v.token);
-							turnOnNotifications();
+							turnOnNotifications(us.id);
 							centrifuge.connect();
 						},
 						(e) => {}
 					);
 				},
 				(e) => {
-					console.log('we error!');
 					fetchData();
 				}
 			);
@@ -221,7 +221,7 @@ const Main = () => {
 		fetchData();
 	}, []);
 	if (!inited) {
-		return snackbar
+		return snackbar;
 	}
 
 	return (
@@ -285,6 +285,7 @@ const Main = () => {
 			>
 				<Panel id="header-search" separator={false}>
 					<AddsTabs
+						adsMode={adsMode}
 						setSavedAdState={setSavedAdState}
 						savedAdState={savedAdState}
 						onFiltersClick={() => setActiveModal(MODAL_FILTERS)}
@@ -431,6 +432,7 @@ const Main = () => {
 						{profileText}
 					</PanelHeader>
 					<Profile
+						setAdsMode={setAdsMode}
 						setPopout={setPopout}
 						setSnackbar={setSnackbar}
 						myID={myID}

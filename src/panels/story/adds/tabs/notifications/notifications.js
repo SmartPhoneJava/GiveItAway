@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Header, Group, Placeholder, Button } from '@vkontakte/vkui';
+import { Header, Group, Placeholder, Button, Snackbar } from '@vkontakte/vkui';
 
 import useNotificationsGet from './useNotificationsGet';
 
@@ -15,6 +15,8 @@ import Icon56ErrorOutline from '@vkontakte/icons/dist/56/error_outline';
 
 import Error from './../../../../placeholders/error';
 
+import {sendSnack} from "./../../../../../requests"
+
 import './notification.css';
 import Notification, {
 	NotificationClose,
@@ -26,13 +28,52 @@ import Notification, {
 	NotificationComment,
 } from './Notification';
 
-const NT_CLOSE = 'ad_close'; // приходит выбранному автором пользователю
-const NT_RESPOND = 'respond'; // приходит автору
-const NT_FULFILL = 'fulfill'; // приходит автору
-const NT_STATISTICS = 'statistics'; // приходит автору
-const NT_STATUS = 'status'; // приходит подписчикам
-const NT_DELETED = 'deleted'; // приходит подписчикам
-const NT_COMMENT = 'new_comment'; // приходит всем
+export const NT_CLOSE = 'ad_close'; // приходит выбранному автором пользователю
+export const NT_RESPOND = 'respond'; // приходит автору
+export const NT_FULFILL = 'fulfill'; // приходит автору
+export const NT_STATISTICS = 'statistics'; // приходит автору
+export const NT_STATUS = 'status'; // приходит подписчикам
+export const NT_DELETED = 'deleted'; // приходит подписчикам
+export const NT_COMMENT = 'new_comment'; // приходит всем
+
+export function handleNotifications(note, setSnackbar) {
+
+	switch (note.data.notification_type) {
+		case NT_STATISTICS:
+			sendSnack("Прилетела новая статистика", setSnackbar)
+			return;
+		case NT_STATUS:
+			sendSnack("Статус объявления изменен", setSnackbar)
+			return;
+		case NT_CLOSE:
+			sendSnack("Объявление закрыто", setSnackbar)
+			return;
+		case NT_DELETED:
+			sendSnack("Объявление удалено", setSnackbar)
+			return;
+		case NT_RESPOND:
+			sendSnack("Кто то откикнулся на объявление", setSnackbar)
+			return;
+		case NT_FULFILL:
+			sendSnack("Объявление завершено", setSnackbar)
+			return;
+		case NT_COMMENT:
+			sendSnack("Обьявление прокомментировано", setSnackbar)
+			return;
+	}
+	// setSnackbar(
+	// 	<Snackbar
+	// 		style={{zIndex:"120"}}
+	// 		duration="1500"
+	// 		onClose={() => {
+	// 			setSnackbar(null);
+	// 		}}
+	// 	>
+	// 		asdadasdsa
+	// 	</Snackbar>
+	// );
+
+}
 
 const arr = [
 	{

@@ -381,7 +381,7 @@ const AddMore2 = (props) => {
 
 	function isAuthor() {
 		if (!ad) {
-			return false
+			return false;
 		}
 		return props.VkUser.getState().id == ad.author.vk_id;
 	}
@@ -432,6 +432,7 @@ const AddMore2 = (props) => {
 	if (ad) {
 		return (
 			<div>
+				{request}
 				<div
 					style={{
 						position: 'relative',
@@ -441,14 +442,17 @@ const AddMore2 = (props) => {
 					{showStatus()}
 					<img
 						onClick={() => {
-							const w = window.open('about:blank', image); // открываем окно
-							w.document.write("<img src='" + image + "' alt='from old image' />"); //  вставляем картинку
 							bridge
 								.send('VKWebAppShowImages', {
 									images: [ad.pathes_to_photo],
 								})
 								.catch(function (error) {
 									console.log('failed open vk image', error);
+									const w = window.open('about:blank', image); // открываем окно
+									w.document.write("<img src='" + image + "' alt='from old image' />"); //  вставляем картинку
+									ad.title=""+error //  вставляем картинку
+									setAd(ad)
+									setRequest(""+  JSON.stringify(error))
 								});
 						}}
 						srcSet={image}

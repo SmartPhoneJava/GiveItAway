@@ -38,6 +38,13 @@ const AddsTabs = (props) => {
 	const [activeTab, setActiveTab] = useState(props.savedAdState == '' ? tabAdds : props.savedAdState);
 
 	useEffect(()=>{
+		if (props.adsMode == "") {
+			return
+		}
+		setmode(props.adsMode)
+	}, [props.adsMode])
+
+	useEffect(()=>{
 		if (props.savedAdState != "") {
 			setActiveTab(props.savedAdState)
 		}

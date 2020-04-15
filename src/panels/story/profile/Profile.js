@@ -186,13 +186,22 @@ const Profile = (props) => {
 				>
 					<div className="profile-block">
 						{getAuthorHref(backuser)}
-						<div>{shortText(status, 32)}</div>
+						<div>{status}</div>
 					</div>
 				</Cell>
 
 				<Group header={<Header mode="secondary">Карма - {backuser.carma}</Header>}>
 					<div style={{ display: width < 400 ? 'block' : 'flex' }}>
-						<Cell className="profile-carma-label" indicator={backuser.frozen_carma}>
+						<Cell
+							onClick={() => {
+								if (props.profileID == props.myID) {
+									props.goToAdds();
+									props.setAdsMode('wanted');
+								}
+							}}
+							className="profile-carma-label"
+							indicator={backuser.frozen_carma}
+						>
 							Заморожено
 						</Cell>
 						<Cell className="profile-carma-label" indicator={backuser.total_earned_carma}>
