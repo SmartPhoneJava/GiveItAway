@@ -23,6 +23,7 @@ import Notification, {
 	NotificationDeleted,
 	NotificationFulFill,
 	NotificationStatistics,
+	NotificationComment,
 } from './Notification';
 
 const NT_CLOSE = 'ad_close'; // приходит выбранному автором пользователю
@@ -31,6 +32,7 @@ const NT_FULFILL = 'fulfill'; // приходит автору
 const NT_STATISTICS = 'statistics'; // приходит автору
 const NT_STATUS = 'status'; // приходит подписчикам
 const NT_DELETED = 'deleted'; // приходит подписчикам
+const NT_COMMENT = 'new_comment'; // приходит всем
 
 const arr = [
 	{
@@ -217,6 +219,9 @@ function getNotifications(arr, lastAdElementRef, openUser, openAd) {
 				break;
 			case NT_FULFILL:
 				inner = <NotificationFulFill openUser={openUser} openAd={openAd} notification={v} />;
+				break;
+			case NT_COMMENT:
+				inner = <NotificationComment openUser={openUser} openAd={openAd} notification={v} />;
 				break;
 		}
 		if (arr.length === index + 1) {

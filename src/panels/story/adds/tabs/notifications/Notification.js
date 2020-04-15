@@ -41,6 +41,56 @@ function getImage(props) {
 	return <Avatar size={48} src={photoURL} />;
 }
 
+function getCommentAuthorName(props) {
+	if (
+		!props ||
+		!props.notification ||
+		!props.notification.payload ||
+		!props.notification.payload.comment ||
+		!props.notification.payload.comment.author ||
+		!props.notification.payload.comment.author.name
+	) {
+		return '';
+	}
+	const name = props.notification.payload.comment.author.name;
+	return (
+		<span
+			style={{ color: '#2F91FD' }}
+			onClick={() => props.openUser(props.notification.payload.comment.author.vk_id)}
+		>
+			{name}
+		</span>
+	);
+}
+
+function getAuthorImage(props) {
+	if (
+		!props ||
+		!props.notification ||
+		!props.notification.payload ||
+		!props.notification.payload.comment ||
+		!props.notification.payload.comment.author ||
+		!props.notification.payload.comment.author.photo_url
+	) {
+		return '';
+	}
+	const photoURL = props.notification.payload.comment.author.photo_url;
+	return <Avatar size={48} src={photoURL} />;
+}
+
+function getCommentText(props) {
+	if (
+		!props ||
+		!props.notification ||
+		!props.notification.payload.comment ||
+		!props.notification.payload.comment.text
+	) {
+		return '';
+	}
+	const text = props.notification.payload.comment.text;
+	return <span style={{ color: 'rgb(100,100,100)' }}>{text}</span>;
+}
+
 function getAuthorHref(props) {
 	if (
 		!props ||
@@ -54,10 +104,7 @@ function getAuthorHref(props) {
 	const id = props.notification.payload.author.vk_id;
 	const name = props.notification.payload.author.name;
 	return (
-		<span
-			style={{ marginRight: '3px', color: '#2F91FD' }}
-			onClick={() => props.openUser(props.notification.payload.author.vk_id)}
-		>
+		<span style={{ color: '#2F91FD' }} onClick={() => props.openUser(id)}>
 			{name}
 		</span>
 	);
@@ -84,6 +131,45 @@ const Notification = (props) => {
 					<div style={{ marginLeft: '4px' }}>упомянул Вас </div>
 				</div>
 				<div>А сколько лет сколько зим? </div>
+			</div>
+		</Cell>
+	);
+};
+
+// notification_id: 1
+// notification_type: "new_comment"
+// creation_date_time: "15 Apr 20 20:16 UTC"
+// payload:
+// ad:
+// ad_id: 1
+// status: "offer"
+// header: "фывыфвфы"
+// __proto__: Object
+// comment:
+// comment_id: 1
+// author: {vk_id: 546402154, name: "Анна", surname: "Дашевская", photo_url: "https://vk.com/images/camera_100.png?ava=1"}
+// text: "комменты"
+// creation_date_time: "15 Apr 20 20:16 UTC"
+// __proto__: Object
+// __proto__: Object
+
+export const NotificationComment = (props) => {
+	return (
+		<Cell
+			className="block_in"
+			size="l"
+			multiline="true"
+			description={
+				<div style={{ display: 'flex' }}>
+					<div style={{ marginRight: '4px' }}>{time(props.notification.creation_date_time)} </div>
+				</div>
+			}
+			before={getAuthorImage(props)}
+		>
+			<div className="block">
+				<div>
+					{getCommentAuthorName(props)} написал {shortText(getCommentText(props), 100)} в {getHeader(props)}
+				</div>
 			</div>
 		</Cell>
 	);

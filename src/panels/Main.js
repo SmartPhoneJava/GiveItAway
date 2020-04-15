@@ -9,7 +9,7 @@ import {
 	PanelHeaderBack,
 	TabbarItem,
 	PanelHeaderSimple,
-	PanelHeaderContent,
+	ScreenSpinner,
 	Counter,
 } from '@vkontakte/vkui';
 
@@ -67,7 +67,6 @@ let notsCounterrr = 0;
 let oldChoosen = { ad_id: -1 };
 
 const Main = () => {
-	
 	const [popout, setPopout] = useState(null); //<ScreenSpinner size="large" />
 	const [inited, setInited] = useState(false);
 
@@ -138,14 +137,14 @@ const Main = () => {
 		// );
 	}
 
-	const [wsNote, setwsNote]=useState({notification_type:"no"})
+	const [wsNote, setwsNote] = useState({ notification_type: 'no' });
 
 	function turnOnNotifications() {
-		console.log('user#' + myID)
+		console.log('user#' + myID);
 		centrifuge.subscribe('user#' + myID, (mes) => {
 			notsCounterrr++;
-			setNotsCounterr(notsCounterrr)
-			console.log('user#' + myID + " " + notsCounterr)
+			setNotsCounterr(notsCounterrr);
+			console.log('user#' + myID + ' ' + notsCounterr);
 		});
 	}
 
@@ -167,23 +166,7 @@ const Main = () => {
 	// }, [choosen]);
 
 	useEffect(() => {
-		if (myID == 0) {
-			return;
-		}
-
-		getToken(
-			setSnackbar,
-			(v) => {
-				setWsToken(v);
-				centrifuge.setToken(v.token);
-				turnOnNotifications();
-				centrifuge.connect();
-			},
-			(e) => {}
-		);
-	}, [myID]);
-
-	useEffect(() => {
+		setPopout(<ScreenSpinner size="large" />)
 		bridge.subscribe(({ detail: { type, data } }) => {
 			if (type === 'VKWebAppUpdateConfig') {
 				const schemeAttribute = document.createAttribute('scheme');
@@ -194,7 +177,7 @@ const Main = () => {
 
 		function getInputData() {
 			const { vk_platform, app_id } = inputArgs();
-			console.log("vksssss", vk_platform, app_id)
+			console.log('vksssss', vk_platform, app_id);
 			setVkPlatform(vk_platform);
 			setAppID(app_id);
 		}
@@ -202,7 +185,7 @@ const Main = () => {
 		async function fetchData() {
 			const us = await bridge.send('VKWebAppGetUserInfo');
 			VkUser.dispatch({ type: 'set', new_state: us });
-			console.log("fetchData", us.id)
+			console.log('fetchData', us.id);
 			setMyID(us.id);
 
 			await Auth(
@@ -210,12 +193,26 @@ const Main = () => {
 				setSnackbar,
 				setPopout,
 				(v) => {
-					console.log("we auth!")
+					console.log('we auth!');
 					setInited(true);
+					if (myID == 0) {
+						return;
+					}
+
+					getToken(
+						setSnackbar,
+						(v) => {
+							setWsToken(v);
+							centrifuge.setToken(v.token);
+							turnOnNotifications();
+							centrifuge.connect();
+						},
+						(e) => {}
+					);
 				},
 				(e) => {
-					console.log("we error!")
-					fetchData()
+					console.log('we error!');
+					fetchData();
 				}
 			);
 		}
@@ -223,7 +220,10 @@ const Main = () => {
 		getInputData();
 		fetchData();
 	}, []);
-	
+	if (!inited) {
+		return snackbar
+	}
+
 	return (
 		<Epic
 			activeStory={activeStory}

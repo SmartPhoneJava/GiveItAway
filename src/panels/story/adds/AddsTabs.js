@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	PanelHeaderSimple,
 	List,
@@ -36,6 +36,11 @@ const AddsTabs = (props) => {
 	const [mode, setmode] = useState('all');
 	const [activeTab, setActiveTab] = useState(props.savedAdState == '' ? tabAdds : props.savedAdState);
 
+	useEffect(()=>{
+		if (props.savedAdState != "") {
+			setActiveTab(props.savedAdState)
+		}
+	}, [props.savedAdState])
 	function select(e) {
 		setmode(e.currentTarget.dataset.mode);
 		setContextOpened(false);
@@ -111,7 +116,7 @@ const AddsTabs = (props) => {
 					zeroNots={props.zeroNots}
 					openUser={(u) => {
 						props.openUser(u);
-						setActiveTab(tabNotification);
+						props.setSavedAdState(tabNotification);
 					}}
 					openAd={(v) => {
 						props.openAd(v);
@@ -138,7 +143,6 @@ const AddsTabs = (props) => {
 					deleteID={props.deleteID}
 					myID={props.myID}
 					city={props.city}
-					openUser={props.openUser}
 					openUser={(u) => {
 						props.openUser(u);
 						setActiveTab(tabAdds);
