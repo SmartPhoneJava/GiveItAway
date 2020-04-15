@@ -62,7 +62,7 @@ const no_prev = 'no prev';
 const addr = AddrWS.getState() + '/connection/websocket';
 let centrifuge = new Centrifuge(addr);
 
-let notsCounterr = 0;
+let notsCounterrr = 0;
 
 let oldChoosen = { ad_id: -1 };
 
@@ -71,6 +71,7 @@ const Main = () => {
 	const [inited, setInited] = useState(false);
 
 	const [profileID, setProfileID] = useState(0);
+	const [notsCounterr, setNotsCounterr] = useState(notsCounterr);
 
 	const [prevActiveStory, setPrevActiveStory] = useState(no_prev);
 	const [activeStory, setActiveStory] = useState(ads);
@@ -139,27 +140,30 @@ const Main = () => {
 	const [wsNote, setwsNote]=useState({notification_type:"no"})
 
 	function turnOnNotifications() {
+		console.log('user#' + myID)
 		centrifuge.subscribe('user#' + myID, (mes) => {
-			notsCounterr++;
+			notsCounterrr++;
+			setNotsCounterr(notsCounterrr)
+			console.log('user#' + myID + " " + notsCounterr)
 		});
 	}
 
-	useEffect(() => {
-		console.log('choosen', choosen.ad_id);
-		if (choosen.ad_id == -1) {
-			return;
-		}
-		centrifuge.disconnect();
-		turnOnNotifications();
+	// useEffect(() => {
+	// 	console.log('choosen', choosen.ad_id);
+	// 	if (choosen.ad_id == -1) {
+	// 		return;
+	// 	}
+	// 	centrifuge.disconnect();
+	// 	turnOnNotifications();
 
-		oldChoosen = choosen;
-		console.log('connecting', oldChoosen.ad_id);
-		centrifuge.subscribe('ad_' + oldChoosen.ad_id, (note) => {
-			console.log('centrifugu notenote', note);
-			setwsNote(note)
-		});
-		centrifuge.connect();
-	}, [choosen]);
+	// 	oldChoosen = choosen;
+	// 	console.log('connecting', oldChoosen.ad_id);
+	// 	centrifuge.subscribe('ad_' + oldChoosen.ad_id, (note) => {
+	// 		console.log('centrifugu notenote', note);
+	// 		setwsNote(note)
+	// 	});
+	// 	centrifuge.connect();
+	// }, [choosen]);
 
 	useEffect(() => {
 		if (myID == 0) {
@@ -226,7 +230,7 @@ const Main = () => {
 						selected={activeStory === ads}
 						data-story={ads}
 						text={adsText}
-						label={notsCounterr == 0 ? null : notsCounterr}
+						label={notsCounterrr == 0 ? null : notsCounterrr}
 						after={<Counter>100</Counter>}
 						// after={notsCounter == 0 ? '' : <Counter>notsCounter</Counter>}
 					>
@@ -284,9 +288,9 @@ const Main = () => {
 							setActiveModal(MODAL_SUBS);
 							scroll();
 						}}
-						notsCounter={notsCounterr}
+						notsCounter={notsCounterrr}
 						zeroNots={() => {
-							notsCounterr = 0;
+							notsCounterrr = 0;
 						}}
 						goSearch={goSearch}
 						setPopout={setPopout}

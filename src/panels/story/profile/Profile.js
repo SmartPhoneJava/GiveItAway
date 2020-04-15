@@ -190,7 +190,7 @@ const Profile = (props) => {
 					</div>
 				</Cell>
 
-				<Group header={<Header mode="secondary">Карма - 0</Header>}>
+				<Group header={<Header mode="secondary">Карма - {backuser.carma}</Header>}>
 					<div style={{ display: width < 400 ? 'block' : 'flex' }}>
 						<Cell className="profile-carma-label" indicator={backuser.frozen_carma}>
 							Заморожено

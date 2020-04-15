@@ -103,8 +103,13 @@ const AddMore2 = (props) => {
 			props.setSnackbar,
 			id,
 			(s) => {
+				console.log('subs are', s);
+				console.log('info info', !isAuthor(), s.length > 0);
+				console.log('filter', s.filter((v) => v.vk_id == props.VkUser.getState().id).length > 0);
+				console.log('isSubscriber1', isSubscriber(s));
 				setSubs(s);
 				setIsSub(isSubscriber(s));
+				console.log('isSubscriber', isSubscriber(s));
 			},
 			(e) => {}
 		);
@@ -375,6 +380,9 @@ const AddMore2 = (props) => {
 	}
 
 	function isAuthor() {
+		if (!ad) {
+			return false
+		}
 		return props.VkUser.getState().id == ad.author.vk_id;
 	}
 
@@ -435,11 +443,13 @@ const AddMore2 = (props) => {
 						onClick={() => {
 							const w = window.open('about:blank', image); // открываем окно
 							w.document.write("<img src='" + image + "' alt='from old image' />"); //  вставляем картинку
-							bridge.send('VKWebAppShowImages', {
-								images: [ad.pathes_to_photo],
-							}).catch(function (error) {
-								console.log('failed open vk image', error);
-							});
+							bridge
+								.send('VKWebAppShowImages', {
+									images: [ad.pathes_to_photo],
+								})
+								.catch(function (error) {
+									console.log('failed open vk image', error);
+								});
 						}}
 						srcSet={image}
 						style={{
