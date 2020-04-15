@@ -1,7 +1,7 @@
 import {createStore} from 'redux';
 // ws://localhost:8000
 // wss://giveitaway.site/centrifugo
-const reducer = (state="wss://giveitaway.site/centrifugo", action) => {
+const reducer = (state="ws://localhost:8000", action) => {
   switch (action.type) {
     case 'set':
       return action.new_state;

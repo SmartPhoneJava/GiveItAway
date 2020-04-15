@@ -67,6 +67,7 @@ let notsCounterrr = 0;
 let oldChoosen = { ad_id: -1 };
 
 const Main = () => {
+	
 	const [popout, setPopout] = useState(null); //<ScreenSpinner size="large" />
 	const [inited, setInited] = useState(false);
 
@@ -127,14 +128,14 @@ const Main = () => {
 	}
 
 	async function scroll() {
-		await bridge.send('VKWebAppScroll', { top: 10000, speed: 600 });
-		window.scrollTo(0, 0);
-		setOnline(
-			appID,
-			ApiVersion,
-			(v) => {},
-			(e) => {}
-		);
+		// await bridge.send('VKWebAppScroll', { top: 10000, speed: 600 });
+		// window.scrollTo(0, 0);
+		// setOnline(
+		// 	appID,
+		// 	ApiVersion,
+		// 	(v) => {},
+		// 	(e) => {}
+		// );
 	}
 
 	const [wsNote, setwsNote]=useState({notification_type:"no"})
@@ -212,14 +213,17 @@ const Main = () => {
 					console.log("we auth!")
 					setInited(true);
 				},
-				(e) => {}
+				(e) => {
+					console.log("we error!")
+					fetchData()
+				}
 			);
 		}
 
 		getInputData();
 		fetchData();
 	}, []);
-
+	
 	return (
 		<Epic
 			activeStory={activeStory}
