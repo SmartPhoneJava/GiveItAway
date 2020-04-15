@@ -447,11 +447,11 @@ const AddMore2 = (props) => {
 									images: [ad.pathes_to_photo],
 								})
 								.catch(function (error) {
-									console.log('failed open vk image', error);
-									const w = window.open('about:blank', image); // открываем окно
-									w.document.write("<img src='" + image + "' alt='from old image' />"); //  вставляем картинку
-									ad.title=""+error //  вставляем картинку
-									setAd(ad)
+									// console.log('failed open vk image', error);
+									// const w = window.open('about:blank', image); // открываем окно
+									// w.document.write("<img src='" + image + "' alt='from old image' />"); //  вставляем картинку
+									// ad.title=""+error //  вставляем картинку
+									// setAd(ad)
 									setRequest(""+  JSON.stringify(error))
 								});
 						}}
