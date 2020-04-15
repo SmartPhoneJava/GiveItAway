@@ -13,6 +13,7 @@ import {
 } from '@vkontakte/vkui';
 
 import Icon28Notifications from '@vkontakte/icons/dist/28/notifications';
+import Icon28CubeBoxOutline from '@vkontakte/icons/dist/28/cube_box_outline';
 import Icon28Notification from '@vkontakte/icons/dist/28/notification';
 
 import Icon28LiveOutline from '@vkontakte/icons/dist/28/live_outline';
@@ -107,7 +108,15 @@ const AddsTabs = (props) => {
 						onClick={select}
 						data-mode="managed"
 					>
-						Мои
+						Отдаю
+					</Cell>
+					<Cell
+						before={<Icon28CubeBoxOutline />}
+						asideContent={mode === 'wanted' ? <Icon24Done fill="var(--accent)" /> : null}
+						onClick={select}
+						data-mode="wanted"
+					>
+						Хочу забрать
 					</Cell>
 				</List>
 			</PanelHeaderContext>

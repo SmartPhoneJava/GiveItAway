@@ -51,12 +51,6 @@ export default function useAdSearch(
 		setInited(false)
 		let cancel;
 
-		// if (prevCategory != category) {
-		// 	pageNumber = 1;
-		// }
-		// console.log('prevCategory:', prevCategory, category, pageNumber);
-		// prevCategory = category;
-
 		let params = {
 			rows_per_page: rowsPerPage,
 			page: pageNumber,
@@ -79,13 +73,16 @@ export default function useAdSearch(
 			params.region = country.title;
 		}
 
-		if (mode != 'all') {
+		let url = '/api/ad/find'
+		if (mode != 'all' && mode != "wanted") {
 			params.author_id = User.getState().vk_id;
+		} else if (mode == "wanted") {
+			url = '/api/ad/wanted'
 		}
 
 		axios({
 			method: 'GET',
-			url: Addr.getState() + '/api/ad/find',
+			url: Addr.getState() + url,
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken(c => (cancel = c)),
