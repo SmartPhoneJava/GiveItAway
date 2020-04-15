@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import bridge from '@vkontakte/vk-bridge';
 import {
 	Avatar,
 	PanelHeaderButton,
-	Counter,
 	Button,
-	CellButton,
 	Group,
 	Header,
 	InfoRow,
@@ -49,7 +48,8 @@ import Comments from './../story/adds/tabs/comments/comments';
 
 import OpenActions from './components/actions';
 
-import {time} from "./../../utils/time"
+import { time } from './../../utils/time';
+import { shortText } from './../../utils/short_text';
 
 const COLOR_DEFAULT = 'rgba(0,0,0,0.6)';
 const COLOR_DONE = 'rgba(0,75,0,0.8)';
@@ -81,9 +81,10 @@ export const AdDefault = {
 };
 
 const AddMore2 = (props) => {
-	const [ad, setAd] = useState(AdDefault);
+	const [ad, setAd] = useState(null);
 
 	const [photoIndex, setPhotoIndex] = useState(0);
+	const [image, setImage] = useState('');
 
 	const [subs, setSubs] = useState(0);
 	const [hide, setHide] = useState(false);
@@ -110,6 +111,10 @@ const AddMore2 = (props) => {
 	}
 
 	useEffect(() => {
+		setImage(ad && ad.pathes_to_photo ? ad.pathes_to_photo[photoIndex].PhotoUrl : '');
+	}, [photoIndex, ad]);
+
+	useEffect(() => {
 		async function init() {
 			const id = props.ad ? props.ad.ad_id : -1;
 			if (id < 0) {
@@ -118,6 +123,7 @@ const AddMore2 = (props) => {
 				let { details, err } = await getDetails(props.setPopout, props.setSnackbar, id);
 				if (!err) {
 					setAd(details);
+
 					initSubscribers(id);
 					console.log('detailed look', details);
 					console.log('i seeet', details.status);
@@ -415,47 +421,34 @@ const AddMore2 = (props) => {
 		);
 	}
 
-	function feedbackText() {
-		if (ad.feedback_type == 'ls') {
-			return <CellButton>Личные сообщения</CellButton>;
-		} else if (ad.feedback_type == 'comments') {
-			return <CellButton>Комментарии</CellButton>;
-		}
-		return <Cell>{ad.extra_field}</Cell>;
-	}
-
-	console.log('adadadad', ad);
-	const image = ad.pathes_to_photo ? ad.pathes_to_photo[photoIndex].PhotoUrl : '';
-
-	return (
-		<div>
-			{/* <div
-				style={{
-					borderTopLeftRadius: '10px',
-					borderTopRightRadius: '10px',
-					backgroundImage: 'url(' + encodeURI(image) + ')',
-					backgroundSize: 'cover',
-					display: 'flex'
-				}}
-			>
-				
-			</div> */}
-			<div
-				style={{
-					position: 'relative',
-					display: 'inline-block',
-				}}
-			>
-				{showStatus()}
-				<img
-					srcSet={image}
+	if (ad) {
+		return (
+			<div>
+				<div
 					style={{
-						width: '100%',
-						objectFit: 'cover',
-						maxHeight:'200px'
+						position: 'relative',
+						display: 'inline-block',
 					}}
-				/>
-				{/* <div style={{ right: '10px', position: 'absolute', top: '10px' }}>
+				>
+					{showStatus()}
+					<img
+						onClick={() => {
+							const w = window.open('about:blank', image); // открываем окно
+							w.document.write("<img src='" + image + "' alt='from old image' />"); //  вставляем картинку
+							bridge.send('VKWebAppShowImages', {
+								images: [ad.pathes_to_photo],
+							}).catch(function (error) {
+								console.log('failed open vk image', error);
+							});
+						}}
+						srcSet={image}
+						style={{
+							width: '100%',
+							objectFit: 'cover',
+							maxHeight: '200px',
+						}}
+					/>
+					{/* <div style={{ right: '10px', position: 'absolute', top: '10px' }}>
 					<PanelHeaderButton
 						mode="secondary"
 						style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
@@ -466,166 +459,168 @@ const AddMore2 = (props) => {
 						</Avatar>
 					</PanelHeaderButton>
 				</div> */}
-			</div>
-			{!ad.pathes_to_photo || ad.pathes_to_photo.length <= 1 ? (
-				''
-			) : (
-				<HorizontalScroll>
-					<div style={{ display: 'flex' }}>
-						{ad.pathes_to_photo
-							? ad.pathes_to_photo.map((img, i) => {
-									return (
-										<div
-											key={img.AdPhotoId}
-											style={{
-												borderRadius: '10px',
-												alignItems: 'center',
-												justifyContent: 'center',
-												padding: '1px',
-											}}
-										>
-											<Button
-												mode="tertiary"
+				</div>
+				{!ad.pathes_to_photo || ad.pathes_to_photo.length <= 1 ? (
+					''
+				) : (
+					<HorizontalScroll>
+						<div style={{ display: 'flex' }}>
+							{ad.pathes_to_photo
+								? ad.pathes_to_photo.map((img, i) => {
+										return (
+											<div
+												key={img.AdPhotoId}
 												style={{
-													padding: '0px',
 													borderRadius: '10px',
-												}}
-												onClick={() => {
-													setPhotoIndex(i);
+													alignItems: 'center',
+													justifyContent: 'center',
+													padding: '1px',
 												}}
 											>
-												<img src={img.PhotoUrl} className="small_img" />
-											</Button>
-										</div>
+												<Button
+													mode="tertiary"
+													style={{
+														padding: '0px',
+														borderRadius: '10px',
+													}}
+													onClick={() => {
+														setPhotoIndex(i);
+													}}
+												>
+													<img src={img.PhotoUrl} className="small_img" />
+												</Button>
+											</div>
+										);
+								  })
+								: ''}
+						</div>
+					</HorizontalScroll>
+				)}
+				<div style={{ padding: '16px' }}>
+					<div style={{ display: 'flex', alignItems: 'center' }}>
+						<div className="CellLeft__head">{ad.header}</div>
+						{isAuthor() ? (
+							<PanelHeaderButton
+								mode="primary"
+								size="l"
+								onClick={() => {
+									setHide(true);
+									OpenActions(
+										props.setPopout,
+										props.setSnackbar,
+										props.refresh,
+										ad.ad_id,
+										() => {
+											props.onCloseClick();
+											setRequest('CLOSE');
+										},
+										status == 'chosen',
+										ad.hidden,
+										subs.length,
+										() => {
+											setHide(false);
+										}
 									);
-							  })
-							: ''}
-					</div>
-				</HorizontalScroll>
-			)}
-			<div style={{ padding: '16px' }}>
-				<div style={{ display: 'flex', alignItems: 'center' }}>
-					<div className="CellLeft__head">{ad.header}</div>
-					{isAuthor() ? (
-						<PanelHeaderButton
-							mode="primary"
-							size="l"
-							onClick={() => {
-								setHide(true);
-								OpenActions(
-									props.setPopout,
-									props.setSnackbar,
-									props.refresh,
-									ad.ad_id,
-									() => {
-										props.onCloseClick();
-										setRequest('CLOSE');
-									},
-									status == 'chosen',
-									ad.hidden,
-									subs.length,
-									() => {
-										setHide(false);
-									}
-								);
-							}}
-							disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
-						>
-							<Avatar style={{ background: 'white' }} size={40}>
-								<Icon28SettingsOutline fill="var(--black)" />
-							</Avatar>
-						</PanelHeaderButton>
-					) : (
-						''
-					)}
-				</div>
-			</div>
-			<Separator />
-			<div
-				style={{
-					display: 'flex',
-					paddingLeft: '16px',
-					margin: '0px',
-				}}
-			>
-				<Cell before={<Icon24Place />}>{ad.region + ', ' + ad.district}</Cell>
-			</div>
-			<Separator />
-			{isDealer || status == 'closed' || status == 'aborted' || isAuthor() ? (
-				''
-			) : isSub ? (
-				<Button
-					style={{ margin: '8px', marginLeft: 'auto', marginRight: 'auto' }}
-					stretched
-					size="xl"
-					mode="destructive"
-					onClick={unsub}
-					before={<Icon24Cancel />}
-				>
-					Отказаться
-				</Button>
-			) : (
-				<Button
-					stretched
-					size="xl"
-					style={{ margin: '8px', marginLeft: 'auto', marginRight: 'auto' }}
-					mode="primary"
-					onClick={sub}
-					before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
-				>
-					Хочу забрать!
-				</Button>
-			)}
-			<div style={{ marginTop: '10px', paddingLeft: '16px', paddingRight: '16px' }}>
-				<div className="CellLeft__block">{ad.text}</div>
-			</div>
-
-			<table>
-				<tbody>
-					<tr>
-						<td className="first">Категория</td>
-						<td>{GetCategoryText(ad.category)}</td>
-					</tr>
-					<tr>
-						<td className="first">Просмотров</td>
-						<td>{ad.views_count}</td>
-					</tr>
-					{status != 'closed' && status != 'aborted' ? (
-						<tr>
-							<td className="first">Отклинулось</td>
-							<td>{subs.length}</td>
-						</tr>
-					) : (
-						''
-					)}
-
-					<tr>
-						<td className="first">Размещено</td>
-						<td>{time(ad.creation_date)}</td>
-					</tr>
-				</tbody>
-			</table>
-			{isAuthor() ? (
-				status != 'closed' && status != 'aborted' ? (
-					<Group header={<Header mode="secondary">Откликнулись</Header>}>
-						{subs.length > 0 ? (
-							subs.map((v) => (
-								<Cell
-									onClick={() => props.openUser(v.vk_id)}
-									key={v.vk_id}
-									before={<Avatar size={36} src={v.photo_url} />}
-								>
-									{v.name + ' ' + v.surname}
-								</Cell>
-							))
+								}}
+								disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
+							>
+								<Avatar style={{ background: 'white' }} size={40}>
+									<Icon28SettingsOutline fill="var(--black)" />
+								</Avatar>
+							</PanelHeaderButton>
 						) : (
-							<InfoRow style={{ paddingLeft: '16px' }}> пусто</InfoRow>
+							''
 						)}
-					</Group>
+					</div>
+				</div>
+				<Separator />
+				<div
+					style={{
+						display: 'flex',
+						paddingLeft: '16px',
+						margin: '0px',
+					}}
+				>
+					<Cell before={<Icon24Place />}>{ad.region + ', ' + ad.district}</Cell>
+				</div>
+				<Separator />
+				{isDealer || status == 'closed' || status == 'aborted' || isAuthor() ? (
+					''
+				) : isSub ? (
+					<Button
+						style={{ margin: '8px', marginLeft: 'auto', marginRight: 'auto' }}
+						stretched
+						size="xl"
+						mode="destructive"
+						onClick={unsub}
+						before={<Icon24Cancel />}
+					>
+						Отказаться
+					</Button>
+				) : (
+					<Button
+						stretched
+						size="xl"
+						style={{ margin: '8px', marginLeft: 'auto', marginRight: 'auto' }}
+						mode="primary"
+						onClick={sub}
+						before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
+					>
+						Хочу забрать!
+					</Button>
+				)}
+				<div style={{ marginTop: '10px', paddingLeft: '16px', paddingRight: '16px' }}>
+					<div className="CellLeft__block">{ad.text}</div>
+				</div>
+
+				<table>
+					<tbody>
+						<tr>
+							<td className="first">Категория</td>
+							<td>{shortText(GetCategoryText(ad.category), 20)}</td>
+						</tr>
+						<tr>
+							<td className="first">Просмотров</td>
+							<td>{ad.views_count}</td>
+						</tr>
+						{status != 'closed' && status != 'aborted' ? (
+							<tr>
+								<td className="first">Отклинулось</td>
+								<td>{subs.length}</td>
+							</tr>
+						) : (
+							''
+						)}
+
+						<tr>
+							<td className="first">Размещено</td>
+							<td>{time(ad.creation_date)}</td>
+						</tr>
+					</tbody>
+				</table>
+				{isAuthor() ? (
+					status != 'closed' && status != 'aborted' ? (
+						<Group header={<Header mode="secondary">Откликнулись</Header>}>
+							{subs.length > 0 ? (
+								subs.map((v) => (
+									<Cell
+										onClick={() => props.openUser(v.vk_id)}
+										key={v.vk_id}
+										before={<Avatar size={36} src={v.photo_url} />}
+									>
+										{v.name + ' ' + v.surname}
+									</Cell>
+								))
+							) : (
+								<InfoRow style={{ paddingLeft: '16px' }}> пусто</InfoRow>
+							)}
+						</Group>
+					) : (
+						''
+					)
 				) : (
 					''
-				)
-			) : (
+				)}
 				<Group header={<Header mode="secondary">Автор</Header>}>
 					<Cell
 						onClick={() => props.openUser(ad.author.vk_id)}
@@ -648,25 +643,26 @@ const AddMore2 = (props) => {
 						</div>
 					</Cell>
 				</Group>
-			)}
 
-			{ad.feedback_type == 'comments' ? (
-				<Comments
-					hide={hide}
-					ad={ad}
-					setPopout={props.setPopout}
-					setSnackbar={props.setSnackbar}
-					myID={props.VkUser.getState().id}
-					openUser={props.openUser}
-				/>
-			) : (
-				<Cell>
-					{' '}
-					<div style={{ color: 'grey' }}>Комментарии закрыты </div>
-				</Cell>
-			)}
-		</div>
-	);
+				{ad.feedback_type == 'comments' ? (
+					<Comments
+						hide={hide}
+						ad={ad}
+						setPopout={props.setPopout}
+						setSnackbar={props.setSnackbar}
+						myID={props.VkUser.getState().id}
+						openUser={props.openUser}
+					/>
+				) : (
+					<Cell>
+						{' '}
+						<div style={{ color: 'grey' }}>Комментарии закрыты </div>
+					</Cell>
+				)}
+			</div>
+		);
+	}
+	return '';
 };
 
 export default AddMore2;

@@ -28,19 +28,12 @@ import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 import OpenActions from './components/actions';
 
 import {time} from "./../../utils/time"
+import {shortText} from "./../../utils/short_text"
 
 import { Draft } from './../../store/draft';
 
 import './addsTab.css';
 import './Add6.css';
-
-function shortText(str, newLength) {
-	if (str.length > newLength) {
-		const s = str.slice(0, newLength);
-		return s + '...';
-	}
-	return str;
-}
 
 export function AdLight(ad, image, openAd) {
 	return (

@@ -8,7 +8,7 @@ import {
   SelectMimicry
 } from "@vkontakte/vkui";
 
-import Icon24Done from "@vkontakte/icons/dist/24/done";
+import {shortText} from "./../../utils/short_text"
 
 import Animal from "./../../img/animal.png";
 import Another from "./../../img/another.png";
@@ -173,14 +173,6 @@ export const categories = [
   CategorySport,
   CategoryAnother
 ];
-
-function shortText(str, newLength) {
-  if (str.length > newLength) {
-    const s = str.slice(0, newLength);
-    return s + '...';
-  }
-  return str;
-}
 
 export const CategoriesLabel = props => {
   return (

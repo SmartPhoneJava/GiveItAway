@@ -4,14 +4,7 @@ import { PanelHeaderSimple, Link, Avatar, Button, Cell } from '@vkontakte/vkui';
 import './notification.css';
 
 import { time } from './../../../../../utils/time';
-
-function shortText(str, newLength) {
-	if (str.length > newLength) {
-		const s = str.slice(0, newLength);
-		return s + '...';
-	}
-	return str;
-}
+import { shortText } from './../../../../../utils/short_text';
 
 function getHeader(props) {
 	if (

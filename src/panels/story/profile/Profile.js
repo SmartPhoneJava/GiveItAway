@@ -14,17 +14,11 @@ import { AdLight } from './../../template/Add6';
 
 import Icon56DoNotDisturbOutline from '@vkontakte/icons/dist/56/do_not_disturb_outline';
 
-import Error from "./../../placeholders/error"
+import Error from './../../placeholders/error';
+
+import { shortText } from './../../../utils/short_text';
 
 import './profile.css';
-
-function shortText(str, newLength) {
-	if (str.length > newLength) {
-		const s = str.slice(0, newLength);
-		return s + '...';
-	}
-	return str;
-}
 
 function getImage(backuser) {
 	if (!backuser || !backuser.photo_url) {
@@ -105,7 +99,7 @@ const Profile = (props) => {
 				setBackUser(v);
 			},
 			(e) => {
-				setFailed(true)
+				setFailed(true);
 			}
 		);
 
@@ -267,13 +261,23 @@ const Profile = (props) => {
 					<div className="infographics-column">
 						<div>Вещей</div>
 						<RadialChart
-							data={[
-								{ angle: backuser.total_given_ads, color: '#00CCFF' },
-								{
-									angle: backuser.total_received_ads,
-									color: '#FFCC33',
-								},
-							]}
+							data={
+								backuser.total_given_ads + backuser.total_received_ads == 0
+									? [
+											{ angle: 1, color: '#00CCFF' },
+											{
+												angle: 1,
+												color: '#FFCC33',
+											},
+									  ]
+									: [
+											{ angle: backuser.total_given_ads, color: '#00CCFF' },
+											{
+												angle: backuser.total_received_ads,
+												color: '#FFCC33',
+											},
+									  ]
+							}
 							showLabels={true}
 							radius={40}
 							innerRadius={30}
@@ -296,13 +300,29 @@ const Profile = (props) => {
 					<div className="infographics-column">
 						Обменов
 						<RadialChart
-							data={[
-								{ angle: backuser.total_given_ads + backuser.total_received_ads, color: '#00CC66' },
-								{
-									angle: backuser.total_aborted_ads,
-									color: '#FF9933',
-								},
-							]}
+							data={
+								backuser.total_given_ads + backuser.total_received_ads + backuser.total_aborted_ads == 0
+									? [
+											{
+												angle: 1,
+												color: '#00CC66',
+											},
+											{
+												angle: 1,
+												color: '#FF9933',
+											},
+									  ]
+									: [
+											{
+												angle: backuser.total_given_ads + backuser.total_received_ads,
+												color: '#00CC66',
+											},
+											{
+												angle: backuser.total_aborted_ads,
+												color: '#FF9933',
+											},
+									  ]
+							}
 							colorType="literal"
 							showLabels={true}
 							radius={40}
@@ -326,20 +346,24 @@ const Profile = (props) => {
 		);
 	}
 	if (failed) {
-		return <Error action={()=>{
-			getUser(
-				props.setPopout,
-				props.setSnackbar,
-				props.profileID,
-				(v) => {
-					setBackUser(v);
-					setFailed(false)
-				},
-				(e) => {
-					setFailed(true)
-				}
-			);
-		}}/>
+		return (
+			<Error
+				action={() => {
+					getUser(
+						props.setPopout,
+						props.setSnackbar,
+						props.profileID,
+						(v) => {
+							setBackUser(v);
+							setFailed(false);
+						},
+						(e) => {
+							setFailed(true);
+						}
+					);
+				}}
+			/>
+		);
 	}
 	return <></>;
 };

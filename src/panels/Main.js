@@ -189,6 +189,7 @@ const Main = () => {
 
 		function getInputData() {
 			const { vk_platform, app_id } = inputArgs();
+			console.log("vksssss", vk_platform, app_id)
 			setVkPlatform(vk_platform);
 			setAppID(app_id);
 		}
@@ -196,13 +197,15 @@ const Main = () => {
 		async function fetchData() {
 			const us = await bridge.send('VKWebAppGetUserInfo');
 			VkUser.dispatch({ type: 'set', new_state: us });
+			console.log("fetchData", us.id)
 			setMyID(us.id);
 
-			Auth(
+			await Auth(
 				us,
 				setSnackbar,
 				setPopout,
 				(v) => {
+					console.log("we auth!")
 					setInited(true);
 				},
 				(e) => {}

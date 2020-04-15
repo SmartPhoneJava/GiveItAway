@@ -91,6 +91,8 @@ export const Location = (
 		if (appID == 0) {
 			return;
 		}
+		await setLocationInfo();	
+
 		if (setDefault) {
 			getUserLocation();
 		}
