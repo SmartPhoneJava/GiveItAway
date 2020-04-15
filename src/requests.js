@@ -98,7 +98,7 @@ export async function adVisible(setPopout, setSnackbar, ad_id, callback) {
 	return err;
 }
 
-export async function getDeal(setSnackbar, ad_id) {
+export async function getDeal(setSnackbar, ad_id, successCallback) {
 	let err = false;
 	let cancel;
 	const deal = await axios({
@@ -109,8 +109,13 @@ export async function getDeal(setSnackbar, ad_id) {
 	})
 		.then(function (response) {
 			console.log('response from getDeal:', response);
-
 			return response.data;
+		}).then(function (response) {
+			if (successCallback) {
+				console.log("action")
+				successCallback(response);
+			}
+			return response;
 		})
 		.catch(function (error) {
 			err = true;
@@ -119,10 +124,14 @@ export async function getDeal(setSnackbar, ad_id) {
 }
 
 export async function denyDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end) {
+	console.log("denyDeall", deal_id)
 	let err = false;
 	let cancel;
 	setPopout(<ScreenSpinner size="large" />);
+	
 
+	console.log("denyDeal", deal_id)
+	
 	await axios({
 		method: 'post',
 		withCredentials: true,
@@ -146,7 +155,7 @@ export async function denyDeal(setPopout, setSnackbar, deal_id, successCallback,
 				() => {
 					denyDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end);
 				},
-				setSnackbar, 
+				setSnackbar,
 				end
 			);
 			failCallback(error);
@@ -193,26 +202,23 @@ export async function acceptDeal(setPopout, setSnackbar, deal_id, successCallbac
 }
 
 export async function CancelClose(setPopout, setSnackbar, ad_id) {
-	setPopout(<ScreenSpinner size="large" />);
 
-	let { deal, err } = await getDeal(setSnackbar, ad_id);
-	console.log('we get deal', deal, err);
-	if (!err) {
-		err = await denyDeal(setSnackbar, deal.deal_id);
-	}
-	if (!err) {
-		sucessNoCancel('Запрос успешно отменен!', setSnackbar);
-	} else {
-		fail(
-			'Ошибка на стороне сервера',
-			() => {
-				CancelClose(setPopout, setSnackbar, ad_id);
+	getDeal(setSnackbar, ad_id, async (deal) => {
+		console.log("success", JSON.stringify(deal))
+		await denyDeal(
+			setPopout,
+			setSnackbar,
+			deal.deal_id,
+			(v) => {
+				console.log("success double")
+				sucessNoCancel('Запрос успешно отменен!', setSnackbar);
 			},
-			setSnackbar
+			(e) => {
+				console.log("faiil double")
+			}
 		);
-	}
-	setPopout(null);
-	return err;
+		console.log("after success")
+	});
 }
 
 export function Close(setPopout, setSnackbar, ad_id, subscriber_id) {
@@ -364,8 +370,9 @@ export async function getSubscribers(setPopout, setSnackbar, ad_id, successCallb
 				err = true;
 			}
 			return response.data;
-		}).then(function (response) {
-			successCallback(response)
+		})
+		.then(function (response) {
+			successCallback(response);
 			setPopout(null);
 			return response;
 		})
@@ -373,7 +380,7 @@ export async function getSubscribers(setPopout, setSnackbar, ad_id, successCallb
 			if (err) {
 				fail('Нет соединения с сервером', () => {}, setSnackbar);
 			}
-			failCallback(error)
+			failCallback(error);
 			setPopout(null);
 		});
 	return { subscribers, err };
@@ -647,7 +654,7 @@ export function sucessNoCancel(text, setSnackbar, end) {
 			onClose={() => {
 				setSnackbar(null);
 				if (end) {
-					end()
+					end();
 				}
 			}}
 			before={
@@ -664,7 +671,7 @@ export function sucessNoCancel(text, setSnackbar, end) {
 export function sendSnack(text, setSnackbar) {
 	setSnackbar(
 		<Snackbar
-			style={{zIndex:"120"}}
+			style={{ zIndex: '120' }}
 			duration="1500"
 			onClose={() => {
 				setSnackbar(null);

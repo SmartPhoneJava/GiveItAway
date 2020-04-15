@@ -433,7 +433,6 @@ const AddMore2 = (props) => {
 		const imgs = ad.pathes_to_photo.map(v=>v.PhotoUrl)
 		return (
 			<div>
-				{request}
 				<div
 					style={{
 						position: 'relative',
@@ -448,12 +447,11 @@ const AddMore2 = (props) => {
 									images: imgs,
 								})
 								.catch(function (error) {
-									// console.log('failed open vk image', error);
-									// const w = window.open('about:blank', image); // открываем окно
-									// w.document.write("<img src='" + image + "' alt='from old image' />"); //  вставляем картинку
-									// ad.title=""+error //  вставляем картинку
-									// setAd(ad)
-									setRequest('' + JSON.stringify(error));
+									const w = window.open('about:blank', image); // открываем окно
+									w.document.write("<img src='" + image + "' alt='from old image' />"); //  вставляем картинку
+									ad.title=""+error //  вставляем картинку
+									setAd(ad)
+								
 								});
 						}}
 						srcSet={image}

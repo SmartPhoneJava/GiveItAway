@@ -65,13 +65,14 @@ let centrifuge = new Centrifuge(addr);
 
 let notsCounterrr = 0;
 
-let oldChoosen = { ad_id: -1 };
 
 const Main = () => {
 	const [popout, setPopout] = useState(null); //<ScreenSpinner size="large" />
 	const [inited, setInited] = useState(false);
 
 	const [adsMode, setAdsMode] = useState("");
+
+	const [history, setHistory] = useState(['main'])
 
 	const [profileID, setProfileID] = useState(0);
 	const [notsCounterr, setNotsCounterr] = useState(notsCounterr);
