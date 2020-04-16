@@ -24,7 +24,7 @@ import Icon28Add from '@vkontakte/icons/dist/28/add_outline';
 
 import { VkUser } from '../store/vkUser';
 
-import { handleNotifications }  from "./story/adds/tabs/notifications/notifications"
+import { handleNotifications } from './story/adds/tabs/notifications/notifications';
 
 import AddMore, { AdDefault } from './template/AddMore';
 import AddMore2 from './template/AddMore2';
@@ -36,7 +36,7 @@ import Error from './placeholders/error';
 
 import { NoRegion } from './template/Location';
 
-import Profile from './story/profile/Profile'
+import Profile from './story/profile/Profile';
 
 import AddsModal, { MODAL_FILTERS, MODAL_CATEGORIES, MODAL_SUBS } from './story/adds/AddsModal';
 import CreateModal from './story/create/CreateModal';
@@ -47,13 +47,16 @@ import { inputArgs } from './../utils/window';
 
 import Centrifuge from 'centrifuge';
 
+const PANEL_ADS = 'ads';
+const PANEL_ONE = 'one';
+const PANEL_USER = 'user';
+
 const ads = 'ads';
 const adsText = 'Объявления';
 
 const add = 'add';
 const addText = 'Создать';
 
-const profile = 'profile';
 const profileText = 'Профиль';
 
 const ApiVersion = '5.5';
@@ -65,14 +68,17 @@ let centrifuge = new Centrifuge(addr);
 
 let notsCounterrr = 0;
 
-
 const Main = () => {
 	const [popout, setPopout] = useState(null); //<ScreenSpinner size="large" />
 	const [inited, setInited] = useState(false);
 
-	const [adsMode, setAdsMode] = useState("");
+	const [adsMode, setAdsMode] = useState('all');
 
-	const [history, setHistory] = useState(['main'])
+	const [history, setHistory] = useState([PANEL_ADS]);
+	const [historyLen, setHistoryLen] = useState(1);
+
+	const [historyAds, setHistoryAds] = useState([]);
+	const [historyProfile, setHistoryProfile] = useState([]);
 
 	const [profileID, setProfileID] = useState(0);
 	const [notsCounterr, setNotsCounterr] = useState(notsCounterr);
@@ -82,21 +88,7 @@ const Main = () => {
 	const [category, setCategory] = useState(CategoryNo);
 	const [category2, setCategory2] = useState(CategoryNo);
 
-	const onStoryChange = (e) => {
-		console.log('my id is ', myID, e.currentTarget.dataset.story, profileID);
-		setActiveStory(e.currentTarget.dataset.story);
-		if (e.currentTarget.dataset.story == ads) {
-			setActivePanel('header-search');
-			setSavedAdState('');
-		} else if (e.currentTarget.dataset.story == profile) {
-			console.log('i set it ', myID);
-			setPrevActiveStory(no_prev);
-			setProfileID(myID);
-		}
-		scroll();
-	};
-
-	const [activePanel, setActivePanel] = useState('header-search');
+	const [activePanel, setActivePanel] = useState(PANEL_ADS);
 	const [activeModal, setActiveModal] = useState(null);
 	const [activeModal2, setActiveModal2] = useState(null);
 	const [snackbar, setSnackbar] = useState(null);
@@ -119,9 +111,95 @@ const Main = () => {
 
 	const [myID, setMyID] = useState(0);
 
-	function goSearch() {
-		setActivePanel('search');
+	const onStoryChange = (e) => {
+		const isProfile = e.currentTarget.dataset.text == profileText;
+		console.log('my id is ', e.currentTarget.dataset.text, isProfile);
+
+		if (e.currentTarget.dataset.story == ads) {
+			if (isProfile) {
+				setActivePanel(PANEL_USER);
+				setPrevActiveStory(no_prev);
+				setProfileID(myID);
+			} else {
+				setActivePanel(PANEL_ADS);
+				setSavedAdState('');
+			}
+		}
+		scroll();
+		setActiveStory(e.currentTarget.dataset.story);
+		setHistory([PANEL_ADS]);
+	};
+
+	function next(currPanel, newPanel) {
+		setHistoryLen(history.length + 1);
+		let a = history.slice();
+		a.push(currPanel);
+		setHistory(a);
+		setActivePanel(newPanel);
 	}
+
+	function back() {
+		let a = history.slice();
+		let panel = a.pop();
+		setHistory(a);
+		setActivePanel(panel);
+	}
+
+	function openAd(ad, currPanel) {
+		setActiveStory(ads);
+		setChoosen(ad);
+		next(currPanel, PANEL_ONE);
+
+		let a = historyAds.slice();
+		a.push(ad);
+		setHistoryAds(a);
+
+		scroll();
+	}
+
+	function openUser(id, currPanel) {
+		setActiveStory(ads);
+		setProfileID(id);
+		setPrevActiveStory('ads');
+		next(currPanel, PANEL_USER);
+
+		let a = historyProfile.slice();
+		a.push(id);
+		setHistoryProfile(a);
+
+		scroll();
+	}
+
+	useEffect(() => {
+		console.log('checker', historyLen, history.length);
+
+		if (historyLen == history.length) {
+			return;
+		}
+		const adsLength = history.filter((v) => {
+			v == PANEL_ONE;
+		}).length;
+		const usersLength = history.filter((v) => {
+			v == PANEL_USER;
+		}).length;
+
+		const a = historyAds.slice();
+		const p = historyProfile.slice();
+		console.log('infos', adsLength, usersLength, a.length, p.length);
+
+		if (adsLength != a.length) {
+			const ad = a.pop();
+			setChoosen(ad);
+			console.log('setChoosen', adsLength, usersLength);
+			setHistoryAds(a);
+		}
+
+		if (usersLength != p.length) {
+			const id = p.pop();
+			setProfileID(id);
+			setHistoryProfile(p);
+		}
+	}, [history]);
 
 	function goToAds(snack) {
 		setActiveStory(ads);
@@ -149,8 +227,8 @@ const Main = () => {
 			notsCounterrr++;
 			setNotsCounterr(notsCounterrr);
 			console.log('user#' + id + ' ' + note);
-			
-			handleNotifications(note, setSnackbar)
+
+			handleNotifications(note, setSnackbar);
 		});
 	}
 
@@ -232,8 +310,9 @@ const Main = () => {
 				<Tabbar>
 					<TabbarItem
 						onClick={onStoryChange}
-						selected={activeStory === ads}
+						selected={activeStory === ads && activePanel != PANEL_USER}
 						data-story={ads}
+						data-text={adsText}
 						text={adsText}
 						label={notsCounterrr == 0 ? null : notsCounterrr}
 						after={<Counter>100</Counter>}
@@ -242,13 +321,20 @@ const Main = () => {
 						<Icon28NewsfeedOutline onClick={onStoryChange} />
 					</TabbarItem>
 
-					<TabbarItem onClick={onStoryChange} selected={activeStory === add} data-story={add} text={addText}>
+					<TabbarItem
+						onClick={onStoryChange}
+						data-text={addText}
+						selected={activeStory === add}
+						data-story={add}
+						text={addText}
+					>
 						<Icon28Add onClick={onStoryChange} />
 					</TabbarItem>
 					<TabbarItem
 						onClick={onStoryChange}
-						selected={activeStory === profile}
-						data-story={profile}
+						selected={activeStory === ads && activePanel == PANEL_USER}
+						data-story={ads}
+						data-text={profileText}
 						text={profileText}
 					>
 						<Icon28User onClick={onStoryChange} />
@@ -260,6 +346,7 @@ const Main = () => {
 				popout={popout}
 				id={ads}
 				activePanel={activePanel}
+				history={history}
 				modal={
 					<AddsModal
 						appID={appID}
@@ -284,7 +371,7 @@ const Main = () => {
 				}
 				header={false}
 			>
-				<Panel id="header-search" separator={false}>
+				<Panel id={PANEL_ADS} separator={false}>
 					<AddsTabs
 						adsMode={adsMode}
 						setSavedAdState={setSavedAdState}
@@ -298,7 +385,6 @@ const Main = () => {
 						zeroNots={() => {
 							notsCounterrr = 0;
 						}}
-						goSearch={goSearch}
 						setPopout={setPopout}
 						setSnackbar={setSnackbar}
 						category={category}
@@ -308,67 +394,40 @@ const Main = () => {
 						country={country}
 						myID={myID}
 						openUser={(id) => {
-							setProfileID(id);
-							setActiveStory(profile);
-							setPrevActiveStory('ads');
-							setActivePanel('header-search');
-							setChoosen(AdDefault);
-							scroll();
+							openUser(id, PANEL_ADS);
 						}}
-						// region={region}
 						sort={sort}
 						dropFilters={() => {
 							setCategory(CategoryNo);
 							setCity(NoRegion);
 							setCountry(NoRegion);
-							// setRegion(NoRegion);
 						}}
 						chooseAdd={(ad) => {
 							setChoosen(ad);
 						}}
 						openAd={(ad) => {
-							setChoosen(ad);
-							setActivePanel('one-panel');
-							scroll();
+							openAd(ad, PANEL_ADS);
 						}}
 						vkPlatform={vkPlatform}
 					/>
 					{snackbar}
 				</Panel>
-				<Panel id="one-panel">
-					<PanelHeaderSimple
-						left={
-							<PanelHeaderBack
-								onClick={() => {
-									setActivePanel('header-search');
-								}}
-							/>
-						}
-					>
+				<Panel id={PANEL_ONE}>
+					<PanelHeaderSimple left={<PanelHeaderBack onClick={back} />}>
 						{choosen ? choosen.header : 'Произошла ошбка'}
 					</PanelHeaderSimple>
 					{choosen ? (
 						<AddMore2
 							wsNote={wsNote}
 							refresh={(id) => {
-								setActivePanel('header-search');
+								back();
 								SetDeleteID(id);
 								scroll();
 							}}
-							back={(id) => {
-								setActivePanel('header-search');
-							}}
-							commentsOpen={() => {
-								setActivePanel('comments');
-								scroll();
-							}}
+							back={back}
 							openUser={(id) => {
-								setProfileID(id);
-								setActiveStory(profile);
-								setPrevActiveStory('ads');
-								setActivePanel('one-panel');
+								openUser(id, PANEL_ONE);
 								setChoosen(choosen);
-								scroll();
 							}}
 							ad={choosen}
 							setPopout={setPopout}
@@ -380,6 +439,32 @@ const Main = () => {
 					) : (
 						Error
 					)}
+					{snackbar}
+				</Panel>
+				<Panel id={PANEL_USER}>
+					<PanelHeaderSimple left={prevActiveStory == no_prev ? null : <PanelHeaderBack onClick={back} />}>
+						Профиль
+					</PanelHeaderSimple>
+					<Profile
+						setAdsMode={setAdsMode}
+						setPopout={setPopout}
+						setSnackbar={setSnackbar}
+						myID={myID}
+						profileID={profileID}
+						appID={appID}
+						apiVersion={ApiVersion}
+						goToAdds={() => {
+							setActiveStory(ads);
+							scroll();
+						}}
+						goToCreate={() => {
+							setActiveStory(add);
+							scroll();
+						}}
+						openAd={(ad) => {
+							openAd(ad, PANEL_USER);
+						}}
+					/>
 					{snackbar}
 				</Panel>
 			</View>
@@ -413,47 +498,6 @@ const Main = () => {
 							SetDeleteID(id);
 						}}
 						chooseCategory={() => setActiveModal2(MODAL_CATEGORIES)}
-					/>
-					{snackbar}
-				</Panel>
-			</View>
-			<View id={profile} activePanel={profile} popout={popout}>
-				<Panel id={profile}>
-					<PanelHeader
-						left={
-							prevActiveStory == no_prev ? null : (
-								<PanelHeaderBack
-									onClick={() => {
-										setActiveStory(prevActiveStory);
-									}}
-								/>
-							)
-						}
-					>
-						{profileText}
-					</PanelHeader>
-					<Profile
-						setAdsMode={setAdsMode}
-						setPopout={setPopout}
-						setSnackbar={setSnackbar}
-						myID={myID}
-						profileID={profileID}
-						appID={appID}
-						apiVersion={ApiVersion}
-						goToAdds={() => {
-							setActiveStory(ads);
-							scroll();
-						}}
-						goToCreate={() => {
-							setActiveStory(add);
-							scroll();
-						}}
-						openAd={(ad) => {
-							setChoosen(ad);
-							setActiveStory(ads);
-							setActivePanel('one-panel');
-							scroll();
-						}}
 					/>
 					{snackbar}
 				</Panel>
