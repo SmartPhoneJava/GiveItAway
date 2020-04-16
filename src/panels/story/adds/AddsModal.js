@@ -26,7 +26,7 @@ const AddsModal = (props) => {
 				onClose={hideModal}
 				header={<ModalHeader name="Фильтры" back={() => hideModal()} />}
 			>
-				<CategoriesLabel category={props.category} open={() => props.setActiveModal(MODAL_CATEGORIES)} />
+				<CategoriesLabel leftMargin="10px" category={props.category} open={() => props.setActiveModal(MODAL_CATEGORIES)} />
 				{Location(
 					props.appID,
 					props.apiVersion,

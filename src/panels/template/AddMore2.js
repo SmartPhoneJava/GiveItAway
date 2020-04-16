@@ -11,9 +11,10 @@ import {
 	Cell,
 	Link,
 	Separator,
+	Counter,
 } from '@vkontakte/vkui';
 
-import { GetCategoryText } from './Categories';
+import { GetCategoryText, GetCategoryImageSmall } from './Categories';
 
 import Icon24CommentOutline from '@vkontakte/icons/dist/24/comment_outline';
 import Icon24Chats from '@vkontakte/icons/dist/24/chats';
@@ -430,7 +431,7 @@ const AddMore2 = (props) => {
 	}
 
 	if (ad) {
-		const imgs = ad.pathes_to_photo.map(v=>v.PhotoUrl)
+		const imgs = ad.pathes_to_photo.map((v) => v.PhotoUrl);
 		return (
 			<div>
 				<div
@@ -449,9 +450,8 @@ const AddMore2 = (props) => {
 								.catch(function (error) {
 									const w = window.open('about:blank', image); // открываем окно
 									w.document.write("<img src='" + image + "' alt='from old image' />"); //  вставляем картинку
-									ad.title=""+error //  вставляем картинку
-									setAd(ad)
-								
+									ad.title = '' + error; //  вставляем картинку
+									setAd(ad);
 								});
 						}}
 						srcSet={image}
@@ -560,27 +560,23 @@ const AddMore2 = (props) => {
 				{isDealer || status == 'closed' || status == 'aborted' || isAuthor() ? (
 					''
 				) : isSub ? (
-					<Button
-						style={{ margin: '8px', marginLeft: 'auto', marginRight: 'auto' }}
-						stretched
-						size="xl"
-						mode="destructive"
-						onClick={unsub}
-						before={<Icon24Cancel />}
-					>
-						Отказаться
-					</Button>
+					<div style={{ margin: '12px' }}>
+						<Button stretched size="xl" mode="destructive" onClick={unsub} before={<Icon24Cancel />}>
+							Отказаться
+						</Button>
+					</div>
 				) : (
-					<Button
-						stretched
-						size="xl"
-						style={{ margin: '8px', marginLeft: 'auto', marginRight: 'auto' }}
-						mode="primary"
-						onClick={sub}
-						before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
-					>
-						Хочу забрать!
-					</Button>
+					<div style={{ margin: '12px' }}>
+						<Button
+							stretched
+							size="xl"
+							mode="primary"
+							onClick={sub}
+							before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
+						>
+							Хочу забрать!
+						</Button>
+					</div>
 				)}
 				<div style={{ marginTop: '10px', paddingLeft: '16px', paddingRight: '16px' }}>
 					<div className="CellLeft__block">{ad.text}</div>
@@ -590,7 +586,7 @@ const AddMore2 = (props) => {
 					<tbody>
 						<tr>
 							<td className="first">Категория</td>
-							<td>{shortText(GetCategoryText(ad.category), 20)}</td>
+							<td>{GetCategoryImageSmall(ad.category)}</td>
 						</tr>
 						<tr>
 							<td className="first">Просмотров</td>
