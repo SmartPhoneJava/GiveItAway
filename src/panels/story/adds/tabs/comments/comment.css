@@ -6,20 +6,10 @@
 .block_in {
 	margin-bottom: 4px;
 
-	background: white;
+	background: var(--background_content);
 	border-style: solid;
 	border-width: 0.5px;
-	border-color: rgb(250, 250, 250);
 }
-/*
-background: '#F2F3F5',
-						position: 'fixed',
-						marginBottom: '45px',
-						marginRight: '20px',
-						bottom: '0',
-						right: '0',
-						zIndex: '100',
-*/
 
 .write {
 	

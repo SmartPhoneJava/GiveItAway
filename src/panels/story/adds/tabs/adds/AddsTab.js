@@ -196,8 +196,6 @@ const addsArrDD = [
 const AddsTab = (props) => {
 	const [search, setSearch] = useState('');
 
-	const [items, setItems] = useState([]);
-
 	const [pageNumber, setPageNumber] = useState(1);
 
 	let { inited, loading, ads, error, hasMore, newPage } = useAdSearch(
@@ -257,7 +255,7 @@ const AddsTab = (props) => {
 	console.log('loading', loading);
 
 	return (
-		<div style={{ background: '#F7F7F7' }}>
+		<div style={{ background: 'var(--background_page)' }}>
 			<Search value={search} onChange={handleSearch} icon={<Icon24Filter />} onIconClick={props.onFiltersClick} />
 			<Group>
 				{ads.length > 0 ? (

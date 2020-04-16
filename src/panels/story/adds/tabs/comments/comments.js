@@ -345,7 +345,6 @@ const Comments = (props) => {
 
 	return (
 		<div>
-			{/* <div style={{ background: '#F7F7F7', paddingBottom: '200px' }}></div> */}
 			{showComments(
 				props.setPopout,
 				props.setSnackbar,

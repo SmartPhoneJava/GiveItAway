@@ -6,7 +6,7 @@ import Icon56ErrorOutline from '@vkontakte/icons/dist/56/error_outline';
 const Error = props => {
 	return (
 		<Placeholder
-			style={{ background: 'red' }}
+			style={{ background: 'var(--destructive)' }}
 			icon={<Icon56ErrorOutline />}
 			header="Сервер временно не доступен &#128560;"
 			action={

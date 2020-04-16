@@ -1,6 +1,6 @@
 .CellLeft__head {
 	font-size: 20px;
-	color: rgb(0, 0, 0);
+	color: var(--text_primary);
 
 	line-height: 22px;
 	margin: 4px;
@@ -11,7 +11,7 @@
 
 .CellLeft__block {
 	font-size: 14px;
-	color: rgb(0, 0, 0);
+	color: var(--text_subhead);
 	line-height: 19px;
 	margin: 4px;
 	overflow: hidden;
@@ -35,7 +35,7 @@ td {
 }
 
 .first {
-	color: #999999;
+	color: var(--text_secondary);
 }
 
 .small_img {

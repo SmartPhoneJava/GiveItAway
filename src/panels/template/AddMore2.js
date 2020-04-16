@@ -461,17 +461,6 @@ const AddMore2 = (props) => {
 							maxHeight: '200px',
 						}}
 					/>
-					{/* <div style={{ right: '10px', position: 'absolute', top: '10px' }}>
-					<PanelHeaderButton
-						mode="secondary"
-						style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
-						size="m"
-					>
-						<Avatar style={{ background: 'rgba(0,0,0,0.7)' }} size={32}>
-							<Icon24VideoFill fill="var(--white)" />
-						</Avatar>
-					</PanelHeaderButton>
-				</div> */}
 				</div>
 				{!ad.pathes_to_photo || ad.pathes_to_photo.length <= 1 ? (
 					''
