@@ -51,7 +51,7 @@
     "react": "^16.13.0",
     "react-canvas": "^1.3.0",
     "react-cent": "^2.0.4",
-    "react-dom": "^16.13.0",
+    "react-dom": "^16.13.1",
     "react-image-gallery": "^1.0.7",
     "react-infinite-scroller": "^1.2.4",
     "react-native": "^0.62.0",

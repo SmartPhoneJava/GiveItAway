@@ -3,12 +3,27 @@ import axios from 'axios';
 
 import { ScreenSpinner } from '@vkontakte/vkui';
 
-
 import { Addr } from './../../../../../store/addr';
 
 import { User } from './AddsTab/../../../../../../store/user';
 
 import { CategoryNo } from './../../../../template/Categories';
+
+export async function useAdSearchA(
+	setPopout,
+	query,
+	category,
+	mode,
+	pageNumber,
+	rowsPerPage,
+	deleteID,
+	city,
+	country,
+	sort,
+	setter
+) {
+	useAdSearch(setPopout, query, category, mode, pageNumber, rowsPerPage, deleteID, city, country, sort, setter);
+}
 
 export default function useAdSearch(
 	setPopout,
@@ -20,7 +35,8 @@ export default function useAdSearch(
 	deleteID,
 	city,
 	country,
-	sort
+	sort,
+	setter
 ) {
 	const [inited, setInited] = useState(false);
 	const [loading, setLoading] = useState(true);
@@ -37,7 +53,7 @@ export default function useAdSearch(
 		console.log('deleteID', deleteID);
 		if (deleteID > 0) {
 			setAds(
-				ads.filter(x => {
+				ads.filter((x) => {
 					return x.ad_id != deleteID;
 				})
 			);
@@ -48,7 +64,7 @@ export default function useAdSearch(
 		setPopout(<ScreenSpinner size="large" />);
 		setLoading(true);
 		setError(false);
-		setInited(false)
+		setInited(false);
 		let cancel;
 
 		let params = {
@@ -73,11 +89,11 @@ export default function useAdSearch(
 			params.region = country.title;
 		}
 
-		let url = '/api/ad/find'
-		if (mode != 'all' && mode != "wanted") {
+		let url = '/api/ad/find';
+		if (mode != 'all' && mode != 'wanted') {
 			params.author_id = User.getState().vk_id;
-		} else if (mode == "wanted") {
-			url = '/api/ad/wanted'
+		} else if (mode == 'wanted') {
+			url = '/api/ad/wanted';
 		}
 
 		axios({
@@ -85,12 +101,12 @@ export default function useAdSearch(
 			url: Addr.getState() + url,
 			params,
 			withCredentials: true,
-			cancelToken: new axios.CancelToken(c => (cancel = c)),
+			cancelToken: new axios.CancelToken((c) => (cancel = c)),
 		})
-			.then(res => {
+			.then((res) => {
 				console.log('useAdsearch', res);
 				const newAds = res.data;
-				setAds(prev => {
+				setAds((prev) => {
 					return [...new Set([...prev, ...newAds])];
 				});
 				setHasMore(newAds.length > 0);
@@ -98,7 +114,7 @@ export default function useAdSearch(
 				setPopout(null);
 				setInited(true);
 			})
-			.catch(e => {
+			.catch((e) => {
 				console.log('fail', e);
 				if (axios.isCancel(e)) return;
 				if (('' + e).indexOf('404') == -1) {
@@ -110,5 +126,8 @@ export default function useAdSearch(
 		return () => cancel();
 	}, [category, mode, query, pageNumber, city, country, sort]);
 
+	if (setter) {
+		setter(inited, pageNumber, ads, loading, error, hasMore);
+	}
 	return { inited, newPage: pageNumber, ads, loading, error, hasMore };
 }
