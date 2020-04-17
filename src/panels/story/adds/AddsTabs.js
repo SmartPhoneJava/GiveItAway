@@ -37,18 +37,18 @@ const AddsTabs = (props) => {
 	const [mode, setmode] = useState('all');
 	const [activeTab, setActiveTab] = useState(props.savedAdState == '' ? tabAdds : props.savedAdState);
 
-	useEffect(()=>{
-		if (props.adsMode == "") {
-			return
+	useEffect(() => {
+		if (props.adsMode == '') {
+			return;
 		}
-		setmode(props.adsMode)
-	}, [props.adsMode])
+		setmode(props.adsMode);
+	}, [props.adsMode]);
 
-	useEffect(()=>{
-		if (props.savedAdState != "") {
-			setActiveTab(props.savedAdState)
+	useEffect(() => {
+		if (props.savedAdState != '') {
+			setActiveTab(props.savedAdState);
 		}
-	}, [props.savedAdState])
+	}, [props.savedAdState]);
 	function select(e) {
 		setmode(e.currentTarget.dataset.mode);
 		setContextOpened(false);
@@ -71,7 +71,7 @@ const AddsTabs = (props) => {
 							<Icon16Dropdown
 								fill="var(--accent)"
 								style={{
-									marginLeft:"15px",
+									marginLeft: '15px',
 									transition: '0.3s',
 									transform: `rotate(${contextOpened ? '180deg' : '0'})`,
 								}}
@@ -129,6 +129,7 @@ const AddsTabs = (props) => {
 			</PanelHeaderContext>
 			{activeTab === tabNotification ? (
 				<Notifications
+					setSnackbar={props.setSnackbar}
 					zeroNots={props.zeroNots}
 					openUser={(u) => {
 						props.openUser(u);

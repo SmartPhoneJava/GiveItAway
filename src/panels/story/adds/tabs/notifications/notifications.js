@@ -15,50 +15,44 @@ import Icon56ErrorOutline from '@vkontakte/icons/dist/56/error_outline';
 
 import Error from './../../../../placeholders/error';
 
-import {sendSnack} from "./../../../../../requests"
+import { timeDate } from './../../../../../utils/time';
+
+import { sendSnack } from './../../../../../requests';
 
 import './notification.css';
-import Notification, {
-	NotificationClose,
-	NotificationRespond,
-	NotificationStatus,
-	NotificationDeleted,
-	NotificationFulFill,
-	NotificationStatistics,
-	NotificationComment,
-} from './Notification';
+import Notification from './Notification';
 
 export const NT_CLOSE = 'ad_close'; // приходит выбранному автором пользователю
 export const NT_RESPOND = 'respond'; // приходит автору
 export const NT_FULFILL = 'fulfill'; // приходит автору
 export const NT_STATISTICS = 'statistics'; // приходит автору
+export const NT_SUB_CANCEL = 'subscriberCancel'; // приходит автору
 export const NT_STATUS = 'status'; // приходит подписчикам
 export const NT_DELETED = 'deleted'; // приходит подписчикам
 export const NT_COMMENT = 'new_comment'; // приходит всем
 
 export function handleNotifications(note, setSnackbar) {
-
 	switch (note.data.notification_type) {
 		case NT_STATISTICS:
-			sendSnack("Прилетела новая статистика", setSnackbar)
+			sendSnack('Прилетела новая статистика', setSnackbar);
 			return;
 		case NT_STATUS:
-			sendSnack("Статус объявления изменен", setSnackbar)
+			sendSnack('Статус объявления изменен', setSnackbar);
 			return;
 		case NT_CLOSE:
-			sendSnack("Объявление закрыто", setSnackbar)
+			sendSnack('Объявление закрыто', setSnackbar);
 			return;
 		case NT_DELETED:
-			sendSnack("Объявление удалено", setSnackbar)
+			sendSnack('Объявление удалено', setSnackbar);
 			return;
 		case NT_RESPOND:
-			sendSnack("Кто то откикнулся на объявление", setSnackbar)
+			sendSnack('Кто то откикнулся на объявление', setSnackbar);
 			return;
 		case NT_FULFILL:
-			sendSnack("Объявление завершено", setSnackbar)
+			sendSnack('Объявление завершено', setSnackbar);
 			return;
 		case NT_COMMENT:
-			sendSnack("Обьявление прокомментировано", setSnackbar)
+			sendSnack('Обьявление прокомментировано', setSnackbar);
 			return;
 	}
 	// setSnackbar(
@@ -72,7 +66,6 @@ export function handleNotifications(note, setSnackbar) {
 	// 		asdadasdsa
 	// 	</Snackbar>
 	// );
-
 }
 
 const arr = [
@@ -239,41 +232,150 @@ const arr = [
 	},
 ];
 
-function getNotifications(arr, lastAdElementRef, openUser, openAd) {
-	return arr.map((v, index) => {
-		let inner = <Notification openUser={openUser} openAd={openAd} key={v.id} notification={v} />;
-		switch (v.notification_type) {
-			case NT_STATISTICS:
-				inner = <NotificationStatistics openUser={openUser} openAd={openAd} notification={v} />;
-				break;
-			case NT_STATUS:
-				inner = <NotificationStatus openUser={openUser} openAd={openAd} notification={v} />;
-				break;
-			case NT_CLOSE:
-				inner = <NotificationClose openUser={openUser} openAd={openAd} notification={v} />;
-				break;
-			case NT_DELETED:
-				inner = <NotificationDeleted openUser={openUser} openAd={openAd} notification={v} />;
-				break;
-			case NT_RESPOND:
-				inner = <NotificationRespond openUser={openUser} openAd={openAd} notification={v} />;
-				break;
-			case NT_FULFILL:
-				inner = <NotificationFulFill openUser={openUser} openAd={openAd} notification={v} />;
-				break;
-			case NT_COMMENT:
-				inner = <NotificationComment openUser={openUser} openAd={openAd} notification={v} />;
-				break;
-		}
-		if (arr.length === index + 1) {
-			return (
-				<div key={v.id} ref={lastAdElementRef}>
-					{inner}
-				</div>
-			);
-		} else {
-			return <div key={v.id}>{inner}</div>;
-		}
+function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackbar) {
+	return bigarr.map((arr, jindex) => {
+		const dt = timeDate(arr[0].creation_date_time);
+		return (
+			<Group key={dt} header={<Header mode="secondary">{dt}</Header>}>
+				{arr.map((v, index) => {
+					let inner = <></>;
+					switch (v.notification_type) {
+						case NT_STATUS:
+							inner = (
+								<Notification
+									ad={v.payload.ad}
+									date={v.creation_date_time}
+									author=""
+									text={
+										v.status == 'chosen'
+											? 'Автор выбрал пользователя для передачи вещи'
+											: v.status == 'close'
+											? 'Вещь отдана'
+											: 'Объявление закрыто'
+									}
+									header={v.payload.ad.header}
+									system={true}
+									openUser={openUser}
+									openAd={openAd}
+									key={v.id}
+									notification={v}
+									setSnackbar={setSnackbar}
+								/>
+							);
+							break;
+						case NT_CLOSE:
+							inner = (
+								<Notification
+									ad={v.payload.ad}
+									date={v.creation_date_time}
+									author=""
+									text="Подтвердите получение вещи"
+									header={v.payload.ad.header}
+									system={true}
+									openUser={openUser}
+									openAd={openAd}
+									key={v.id}
+									notification={v}
+									setSnackbar={setSnackbar}
+								/>
+							);
+							break;
+						case NT_DELETED:
+							inner = (
+								<Notification
+									ad={v.payload.ad}
+									date={v.creation_date_time}
+									author=""
+									text="Объявление удалено"
+									header={v.payload.ad.header}
+									system={true}
+									openUser={openUser}
+									openAd={openAd}
+									key={v.id}
+									notification={v}
+									setSnackbar={setSnackbar}
+								/>
+							);
+							break;
+						case NT_RESPOND:
+							inner = (
+								<Notification
+									ad={v.payload.ad}
+									date={v.creation_date_time}
+									author={v.payload.author.name + ' ' + v.payload.author.surname[0] + '.'}
+									text="хочет забрать!"
+									header={v.payload.ad.header}
+									system={true}
+									openUser={openUser}
+									openAd={openAd}
+									key={v.id}
+									notification={v}
+									setSnackbar={setSnackbar}
+								/>
+							);
+							break;
+						case NT_FULFILL:
+							inner = (
+								<Notification
+									ad={v.payload.ad}
+									date={v.creation_date_time}
+									author=""
+									text="Ваша вещь получена!"
+									header={v.payload.ad.header}
+									system={true}
+									openUser={openUser}
+									openAd={openAd}
+									key={v.id}
+									notification={v}
+									setSnackbar={setSnackbar}
+								/>
+							);
+							break;
+						case NT_COMMENT:
+							inner = (
+								<Notification
+									date={v.creation_date_time}
+									author={v.payload.author.name + ' ' + v.payload.author.surname[0] + '. написал'}
+									text={v.payload.text}
+									header="Безымянное объявление"
+									system={false}
+									openUser={openUser}
+									openAd={openAd}
+									key={v.id}
+									notification={v}
+									setSnackbar={setSnackbar}
+								/>
+							);
+							break;
+						case NT_SUB_CANCEL:
+							inner = (
+								<Notification
+									ad={v.payload.ad}
+									date={v.creation_date_time}
+									author={v.payload.author.name + ' ' + v.payload.author.surname[0] + '.'}
+									text="отписался от обновлений"
+									header={v.payload.ad.header}
+									system={true}
+									openUser={openUser}
+									openAd={openAd}
+									key={v.id}
+									notification={v}
+									setSnackbar={setSnackbar}
+								/>
+							);
+					}
+					if (arr.length === index + 1 && bigarr.length === jindex + 1) {
+						return (
+							<div key={v.notification_id} ref={lastAdElementRef}>
+								{inner}
+							</div>
+						);
+					} else {
+						return <div key={v.notification_id}>{inner}</div>;
+					}
+				})}
+			</Group>
+		);
 	});
 }
 
@@ -302,50 +404,89 @@ const Notifications = (props) => {
 		[loading, hasMore]
 	);
 
-	const arrNotRead = nots.filter((v) => !v.is_read);
-	const arrRead = nots.filter((v) => v.is_read);
+	let arrNotRead = [];
+	let arrRead = [];
+
+	function countNotRead() {
+		let anr = [];
+		arrNotRead.forEach((e) => {
+			anr = [...anr, ...e];
+		});
+		anr = [...anr, ...nots.filter((v) => !v.is_read)];
+		arrNotRead = [];
+
+		while (anr.length > 0) {
+			const first = anr[0];
+			const filtered = anr.filter((v) => {
+				return timeDate(v.creation_date_time) == timeDate(first.creation_date_time);
+			});
+			arrNotRead.push(filtered);
+			anr = anr.slice(filtered.length);
+		}
+	}
+
+	function countRead() {
+		let ar = [];
+		arrRead.forEach((e) => {
+			ar = [...ar, ...e];
+		});
+		ar = [...ar, ...nots.filter((v) => v.is_read)];
+		arrRead = [];
+
+		while (ar.length > 0) {
+			const first = ar[0];
+			const filtered = ar.filter((v) => {
+				return timeDate(v.creation_date_time) == timeDate(first.creation_date_time);
+			});
+			arrRead.push(filtered);
+			ar = ar.slice(filtered.length);
+		}
+	}
+
+	countNotRead();
+	countRead();
 
 	console.log('arrRead:', arrRead, error);
 	props.zeroNots();
 	if (error) {
 		return <Error />;
 	}
-	if (inited) {
-		return (
-			<div style={{ background: '#F7F7F7' }}>
-				{arrNotRead.length > 0 ? (
-					<Group header={<Header mode="secondary">Непрочитанные</Header>}>
-						{getNotifications(arrNotRead, lastAdElementRef, props.openUser, props.openAd)}
-					</Group>
-				) : (
-					''
-				)}
-				{arrRead.length > 0 ? (
-					<Group header={<Header mode="secondary">Прочитанные</Header>}>
-						{getNotifications(arrRead, lastAdElementRef, props.openUser, props.openAd)}
-					</Group>
-				) : (
-					''
-				)}
-				{arrNotRead.length + arrRead.length == 0 ? (
-					<Placeholder
-						icon={<Icon56ErrorOutline />}
-						header="Пусто"
-						action={
-							<Button onClick={() => props.goToAds()} size="l">
-								Вернуться в ленту обьявлений
-							</Button>
-						}
-					>
-						Вы еще не получили ни одного уведомления
-					</Placeholder>
-				) : (
-					''
-				)}
-			</div>
-		);
-	}
-	return <></>;
+
+	return (
+		<div>
+			{arrNotRead.length > 0 ? (
+				<Group header={<Header mode="primary">Непрочитанные</Header>}>
+					{getNotifications(arrNotRead, lastAdElementRef, props.openUser, props.openAd, props.setSnackbar)}
+				</Group>
+			) : (
+				''
+			)}
+			{arrRead.length > 0 ? (
+				<Group header={<Header mode="primary">Прочитанные</Header>}>
+					{getNotifications(arrRead, lastAdElementRef, props.openUser, props.openAd, props.setSnackbar)}
+				</Group>
+			) : (
+				''
+			)}
+			{!inited ? (
+				''
+			) : arrNotRead.length + arrRead.length == 0 ? (
+				<Placeholder
+					icon={<Icon56ErrorOutline />}
+					header="Пусто"
+					action={
+						<Button onClick={() => props.goToAds()} size="l">
+							Вернуться в ленту обьявлений
+						</Button>
+					}
+				>
+					Вы еще не получили ни одного уведомления
+				</Placeholder>
+			) : (
+				''
+			)}
+		</div>
+	);
 };
 
 export default Notifications;

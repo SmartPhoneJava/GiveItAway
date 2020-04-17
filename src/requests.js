@@ -278,7 +278,7 @@ export function subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallba
 			fail(
 				'Нет соединения с сервером',
 				() => {
-					subscribe(setPopout, setSnackbar, ad_id, clCancel);
+					subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallback, failCallback, end);
 				},
 				setSnackbar,
 				end

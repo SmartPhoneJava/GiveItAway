@@ -5,21 +5,12 @@ import { ScreenSpinner } from '@vkontakte/vkui';
 
 import { Addr } from '../../../../../store/addr';
 
-import { User } from '../../../../../store/user';
-
-import { CategoryNo } from '../../../../template/Categories';
-
 export default function useNotificationsGet(setPopout, query, pageNumber, rowsPerPage) {
 	const [inited, setInited] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
 	const [nots, setNots] = useState([]);
 	const [hasMore, setHasMore] = useState(false);
-
-	useEffect(() => {
-		setNots([]);
-		pageNumber = 1;
-	}, [query]);
 
 	useEffect(() => {
 		setPopout(<ScreenSpinner size="large" />);
