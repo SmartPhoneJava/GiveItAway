@@ -110,9 +110,10 @@ export async function getDeal(setSnackbar, ad_id, successCallback) {
 		.then(function (response) {
 			console.log('response from getDeal:', response);
 			return response.data;
-		}).then(function (response) {
+		})
+		.then(function (response) {
 			if (successCallback) {
-				console.log("action")
+				console.log('action');
 				successCallback(response);
 			}
 			return response;
@@ -124,14 +125,13 @@ export async function getDeal(setSnackbar, ad_id, successCallback) {
 }
 
 export async function denyDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end) {
-	console.log("denyDeall", deal_id)
+	console.log('denyDeall', deal_id);
 	let err = false;
 	let cancel;
 	setPopout(<ScreenSpinner size="large" />);
-	
 
-	console.log("denyDeal", deal_id)
-	
+	console.log('denyDeal', deal_id);
+
 	await axios({
 		method: 'post',
 		withCredentials: true,
@@ -202,22 +202,21 @@ export async function acceptDeal(setPopout, setSnackbar, deal_id, successCallbac
 }
 
 export async function CancelClose(setPopout, setSnackbar, ad_id) {
-
 	getDeal(setSnackbar, ad_id, async (deal) => {
-		console.log("success", JSON.stringify(deal))
+		console.log('success', JSON.stringify(deal));
 		await denyDeal(
 			setPopout,
 			setSnackbar,
 			deal.deal_id,
 			(v) => {
-				console.log("success double")
+				console.log('success double');
 				sucessNoCancel('Запрос успешно отменен!', setSnackbar);
 			},
 			(e) => {
-				console.log("faiil double")
+				console.log('faiil double');
 			}
 		);
-		console.log("after success")
+		console.log('after success');
 	});
 }
 
@@ -274,15 +273,25 @@ export function subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallba
 		})
 		.catch(function (error) {
 			err = true;
+			console.log('loook, error', error, status);
 			failCallback(error);
-			fail(
-				'Нет соединения с сервером',
-				() => {
-					subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallback, failCallback, end);
-				},
-				setSnackbar,
-				end
-			);
+			if (error == "Error: Request failed with status code 409") {
+				fail(
+					'недостаточно кармы. Откажитесь от другой вещи, чтобы получить эту!',
+					null,
+					setSnackbar,
+					end
+				);
+			} else {
+				fail(
+					'Нет соединения с сервером',
+					() => {
+						subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallback, failCallback, end);
+					},
+					setSnackbar,
+					end
+				);
+			}
 			setPopout(null);
 		});
 	return err;
@@ -583,7 +592,7 @@ export function fail(err, repeat, setSnackbar, end) {
 		repeat
 			? setSnackbar(
 					<Snackbar
-						duration="1500"
+						duration="2000"
 						onClose={() => {
 							setSnackbar(null);
 							if (end) {
@@ -606,7 +615,7 @@ export function fail(err, repeat, setSnackbar, end) {
 			  )
 			: setSnackbar(
 					<Snackbar
-						duration="1500"
+						duration="2000"
 						onClose={() => setSnackbar(null)}
 						before={
 							<Avatar size={24} style={{ background: 'red' }}>

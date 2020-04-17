@@ -119,11 +119,13 @@ const CreateAdd = (props) => {
 			setErrorHeader('Контактные данные не указаны');
 			setErrorText('Укажите информацию для связи с вами - максимум 1000 символов.');
 		}
-		if (city.id < 0 || country.id < 0) {
-			v = false;
-			setErrorHeader('Местоположение не указано');
-			setErrorText('Укажите свою страну и город с помощью выпадающих списков выше');
-		}
+
+		// !! временная мера!
+		// if (city.id < 0 || country.id < 0) {
+		// 	v = false;
+		// 	setErrorHeader('Местоположение не указано');
+		// 	setErrorText('Укажите свою страну и город с помощью выпадающих списков выше');
+		// }
 		if (items[0].photos.length == 0)  {
 			v = false;
 			setErrorHeader('Не загружено ни одной фотографии');

@@ -171,7 +171,7 @@ const Add6 = (props) => {
 			// >
 			// 	<Icon24MoreVertical />
 			// </PanelHeaderButton>
-			<Icon24MoreVertical onClick={openSettings} style={{ marginLeft: '5px' }} />
+			<Icon24MoreVertical onClick={openSettings} style={{ marginLeft: 'auto', marginTop: '15px', marginRight:"10px" }} />
 		) : (
 			''
 		);
@@ -200,20 +200,14 @@ const Add6 = (props) => {
 				) : (
 					''
 				)}
+
 				<div
+					onClick={openAd}
 					style={{
-						display: 'flex',
+						display: 'block',
 					}}
 				>
-					<div
-						onClick={openAd}
-						style={{
-							display: 'block',
-						}}
-					>
-						<div>{!ad.anonymous ? ad.author.name + ' ' + ad.author.surname : ''}</div>
-					</div>
-					{controllButton()}
+					<div>{!ad.anonymous ? ad.author.name + ' ' + ad.author.surname : ''}</div>
 				</div>
 			</div>
 		);
@@ -318,10 +312,11 @@ const Add6 = (props) => {
 							''
 						)}
 					</div>
-					<div style={{ padding: '10px' }}>
+					<div onClick={props.openAd} style={{ padding: '10px' }}>
 						{authorPanel(props.openAd)}
-						<InfoRow onClick={props.openAd}> {shortText(ad.header, 300)} </InfoRow>
+						<InfoRow> {shortText(ad.header, 300)} </InfoRow>
 					</div>
+					{controllButton()}
 				</div>
 				<div
 					onClick={props.openAd}

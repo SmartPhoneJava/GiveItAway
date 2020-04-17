@@ -269,7 +269,7 @@ function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackba
 									ad={v.payload.ad}
 									date={v.creation_date_time}
 									author=""
-									text="Подтвердите получение вещи"
+									text="Автор выбрал вас получателем. Кликни по мне после получения объекта объявления!"
 									header={v.payload.ad.header}
 									system={true}
 									openUser={openUser}

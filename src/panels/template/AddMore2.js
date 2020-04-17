@@ -232,7 +232,7 @@ const AddMore2 = (props) => {
 			return statusWrapper(
 				<>
 					<InfoRow style={{ padding: '10px', color: 'rgb(200,200,200)', textAlign: 'center' }}>
-						Подтвердите получение вещи:
+						Автор решил отдать вещь вам. Подтвердите получение вещи после получения:
 					</InfoRow>
 					<div style={{ display: 'flex' }}>
 						<Button
@@ -434,8 +434,7 @@ const AddMore2 = (props) => {
 		const imgs = ad.pathes_to_photo.map((v) => v.PhotoUrl);
 		return (
 			<div>
-				<div
-				>
+				<div style={{position:"relative"}}>
 					{showStatus()}
 					<img
 						onClick={() => {
