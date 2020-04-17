@@ -435,10 +435,6 @@ const AddMore2 = (props) => {
 		return (
 			<div>
 				<div
-					style={{
-						position: 'relative',
-						display: 'inline-block',
-					}}
 				>
 					{showStatus()}
 					<img
@@ -459,6 +455,7 @@ const AddMore2 = (props) => {
 							width: '100%',
 							objectFit: 'cover',
 							maxHeight: '200px',
+							margin: 'auto',
 						}}
 					/>
 				</div>

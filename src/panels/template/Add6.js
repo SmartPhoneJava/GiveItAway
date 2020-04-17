@@ -16,19 +16,18 @@ import Icon24Info from '@vkontakte/icons/dist/24/info';
 
 import Icon24Hide from '@vkontakte/icons/dist/24/hide';
 
+import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
+
 import Icon20ArticleBoxOutline from '@vkontakte/icons/dist/20/article_box_outline';
 
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';
 import Icon16CheckCircle from '@vkontakte/icons/dist/16/check_circle';
 import Icon16Clear from '@vkontakte/icons/dist/16/clear';
 
-import Icon24Settings from '@vkontakte/icons/dist/24/settings';
-import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
-
 import OpenActions from './components/actions';
 
-import {time} from "./../../utils/time"
-import {shortText} from "./../../utils/short_text"
+import { time } from './../../utils/time';
+import { shortText } from './../../utils/short_text';
 
 import { Draft } from './../../store/draft';
 
@@ -37,7 +36,7 @@ import './Add6.css';
 
 export function AdLight(ad, image, openAd) {
 	return (
-		<div className="light-main-left" onClick={openAd}>
+		<div className="light-main-left">
 			<img src={image} className="light-tiled" />
 			<div className="light-name">
 				<div
@@ -162,22 +161,23 @@ const Add6 = (props) => {
 	}
 
 	function controllButton() {
-		return isAuthor() ? (
-			<PanelHeaderButton
-				mode="primary"
-				size="m"
-				className="button"
-				onClick={openSettings}
-				disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
-			>
-				<Icon28SettingsOutline fill="#2F91FD" />
-			</PanelHeaderButton>
+		return (ad.status == 'offer' || ad.status == 'chosen') && isAuthor() ? (
+			// <PanelHeaderButton
+			// 	mode="primary"
+			// 	size="m"
+			// 	className="button"
+			// 	onClick={openSettings}
+			// 	disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
+			// >
+			// 	<Icon24MoreVertical />
+			// </PanelHeaderButton>
+			<Icon24MoreVertical onClick={openSettings} style={{ marginLeft: '5px' }} />
 		) : (
 			''
 		);
 	}
 
-	function authorPanel() {
+	function authorPanel(openAd) {
 		return (
 			<div
 				style={{
@@ -202,23 +202,25 @@ const Add6 = (props) => {
 				)}
 				<div
 					style={{
-						display: 'block',
+						display: 'flex',
 					}}
 				>
-					<div>{!ad.anonymous ? ad.author.name + ' ' + ad.author.surname : ''}</div>
 					<div
+						onClick={openAd}
 						style={{
-							color: 'grey',
+							display: 'block',
 						}}
 					>
-						{time(ad.creation_date)}
+						<div>{!ad.anonymous ? ad.author.name + ' ' + ad.author.surname : ''}</div>
 					</div>
+					{controllButton()}
 				</div>
 			</div>
 		);
 	}
 
 	function commonActions() {
+		return <></>;
 		return (
 			<div style={{ marginLeft: 'auto' }}>
 				<PanelHeaderButton mode="secondary" className="button" size="m" disabled={ad.status !== 'offer'}>
@@ -237,9 +239,9 @@ const Add6 = (props) => {
 			</div>
 		);
 	}
-	
+
 	if (!ad) {
-		return <></>
+		return <></>;
 	}
 	return (
 		<div className="outter">
@@ -256,8 +258,8 @@ const Add6 = (props) => {
 						: 'tile'
 				}
 			>
-				<div onClick={props.openAd} className="main">
-					<div className="main-left">
+				<div className="main">
+					<div onClick={props.openAd} className="main-left">
 						<img src={image} className="tiled" />
 						<div className="city">
 							<div
@@ -316,18 +318,25 @@ const Add6 = (props) => {
 							''
 						)}
 					</div>
-					<div>
-						<div style={{ padding: '10px' }}>
-							{authorPanel()}
-							<InfoRow> {shortText(ad.header, 300)} </InfoRow>
-						</div>
+					<div style={{ padding: '10px' }}>
+						{authorPanel(props.openAd)}
+						<InfoRow onClick={props.openAd}> {shortText(ad.header, 300)} </InfoRow>
 					</div>
 				</div>
-				<Separator />
-				<div style={{ display: 'flex' }}>
-					{controllButton()}
-					{commonActions()}
+				<div
+					onClick={props.openAd}
+					style={{
+						textAlign: 'center',
+						color: 'grey',
+						width: '120px',
+						marginBottom: '4px',
+						marginTop: '4px',
+					}}
+				>
+					{time(ad.creation_date)}
 				</div>
+				<Separator />
+				<div style={{ display: 'flex' }}>{commonActions()}</div>
 			</div>
 		</div>
 	);
