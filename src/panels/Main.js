@@ -131,6 +131,7 @@ const Main = () => {
 	};
 
 	function next(currPanel, newPanel) {
+		windpw.history.pushState({}, currPanel)
 		setHistoryLen(history.length + 1);
 		let a = history.slice();
 		a.push(currPanel);
@@ -139,6 +140,7 @@ const Main = () => {
 	}
 
 	function back() {
+		window.history.pop()
 		let a = history.slice();
 		let panel = a.pop();
 		setHistory(a);
@@ -304,7 +306,6 @@ const Main = () => {
 	}
 
 	return (
-		<ConfigProvider isWebView={true}>
 			<Epic
 				activeStory={activeStory}
 				tabbar={
@@ -507,7 +508,6 @@ const Main = () => {
 					</Panel>
 				</View>
 			</Epic>
-		</ConfigProvider>
 	);
 };
 
