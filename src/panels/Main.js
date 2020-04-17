@@ -131,7 +131,7 @@ const Main = () => {
 	};
 
 	function next(currPanel, newPanel) {
-		windpw.history.pushState({}, currPanel)
+		window.history.pushState({}, currPanel)
 		setHistoryLen(history.length + 1);
 		let a = history.slice();
 		a.push(currPanel);
@@ -140,7 +140,7 @@ const Main = () => {
 	}
 
 	function back() {
-		window.history.pop()
+		window.history.back()
 		let a = history.slice();
 		let panel = a.pop();
 		setHistory(a);
