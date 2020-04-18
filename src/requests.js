@@ -228,7 +228,7 @@ export function Close(setPopout, setSnackbar, ad_id, subscriber_id) {
 	axios({
 		method: 'put',
 		withCredentials: true,
-		params: { subscriber_id: subscriber_id },
+		params: { subscriber_id: subscriber_id, type:"choice" },
 		url: Addr.getState() + '/api/ad/' + ad_id + '/make_deal',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
