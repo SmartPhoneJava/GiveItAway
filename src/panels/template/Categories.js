@@ -109,6 +109,8 @@ export const CategoryPencil = 'pencil';
 export const CategoryPlay = 'play';
 export const CategorySport = 'sport';
 
+import './categories.css';
+
 export function GetCategory400(category) {
 	let image = Another400;
 	switch (category) {
@@ -163,7 +165,6 @@ export function GetCategory400(category) {
 	}
 	return image;
 }
-
 
 export function GetCategory100(category) {
 	let image = Another100;
@@ -220,7 +221,6 @@ export function GetCategory100(category) {
 	return image;
 }
 
-
 export function GetCategory50(category) {
 	let image = Another50;
 	switch (category) {
@@ -275,7 +275,6 @@ export function GetCategory50(category) {
 	}
 	return image;
 }
-
 
 export function GetCategory30(category) {
 	let image = Another30;
@@ -475,13 +474,24 @@ export const CategoriesLabel = (props) => {
 				display: 'flex',
 				alignContent: 'center',
 				alignItems: 'center',
+				color: 'red',
+				// color: "var(--text_primary)",
 				paddingLeft: props.leftMargin,
 			}}
 		>
 			{GetCategoryImage(props.category)}
-			<FormLayout style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+			<FormLayout style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'red' }}>
 				<SelectMimicry
 					top="Категория"
+					style={{
+						display: 'flex',
+						alignContent: 'center',
+						alignItems: 'center',
+						color: 'red',
+						// color: "var(--text_primary)",
+						paddingLeft: props.leftMargin,
+					}}
+					value={GetCategoryText(props.category)}
 					placeholder={GetCategoryText(props.category)}
 					onClick={() => props.open()}
 				/>

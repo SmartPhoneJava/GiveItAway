@@ -78,7 +78,7 @@ const AddsTabs = (props) => {
 							/>
 						}
 					>
-						{tabAddsText}
+						{mode == 'all' ? 'Все' : mode == 'wanted' ? 'Хочу забрать' : 'Отдаю'}
 					</TabsItem>
 					<TabsItem
 						// label={props.notsCounter == 0 ? null : props.notsCounter}

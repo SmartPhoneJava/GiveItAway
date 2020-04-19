@@ -8,7 +8,7 @@ const Error = props => {
 		<Placeholder
 			style={{ background: 'var(--destructive)' }}
 			icon={<Icon56ErrorOutline />}
-			header="Сервер временно не доступен &#128560;"
+			header="Сервер временно недоступен &#128560;"
 			action={
 				props.action ? (
 					<Button onClick={() => props.action()} size="l">

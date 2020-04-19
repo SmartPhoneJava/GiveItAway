@@ -404,6 +404,7 @@ const Main = () => {
 								setCategory(CategoryNo);
 								setCity(NoRegion);
 								setCountry(NoRegion);
+								setSort("time")
 							}}
 							chooseAdd={(ad) => {
 								setChoosen(ad);

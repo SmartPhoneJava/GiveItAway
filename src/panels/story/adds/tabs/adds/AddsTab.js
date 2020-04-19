@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Group, ScreenSpinner, Button } from '@vkontakte/vkui';
+import { Search, Group, ScreenSpinner, Button, Placeholder } from '@vkontakte/vkui';
 
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 
@@ -202,22 +202,21 @@ const addsArrDD = [
 	},
 ];
 
-let i = 0
+let i = 0;
 
 const AddsTab = (props) => {
 	const [search, setSearch] = useState('');
 	const [searchR, setSearchR] = useState('');
 
 	useEffect(() => {
-		
-		i++
-		let j = i
+		i++;
+		let j = i;
 		setTimeout(() => {
-			console.log("j, i", j, i)
+			console.log('j, i', j, i);
 			if (j == i) {
 				setSearchR(search);
 			}
-		}, 500); 
+		}, 500);
 	}, [search]);
 
 	// const [inited, setInited] = useState(false);
@@ -263,104 +262,6 @@ const AddsTab = (props) => {
 		props.sort
 	);
 
-	// //
-	// const [inited, setInited] = useState(false);
-	// const [loading, setLoading] = useState(true);
-	// const [error, setError] = useState(false);
-	// const [ads, setAds] = useState([]);
-	// const [hasMore, setHasMore] = useState(false);
-	// const [pageNumber, setPageNumber] = useState(1);
-
-	// useEffect(() => {
-	// 	setAds([]);
-	// 	setPageNumber(1);
-	// }, [props.category, props.mode, searchR, props.city, props.country, props.sort]);
-
-	// useEffect(() => {
-	// 	console.log('deleteID', props.deleteID);
-	// 	if (props.deleteID > 0) {
-	// 		setAds(
-	// 			ads.filter((x) => {
-	// 				return x.ad_id != props.deleteID;
-	// 			})
-	// 		);
-	// 	}
-	// }, [props.deleteID]);
-
-	// useEffect(() => {
-	// 	let cancel;
-	// 	async function go() {
-	// 		if (cancel) {
-	// 			cancel();
-	// 		}
-	// 		props.setPopout(<ScreenSpinner size="large" />);
-	// 		setLoading(true);
-	// 		setError(false);
-	// 		setInited(false);
-
-	// 		const rowsPerPage = 5;
-
-	// 		let params = {
-	// 			rows_per_page: rowsPerPage,
-	// 			page: pageNumber,
-	// 			category: props.category,
-	// 			sort_by: props.sort,
-	// 		};
-	// 		if (props.category == '' || props.category == CategoryNo) {
-	// 			params = {
-	// 				rows_per_page: rowsPerPage,
-	// 				page: pageNumber,
-	// 			};
-	// 		}
-
-	// 		if (props.city && props.city.id != -1) {
-	// 			params.district = props.city.title;
-	// 		}
-
-	// 		console.log('before check', props.country);
-	// 		if (props.country && props.country.id != -1) {
-	// 			params.region = props.country.title;
-	// 		}
-
-	// 		let url = '/api/ad/find';
-	// 		if (props.mode != 'all' && props.mode != 'wanted') {
-	// 			params.author_id = User.getState().vk_id;
-	// 		} else if (props.mode == 'wanted') {
-	// 			url = '/api/ad/wanted';
-	// 		}
-
-	// 		axios({
-	// 			method: 'GET',
-	// 			url: Addr.getState() + url,
-	// 			params,
-	// 			withCredentials: true,
-	// 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
-	// 		})
-	// 			.then((res) => {
-	// 				console.log('useAdsearch', res);
-	// 				const newAds = res.data;
-	// 				setAds((prev) => {
-	// 					return [...new Set([...prev, ...newAds])];
-	// 				});
-	// 				setHasMore(newAds.length > 0);
-	// 				setLoading(false);
-	// 				props.setPopout(null);
-	// 				setInited(true);
-	// 			})
-	// 			.catch((e) => {
-	// 				console.log('fail', e);
-	// 				if (axios.isCancel(e)) return;
-	// 				if (('' + e).indexOf('404') == -1) {
-	// 					setError(true);
-	// 				}
-	// 				props.setPopout(null);
-	// 				setInited(true);
-	// 			});
-	// 		return () => cancel();
-	// 	}
-	// 	go();
-	// }, [props.category, props.mode, searchR, pageNumber, props.city, props.country, props.sort]);
-
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
 		(node) => {
@@ -368,7 +269,7 @@ const AddsTab = (props) => {
 			if (observer.current) observer.current.disconnect();
 			observer.current = new IntersectionObserver((entries) => {
 				if (entries[0].isIntersecting && hasMore) {
-					setPageNumber((prevPageNumber) => pageNumber + 1);
+					setPageNumber((prevPageNumber) => newPage + 1);
 				}
 			});
 			if (node) observer.current.observe(node);
@@ -405,7 +306,14 @@ const AddsTab = (props) => {
 
 	return (
 		<div style={{ background: 'var(--background_page)' }}>
-			<Search disabled placeholder="Поиск временно не доступен" value={search} onChange={handleSearch} icon={<Icon24Filter />} onIconClick={props.onFiltersClick} />
+			<Search
+				disabled
+				placeholder="Поиск временно недоступен"
+				value={search}
+				onChange={handleSearch}
+				icon={<Icon24Filter />}
+				onIconClick={props.onFiltersClick}
+			/>
 			<Group>
 				{ads.length > 0 ? (
 					ads.map((ad, index) => {
@@ -468,6 +376,7 @@ const AddsTab = (props) => {
 					<AdNotFound dropFilters={props.dropFilters} />
 				)}
 			</Group>
+		
 		</div>
 	);
 };

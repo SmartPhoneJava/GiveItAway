@@ -128,7 +128,7 @@ const Add7 = (props) => {
 
 	function metroPanel() {
 		return (
-			<InfoRow className="atext" style={{marginTop:"2px"}}>
+			<InfoRow onClick={props.openAd} className="atext" style={{marginTop:"2px"}}>
 				<div style={{ display: 'flex' }}>
 					<Avatar style={{ marginRight: '5px' }} size={16} src={MetroImage30} /> Аэропорт
 				</div>
@@ -208,14 +208,14 @@ const Add7 = (props) => {
 						''
 					)}
 				</div>
-				<div onClick={props.openAd} className="aright-main">
+				<div className="aright-main">
 					<div style={{ display: 'flex' }}>
-						<InfoRow className="aheader"> {shortText(ad.header, 30)} </InfoRow>
+						<InfoRow onClick={props.openAd} className="aheader"> {shortText(ad.header, 30)} </InfoRow>
 
 						{controllButton()}
 					</div>
-					<InfoRow className="atext"> {GetCategoryText(ad.category)} </InfoRow>
-					<InfoRow className="atext"> {time(ad.creation_date, 300)} </InfoRow>
+					<InfoRow onClick={props.openAd} className="atext"> {GetCategoryText(ad.category)} </InfoRow>
+					<InfoRow onClick={props.openAd} className="atext"> {time(ad.creation_date, 300)} </InfoRow>
 					{metroPanel()}
 					{authorPanel()}
 				</div>
