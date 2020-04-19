@@ -81,6 +81,8 @@ const Main = () => {
 	const [historyProfile, setHistoryProfile] = useState([]);
 
 	const [profileID, setProfileID] = useState(0);
+	const [profileName, setProfileName] = useState('Профиль');
+
 	const [notsCounterr, setNotsCounterr] = useState(notsCounterr);
 
 	const [prevActiveStory, setPrevActiveStory] = useState(no_prev);
@@ -113,7 +115,6 @@ const Main = () => {
 
 	const onStoryChange = (e) => {
 		const isProfile = e.currentTarget.dataset.text == profileText;
-		console.log('my id is ', e.currentTarget.dataset.text, isProfile);
 
 		if (e.currentTarget.dataset.story == ads) {
 			if (isProfile) {
@@ -133,9 +134,16 @@ const Main = () => {
 	useEffect(() => {
 		if (profileID != 0) {
 			setActivePanel(PANEL_USER);
-			setPrevActiveStory(no_prev);
 		}
 	}, [profileID]);
+
+	useEffect(() => {
+		if (choosen.ad_id != -1) {
+			setActivePanel(PANEL_ONE);
+		} else {
+			setActivePanel(PANEL_ADS);
+		}
+	}, [choosen]);
 
 	function next(currPanel, newPanel) {
 		window.history.pushState({}, currPanel);
@@ -155,20 +163,22 @@ const Main = () => {
 	}
 
 	function openAd(ad, currPanel) {
+		console.log('openAd clicked');
 		setActiveStory(ads);
 		setChoosen(ad);
-		next(currPanel, PANEL_ONE);
+		if (currPanel) {
+			next(currPanel, PANEL_ONE);
 
-		let a = historyAds.slice();
-		a.push(ad);
-		setHistoryAds(a);
+			let a = historyAds.slice();
+			a.push(ad);
+			setHistoryAds(a);
+		}
 
 		scroll();
 	}
 
 	function openUser(id, currPanel) {
 		setActiveStory(ads);
-		console.log('openUser');
 		setProfileID(id);
 		setPrevActiveStory('ads');
 		next(currPanel, PANEL_USER);
@@ -181,8 +191,6 @@ const Main = () => {
 	}
 
 	useEffect(() => {
-		console.log('checker', historyLen, history.length);
-
 		if (historyLen == history.length || history.length == 1) {
 			return;
 		}
@@ -195,12 +203,10 @@ const Main = () => {
 
 		const a = historyAds.slice();
 		const p = historyProfile.slice();
-		console.log('infos', adsLength, usersLength, a.length, p.length);
-
+		
 		if (adsLength != a.length) {
 			const ad = a.pop();
 			setChoosen(ad);
-			console.log('setChoosen', adsLength, usersLength);
 			setHistoryAds(a);
 		}
 
@@ -271,7 +277,6 @@ const Main = () => {
 
 		function getInputData() {
 			const { vk_platform, app_id } = inputArgs();
-			console.log('vksssss', vk_platform, app_id);
 			setVkPlatform(vk_platform);
 			setAppID(app_id);
 		}
@@ -279,7 +284,6 @@ const Main = () => {
 		async function fetchData() {
 			const us = await bridge.send('VKWebAppGetUserInfo');
 			VkUser.dispatch({ type: 'set', new_state: us });
-			console.log('fetchData', us.id);
 			setMyID(us.id);
 
 			await Auth(
@@ -455,11 +459,12 @@ const Main = () => {
 				</Panel>
 				<Panel id={PANEL_USER}>
 					<PanelHeaderSimple left={prevActiveStory == no_prev ? null : <PanelHeaderBack onClick={back} />}>
-						Профиль
+						{profileName}
 					</PanelHeaderSimple>
 					<Profile
 						setAdsMode={setAdsMode}
 						setPopout={setPopout}
+						setProfileName={setProfileName}
 						setSnackbar={setSnackbar}
 						myID={myID}
 						profileID={profileID}
@@ -510,6 +515,7 @@ const Main = () => {
 							SetDeleteID(id);
 						}}
 						chooseCategory={() => setActiveModal2(MODAL_CATEGORIES)}
+						openAd={openAd}
 					/>
 					{snackbar}
 				</Panel>

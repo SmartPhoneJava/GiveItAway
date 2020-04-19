@@ -228,7 +228,7 @@ export function Close(setPopout, setSnackbar, ad_id, subscriber_id) {
 	axios({
 		method: 'put',
 		withCredentials: true,
-		params: { subscriber_id: subscriber_id, type:"choice" },
+		params: { subscriber_id: subscriber_id, type: 'choice' },
 		url: Addr.getState() + '/api/ad/' + ad_id + '/make_deal',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
@@ -275,13 +275,8 @@ export function subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallba
 			err = true;
 			console.log('loook, error', error, status);
 			failCallback(error);
-			if (error == "Error: Request failed with status code 409") {
-				fail(
-					'недостаточно кармы. Откажитесь от другой вещи, чтобы получить эту!',
-					null,
-					setSnackbar,
-					end
-				);
+			if (error == 'Error: Request failed with status code 409') {
+				fail('недостаточно кармы. Откажитесь от другой вещи, чтобы получить эту!', null, setSnackbar, end);
 			} else {
 				fail(
 					'Нет соединения с сервером',
@@ -512,7 +507,7 @@ export async function CreateImages(items, id, goToAds, setSnackbar) {
 	});
 }
 
-export async function CreateAd(obj, items, goToAds, setSnackbar, setPopout) {
+export async function CreateAd(obj, items, openAd, setSnackbar, setPopout) {
 	setPopout(<ScreenSpinner size="large" />);
 	let cancel;
 	await axios({
@@ -524,10 +519,18 @@ export async function CreateAd(obj, items, goToAds, setSnackbar, setPopout) {
 	})
 		.then(async function (response) {
 			setPopout(null);
+			console.log('createAddddd', response.data);
 			if (response.status != 201) {
 				throw new Error('Не тот код!');
 			}
-			await CreateImages(items, response.data.ad_id, goToAds, setSnackbar);
+			await CreateImages(
+				items,
+				response.data.ad_id,
+				() => {
+					openAd({ ad_id: response.data.ad_id });
+				},
+				setSnackbar
+			);
 			return response;
 		})
 		.then(function (response) {

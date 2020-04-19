@@ -126,7 +126,7 @@ const CreateAdd = (props) => {
 		// 	setErrorHeader('Местоположение не указано');
 		// 	setErrorText('Укажите свою страну и город с помощью выпадающих списков выше');
 		// }
-		if (items[0].photos.length == 0)  {
+		if (items[0].photos.length == 0) {
 			v = false;
 			setErrorHeader('Не загружено ни одной фотографии');
 			setErrorText('Загрузите от 1 до 3 фотографий предмета!');
@@ -199,7 +199,7 @@ const CreateAdd = (props) => {
 			}
 			const obj = JSON.stringify(ob);
 
-			CreateAd(obj, items, props.goToAds, props.setSnackbar, props.setPopout);
+			CreateAd(obj, items, props.openAd, props.setSnackbar, props.setPopout);
 		} else {
 			saveCancel();
 		}

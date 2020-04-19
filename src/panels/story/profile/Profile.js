@@ -108,6 +108,7 @@ const Profile = (props) => {
 			props.profileID,
 			(v) => {
 				setBackUser(v);
+				props.setProfileName(v.name + ' ' + v.surname);
 			},
 			(e) => {
 				setFailed(true);
@@ -119,7 +120,7 @@ const Profile = (props) => {
 			props.appID,
 			props.apiVersion,
 			(v) => {
-				console.log("getUserVK", v)
+				console.log('getUserVK', v);
 				setVkUser(v);
 			},
 			(e) => {}
@@ -140,7 +141,6 @@ const Profile = (props) => {
 			<HorizontalScroll>
 				<div style={{ marginLeft: '10px', display: 'flex' }}>
 					{given.map((ad, index) => {
-					
 						if (given.length === index + 1) {
 							return (
 								<div style={{ padding: '4px' }} key={ad.ad_id} ref={givenLastAdElementRef}>
@@ -184,7 +184,7 @@ const Profile = (props) => {
 		);
 	}
 
-	console.log("we want update", props.profileID)
+	console.log('we want update', props.profileID);
 
 	if (backuser) {
 		return (
@@ -216,7 +216,7 @@ const Profile = (props) => {
 					}
 					before={getImage(backuser)}
 					description={
-						!vkUser ? "" : vkUser.online ? 'online' : 'был(а) в сети ' + fromSeconds(vkUser.last_seen.time)
+						!vkUser ? '' : vkUser.online ? 'online' : 'был(а) в сети ' + fromSeconds(vkUser.last_seen.time)
 					}
 				>
 					<div className="profile-block">
@@ -229,7 +229,7 @@ const Profile = (props) => {
 					</div>
 				</Cell>
 
-				<Group header={<Header mode="primary">Карма - {backuser.carma}</Header>}>
+				<Group header={<Header mode="primary">Карма - {backuser.carma} Ҝ</Header>}>
 					{props.profileID == props.myID ? (
 						<div style={{ display: width < 400 ? 'block' : 'flex' }}>
 							<Cell
@@ -240,14 +240,20 @@ const Profile = (props) => {
 									}
 								}}
 								className="profile-carma-label"
-								indicator={backuser.frozen_carma}
+								indicator={<span>{backuser.frozen_carma + ' Ҝ'}</span>}
 							>
 								Заморожено
 							</Cell>
-							<Cell className="profile-carma-label" indicator={backuser.total_earned_carma}>
+							<Cell
+								className="profile-carma-label"
+								indicator={<span>{backuser.total_earned_carma + ' Ҝ'}</span>}
+							>
 								Получено
 							</Cell>
-							<Cell className="profile-carma-label" indicator={backuser.total_spent_carma}>
+							<Cell
+								className="profile-carma-label"
+								indicator={<span>{backuser.total_spent_carma + ' Ҝ'}</span>}
+							>
 								Потрачено
 							</Cell>
 						</div>

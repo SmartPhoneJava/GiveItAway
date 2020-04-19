@@ -7,7 +7,11 @@ export function fromSeconds(t) {
 
 export function time(t) {
 	moment.locale('ru');
-	return moment(t).fromNow();
+	let text =  moment(t).fromNow();
+	if (text == "несколько секунд назад") {
+		text = "только что"
+	}
+	return text
 }
 
 export function old(t) {

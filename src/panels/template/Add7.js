@@ -23,64 +23,6 @@ import { Draft } from '../../store/draft';
 import './Add7.css';
 import { GetCategoryText } from './Categories';
 
-export function AdLight(ad, image, openAd) {
-	return (
-		<div className="light-main-left">
-			<img src={image} className="light-tiled" />
-			<div className="light-name">
-				<div
-					style={{
-						display: 'flex',
-						justifyContent: 'center',
-						alignItems: 'center',
-						padding: '2px',
-					}}
-				>
-					<Icon20ArticleBoxOutline /> {shortText(ad.header, 20)}
-				</div>
-			</div>
-
-			{ad.status == 'aborted' ? (
-				<div className="light-failed">
-					<div className="on-img-text">
-						<Icon16Clear style={{ marginRight: '5px' }} />
-						Отменено
-					</div>
-				</div>
-			) : (
-				''
-			)}
-			{ad.status == 'closed' ? (
-				<div className="light-success">
-					<div className="on-img-text">
-						<Icon16CheckCircle style={{ marginRight: '5px' }} />
-						Вещь отдана
-					</div>
-				</div>
-			) : (
-				''
-			)}
-			{ad.status == 'chosen' ? (
-				<div className="light-deal">
-					<div
-						style={{
-							alignItems: 'center',
-							justifyContent: 'center',
-							color: 'rgb(220,220,220)',
-							fontSize: '12px',
-							padding: '2px',
-						}}
-					>
-						Ожидание ответа
-					</div>
-				</div>
-			) : (
-				''
-			)}
-		</div>
-	);
-}
-
 const Add7 = (props) => {
 	const [ad, setAd] = useState(props.ad);
 	const [haveDeal, setHaveDeal] = useState(false);
@@ -102,7 +44,6 @@ const Add7 = (props) => {
 	const image = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : '';
 
 	function openSettings() {
-		props.chooseAdd(ad);
 		OpenActions(
 			props.setPopout,
 			props.setSnackbar,

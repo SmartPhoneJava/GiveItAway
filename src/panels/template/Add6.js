@@ -36,7 +36,7 @@ import './Add6.css';
 
 export function AdLight(ad, image, openAd) {
 	return (
-		<div className="light-main-left">
+		<div onClick={openAd} className="light-main-left">
 			<img src={image} className="light-tiled" />
 			<div className="light-name">
 				<div
@@ -171,7 +171,10 @@ const Add6 = (props) => {
 			// >
 			// 	<Icon24MoreVertical />
 			// </PanelHeaderButton>
-			<Icon24MoreVertical onClick={openSettings} style={{ marginLeft: 'auto', marginTop: '15px', marginRight:"10px" }} />
+			<Icon24MoreVertical
+				onClick={openSettings}
+				style={{ marginLeft: 'auto', marginTop: '15px', marginRight: '10px' }}
+			/>
 		) : (
 			''
 		);

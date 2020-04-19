@@ -327,7 +327,6 @@ const AddMore2 = (props) => {
 	}
 
 	function showStatus() {
-		console.log('statusstatus', status);
 		switch (status) {
 			case 'chosen':
 				return showChosen();
@@ -580,7 +579,7 @@ const AddMore2 = (props) => {
 						{status != 'closed' && status != 'aborted' ? (
 							<tr>
 								<td className="first">Отклинулось</td>
-								<td>{subs.length}</td>
+								<td>{subs && subs.length > 0 ? subs.length : "0"}</td>
 							</tr>
 						) : (
 							''
