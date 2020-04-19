@@ -4,6 +4,7 @@ import { Search, Group, ScreenSpinner, Button } from '@vkontakte/vkui';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 
 import Add from './../../../../template/Add';
+import Add7 from './../../../../template/Add7';
 import Add6 from './../../../../template/Add6';
 import Add5 from './../../../../template/Add5';
 import Add4 from './../../../../template/Add4';
@@ -382,7 +383,7 @@ const AddsTab = (props) => {
 
 	function Ad(ad) {
 		return (
-			<Add6
+			<Add7
 				vkPlatform={props.vkPlatform}
 				openUser={props.openUser}
 				openAd={() => props.openAd(ad)}
