@@ -1,5 +1,16 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Avatar, Button, Cell, Header, Group, Placeholder, HorizontalScroll, Separator } from '@vkontakte/vkui';
+import {
+	Avatar,
+	CellButton,
+	Link,
+	Button,
+	Cell,
+	Header,
+	Group,
+	Placeholder,
+	HorizontalScroll,
+	Separator,
+} from '@vkontakte/vkui';
 
 import { RadialChart } from 'react-vis';
 
@@ -16,7 +27,7 @@ import Icon56DoNotDisturbOutline from '@vkontakte/icons/dist/56/do_not_disturb_o
 
 import Error from './../../placeholders/error';
 
-import { shortText } from './../../../utils/short_text';
+import { old, time, fromSeconds } from './../../../utils/time';
 
 import './profile.css';
 
@@ -38,8 +49,8 @@ function getAuthorHref(backuser) {
 
 const Profile = (props) => {
 	const [backuser, setBackUser] = useState();
-	const [status, setStatus] = useState('');
-	const [online, setOnline] = useState(false);
+	const [vkUser, setVkUser] = useState('');
+
 	const [failed, setFailed] = useState(false);
 
 	const width = document.body.clientWidth;
@@ -107,9 +118,9 @@ const Profile = (props) => {
 			props.profileID,
 			props.appID,
 			props.apiVersion,
-			(o, s) => {
-				setOnline(o == 1);
-				setStatus(s);
+			(v) => {
+				console.log("getUserVK", v)
+				setVkUser(v);
 			},
 			(e) => {}
 		);
@@ -129,6 +140,7 @@ const Profile = (props) => {
 			<HorizontalScroll>
 				<div style={{ marginLeft: '10px', display: 'flex' }}>
 					{given.map((ad, index) => {
+					
 						if (given.length === index + 1) {
 							return (
 								<div style={{ padding: '4px' }} key={ad.ad_id} ref={givenLastAdElementRef}>
@@ -172,6 +184,8 @@ const Profile = (props) => {
 		);
 	}
 
+	console.log("we want update", props.profileID)
+
 	if (backuser) {
 		return (
 			<>
@@ -181,36 +195,65 @@ const Profile = (props) => {
 					}}
 					size="l"
 					multiline="true"
+					asideContent={
+						vkUser.can_write_private_message == 1 ? (
+							<Link
+								style={{ marginLeft: '15px' }}
+								href={'https://vk.com/im?sel=' + props.profileID}
+								target="_blank"
+							>
+								Написать
+							</Link>
+						) : (
+							<Link
+								style={{ marginLeft: '15px' }}
+								href={'https://vk.com/id' + props.profileID}
+								target="_blank"
+							>
+								Написать
+							</Link>
+						)
+					}
 					before={getImage(backuser)}
-					description={online ? 'online' : ''}
+					description={
+						!vkUser ? "" : vkUser.online ? 'online' : 'был(а) в сети ' + fromSeconds(vkUser.last_seen.time)
+					}
 				>
 					<div className="profile-block">
 						{getAuthorHref(backuser)}
-						<div>{status}</div>
+						<div style={{ display: 'flex' }}>
+							{vkUser && vkUser.city ? vkUser.city.title + ', ' : ''} {vkUser ? old(vkUser.bdate) : ''}
+						</div>
+						<div>{vkUser && vkUser.mobile_phone ? 'мобильный: ' + vkUser.mobile_phone : ''}</div>
+						<div>{vkUser && vkUser.home_phone ? 'домашний: ' + vkUser.home_phone : ''}</div>
 					</div>
 				</Cell>
 
-				<Group header={<Header mode="secondary">Карма - {backuser.carma}</Header>}>
-					<div style={{ display: width < 400 ? 'block' : 'flex' }}>
-						<Cell
-							onClick={() => {
-								if (props.profileID == props.myID) {
-									props.goToAdds();
-									props.setAdsMode('wanted');
-								}
-							}}
-							className="profile-carma-label"
-							indicator={backuser.frozen_carma}
-						>
-							Заморожено
-						</Cell>
-						<Cell className="profile-carma-label" indicator={backuser.total_earned_carma}>
-							Получено
-						</Cell>
-						<Cell className="profile-carma-label" indicator={backuser.total_spent_carma}>
-							Потрачено
-						</Cell>
-					</div>
+				<Group header={<Header mode="primary">Карма - {backuser.carma}</Header>}>
+					{props.profileID == props.myID ? (
+						<div style={{ display: width < 400 ? 'block' : 'flex' }}>
+							<Cell
+								onClick={() => {
+									if (props.profileID == props.myID) {
+										props.goToAdds();
+										props.setAdsMode('wanted');
+									}
+								}}
+								className="profile-carma-label"
+								indicator={backuser.frozen_carma}
+							>
+								Заморожено
+							</Cell>
+							<Cell className="profile-carma-label" indicator={backuser.total_earned_carma}>
+								Получено
+							</Cell>
+							<Cell className="profile-carma-label" indicator={backuser.total_spent_carma}>
+								Потрачено
+							</Cell>
+						</div>
+					) : (
+						''
+					)}
 				</Group>
 
 				<Group header={<Header mode="secondary">Отдано вещей - {backuser.total_given_ads}</Header>}>

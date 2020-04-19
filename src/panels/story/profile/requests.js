@@ -56,12 +56,12 @@ export async function getUserVK(id, appID, apiVersion, successCallback, failCall
 			params: {
 				v: apiVersion,
 				user_ids: id,
-				fields: 'status, online',
+				fields: 'online,city,bdate,contacts,last_seen,can_write_private_message',
 				access_token: el.access_token,
 			},
 		})
 		.then(function (response) {
-			successCallback(response.response[0].online, response.response[0].status);
+			successCallback(response.response[0]);
 			return response.response[0];
 		})
 		.catch(function (error) {
@@ -98,4 +98,3 @@ export async function setOnline(appID, apiVersion, successCallback, failCallback
 
 	return userdata;*/
 }
-

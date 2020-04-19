@@ -15,7 +15,7 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 	useEffect(() => {
 		setAds([]);
 		pageNumber = 1;
-	}, []);
+	}, [user_id]);
 
 	useEffect(() => {
 		setPopout(<ScreenSpinner size="large" />);
@@ -57,7 +57,7 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 				setInited(true);
 			});
 		return () => cancel();
-	}, [pageNumber]);
+	}, [pageNumber, user_id]);
 
 	return { received_loading: loading, received: ads, received_hasMore: hasMore, received_newPage: pageNumber };
 }

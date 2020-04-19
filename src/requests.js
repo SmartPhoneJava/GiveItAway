@@ -396,7 +396,6 @@ export async function getSubscribers(setPopout, setSnackbar, ad_id, successCallb
 }
 
 export async function canWritePrivateMessage(id, appID, apiVersion) {
-	apiVersion = '5.00';
 	console.log('before userdata', id, appID, apiVersion);
 	const el = await bridge.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' });
 

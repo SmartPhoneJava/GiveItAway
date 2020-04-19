@@ -15,7 +15,7 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 	useEffect(() => {
 		setAds([]);
 		pageNumber = 1;
-	}, []);
+	}, [user_id]);
 
 	useEffect(() => {
 		setPopout(<ScreenSpinner size="large" />);
@@ -27,7 +27,6 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 		let params = {
 			rows_per_page: rowsPerPage,
 			page: pageNumber,
-			
 		};
 		
 		axios({
@@ -58,7 +57,7 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 				setInited(true);
 			});
 		return () => cancel();
-	}, [pageNumber]);
+	}, [pageNumber,user_id]);
 
 	return { given_loading: loading, given: ads, given_hasMore: hasMore, given_newPage: pageNumber };
 }

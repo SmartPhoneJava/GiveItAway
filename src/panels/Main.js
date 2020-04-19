@@ -59,7 +59,7 @@ const addText = 'Создать';
 
 const profileText = 'Профиль';
 
-const ApiVersion = '5.5';
+const ApiVersion = '5.103';
 
 const no_prev = 'no prev';
 
@@ -117,9 +117,9 @@ const Main = () => {
 
 		if (e.currentTarget.dataset.story == ads) {
 			if (isProfile) {
+				setProfileID(myID);
 				setActivePanel(PANEL_USER);
 				setPrevActiveStory(no_prev);
-				setProfileID(myID);
 			} else {
 				setActivePanel(PANEL_ADS);
 				setSavedAdState('');
@@ -130,8 +130,15 @@ const Main = () => {
 		setHistory([PANEL_ADS]);
 	};
 
+	useEffect(() => {
+		if (profileID != 0) {
+			setActivePanel(PANEL_USER);
+			setPrevActiveStory(no_prev);
+		}
+	}, [profileID]);
+
 	function next(currPanel, newPanel) {
-		window.history.pushState({}, currPanel)
+		window.history.pushState({}, currPanel);
 		setHistoryLen(history.length + 1);
 		let a = history.slice();
 		a.push(currPanel);
@@ -140,7 +147,7 @@ const Main = () => {
 	}
 
 	function back() {
-		window.history.back()
+		window.history.back();
 		let a = history.slice();
 		let panel = a.pop();
 		setHistory(a);
@@ -161,6 +168,7 @@ const Main = () => {
 
 	function openUser(id, currPanel) {
 		setActiveStory(ads);
+		console.log('openUser');
 		setProfileID(id);
 		setPrevActiveStory('ads');
 		next(currPanel, PANEL_USER);
@@ -175,7 +183,7 @@ const Main = () => {
 	useEffect(() => {
 		console.log('checker', historyLen, history.length);
 
-		if (historyLen == history.length) {
+		if (historyLen == history.length || history.length == 1) {
 			return;
 		}
 		const adsLength = history.filter((v) => {
@@ -306,209 +314,207 @@ const Main = () => {
 	}
 
 	return (
-			<Epic
-				activeStory={activeStory}
-				tabbar={
-					<Tabbar>
-						<TabbarItem
-							onClick={onStoryChange}
-							selected={activeStory === ads && activePanel != PANEL_USER}
-							data-story={ads}
-							data-text={adsText}
-							text={adsText}
-							label={notsCounterrr == 0 ? null : notsCounterrr}
-							after={<Counter>100</Counter>}
-							// after={notsCounter == 0 ? '' : <Counter>notsCounter</Counter>}
-						>
-							<Icon28NewsfeedOutline onClick={onStoryChange} />
-						</TabbarItem>
+		<Epic
+			activeStory={activeStory}
+			tabbar={
+				<Tabbar>
+					<TabbarItem
+						onClick={onStoryChange}
+						selected={activeStory === ads && activePanel != PANEL_USER}
+						data-story={ads}
+						data-text={adsText}
+						text={adsText}
+						label={notsCounterrr == 0 ? null : notsCounterrr}
+						after={<Counter>100</Counter>}
+						// after={notsCounter == 0 ? '' : <Counter>notsCounter</Counter>}
+					>
+						<Icon28NewsfeedOutline onClick={onStoryChange} />
+					</TabbarItem>
 
-						<TabbarItem
-							onClick={onStoryChange}
-							data-text={addText}
-							selected={activeStory === add}
-							data-story={add}
-							text={addText}
-						>
-							<Icon28Add onClick={onStoryChange} />
-						</TabbarItem>
-						<TabbarItem
-							onClick={onStoryChange}
-							selected={activeStory === ads && activePanel == PANEL_USER}
-							data-story={ads}
-							data-text={profileText}
-							text={profileText}
-						>
-							<Icon28User onClick={onStoryChange} />
-						</TabbarItem>
-					</Tabbar>
+					<TabbarItem
+						onClick={onStoryChange}
+						data-text={addText}
+						selected={activeStory === add}
+						data-story={add}
+						text={addText}
+					>
+						<Icon28Add onClick={onStoryChange} />
+					</TabbarItem>
+					<TabbarItem
+						onClick={onStoryChange}
+						selected={activeStory === ads && activePanel == PANEL_USER}
+						data-story={ads}
+						data-text={profileText}
+						text={profileText}
+					>
+						<Icon28User onClick={onStoryChange} />
+					</TabbarItem>
+				</Tabbar>
+			}
+		>
+			<View
+				popout={popout}
+				id={ads}
+				activePanel={activePanel}
+				onSwipeBack={back}
+				history={history}
+				modal={
+					<AddsModal
+						appID={appID}
+						apiVersion={ApiVersion}
+						vkPlatform={vkPlatform}
+						activeModal={activeModal}
+						setActiveModal={setActiveModal}
+						category={category}
+						setCategory={setCategory}
+						city={city}
+						country={country}
+						// region={region}
+						setCity={setCity}
+						setCountry={setCountry}
+						// setRegion={setRegion}
+						sort={sort}
+						setSort={setSort}
+						setPopout={setPopout}
+						setSnackbar={setSnackbar}
+						ad={choosen}
+					/>
+				}
+				header={false}
+			>
+				<Panel id={PANEL_ADS} separator={false}>
+					<AddsTabs
+						adsMode={adsMode}
+						setSavedAdState={setSavedAdState}
+						savedAdState={savedAdState}
+						onFiltersClick={() => setActiveModal(MODAL_FILTERS)}
+						onCloseClick={(act) => {
+							setActiveModal(MODAL_SUBS);
+							scroll();
+						}}
+						notsCounter={notsCounterrr}
+						zeroNots={() => {
+							notsCounterrr = 0;
+						}}
+						setPopout={setPopout}
+						setSnackbar={setSnackbar}
+						category={category}
+						refresh={SetDeleteID}
+						deleteID={deleteID}
+						city={city}
+						country={country}
+						myID={myID}
+						openUser={(id) => {
+							openUser(id, PANEL_ADS);
+						}}
+						sort={sort}
+						dropFilters={() => {
+							setCategory(CategoryNo);
+							setCity(NoRegion);
+							setCountry(NoRegion);
+							setSort('time');
+						}}
+						chooseAdd={(ad) => {
+							setChoosen(ad);
+						}}
+						openAd={(ad) => {
+							openAd(ad, PANEL_ADS);
+						}}
+						vkPlatform={vkPlatform}
+					/>
+					{snackbar}
+				</Panel>
+				<Panel id={PANEL_ONE}>
+					<PanelHeaderSimple left={<PanelHeaderBack onClick={back} />}>
+						{choosen ? choosen.header : 'Произошла ошбка'}
+					</PanelHeaderSimple>
+					{choosen ? (
+						<AddMore2
+							wsNote={wsNote}
+							refresh={(id) => {
+								back();
+								SetDeleteID(id);
+								scroll();
+							}}
+							back={back}
+							openUser={(id) => {
+								openUser(id, PANEL_ONE);
+								setChoosen(choosen);
+							}}
+							ad={choosen}
+							setPopout={setPopout}
+							setSnackbar={setSnackbar}
+							VkUser={VkUser}
+							vkPlatform={vkPlatform}
+							onCloseClick={() => setActiveModal(MODAL_SUBS)}
+						/>
+					) : (
+						Error
+					)}
+					{snackbar}
+				</Panel>
+				<Panel id={PANEL_USER}>
+					<PanelHeaderSimple left={prevActiveStory == no_prev ? null : <PanelHeaderBack onClick={back} />}>
+						Профиль
+					</PanelHeaderSimple>
+					<Profile
+						setAdsMode={setAdsMode}
+						setPopout={setPopout}
+						setSnackbar={setSnackbar}
+						myID={myID}
+						profileID={profileID}
+						appID={appID}
+						apiVersion={ApiVersion}
+						goToAdds={() => {
+							setActiveStory(ads);
+							scroll();
+						}}
+						goToCreate={() => {
+							setActiveStory(add);
+							scroll();
+						}}
+						openAd={(ad) => {
+							openAd(ad, PANEL_USER);
+						}}
+					/>
+					{snackbar}
+				</Panel>
+			</View>
+
+			<View
+				id={add}
+				activePanel={add}
+				popout={popout}
+				modal={
+					<CreateModal
+						activeModal={activeModal2}
+						setActiveModal={setActiveModal2}
+						category={category2}
+						setCategory={setCategory2}
+					/>
 				}
 			>
-				<View
-					popout={popout}
-					id={ads}
-					activePanel={activePanel}
-					onSwipeBack={back}
-					history={history}
-					modal={
-						<AddsModal
-							appID={appID}
-							apiVersion={ApiVersion}
-							vkPlatform={vkPlatform}
-							activeModal={activeModal}
-							setActiveModal={setActiveModal}
-							category={category}
-							setCategory={setCategory}
-							city={city}
-							country={country}
-							// region={region}
-							setCity={setCity}
-							setCountry={setCountry}
-							// setRegion={setRegion}
-							sort={sort}
-							setSort={setSort}
-							setPopout={setPopout}
-							setSnackbar={setSnackbar}
-							ad={choosen}
-						/>
-					}
-					header={false}
-				>
-					<Panel id={PANEL_ADS} separator={false}>
-						<AddsTabs
-							adsMode={adsMode}
-							setSavedAdState={setSavedAdState}
-							savedAdState={savedAdState}
-							onFiltersClick={() => setActiveModal(MODAL_FILTERS)}
-							onCloseClick={(act) => {
-								setActiveModal(MODAL_SUBS);
-								scroll();
-							}}
-							notsCounter={notsCounterrr}
-							zeroNots={() => {
-								notsCounterrr = 0;
-							}}
-							setPopout={setPopout}
-							setSnackbar={setSnackbar}
-							category={category}
-							refresh={SetDeleteID}
-							deleteID={deleteID}
-							city={city}
-							country={country}
-							myID={myID}
-							openUser={(id) => {
-								openUser(id, PANEL_ADS);
-							}}
-							sort={sort}
-							dropFilters={() => {
-								setCategory(CategoryNo);
-								setCity(NoRegion);
-								setCountry(NoRegion);
-								setSort("time")
-							}}
-							chooseAdd={(ad) => {
-								setChoosen(ad);
-							}}
-							openAd={(ad) => {
-								openAd(ad, PANEL_ADS);
-							}}
-							vkPlatform={vkPlatform}
-						/>
-						{snackbar}
-					</Panel>
-					<Panel id={PANEL_ONE}>
-						<PanelHeaderSimple left={<PanelHeaderBack onClick={back} />}>
-							{choosen ? choosen.header : 'Произошла ошбка'}
-						</PanelHeaderSimple>
-						{choosen ? (
-							<AddMore2
-								wsNote={wsNote}
-								refresh={(id) => {
-									back();
-									SetDeleteID(id);
-									scroll();
-								}}
-								back={back}
-								openUser={(id) => {
-									openUser(id, PANEL_ONE);
-									setChoosen(choosen);
-								}}
-								ad={choosen}
-								setPopout={setPopout}
-								setSnackbar={setSnackbar}
-								VkUser={VkUser}
-								vkPlatform={vkPlatform}
-								onCloseClick={() => setActiveModal(MODAL_SUBS)}
-							/>
-						) : (
-							Error
-						)}
-						{snackbar}
-					</Panel>
-					<Panel id={PANEL_USER}>
-						<PanelHeaderSimple
-							left={prevActiveStory == no_prev ? null : <PanelHeaderBack onClick={back} />}
-						>
-							Профиль
-						</PanelHeaderSimple>
-						<Profile
-							setAdsMode={setAdsMode}
-							setPopout={setPopout}
-							setSnackbar={setSnackbar}
-							myID={myID}
-							profileID={profileID}
-							appID={appID}
-							apiVersion={ApiVersion}
-							goToAdds={() => {
-								setActiveStory(ads);
-								scroll();
-							}}
-							goToCreate={() => {
-								setActiveStory(add);
-								scroll();
-							}}
-							openAd={(ad) => {
-								openAd(ad, PANEL_USER);
-							}}
-						/>
-						{snackbar}
-					</Panel>
-				</View>
-
-				<View
-					id={add}
-					activePanel={add}
-					popout={popout}
-					modal={
-						<CreateModal
-							activeModal={activeModal2}
-							setActiveModal={setActiveModal2}
-							category={category2}
-							setCategory={setCategory2}
-						/>
-					}
-				>
-					<Panel id={add}>
-						<PanelHeader>{addText}</PanelHeader>
-						<CreateAdd
-							vkPlatform={vkPlatform}
-							myID={myID}
-							appID={appID}
-							apiVersion={ApiVersion}
-							setPopout={setPopout}
-							goToAds={goToAds}
-							snackbar={snackbar}
-							setSnackbar={setSnackbar}
-							category={category2}
-							refresh={(id) => {
-								SetDeleteID(id);
-							}}
-							chooseCategory={() => setActiveModal2(MODAL_CATEGORIES)}
-						/>
-						{snackbar}
-					</Panel>
-				</View>
-			</Epic>
+				<Panel id={add}>
+					<PanelHeader>{addText}</PanelHeader>
+					<CreateAdd
+						vkPlatform={vkPlatform}
+						myID={myID}
+						appID={appID}
+						apiVersion={ApiVersion}
+						setPopout={setPopout}
+						goToAds={goToAds}
+						snackbar={snackbar}
+						setSnackbar={setSnackbar}
+						category={category2}
+						refresh={(id) => {
+							SetDeleteID(id);
+						}}
+						chooseCategory={() => setActiveModal2(MODAL_CATEGORIES)}
+					/>
+					{snackbar}
+				</Panel>
+			</View>
+		</Epic>
 	);
 };
 

@@ -36,6 +36,7 @@ export async function postComment(setPopout, setSnackbar, ad_id, comment, succes
 			setPopout(null);
 			successCallback(response);
 			// success('Комментарий отправлен', null, setSnackbar, end);
+			end()
 			return response;
 		})
 		.catch(function (error) {
