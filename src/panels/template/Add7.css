@@ -3,7 +3,6 @@
 	border-radius: 5px;
 	padding: 10px 15px;
 	background: var(--background_content);
-	
 }
 
 img.atiled {
@@ -21,7 +20,7 @@ img.atiled {
 	left: 0px;
 	width: 116px;
 	background: rgba(0, 0, 0, 0.5);
-	color: rgb(215,215,215);
+	color: rgb(215, 215, 215);
 	font-size: 12px;
 	padding: 2px;
 	align-items: center;
@@ -145,17 +144,24 @@ img.light-tiled {
 }
 
 .aheader {
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	overflow-x: hidden;
+	margin-right: 4px;
 	font-weight: 600;
-	color:var(--header_text_primary);
+	color: var(--header_text_primary);
 	font-size: 15px;
 	margin-bottom: 10px;
 }
 
 .atext {
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+	overflow-x: hidden;
 	font-size: 13px;
 	line-height: 14px;
 	padding-bottom: 5px;
-	color:var(--header_text_secondary);
+	color: var(--header_text_secondary);
 }
 
 .on-img-text {
@@ -170,14 +176,17 @@ img.light-tiled {
 	display: flex;
 	font-size: 13px;
 	line-height: 20px;
-	color:var(--header_text_secondary);
+	color: var(--header_text_secondary);
 
 	position: absolute;
-    bottom: 0;
+	bottom: 0;
 }
 
 .aright-main {
-	position: relative;
+	position: relative; 
 	display: block;
-	flex:1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	flex: 1;
 }

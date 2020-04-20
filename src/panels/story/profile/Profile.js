@@ -230,7 +230,7 @@ const Profile = (props) => {
 
 				<Group header={<Header mode="primary">Карма - {backuser.carma} Ҝ</Header>}>
 					{props.profileID == props.myID ? (
-						<div style={{ display: width < 400 ? 'block' : 'flex' }}>
+						<div style={{ display: width < 450 ? 'block' : 'flex' }}>
 							<Cell
 								onClick={() => {
 									if (props.profileID == props.myID) {

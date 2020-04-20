@@ -6,21 +6,26 @@ let request_id = 0;
 
 export const NoRegion = { id: -1, title: '' };
 
-async function updateCities(apiVersion, setCities, id, rgs, token) {
-	const params = { v: apiVersion, access_token: token, country_id: id };
-	// if (rgs) {
-	// 	console.log('region exist', rgs);
-	// 	params.region_id = rgs.id;
-	// }
-	const ci = await bridge.send('VKWebAppCallAPIMethod', {
-		method: 'database.getCities',
-		request_id: 'city' + request_id,
-		params: params,
-	});
+async function updateCities(apiVersion, setCities, id, token) {
+	bridge
+		.send('VKWebAppCallAPIMethod', {
+			method: 'database.getCities',
+			request_id: 'city' + request_id,
+			params: {
+				v: apiVersion,
+				access_token: token,
+				country_id: id,
+			},
+		})
+		.then((response) => {
+			setCities(response.response.items);
+			return response;
+		})
+		.catch((error) => {
+			console.log('VKWebAppCallAPIMethod:', error);
+		});
 
 	request_id++;
-	setCities(ci.response.items);
-	return ci.response.items;
 }
 
 // async function updateRegions(apiVersion, setRegions, id, token) {
@@ -35,18 +40,7 @@ async function updateCities(apiVersion, setCities, id, rgs, token) {
 // 	return rgs.response.items;
 // }
 
-export const Location = (
-	appID,
-	apiVersion,
-	vkPlatform,
-	country,
-	setCountry,
-	// region,
-	// setRegion,
-	city,
-	setCity,
-	setDefault
-) => {
+export const Location = (appID, apiVersion, vkPlatform, country, setCountry, city, setCity, setDefault) => {
 	const [countries, setCountries] = useState([NoRegion]);
 	// const [regions, setRegions] = useState([NoRegion]);
 	const [cities, setCities] = useState([NoRegion]);
@@ -58,44 +52,57 @@ export const Location = (
 	const [accessToken, setAccessToken] = useState('');
 
 	async function getUserLocation() {
-		const data = await bridge.send('VKWebAppGetUserInfo', {});
-
-		if (country == NoRegion) {
-			setCountry(data.country);
-			setCountryID(data.country.id);
-		}
-		if (city == NoRegion) {
-			setCity(data.city);
-			setCityID(data.city.id);
-		}
+		bridge
+			.send('VKWebAppGetUserInfo', {})
+			.then((data) => {
+				if (country == NoRegion) {
+					setCountry(data.country);
+					setCountryID(data.country.id);
+				}
+				if (city == NoRegion) {
+					setCity(data.city);
+					setCityID(data.city.id);
+				}
+				return data;
+			})
+			.catch((error) => {
+				console.log('VKWebAppGetUserInfo:', error);
+			});
 	}
 
 	async function setLocationInfo() {
-		const el = await bridge.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' });
-		setAccessToken(el.access_token);
-		const vkctrs = await bridge.send('VKWebAppCallAPIMethod', {
-			method: 'database.getCountries',
-			request_id: 'api' + request_id,
-			params: { v: apiVersion, access_token: el.access_token },
-		});
-
-		const ctrs = vkctrs.response.items;
-
+		bridge
+			.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' })
+			.then((res) => {
+				console.log('sucess VKWebAppGetAuthToken', res.access_token);
+				return res.access_token;
+			})
+			.then((access_token) => {
+				setAccessToken(access_token);
+				bridge
+					.send('VKWebAppCallAPIMethod', {
+						method: 'database.getCountries',
+						request_id: 'api' + request_id,
+						params: { v: apiVersion, access_token },
+					})
+					.then((response) => {
+						console.log('sucess VKWebAppCallAPIMethod', response.response.items);
+						return response.response.items;
+					})
+					.then((ctrs) => {
+						setCountries(ctrs);
+						updateCities(apiVersion, setCities, 1, access_token);
+						return ctrs;
+					})
+					.catch((error) => {
+						console.log('VKWebAppCallAPIMethod:', error);
+					});
+				return access_token;
+			})
+			.catch((error) => {
+				console.log('VKWebAppGetAuthToken:', error);
+			});
 		request_id++;
-		setCountries(ctrs);
-		const cts = await updateCities(apiVersion, setCities, 1, null, el.access_token);
-		return { ctrs, cts };
-	}
-
-	async function init(appID) {
-		if (appID == 0) {
-			return;
-		}
-		await setLocationInfo();	
-
-		if (setDefault) {
-			getUserLocation();
-		}
 	}
 
 	function chooseCountry(e) {
@@ -106,18 +113,22 @@ export const Location = (
 		const c = countries.filter((v) => v.id == e.target.value)[0];
 		setCountry(c);
 
-		// setRegion(NoRegion);
-		// setRegionID(-1);
-
 		setCity(NoRegion);
 		setCityID(-1);
 
 		// updateRegions(apiVersion, setRegions, c.id, accessToken);
-		updateCities(apiVersion, setCities, c.id, null, accessToken);
+		updateCities(apiVersion, setCities, c.id, accessToken);
 	}
 
 	useEffect(() => {
-		init(appID);
+		if (appID == 0) {
+			return;
+		}
+		setLocationInfo();
+
+		if (setDefault) {
+			getUserLocation();
+		}
 	}, [appID]);
 
 	useEffect(() => {

@@ -14,14 +14,6 @@ import Add0 from './../../../../template/Add0';
 
 import useAdSearch from './useAdSearch';
 
-import axios from 'axios';
-
-import { Addr } from './../../../../../store/addr';
-
-import { User } from './AddsTab/../../../../../../store/user';
-
-import { CategoryNo } from './../../../../template/Categories';
-
 import Error from './../../../../placeholders/error';
 import AdNotFound from './../../../../placeholders/adNotFound';
 
@@ -218,34 +210,6 @@ const AddsTab = (props) => {
 		}, 500);
 	}, [search]);
 
-	// const [inited, setInited] = useState(false);
-	// const [loading, setLoading] = useState(true);
-	// const [ads, setAds] = useState();
-	// const [error, setError] = useState(1);
-	// const [hasMore, setHasMore] = useState(1);
-	// const [newPage, setNewPage] = useState(1);
-
-	// useAdSearchA(
-	// 	props.setPopout,
-	// 	search,
-	// 	props.category,
-	// 	props.mode,
-	// 	pageNumber,
-	// 	5,
-	// 	props.deleteID,
-	// 	props.city,
-	// 	props.country,
-	// 	props.sort,
-	// 	(inited0, loading0, ads0, error0, hasMore0, newPage0) => {
-	// 		setInited(inited0);
-	// 		setLoading(loading0);
-	// 		setAds(ads0);
-	// 		// setError(error0);
-	// 		// setHasMore(hasMore0);
-	// 		// setNewPage(newPage0);
-	// 	}
-	// );
-
 	const [pageNumber, setPageNumber] = useState(1);
 
 	let { inited, loading, ads, error, hasMore, newPage } = useAdSearch(
@@ -300,7 +264,7 @@ const AddsTab = (props) => {
 
 	const width = document.body.clientWidth;
 	return (
-		<div style={{ background: 'var(--background_page)' }}>
+		<div style={{ height:"auto", display: 'flex', background: 'var(--background_page)', flexDirection: "column" }}>
 			<Search
 				disabled
 				placeholder="Поиск временно недоступен"
@@ -371,10 +335,10 @@ const AddsTab = (props) => {
 					<AdNotFound dropFilters={props.dropFilters} />
 				)}
 			</Group>
-		
+			
 		</div>
 	);
 };
 
 export default AddsTab;
-//283
+//283 -> 380
