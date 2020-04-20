@@ -14,6 +14,8 @@ import {
 	Counter,
 } from '@vkontakte/vkui';
 
+import { browserHistory } from 'react-router';
+
 import AddsTabs from './story/adds/AddsTabs';
 import CreateAdd from './story/create/CreateAdd';
 
@@ -132,6 +134,19 @@ const Main = () => {
 	};
 
 	useEffect(() => {
+		window.onpopstate = function (event) {
+			back();
+			console.log('location: ' + document.location + ', state: ' + JSON.stringify(event.state));
+		};
+	}, []);
+
+	// useEffect(() => {
+	// 	browserHistory.listen(() => {
+	// 		console.log('tweak');
+	// 	});
+	// }, []);
+
+	useEffect(() => {
 		if (profileID != 0) {
 			setActivePanel(PANEL_USER);
 		}
@@ -155,7 +170,7 @@ const Main = () => {
 	}
 
 	function back() {
-		window.history.back();
+		// window.history.back();
 		let a = history.slice();
 		let panel = a.pop();
 		setHistory(a);
@@ -191,6 +206,7 @@ const Main = () => {
 	}
 
 	useEffect(() => {
+		console.log('history change', historyLen, history.length, window.history.length);
 		if (historyLen == history.length || history.length == 1) {
 			return;
 		}
@@ -203,7 +219,7 @@ const Main = () => {
 
 		const a = historyAds.slice();
 		const p = historyProfile.slice();
-		
+
 		if (adsLength != a.length) {
 			const ad = a.pop();
 			setChoosen(ad);

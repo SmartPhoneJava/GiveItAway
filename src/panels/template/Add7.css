@@ -152,7 +152,6 @@ img.light-tiled {
 }
 
 .atext {
-	font-weight: 600;
 	font-size: 13px;
 	line-height: 16px;
 	color:var(--header_text_secondary);
@@ -168,10 +167,9 @@ img.light-tiled {
 
 .aauthor {
 	display: flex;
-	font-weight: 600;
 	font-size: 13px;
 	line-height: 20px;
-	color:var(--header_text);
+	color:var(--header_text_secondary);
 
 	position: absolute;
     bottom: 0;
