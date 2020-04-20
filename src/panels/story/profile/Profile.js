@@ -120,7 +120,6 @@ const Profile = (props) => {
 			props.appID,
 			props.apiVersion,
 			(v) => {
-				console.log('getUserVK', v);
 				setVkUser(v);
 			},
 			(e) => {}

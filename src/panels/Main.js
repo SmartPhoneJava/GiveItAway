@@ -48,6 +48,7 @@ import { AddrWS } from './../store/addr_ws';
 import { inputArgs } from './../utils/window';
 
 import Centrifuge from 'centrifuge';
+import continuousSizeLegend from 'react-vis/dist/legends/continuous-size-legend';
 
 const PANEL_ADS = 'ads';
 const PANEL_ONE = 'one';
@@ -104,8 +105,6 @@ const Main = () => {
 
 	const [deleteID, SetDeleteID] = useState(-1);
 
-	const [wsToken, setWsToken] = useState('');
-
 	const [city, setCity] = useState(NoRegion);
 	const [country, setCountry] = useState(NoRegion);
 
@@ -114,6 +113,8 @@ const Main = () => {
 	const [savedAdState, setSavedAdState] = useState('');
 
 	const [myID, setMyID] = useState(0);
+
+	const [createState, setCreateState] = useState({inited:false})
 
 	const onStoryChange = (e) => {
 		const isProfile = e.currentTarget.dataset.text == profileText;
@@ -134,19 +135,6 @@ const Main = () => {
 	};
 
 	useEffect(() => {
-		window.onpopstate = function (event) {
-			back();
-			console.log('location: ' + document.location + ', state: ' + JSON.stringify(event.state));
-		};
-	}, []);
-
-	// useEffect(() => {
-	// 	browserHistory.listen(() => {
-	// 		console.log('tweak');
-	// 	});
-	// }, []);
-
-	useEffect(() => {
 		if (profileID != 0) {
 			setActivePanel(PANEL_USER);
 		}
@@ -160,8 +148,9 @@ const Main = () => {
 		}
 	}, [choosen]);
 
-	function next(currPanel, newPanel) {
-		window.history.pushState({}, currPanel);
+	function next(currPanel, newPanel, ad, profileID) {
+		console.log("nextnext", currPanel, newPanel)
+		window.history.pushState({ currPanel: newPanel, ad: ad, profileID: profileID }, currPanel);
 		setHistoryLen(history.length + 1);
 		let a = history.slice();
 		a.push(currPanel);
@@ -178,11 +167,10 @@ const Main = () => {
 	}
 
 	function openAd(ad, currPanel) {
-		console.log('openAd clicked');
 		setActiveStory(ads);
 		setChoosen(ad);
 		if (currPanel) {
-			next(currPanel, PANEL_ONE);
+			next(currPanel, PANEL_ONE, ad, null);
 
 			let a = historyAds.slice();
 			a.push(ad);
@@ -196,7 +184,7 @@ const Main = () => {
 		setActiveStory(ads);
 		setProfileID(id);
 		setPrevActiveStory('ads');
-		next(currPanel, PANEL_USER);
+		next(currPanel, PANEL_USER, null, id);
 
 		let a = historyProfile.slice();
 		a.push(id);
@@ -204,6 +192,25 @@ const Main = () => {
 
 		scroll();
 	}
+
+	useEffect(() => {
+		window.history.pushState({ currPanel: PANEL_ADS, ad: AdDefault }, PANEL_ADS);
+		window.onpopstate = function (event) {
+			if (!event.state) {
+				bridge.send("VKWebAppClose", {"status": "success", "payload": {"name": "test"} });
+				return
+			}
+			const currPanel = event.state.currPanel;
+			setActivePanel(currPanel);
+			if (currPanel == PANEL_USER) {
+				setProfileID(event.state.profileID);
+			} else if (currPanel == PANEL_ONE) {
+				setChoosen(event.state.ad);
+			}
+			console.log('infors', currPanel, event.state.ad, event.state.profileID);
+			console.log('location: ' + document.location + ', state: ' + JSON.stringify(event.state));
+		};
+	}, []);
 
 	useEffect(() => {
 		console.log('history change', historyLen, history.length, window.history.length);
@@ -312,7 +319,6 @@ const Main = () => {
 					getToken(
 						setSnackbar,
 						(v) => {
-							setWsToken(v);
 							centrifuge.setToken(v.token);
 							turnOnNotifications(us.id);
 							centrifuge.connect();
@@ -458,8 +464,8 @@ const Main = () => {
 							}}
 							back={back}
 							openUser={(id) => {
+								console.log("PANEL_ONE", id)
 								openUser(id, PANEL_ONE);
-								setChoosen(choosen);
 							}}
 							ad={choosen}
 							setPopout={setPopout}
@@ -488,6 +494,7 @@ const Main = () => {
 						apiVersion={ApiVersion}
 						goToAdds={() => {
 							setActiveStory(ads);
+							setActivePanel(PANEL_ADS)
 							scroll();
 						}}
 						goToCreate={() => {
@@ -518,6 +525,7 @@ const Main = () => {
 				<Panel id={add}>
 					<PanelHeader>{addText}</PanelHeader>
 					<CreateAdd
+						setCreateState={setCreateState}
 						vkPlatform={vkPlatform}
 						myID={myID}
 						appID={appID}

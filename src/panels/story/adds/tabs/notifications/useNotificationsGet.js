@@ -32,7 +32,6 @@ export default function useNotificationsGet(setPopout, query, pageNumber, rowsPe
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
 		})
 			.then((res) => {
-				console.log('sucess', res);
 				const newNots = res.data;
 				setNots((prev) => {
 					return [...new Set([...prev, ...newNots])];

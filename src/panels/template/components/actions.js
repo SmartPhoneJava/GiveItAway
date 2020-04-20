@@ -10,7 +10,6 @@ import { getSubscribers } from './../../../requests';
 import { CancelClose, adVisible, adHide, deleteAd } from './../../../requests';
 
 function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClosing, hidden, failedOpen) {
-	console.log('isClosingisClosing', ad_id, isClosing);
 	setPopout(
 		<ActionSheet onClose={() => setPopout(null)}>
 			{isClosing ? (

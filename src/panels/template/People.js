@@ -48,7 +48,6 @@ export const PeopleRB = withModalRootContext((props) => {
 						value={v.vk_id}
 						onClick={(e) => {
 							const { value } = e.currentTarget;
-							console.log('value', value);
 							Close(props.setPopout, props.setSnackbar, props.ad_id, value);
 							props.back();
 							Draft.dispatch({ type: 'set', new_state: 'CLOSE' });

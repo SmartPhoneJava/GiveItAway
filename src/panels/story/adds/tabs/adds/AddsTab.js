@@ -212,7 +212,6 @@ const AddsTab = (props) => {
 		i++;
 		let j = i;
 		setTimeout(() => {
-			console.log('j, i', j, i);
 			if (j == i) {
 				setSearchR(search);
 			}
@@ -300,10 +299,6 @@ const AddsTab = (props) => {
 	}
 
 	const width = document.body.clientWidth;
-	console.log('width', width);
-
-	console.log('loading', loading);
-
 	return (
 		<div style={{ background: 'var(--background_page)' }}>
 			<Search

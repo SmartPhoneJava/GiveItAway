@@ -53,7 +53,7 @@ const Comment = (props) => {
 			multiline="true"
 			description={
 				<div style={{ display: 'flex', marginTop: '2px' }}>
-					<div style={{ marginRight: '4px' }}>{time(props.v.creation_date_time)} </div>
+					<div style={{ marginRight: '4px', color:"var(--icon_secondary)" }}>{time(props.v.creation_date_time)} </div>
 				</div>
 			}
 			before={getImage(props)}
@@ -61,7 +61,7 @@ const Comment = (props) => {
 			<div className="block">
 				<div style={{ display: 'block' }}>
 					{getAuthorHref(props)}
-					<div>{props.v.text} </div>
+					<div style={{color:"var(--text_secondary)"}}>{props.v.text} </div>
 				</div>
 			</div>
 		</Cell>

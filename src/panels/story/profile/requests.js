@@ -20,8 +20,6 @@ export async function getUser(setPopout, setSnackbar, user_id, successCallback, 
 	let err = false;
 	let cancel;
 
-	console.log('user_iduser_id', user_id);
-
 	await axios({
 		method: 'get',
 		withCredentials: true,

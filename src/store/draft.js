@@ -9,8 +9,3 @@ const reducer = (state="DRAFT", action) => {
   }
 }
 export const Draft = createStore(reducer);
-const update = () => {
-  console.log("DRAFT:", Draft.getState()); // при каждом обращение к User будет выводить его значение
-
-}
-Draft.subscribe(update);  // Подписываемся на вызов User

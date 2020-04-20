@@ -20,8 +20,6 @@ export async function postComment(setPopout, setSnackbar, ad_id, comment, succes
 	let err = false;
 	let cancel;
 
-	console.log('data:::', comment);
-
 	await axios({
 		method: 'post',
 		withCredentials: true,

@@ -8,9 +8,5 @@ const reducer = (state={}, action) => {
   }
 }
 export const User = createStore(reducer);
-const update = () => {
-  console.log("sub:", User.getState()); // при каждом обращение к User будет выводить его значение
-}
-User.subscribe(update);  // Подписываемся на вызов User
 
 /*http://35.223.136.32:8091/ */

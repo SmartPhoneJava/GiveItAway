@@ -483,14 +483,6 @@ export const CategoriesLabel = (props) => {
 			<FormLayout style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'red' }}>
 				<SelectMimicry
 					top="Категория"
-					style={{
-						display: 'flex',
-						alignContent: 'center',
-						alignItems: 'center',
-						color: 'red',
-						// color: "var(--text_primary)",
-						paddingLeft: props.leftMargin,
-					}}
 					value={GetCategoryText(props.category)}
 					placeholder={GetCategoryText(props.category)}
 					onClick={() => props.open()}

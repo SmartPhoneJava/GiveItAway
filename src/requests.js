@@ -563,7 +563,6 @@ export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
 				);
 			} else {
 				refresh(ad_id);
-				console.log('i set', ad_id);
 				setSnackbar(
 					<Snackbar
 						duration="1500"
