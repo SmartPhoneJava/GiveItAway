@@ -40,7 +40,7 @@ import { NoRegion } from './template/Location';
 
 import Profile from './story/profile/Profile';
 
-import AddsModal, { MODAL_FILTERS, MODAL_CATEGORIES, MODAL_SUBS } from './story/adds/AddsModal';
+import AddsModal, { MODAL_FILTERS, MODAL_CATEGORIES, MODAL_SUBS, GEO_TYPE_FILTERS } from './story/adds/AddsModal';
 import CreateModal from './story/create/CreateModal';
 
 import { AddrWS } from './../store/addr_ws';
@@ -105,6 +105,13 @@ const Main = () => {
 
 	const [deleteID, SetDeleteID] = useState(-1);
 
+	const [geodata, setGeodata] = useState({
+		long: -1,
+		lat: -1,
+	});
+
+	const [radius, setRadius] = useState(5);
+
 	const [city, setCity] = useState(NoRegion);
 	const [country, setCountry] = useState(NoRegion);
 
@@ -113,6 +120,8 @@ const Main = () => {
 	const [savedAdState, setSavedAdState] = useState('');
 
 	const [myID, setMyID] = useState(0);
+
+	const [geoType, setGeoType] = useState(GEO_TYPE_FILTERS);
 
 	const [createState, setCreateState] = useState({inited:false})
 
@@ -386,6 +395,8 @@ const Main = () => {
 				history={history}
 				modal={
 					<AddsModal
+						geoType={geoType}
+						setGeoType={setGeoType}
 						appID={appID}
 						apiVersion={ApiVersion}
 						vkPlatform={vkPlatform}
@@ -398,6 +409,10 @@ const Main = () => {
 						// region={region}
 						setCity={setCity}
 						setCountry={setCountry}
+						radius={radius}
+						setRadius={setRadius}
+						geodata={geodata}
+						setGeodata={setGeodata}
 						// setRegion={setRegion}
 						sort={sort}
 						setSort={setSort}
