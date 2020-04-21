@@ -9,12 +9,11 @@ import {
 	PanelHeaderBack,
 	TabbarItem,
 	PanelHeaderSimple,
-	ConfigProvider,
 	ScreenSpinner,
 	Counter,
 } from '@vkontakte/vkui';
 
-import { browserHistory } from 'react-router';
+import './main.css';
 
 import AddsTabs from './story/adds/AddsTabs';
 import CreateAdd from './story/create/CreateAdd';
@@ -123,7 +122,7 @@ const Main = () => {
 
 	const [geoType, setGeoType] = useState(GEO_TYPE_FILTERS);
 
-	const [createState, setCreateState] = useState({inited:false})
+	const [createState, setCreateState] = useState({ inited: false });
 
 	const onStoryChange = (e) => {
 		const isProfile = e.currentTarget.dataset.text == profileText;
@@ -158,7 +157,7 @@ const Main = () => {
 	}, [choosen]);
 
 	function next(currPanel, newPanel, ad, profileID) {
-		console.log("nextnext", currPanel, newPanel)
+		console.log('nextnext', currPanel, newPanel);
 		window.history.pushState({ currPanel: newPanel, ad: ad, profileID: profileID }, currPanel);
 		setHistoryLen(history.length + 1);
 		let a = history.slice();
@@ -206,8 +205,8 @@ const Main = () => {
 		window.history.pushState({ currPanel: PANEL_ADS, ad: AdDefault }, PANEL_ADS);
 		window.onpopstate = function (event) {
 			if (!event.state) {
-				bridge.send("VKWebAppClose", {"status": "success", "payload": {"name": "test"} });
-				return
+				bridge.send('VKWebAppClose', { status: 'success', payload: { name: 'test' } });
+				return;
 			}
 			const currPanel = event.state.currPanel;
 			setActivePanel(currPanel);
@@ -467,7 +466,7 @@ const Main = () => {
 				</Panel>
 				<Panel id={PANEL_ONE}>
 					<PanelHeaderSimple left={<PanelHeaderBack onClick={back} />}>
-						{choosen ? choosen.header : 'Произошла ошбка'}
+						{choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошбка'}
 					</PanelHeaderSimple>
 					{choosen ? (
 						<AddMore2
@@ -479,7 +478,7 @@ const Main = () => {
 							}}
 							back={back}
 							openUser={(id) => {
-								console.log("PANEL_ONE", id)
+								console.log('PANEL_ONE', id);
 								openUser(id, PANEL_ONE);
 							}}
 							ad={choosen}
@@ -496,7 +495,7 @@ const Main = () => {
 				</Panel>
 				<Panel id={PANEL_USER}>
 					<PanelHeaderSimple left={prevActiveStory == no_prev ? null : <PanelHeaderBack onClick={back} />}>
-						{profileName}
+						<p className="panel-header"> {profileName} </p>
 					</PanelHeaderSimple>
 					<Profile
 						setAdsMode={setAdsMode}
@@ -509,7 +508,7 @@ const Main = () => {
 						apiVersion={ApiVersion}
 						goToAdds={() => {
 							setActiveStory(ads);
-							setActivePanel(PANEL_ADS)
+							setActivePanel(PANEL_ADS);
 							scroll();
 						}}
 						goToCreate={() => {

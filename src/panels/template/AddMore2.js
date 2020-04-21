@@ -14,7 +14,12 @@ import {
 	Counter,
 } from '@vkontakte/vkui';
 
+import 'react-photoswipe/lib/photoswipe.css';
+import { PhotoSwipe, PhotoSwipeGallery } from 'react-photoswipe';
+
 import { GetCategoryText, GetCategoryImageSmall } from './Categories';
+
+import Icon24VideoFill from '@vkontakte/icons/dist/24/video_fill';
 
 import Icon24CommentOutline from '@vkontakte/icons/dist/24/comment_outline';
 import Icon24Chats from '@vkontakte/icons/dist/24/chats';
@@ -81,11 +86,32 @@ export const AdDefault = {
 	},
 };
 
+let saveInstance = null;
+
 const AddMore2 = (props) => {
+	const [isOpen, setIsOpen] = useState(false);
+	const [options, setOptions] = useState([]);
+
+	const handleClose = () => {
+		setIsOpen(false);
+	};
+
+	const getThumbnailContent = (item) => {
+		return <img src={item.thumbnail} height={90} />;
+	};
+
 	const [ad, setAd] = useState(null);
 
 	const [photoIndex, setPhotoIndex] = useState(0);
 	const [image, setImage] = useState('');
+
+	const openPhotoSwipe = (i) => {
+		setOptions({
+			closeOnScroll: false,
+			index: i,
+		});
+		setIsOpen(true);
+	};
 
 	const [subs, setSubs] = useState(0);
 	const [hide, setHide] = useState(false);
@@ -117,10 +143,18 @@ const AddMore2 = (props) => {
 	}
 
 	useEffect(() => {
+		if (ad == null || ad == saveInstance || ad == AdDefault) {
+			return;
+		}
 		setImage(ad && ad.pathes_to_photo ? ad.pathes_to_photo[photoIndex].PhotoUrl : '');
 	}, [photoIndex, ad]);
 
 	useEffect(() => {
+		console.log('cheeeeck', ad, saveInstance, AdDefault);
+		// if (ad != null && props.ad.ad_id != AdDefault.ad_id) {
+		// 	setAd(saveInstance)
+		// 	return;
+		// }
 		async function init() {
 			const id = props.ad ? props.ad.ad_id : -1;
 			if (id < 0) {
@@ -141,31 +175,12 @@ const AddMore2 = (props) => {
 						setIsDealer(deal.subscriber_id == props.VkUser.getState().id);
 						setDeal(deal);
 					}
+					// saveInstance = details;
 				}
 			}
 		}
 		init();
-		console.log('need refresh catched');
 	}, [props.ad, request]);
-
-	function detectContactsType(contacts) {
-		if (!contacts) {
-			return 'error';
-		}
-		const ematlRG = '/.+@.+..+/i';
-		if (contacts.match(ematlRG)) {
-			return 'email';
-		}
-		if (contacts.indexOf('http')) {
-			return 'web';
-		}
-		// const phoneRG = "/^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$"
-		// if (contacts.match(phoneRG)) {
-		// 	return 'phone';
-		// }
-		return 'no';
-		/**  */
-	}
 
 	function statusWrapper(block, color) {
 		color = color || COLOR_DEFAULT;
@@ -379,6 +394,32 @@ const AddMore2 = (props) => {
 		);
 	}
 
+	const [imgs, setImgs] = useState([]);
+	// const [photoSwipeImgs, setPhotoSwipeImgs] = useState([]);
+
+	useEffect(() => {
+		if (!ad || ad.id == -1) {
+			return;
+		}
+		setImgs(ad.pathes_to_photo.map((v) => v.PhotoUrl));
+		// setPhotoSwipeImgs(
+		// 	ad.pathes_to_photo.map((v) => {
+		// 		let img = new Image();
+		// 		img.src = v.PhotoUrl;
+		// 		let width = img.width;
+		// 		let hight = img.height;
+		// 		return {
+		// 			src: v.PhotoUrl,
+		// 			msrc: v.PhotoUrl,
+		// 			w: width,
+		// 			h: hight,
+		// 			title: ad.header,
+		// 			thumbnail: v.PhotoUrl,
+		// 		};
+		// 	})
+		// );
+	}, [ad]);
+
 	function isAuthor() {
 		if (!ad) {
 			return false;
@@ -430,10 +471,52 @@ const AddMore2 = (props) => {
 	}
 
 	if (ad) {
-		const imgs = ad.pathes_to_photo.map((v) => v.PhotoUrl);
+		const photoSwipeImgs = ad.pathes_to_photo.map((v) => {
+			let img = new Image();
+			img.src = v.PhotoUrl;
+			let width = img.width;
+			let hight = img.height;
+			return {
+				src: v.PhotoUrl,
+				msrc: v.PhotoUrl,
+				w: width,
+				h: hight,
+				title: ad.header,
+				thumbnail: v.PhotoUrl,
+			};
+		});
 		return (
 			<div>
-				<div style={{position:"relative"}}>
+				<PhotoSwipe
+					style={{ marginTop: '50px' }}
+					isOpen={isOpen}
+					items={photoSwipeImgs}
+					options={options}
+					onClose={handleClose}
+				/>
+
+				<div style={{ position: 'relative' }}>
+					<div style={{ right: '10px', position: 'absolute', top: '6px' }}>
+						<PanelHeaderButton
+							onClick={() => {
+								bridge
+									.send('VKWebAppShowImages', {
+										images: imgs,
+									})
+									.catch(function (error) {
+										console.log('photoIndex', photoIndex);
+										openPhotoSwipe(photoIndex);
+									});
+							}}
+							mode="secondary"
+							style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
+							size="m"
+						>
+							<Avatar style={{ background: 'rgba(0,0,0,0.7)' }} size={32}>
+								<Icon24VideoFill fill="var(--white)" />
+							</Avatar>
+						</PanelHeaderButton>
+					</div>
 					{showStatus()}
 					<img
 						onClick={() => {
@@ -442,21 +525,20 @@ const AddMore2 = (props) => {
 									images: imgs,
 								})
 								.catch(function (error) {
-									const w = window.open('about:blank', image); // открываем окно
-									w.document.write("<img src='" + image + "' alt='from old image' />"); //  вставляем картинку
-									ad.title = '' + error; //  вставляем картинку
-									setAd(ad);
+									console.log('photoIndex', photoIndex);
+									openPhotoSwipe(photoIndex);
 								});
 						}}
 						srcSet={image}
 						style={{
 							width: '100%',
 							objectFit: 'cover',
-							maxHeight: '200px',
+							maxHeight: '250px',
 							margin: 'auto',
 						}}
 					/>
 				</div>
+
 				{!ad.pathes_to_photo || ad.pathes_to_photo.length <= 1 ? (
 					''
 				) : (
@@ -484,7 +566,14 @@ const AddMore2 = (props) => {
 														setPhotoIndex(i);
 													}}
 												>
-													<img src={img.PhotoUrl} className="small_img" />
+													<img
+														style={{
+															filter:
+																i == photoIndex ? 'brightness(40%)' : 'brightness(90%)',
+														}}
+														src={img.PhotoUrl}
+														className="small_img"
+													/>
 												</Button>
 											</div>
 										);
@@ -493,6 +582,7 @@ const AddMore2 = (props) => {
 						</div>
 					</HorizontalScroll>
 				)}
+
 				<div style={{ padding: '16px' }}>
 					<div style={{ display: 'flex', alignItems: 'center' }}>
 						<div className="CellLeft__head">{ad.header}</div>
@@ -579,7 +669,7 @@ const AddMore2 = (props) => {
 						{status != 'closed' && status != 'aborted' ? (
 							<tr>
 								<td className="first">Отклинулось</td>
-								<td>{subs && subs.length > 0 ? subs.length : "0"}</td>
+								<td>{subs && subs.length > 0 ? subs.length : '0'}</td>
 							</tr>
 						) : (
 							''
@@ -657,5 +747,7 @@ const AddMore2 = (props) => {
 	}
 	return '';
 };
+
+// 857
 
 export default AddMore2;
