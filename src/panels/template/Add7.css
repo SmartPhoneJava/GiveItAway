@@ -141,6 +141,7 @@ img.light-tiled {
 	padding-left: 4px;
 	padding-right: 4px;
 	vertical-align: bottom;
+	flex: 1;
 }
 
 .aheader {

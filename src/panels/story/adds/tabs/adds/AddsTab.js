@@ -14,6 +14,8 @@ import Add0 from './../../../../template/Add0';
 
 import useAdSearch from './useAdSearch';
 
+import './addsTab.css';
+
 import Error from './../../../../placeholders/error';
 import AdNotFound from './../../../../placeholders/adNotFound';
 
@@ -264,7 +266,17 @@ const AddsTab = (props) => {
 
 	const width = document.body.clientWidth;
 	return (
-		<div style={{ height:"auto", display: 'flex', background: 'var(--background_page)', flexDirection: "column" }}>
+		<div
+			style={{
+				height: 'auto',
+				display: 'flex',
+				background: 'var(--background_page)',
+				flexDirection: 'column',
+				overflow: 'hidden',
+				textOverflow: 'ellipsis',
+				whiteSpace: 'nowrap',
+			}}
+		>
 			<Search
 				disabled
 				placeholder="Поиск временно недоступен"
@@ -289,26 +301,26 @@ const AddsTab = (props) => {
 						if (index % 2) {
 							const prev = ads[index - 1];
 							const first = (
-								<div style={{ flex: 1 }} key={prev.ad_id}>
+								<div className="one-block" key={prev.ad_id}>
 									{Ad(prev)}
 								</div>
 							);
 
 							let second = (
-								<div style={{ flex: 1 }} key={ad.ad_id}>
+								<div className="one-block" key={ad.ad_id}>
 									{Ad(ad)}
 								</div>
 							);
 
 							if (ads.length === index + 1) {
 								second = (
-									<div style={{ flex: 1 }} key={ad.ad_id} ref={lastAdElementRef}>
+									<div className="one-block" key={ad.ad_id} ref={lastAdElementRef}>
 										{Ad(ad)}
 									</div>
 								);
 							}
 							return (
-								<div style={{ display: 'flex' }}>
+								<div className="flex-blocks">
 									{first} {second}
 								</div>
 							);
@@ -335,7 +347,6 @@ const AddsTab = (props) => {
 					<AdNotFound dropFilters={props.dropFilters} />
 				)}
 			</Group>
-			
 		</div>
 	);
 };
