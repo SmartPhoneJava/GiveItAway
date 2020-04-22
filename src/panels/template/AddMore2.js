@@ -12,6 +12,8 @@ import {
 	Link,
 	Separator,
 	Counter,
+	CellButton,
+	Placeholder,
 } from '@vkontakte/vkui';
 
 import 'react-photoswipe/lib/photoswipe.css';
@@ -41,6 +43,8 @@ import { subscribe, unsubscribe, getDetails, getSubscribers, getDeal, acceptDeal
 import './addsTab.css';
 
 import './styles.css';
+
+import PANEL_ONE from './../../panels/Main';
 
 import Cat from './../../img/cat.jpg';
 import Man from './../../img/man.jpeg';
@@ -90,7 +94,7 @@ let saveInstance = null;
 
 const AddMore2 = (props) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [options, setOptions] = useState([]);
+	const [options, setOptions] = useState({});
 
 	const handleClose = () => {
 		setIsOpen(false);
@@ -728,24 +732,35 @@ const AddMore2 = (props) => {
 				</Group>
 
 				{ad.feedback_type == 'comments' ? (
-					<Comments
-						hide={hide}
-						ad={ad}
-						setPopout={props.setPopout}
-						setSnackbar={props.setSnackbar}
-						myID={props.VkUser.getState().id}
-						openUser={props.openUser}
-					/>
+					<>
+						<Comments
+							hide={true}
+							ad={ad}
+							amount={1}
+							maxAmount={1}
+							setPopout={props.setPopout}
+							setSnackbar={props.setSnackbar}
+							myID={props.VkUser.getState().id}
+							openUser={props.openUser}
+						/>
+						<CellButton
+							onClick={() => {
+								props.openComments(ad);
+							}}
+						>
+							Посмотреть все
+						</CellButton>
+					</>
 				) : (
 					<Cell>
 						{' '}
-						<div style={{ color: 'grey' }}>Комментарии закрыты </div>
+						<div style={{ color: 'var(--text_primary)' }}>Комментарии закрыты </div>
 					</Cell>
 				)}
 			</div>
 		);
 	}
-	return '';
+	return <Placeholder></Placeholder>;
 };
 
 // 857

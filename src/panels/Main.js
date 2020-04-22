@@ -44,6 +44,8 @@ import CreateModal from './story/create/CreateModal';
 
 import { AddrWS } from './../store/addr_ws';
 
+import Comments from "./story/adds/tabs/comments/comments"
+
 import { inputArgs } from './../utils/window';
 
 import Centrifuge from 'centrifuge';
@@ -52,6 +54,8 @@ import continuousSizeLegend from 'react-vis/dist/legends/continuous-size-legend'
 const PANEL_ADS = 'ads';
 const PANEL_ONE = 'one';
 const PANEL_USER = 'user';
+const PANEL_SUBS = 'subs';
+const PANEL_COMMENTS = 'comments';
 
 const ads = 'ads';
 const adsText = 'Объявления';
@@ -185,6 +189,15 @@ const Main = () => {
 			setHistoryAds(a);
 		}
 
+		scroll();
+	}
+
+	function openComments(ad) {
+		setActiveStory(ads);
+		next(PANEL_ONE, PANEL_COMMENTS, ad, null);
+		let a = historyAds.slice();
+		a.push(ad);
+		setHistoryAds(a);
 		scroll();
 	}
 
@@ -481,6 +494,9 @@ const Main = () => {
 								console.log('PANEL_ONE', id);
 								openUser(id, PANEL_ONE);
 							}}
+							openComments={(ad)=>{
+								openComments(ad)
+							}}
 							ad={choosen}
 							setPopout={setPopout}
 							setSnackbar={setSnackbar}
@@ -519,6 +535,29 @@ const Main = () => {
 							openAd(ad, PANEL_USER);
 						}}
 					/>
+					{snackbar}
+				</Panel>
+				<Panel id={PANEL_COMMENTS}>
+					<PanelHeaderSimple left={<PanelHeaderBack onClick={back} />}>
+						{choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошбка'}
+					</PanelHeaderSimple>
+					{choosen ? (
+						<Comments
+							hide={false}
+							ad={choosen}
+							panel={PANEL_COMMENTS}
+							amount={5}
+							maxAmount={-1}
+							setPopout={setPopout}
+							setSnackbar={setSnackbar}
+							myID={myID}
+							openUser={(id) => {
+								openUser(id, PANEL_ADS);
+							}}
+						/>
+					) : (
+						Error
+					)}
 					{snackbar}
 				</Panel>
 			</View>

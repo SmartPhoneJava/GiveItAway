@@ -12,6 +12,8 @@ import {
 	Avatar,
 } from '@vkontakte/vkui';
 
+import PANEL_ONE from './../../../../Main';
+
 import useCommentsGet from './useCommentsGet';
 
 import Man from './../../../../../img/man.jpeg';
@@ -166,75 +168,73 @@ function showComments(
 	openUser
 ) {
 	return (
-		<div style={{ marginBottom: '15%' }}>
-			<Group header={<Header mode="secondary">{'комментариев ' + nots.length}</Header>}>
-				{nots.map((v, index) => {
-					let inner = (
-						<Comment
-							onClick={() => {
-								console.log('compare', v.author.vk_id, myID);
-								if (v.author.vk_id != myID) {
-									openUser(v.author.vk_id);
-									return;
-								}
+		<Group header={<Header mode="secondary">{'комментариев ' + nots.length}</Header>}>
+			{nots.map((v, index) => {
+				let inner = (
+					<Comment
+						onClick={() => {
+							console.log('compare', v.author.vk_id, myID);
+							if (v.author.vk_id != myID) {
+								openUser(v.author.vk_id);
+								return;
+							}
 
-								setPopout(
-									<ActionSheet onClose={() => setPopout(null)}>
-										<ActionSheetItem
-											autoclose
-											onClick={() => {
-												setText(v.text);
-												setEditableID(v.comment_id);
-												setSearch('' + v.comment_id + v.text);
-											}}
-										>
-											Редактировать
+							setPopout(
+								<ActionSheet onClose={() => setPopout(null)}>
+									<ActionSheetItem
+										autoclose
+										onClick={() => {
+											setText(v.text);
+											setEditableID(v.comment_id);
+											setSearch('' + v.comment_id + v.text);
+										}}
+									>
+										Редактировать
+									</ActionSheetItem>
+									<ActionSheetItem
+										autoclose
+										mode="destructive"
+										onClick={() => {
+											setHide(true);
+											deleteComment(
+												setPopout,
+												setSnackbar,
+												v,
+												(vv) => {
+													setSearch('' + v.comment_id + 'deleted');
+												},
+												(e) => {},
+												() => {
+													setHide(false);
+												}
+											);
+										}}
+									>
+										Удалить
+									</ActionSheetItem>
+									{osname === IOS && (
+										<ActionSheetItem autoclose mode="cancel">
+											Отменить
 										</ActionSheetItem>
-										<ActionSheetItem
-											autoclose
-											mode="destructive"
-											onClick={() => {
-												setHide(true);
-												deleteComment(
-													setPopout,
-													setSnackbar,
-													v,
-													(vv) => {
-														setSearch('' + v.comment_id + 'deleted');
-													},
-													(e) => {},
-													() => {
-														setHide(false);
-													}
-												);
-											}}
-										>
-											Удалить
-										</ActionSheetItem>
-										{osname === IOS && (
-											<ActionSheetItem autoclose mode="cancel">
-												Отменить
-											</ActionSheetItem>
-										)}
-									</ActionSheet>
-								);
-							}}
-							v={v}
-						/>
+									)}
+								</ActionSheet>
+							);
+						}}
+						v={v}
+					/>
+				);
+
+				if (nots.length === index + 1) {
+					return (
+						<div key={v.comment_id} ref={lastAdElementRef}>
+							{inner}
+						</div>
 					);
-
-					if (nots.length === index + 1) {
-						return (
-							<div key={v.comment_id} ref={lastAdElementRef}>
-								{inner}
-							</div>
-						);
-					} else {
-						return <div key={v.comment_id}>{inner}</div>;
-					}
-				})}
-			</Group>
-		</div>
+				} else {
+					return <div key={v.comment_id}>{inner}</div>;
+				}
+			})}
+		</Group>
 	);
 }
 
@@ -252,8 +252,9 @@ const Comments = (props) => {
 		props.setPopout,
 		search,
 		pageNumber,
-		5,
-		props.ad.ad_id
+		props.amount,
+		props.ad.ad_id,
+		props.maxAmount
 	);
 	const [nots, setNots] = useState([]);
 	useEffect(() => {
@@ -276,6 +277,10 @@ const Comments = (props) => {
 		},
 		[loading, hasMore]
 	);
+
+	useEffect(()=>{
+		setHide(props.hide)
+	}, [props.hide])
 
 	function sendComment() {
 		setHide(true);
@@ -358,7 +363,7 @@ const Comments = (props) => {
 				props.openUser
 			)}
 
-			{hide || props.hide ? (
+			{hide ? (
 				''
 			) : (
 				<div className="write">

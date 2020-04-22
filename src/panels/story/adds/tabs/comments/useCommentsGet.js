@@ -9,7 +9,7 @@ import { User } from '../../../../../store/user';
 
 import { CategoryNo } from '../../../../template/Categories';
 
-export default function useCommentsGet(setPopout, query, pageNumber, rowsPerPage, ad_id) {
+export default function useCommentsGet(setPopout, query, pageNumber, rowsPerPage, ad_id, maxAmount) {
 	const [inited, setInited] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
@@ -22,6 +22,10 @@ export default function useCommentsGet(setPopout, query, pageNumber, rowsPerPage
 	}, [query]);
 
 	useEffect(() => {
+		if (maxAmount && maxAmount > 0 && maxAmount <= (pageNumber-1)*rowsPerPage) {
+			setHasMore(false);
+			return
+		}
 		setPopout(<ScreenSpinner size="large" />);
 		setLoading(true);
 		setError(false);
@@ -43,10 +47,10 @@ export default function useCommentsGet(setPopout, query, pageNumber, rowsPerPage
 			.then((res) => {
 				console.log('sucess comments', res);
 				const newNots = res.data;
-				
+
 				setNots((prev) => {
 					const v = [...new Set([...prev, ...newNots])];
-					return v
+					return v;
 				});
 				setHasMore(newNots.length > 0);
 				setLoading(false);
