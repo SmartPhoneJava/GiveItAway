@@ -252,111 +252,6 @@ export function Close(setPopout, setSnackbar, ad_id, subscriber_id) {
 	return err;
 }
 
-export function subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallback, failCallback, end) {
-	setPopout(<ScreenSpinner size="large" />);
-	let err = false;
-	let cancel;
-	axios({
-		method: 'post',
-		withCredentials: true,
-		url: Addr.getState() + '/api/ad/' + ad_id + '/subscribe',
-		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-	})
-		.then(function (response) {
-			return response.data;
-		})
-		.then(function (response) {
-			setPopout(null);
-			successCallback(response);
-			success('Теперь вы будете получать уведомления, связанные с этим постом', clCancel, setSnackbar, end);
-			return response;
-		})
-		.catch(function (error) {
-			err = true;
-			console.log('loook, error', error, status);
-			failCallback(error);
-			if (error == 'Error: Request failed with status code 409') {
-				fail('недостаточно кармы. Откажитесь от другой вещи, чтобы получить эту!', null, setSnackbar, end);
-			} else {
-				fail(
-					'Нет соединения с сервером',
-					() => {
-						subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallback, failCallback, end);
-					},
-					setSnackbar,
-					end
-				);
-			}
-			setPopout(null);
-		});
-	return err;
-}
-
-export function unsubscribe(setPopout, setSnackbar, ad_id, clCancel, successCallback, failCallback, end) {
-	setPopout(<ScreenSpinner size="large" />);
-	let err = false;
-	let cancel;
-	axios({
-		method: 'post',
-		withCredentials: true,
-		url: Addr.getState() + '/api/ad/' + ad_id + '/unsubscribe',
-		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-	})
-		.then(function (response) {
-			return response.data;
-		})
-		.then(function (response) {
-			setPopout(null);
-			successCallback(response);
-			success('Больше вы не будете получать связанные с этим постом уведомления', clCancel, setSnackbar, end);
-			return response;
-		})
-		.catch(function (error) {
-			err = true;
-			failCallback(error);
-			fail(
-				'Нет соединения с сервером',
-				() => {
-					unsubscribe(setPopout, setSnackbar, ad_id, clCancel);
-				},
-				setSnackbar,
-				end
-			);
-			setPopout(null);
-		});
-	return err;
-}
-
-export async function getDetails(setPopout, setSnackbar, ad_id, successCallback, failCallback, end) {
-	setPopout(<ScreenSpinner size="large" />);
-	let err = false;
-	let cancel;
-	const data = await axios({
-		method: 'get',
-		withCredentials: true,
-		url: Addr.getState() + '/api/ad/' + ad_id + '/details',
-		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-	})
-		.then(function (response) {
-			setPopout(null);
-			console.log('response from getDetails:', response);
-			return response.data;
-		})
-		.catch(function (error) {
-			err = true;
-			fail(
-				'Нет соединения с сервером',
-				() => {
-					getDetails(setPopout, setSnackbar, ad_id);
-				},
-				setSnackbar
-			);
-			setPopout(null);
-		});
-
-	return { details: data, err };
-}
-
 export async function getSubscribers(setPopout, setSnackbar, ad_id, successCallback, failCallback) {
 	setPopout(<ScreenSpinner size="large" />);
 	let err = false;
@@ -388,6 +283,36 @@ export async function getSubscribers(setPopout, setSnackbar, ad_id, successCallb
 			setPopout(null);
 		});
 	return { subscribers, err };
+}
+
+export async function getDetails(setPopout, setSnackbar, ad_id, successCallback, failCallback, end) {
+	setPopout(<ScreenSpinner size="large" />);
+	let err = false;
+	let cancel;
+	const data = await axios({
+		method: 'get',
+		withCredentials: true,
+		url: Addr.getState() + '/api/ad/' + ad_id + '/details',
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(function (response) {
+			setPopout(null);
+			console.log('response from getDetails:', response);
+			return response.data;
+		})
+		.catch(function (error) {
+			err = true;
+			fail(
+				'Нет соединения с сервером',
+				() => {
+					getDetails(setPopout, setSnackbar, ad_id);
+				},
+				setSnackbar
+			);
+			setPopout(null);
+		});
+
+	return { details: data, err };
 }
 
 export async function canWritePrivateMessage(id, appID, apiVersion) {

@@ -23,6 +23,8 @@ import { GetCategoryText, GetCategoryImageSmall } from './Categories';
 
 import Icon24VideoFill from '@vkontakte/icons/dist/24/video_fill';
 
+import Icon24Delete from '@vkontakte/icons/dist/24/delete';
+
 import Icon24CommentOutline from '@vkontakte/icons/dist/24/comment_outline';
 import Icon24Chats from '@vkontakte/icons/dist/24/chats';
 
@@ -38,7 +40,10 @@ import Icon24Settings from '@vkontakte/icons/dist/24/settings';
 import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 import Icon24Place from '@vkontakte/icons/dist/24/place';
 
-import { subscribe, unsubscribe, getDetails, getSubscribers, getDeal, acceptDeal, denyDeal } from './../../requests';
+import Subs from './../story/adds/tabs/subs/subs';
+import { subscribe, unsubscribe } from './../story/adds/tabs/subs/requests';
+
+import { getSubscribers, getDetails, getDeal, acceptDeal, denyDeal } from './../../requests';
 
 import './addsTab.css';
 
@@ -134,13 +139,8 @@ const AddMore2 = (props) => {
 			props.setSnackbar,
 			id,
 			(s) => {
-				console.log('subs are', s);
-				console.log('info info', !isAuthor(), s.length > 0);
-				console.log('filter', s.filter((v) => v.vk_id == props.VkUser.getState().id).length > 0);
-				console.log('isSubscriber1', isSubscriber(s));
 				setSubs(s);
 				setIsSub(isSubscriber(s));
-				console.log('isSubscriber', isSubscriber(s));
 			},
 			(e) => {}
 		);
@@ -588,37 +588,81 @@ const AddMore2 = (props) => {
 				)}
 
 				<div style={{ padding: '16px' }}>
-					<div style={{ display: 'flex', alignItems: 'center' }}>
+					<div style={{ display: 'block', alignItems: 'center' }}>
 						<div className="CellLeft__head">{ad.header}</div>
 						{isAuthor() ? (
-							<PanelHeaderButton
-								mode="primary"
-								size="l"
-								onClick={() => {
-									setHide(true);
-									OpenActions(
-										props.setPopout,
-										props.setSnackbar,
-										props.refresh,
-										ad.ad_id,
-										() => {
-											props.onCloseClick();
-											setRequest('CLOSE');
-										},
-										status == 'chosen',
-										ad.hidden,
-										subs.length,
-										() => {
-											setHide(false);
-										}
-									);
-								}}
-								disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
-							>
-								<Avatar style={{ background: 'white' }} size={40}>
-									<Icon28SettingsOutline fill="var(--black)" />
-								</Avatar>
-							</PanelHeaderButton>
+							<div style={{ display: 'block' }}>
+								<div style={{ display: 'flex' }}>
+									<CellButton
+										onClick={() => {
+											setHide(true);
+											OpenActions(
+												props.setPopout,
+												props.setSnackbar,
+												props.refresh,
+												ad.ad_id,
+												() => {
+													props.onCloseClick();
+													setRequest('CLOSE');
+												},
+												status == 'chosen',
+												ad.hidden,
+												subs.length,
+												() => {
+													setHide(false);
+												}
+											);
+										}}
+										disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
+										before={<Icon28SettingsOutline />}
+									>
+										Управлять
+									</CellButton>
+									<CellButton
+										mode="danger"
+										disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
+										before={<Icon24Delete />}
+									>
+										Удалить
+									</CellButton>
+								</div>
+								{/* <PanelHeaderButton
+									mode="primary"
+									size="l"
+									onClick={() => {
+										setHide(true);
+										OpenActions(
+											props.setPopout,
+											props.setSnackbar,
+											props.refresh,
+											ad.ad_id,
+											() => {
+												props.onCloseClick();
+												setRequest('CLOSE');
+											},
+											status == 'chosen',
+											ad.hidden,
+											subs.length,
+											() => {
+												setHide(false);
+											}
+										);
+									}}
+									disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
+								>
+									<Avatar style={{ background: 'white' }} size={40}>
+										<Icon28SettingsOutline fill="var(--black)" />
+									</Avatar>
+								</PanelHeaderButton> */}
+								<Button
+									disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
+									mode="commerce"
+									size="xl"
+									onClick={() => props.openSubs(ad)}
+								>
+									Отдать
+								</Button>
+							</div>
 						) : (
 							''
 						)}
@@ -664,7 +708,7 @@ const AddMore2 = (props) => {
 					<tbody>
 						<tr>
 							<td className="first">Категория</td>
-							<td>{GetCategoryImageSmall(ad.category)}</td>
+							<td>{GetCategoryText(ad.category)}</td>
 						</tr>
 						<tr>
 							<td className="first">Просмотров</td>
@@ -687,21 +731,16 @@ const AddMore2 = (props) => {
 				</table>
 				{isAuthor() ? (
 					status != 'closed' && status != 'aborted' ? (
-						<Group header={<Header mode="secondary">Откликнулись</Header>}>
-							{subs.length > 0 ? (
-								subs.map((v) => (
-									<Cell
-										onClick={() => props.openUser(v.vk_id)}
-										key={v.vk_id}
-										before={<Avatar size={36} src={v.photo_url} />}
-									>
-										{v.name + ' ' + v.surname}
-									</Cell>
-								))
-							) : (
-								<InfoRow style={{ paddingLeft: '16px' }}> пусто</InfoRow>
-							)}
-						</Group>
+						<Subs
+							setPopout={props.setPopout}
+							setSnackbar={props.setSnackbar}
+							openUser={props.openUser}
+							amount={2}
+							maxAmount={2}
+							openSubs={() => props.openSubs(ad)}
+							ad={ad}
+							mini={true}
+						/>
 					) : (
 						''
 					)

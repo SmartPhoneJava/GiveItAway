@@ -15,6 +15,8 @@ import {
 
 import './main.css';
 
+import Subs from './story/adds/tabs/subs/subs'
+
 import AddsTabs from './story/adds/AddsTabs';
 import CreateAdd from './story/create/CreateAdd';
 
@@ -44,7 +46,7 @@ import CreateModal from './story/create/CreateModal';
 
 import { AddrWS } from './../store/addr_ws';
 
-import Comments from "./story/adds/tabs/comments/comments"
+import Comments from './story/adds/tabs/comments/comments';
 
 import { inputArgs } from './../utils/window';
 
@@ -195,6 +197,15 @@ const Main = () => {
 	function openComments(ad) {
 		setActiveStory(ads);
 		next(PANEL_ONE, PANEL_COMMENTS, ad, null);
+		let a = historyAds.slice();
+		a.push(ad);
+		setHistoryAds(a);
+		scroll();
+	}
+
+	function openSubs(ad) {
+		setActiveStory(ads);
+		next(PANEL_ONE, PANEL_SUBS, ad, null);
 		let a = historyAds.slice();
 		a.push(ad);
 		setHistoryAds(a);
@@ -494,8 +505,11 @@ const Main = () => {
 								console.log('PANEL_ONE', id);
 								openUser(id, PANEL_ONE);
 							}}
-							openComments={(ad)=>{
-								openComments(ad)
+							openComments={(ad) => {
+								openComments(ad);
+							}}
+							openSubs={(ad) => {
+								openSubs(ad);
 							}}
 							ad={choosen}
 							setPopout={setPopout}
@@ -554,6 +568,24 @@ const Main = () => {
 							openUser={(id) => {
 								openUser(id, PANEL_ADS);
 							}}
+						/>
+					) : (
+						Error
+					)}
+					{snackbar}
+				</Panel>
+				<Panel id={PANEL_SUBS}>
+					<PanelHeaderSimple left={<PanelHeaderBack onClick={back} />}>
+						{choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошбка'}
+					</PanelHeaderSimple>
+					{choosen ? (
+						<Subs
+							setPopout={setPopout}
+							setSnackbar={setSnackbar}
+							openUser={openUser}
+							amount={5}
+							maxAmount={-1}
+							ad={choosen}
 						/>
 					) : (
 						Error
