@@ -19,11 +19,12 @@ import {
 import 'react-photoswipe/lib/photoswipe.css';
 import { PhotoSwipe, PhotoSwipeGallery } from 'react-photoswipe';
 
-
 import Icon56WriteOutline from '@vkontakte/icons/dist/56/write_outline';
 
-
 import { GetCategoryText, GetCategoryImageSmall } from './Categories';
+
+import Icon24Hide from '@vkontakte/icons/dist/24/hide';
+import Icon24Globe from '@vkontakte/icons/dist/24/globe';
 
 import Icon24VideoFill from '@vkontakte/icons/dist/24/video_fill';
 
@@ -47,7 +48,16 @@ import Icon24Place from '@vkontakte/icons/dist/24/place';
 import Subs from './../story/adds/tabs/subs/subs';
 import { subscribe, unsubscribe } from './../story/adds/tabs/subs/requests';
 
-import { getSubscribers, getDetails, getDeal, acceptDeal, denyDeal } from './../../requests';
+import {
+	adVisible,
+	adHide,
+	deleteAd,
+	getSubscribers,
+	getDetails,
+	getDeal,
+	acceptDeal,
+	denyDeal,
+} from './../../requests';
 
 import './addsTab.css';
 
@@ -129,6 +139,7 @@ const AddMore2 = (props) => {
 	const [subs, setSubs] = useState(0);
 	const [hide, setHide] = useState(false);
 
+	const [hidden, setHidden] = useState(false);
 	const [isSub, setIsSub] = useState(false);
 	const [isDealer, setIsDealer] = useState(false);
 	const [status, setStatus] = useState('unknown');
@@ -175,6 +186,7 @@ const AddMore2 = (props) => {
 					initSubscribers(id);
 					console.log('detailed look', details);
 					console.log('i seeet', details.status);
+					setHidden(details.hidden);
 					setStatus(details.status);
 
 					let { deal, err } = await getDeal(props.setSnackbar, details.ad_id);
@@ -599,33 +611,26 @@ const AddMore2 = (props) => {
 								<div style={{ display: 'flex' }}>
 									<CellButton
 										onClick={() => {
-											setHide(true);
-											OpenActions(
-												props.setPopout,
-												props.setSnackbar,
-												props.refresh,
-												ad.ad_id,
-												() => {
-													props.onCloseClick();
-													setRequest('CLOSE');
-												},
-												status == 'chosen',
-												ad.hidden,
-												subs.length,
-												() => {
-													setHide(false);
-												}
-											);
+											hidden
+												? adVisible(props.setPopout, props.setSnackbar, ad.ad_id, () => {
+														setHidden(false);
+												  })
+												: adHide(props.setPopout, props.setSnackbar, ad.ad_id, () => {
+														setHidden(true);
+												  });
 										}}
 										disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
-										before={<Icon28SettingsOutline />}
+										before={hidden ? <Icon24Globe /> : <Icon24Hide />}
 									>
-										Управлять
+										{hidden ? 'Сделать видимым' : 'Сделать невидимым'}
 									</CellButton>
 									<CellButton
 										mode="danger"
 										disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
 										before={<Icon24Delete />}
+										onClick={() => {
+											deleteAd(props.setPopout, ad.ad_id, props.setSnackbar, props.refresh);
+										}}
 									>
 										Удалить
 									</CellButton>

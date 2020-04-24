@@ -32,7 +32,7 @@ import { shortText } from './../../utils/short_text';
 import { Draft } from './../../store/draft';
 
 import './addsTab.css';
-import './Add6.css';
+import './Add7.css';
 
 export function AdLight(ad, image, openAd) {
 	return (
