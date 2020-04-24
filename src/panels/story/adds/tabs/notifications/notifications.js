@@ -302,7 +302,9 @@ function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackba
 								<Notification
 									ad={v.payload.ad}
 									date={v.creation_date_time}
-									author={v.payload ? v.payload.author.name + ' ' + v.payload.author.surname[0] + '.' : ""}
+									author={
+										v.payload ? v.payload.author.name + ' ' + v.payload.author.surname[0] + '.' : ''
+									}
 									text="хочет забрать!"
 									header={v.payload.ad.header}
 									system={true}
@@ -336,9 +338,16 @@ function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackba
 								<Notification
 									date={v.creation_date_time}
 									// author={v.payload.author.name + ' ' + v.payload.author.surname[0] + '. написал'}
-									author={v.payload.author ? v.payload.author.name + ' ' + v.payload.author.surname[0] + '.' : ""}
-									text={v.payload.text}
-									header="Безымянное объявление"
+									author={
+										v.payload && v.payload.comment.author
+											? v.payload.comment.author.name +
+											  ' ' +
+											  v.payload.comment.author.surname[0] +
+											  '.'
+											: ''
+									}
+									text={v.payload ? v.payload.comment.text : ""}
+									header={v.payload ? v.payload.ad.header: ""}
 									system={false}
 									openUser={openUser}
 									openAd={openAd}
@@ -353,7 +362,11 @@ function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackba
 								<Notification
 									ad={v.payload.ad}
 									date={v.creation_date_time}
-									author={v.payload.author ? v.payload.author.name + ' ' + v.payload.author.surname[0] + '.' : ""}
+									author={
+										v.payload.author
+											? v.payload.author.name + ' ' + v.payload.author.surname[0] + '.'
+											: ''
+									}
 									//author={v.payload.author.name + ' ' + v.payload.author.surname[0] + '.'}
 									text="отписался от обновлений"
 									header={v.payload.ad.header}
