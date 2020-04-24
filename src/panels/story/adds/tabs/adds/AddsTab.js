@@ -274,7 +274,7 @@ const AddsTab = (props) => {
 				flexDirection: 'column',
 				overflow: 'hidden',
 				textOverflow: 'ellipsis',
-				whiteSpace: 'nowrap',
+				whiteSpace: ads.length > 0 ? 'nowrap' : 'normal',
 			}}
 		>
 			<Search
