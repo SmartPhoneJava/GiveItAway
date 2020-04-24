@@ -19,6 +19,10 @@ import {
 import 'react-photoswipe/lib/photoswipe.css';
 import { PhotoSwipe, PhotoSwipeGallery } from 'react-photoswipe';
 
+
+import Icon56WriteOutline from '@vkontakte/icons/dist/56/write_outline';
+
+
 import { GetCategoryText, GetCategoryImageSmall } from './Categories';
 
 import Icon24VideoFill from '@vkontakte/icons/dist/24/video_fill';
@@ -788,10 +792,7 @@ const AddMore2 = (props) => {
 						/>
 					</>
 				) : (
-					<Cell>
-						{' '}
-						<div style={{ color: 'var(--text_primary)' }}>Комментарии закрыты </div>
-					</Cell>
+					<Placeholder icon={<Icon56WriteOutline />} header="Комментарии закрыты"></Placeholder>
 				)}
 			</div>
 		);

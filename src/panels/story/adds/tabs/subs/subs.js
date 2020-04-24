@@ -17,6 +17,8 @@ import {
 	Link,
 } from '@vkontakte/vkui';
 
+import Icon56Users3Outline from '@vkontakte/icons/dist/56/users_outline';
+
 import Icon24Shuffle from '@vkontakte/icons/dist/24/shuffle';
 import Icon24Help from '@vkontakte/icons/dist/24/help';
 import Icon24Message from '@vkontakte/icons/dist/24/message';
@@ -212,7 +214,11 @@ const Subs = (props) => {
 	);
 
 	if (subs.length == 0) {
-		return 'Никто еще не откликнулся';
+		return (
+			<Placeholder icon={<Icon56Users3Outline />} header="Откливнушихся нет">
+				Никто еще не захотел забрать
+			</Placeholder>
+		);
 	}
 
 	return props.mini ? (

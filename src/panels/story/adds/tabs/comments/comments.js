@@ -7,6 +7,8 @@ import {
 	ActionSheet,
 	ActionSheetItem,
 	PanelHeaderButton,
+	Placeholder,
+	Button,
 	osname,
 	IOS,
 	Avatar,
@@ -24,6 +26,8 @@ import Jins from './../../../../../img/jins.jpg';
 import Tea from './../../../../../img/tea.jpg';
 import Playstein from './../../../../../img/playstein.jpg';
 import Bb from './../../../../../img/bb.jpg';
+
+import Icon56WriteOutline from '@vkontakte/icons/dist/56/write_outline';
 
 import Icon24Send from '@vkontakte/icons/dist/24/send';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
@@ -369,6 +373,19 @@ const Comments = (props) => {
 
 	return (
 		<div>
+			{nots.length == 0 ? (
+				<Placeholder
+					action={
+						props.mini ? (
+							<Button size="l" onClick={props.openCommentaries}>
+								Написать
+							</Button>
+						) : null
+					}
+					icon={<Icon56WriteOutline />}
+					header="Комментариев нет"
+				></Placeholder>
+			) : null}
 			{showComments(
 				props.setPopout,
 				props.setSnackbar,
