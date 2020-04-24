@@ -238,8 +238,10 @@ const CreateItem = (props) => {
 						</File>
 						<InfoRow
 							style={{
-								color: 'grey',
+								color: 'var(--text_secondary)',
 								marginTop: '6px',
+								paddingLeft: '6px',
+								paddingRight: '6px',
 							}}
 						>
 							{photoText}

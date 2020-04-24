@@ -11,7 +11,7 @@ import {
 	Cell,
 	Link,
 	Separator,
-	Counter,
+	ScreenSpinner,
 	CellButton,
 	Placeholder,
 } from '@vkontakte/vkui';
@@ -166,7 +166,7 @@ const AddMore2 = (props) => {
 	const [request, setRequest] = useState('no');
 
 	function isNotValid(a) {
-		return a == null || a.ad_id == AD_LOADING.ad_id || a == saveInstance || a.ad_id == AdDefault.ad_id;
+		return a == null || a.ad_id == AD_LOADING.ad_id || a.ad_id == AdDefault.ad_id;
 	}
 
 	async function initSubscribers(id) {
@@ -191,9 +191,9 @@ const AddMore2 = (props) => {
 
 	useEffect(() => {
 		if (isNotValid(props.ad)) {
+			setImage('');
 			return;
 		}
-		console.log("loooook", props.ad, props.ad.ad_id, props.ad.ad_id == AD_LOADING.ad_id )
 		async function init() {
 			const id = props.ad.ad_id;
 			getDetails(
@@ -502,7 +502,11 @@ const AddMore2 = (props) => {
 		);
 	}
 	if (isNotValid(ad) || isNotValid(props.ad)) {
-		return <Placeholder>Загрузка</Placeholder>;
+		return (
+			<Placeholder stretched header="Загрузка объявления">
+				<ScreenSpinner size="large" />
+			</Placeholder>
+		);
 	}
 
 	const photoSwipeImgs = ad.pathes_to_photo.map((v) => {

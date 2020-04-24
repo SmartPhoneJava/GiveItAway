@@ -9,22 +9,6 @@ import { User } from './AddsTab/../../../../../../store/user';
 
 import { CategoryNo } from './../../../../template/Categories';
 
-export async function useAdSearchA(
-	setPopout,
-	query,
-	category,
-	mode,
-	pageNumber,
-	rowsPerPage,
-	deleteID,
-	city,
-	country,
-	sort,
-	setter
-) {
-	useAdSearch(setPopout, query, category, mode, pageNumber, rowsPerPage, deleteID, city, country, sort, setter);
-}
-
 export default function useAdSearch(
 	setPopout,
 	query,
@@ -36,7 +20,7 @@ export default function useAdSearch(
 	city,
 	country,
 	sort,
-	setter
+	geodata
 ) {
 	const [inited, setInited] = useState(false);
 	const [loading, setLoading] = useState(true);
@@ -47,7 +31,7 @@ export default function useAdSearch(
 	useEffect(() => {
 		setAds([]);
 		pageNumber = 1;
-	}, [category, mode, query, city, country, sort]);
+	}, [category, mode, query, city, country, sort, geodata]);
 
 	useEffect(() => {
 		console.log('deleteID', deleteID);
@@ -80,11 +64,16 @@ export default function useAdSearch(
 			};
 		}
 
+		if (geodata) {
+			params.lat=geodata.lat
+			params.long=geodata.long
+		}
+
 		if (city && city.id != -1) {
 			params.district = city.title;
 		}
 
-		console.log('before check', country);
+		console.log('before check', geodata);
 		if (country && country.id != -1) {
 			params.region = country.title;
 		}
@@ -124,10 +113,8 @@ export default function useAdSearch(
 				setInited(true);
 			});
 		return () => cancel();
-	}, [category, mode, query, pageNumber, city, country, sort]);
+	}, [category, mode, query, pageNumber, city, country, sort, geodata]);
 
-	if (setter) {
-		setter(inited, pageNumber, ads, loading, error, hasMore);
-	}
+
 	return { inited, newPage: pageNumber, ads, loading, error, hasMore };
 }

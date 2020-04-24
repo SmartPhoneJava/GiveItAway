@@ -42,8 +42,8 @@ const AddsModal = (props) => {
 	function applyGeo(e) {
 		props.setSort(e.currentTarget.value);
 		bridge.send('VKWebAppGetGeodata').then((value) => {
-			setGeodata(value);
-			console.log('value', value);
+			props.setGeodata(value);
+			console.log('VKWebAppGetGeodata', value);
 		});
 	}
 
@@ -92,11 +92,20 @@ const AddsModal = (props) => {
 								defaultChecked
 								onClick={(e) => {
 									props.setSort(e.currentTarget.value);
+									props.setActiveModal(null);
 								}}
 							>
 								По времени
 							</Radio>
-							<Radio key="2" value="geo" name="sort" onClick={applyGeo}>
+							<Radio
+								key="2"
+								value="geo"
+								name="sort"
+								onClick={(e) => {
+									applyGeo(e);
+									props.setActiveModal(null);
+								}}
+							>
 								По близости
 							</Radio>
 						</div>
@@ -108,11 +117,21 @@ const AddsModal = (props) => {
 								name="sort"
 								onClick={(e) => {
 									props.setSort(e.currentTarget.value);
+									props.setActiveModal(null);
 								}}
 							>
 								По времени
 							</Radio>
-							<Radio key="4" value="geo" name="sort" defaultChecked onClick={applyGeo}>
+							<Radio
+								key="4"
+								value="geo"
+								name="sort"
+								defaultChecked
+								onClick={(e) => {
+									applyGeo(e);
+									props.setActiveModal(null);
+								}}
+							>
 								По близости
 							</Radio>
 						</div>

@@ -350,6 +350,7 @@ function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackba
 									header={v.payload ? v.payload.ad.header: ""}
 									system={false}
 									openUser={openUser}
+									ad={v.payload.ad}
 									openAd={openAd}
 									key={v.id}
 									notification={v}

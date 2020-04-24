@@ -165,7 +165,7 @@ const AddsTabs = (props) => {
 						props.openUser(u);
 						setActiveTab(tabAdds);
 					}}
-					// region={props.region}
+					geodata={props.geodata}
 					country={props.country}
 					sort={props.sort}
 					refresh={props.refresh}

@@ -461,6 +461,7 @@ const Main = () => {
 			>
 				<Panel id={PANEL_ADS} separator={false}>
 					<AddsTabs
+						geodata={geodata}
 						adsMode={adsMode}
 						setSavedAdState={setSavedAdState}
 						savedAdState={savedAdState}

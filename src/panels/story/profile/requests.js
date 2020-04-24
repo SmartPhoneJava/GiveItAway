@@ -45,27 +45,36 @@ export async function getUser(setPopout, setSnackbar, user_id, successCallback, 
 }
 
 export async function getUserVK(id, appID, apiVersion, successCallback, failCallback) {
-	const el = await bridge.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' });
-
-	const userdata = await bridge
-		.send('VKWebAppCallAPIMethod', {
-			method: 'users.get',
-			request_id: 'getUserVK' + request_id,
-			params: {
-				v: apiVersion,
-				user_ids: id,
-				fields: 'online,city,bdate,contacts,last_seen,can_write_private_message',
-				access_token: el.access_token,
-			},
+	console.log('appID', appID, id);
+	bridge
+		.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' })
+		.then((t) => {
+			const access_token = t
+			bridge
+				.send('VKWebAppCallAPIMethod', {
+					method: 'users.get',
+					request_id: 'getUserVK' + request_id,
+					params: {
+						v: apiVersion,
+						user_ids: id,
+						fields: 'online,city,bdate,contacts,last_seen,can_write_private_message',
+						access_token: access_token,
+					},
+				})
+				.then(function (response) {
+					successCallback(response.response[0]);
+					return response.response[0];
+				})
+				.catch(function (error) {
+					failCallback(error);
+					console.log('cant do VKWebAppCallAPIMethod cause ', error);
+				});
+			return access_token;
 		})
-		.then(function (response) {
-			successCallback(response.response[0]);
-			return response.response[0];
-		})
-		.catch(function (error) {
+		.catch((error) => {
 			failCallback(error);
+			console.log('cant do VKWebAppGetAuthToken cause ', error);
 		});
-	request_id++;
 
 	return userdata;
 }

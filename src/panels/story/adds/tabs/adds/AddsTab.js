@@ -238,7 +238,8 @@ const AddsTab = (props) => {
 		props.deleteID,
 		props.city,
 		props.country,
-		props.sort
+		props.sort,
+		props.geodata
 	);
 
 	const observer = useRef();
