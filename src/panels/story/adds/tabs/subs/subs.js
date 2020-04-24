@@ -12,42 +12,144 @@ import {
 	IOS,
 	Avatar,
 	CellButton,
+	ActionSheet,
+	ActionSheetItem,
+	Link,
 } from '@vkontakte/vkui';
 
+import Icon24Shuffle from '@vkontakte/icons/dist/24/shuffle';
+import Icon24Help from '@vkontakte/icons/dist/24/help';
+import Icon24Message from '@vkontakte/icons/dist/24/message';
+import Icon24Gift from '@vkontakte/icons/dist/24/gift';
+import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';
+
 import useSubsGet from './useSubsGet';
+
+import { getDeal, Close, CancelClose } from './../../../../../requests';
 
 import Icon44SmileOutline from '@vkontakte/icons/dist/44/smile_outline';
 
 import './subs.css';
 
-function showSubs(setPopout, setSnackbar, lastAdElementRef, subs) {
+function userClick(setPopout, openUser, v, dealer, close, cancel) {
+	if (v) {
+		setPopout(
+			<ActionSheet onClose={() => setPopout(null)}>
+				{!dealer || v.vk_id != dealer.vk_id ? (
+					<ActionSheetItem autoclose onClick={() => close(v)}>
+						Отдать
+					</ActionSheetItem>
+				) : (
+					<ActionSheetItem autoclose onClick={() => cancel(v)}>
+						Отменить
+					</ActionSheetItem>
+				)}
+				<ActionSheetItem
+					autoclose
+					onClick={() => {
+						if (dealer) {
+							openUser(dealer.vk_id);
+						}
+					}}
+				>
+					Перейти в профиль
+				</ActionSheetItem>
+				<ActionSheetItem
+					autoclose
+					onClick={() => {
+						window.open('https://vk.com/im?sel=' + dealer.vk_id);
+					}}
+				>
+					Написать
+				</ActionSheetItem>
+				{osname === IOS && (
+					<ActionSheetItem autoclose mode="cancel">
+						Отменить
+					</ActionSheetItem>
+				)}
+			</ActionSheet>
+		);
+	}
+}
+
+function showSubs(dealer, setPopout, lastAdElementRef, subs, openUser, close, cancel) {
 	return (
-		<Group header={<Header mode="secondary">Откликнулись</Header>}>
-			{subs.length > 0 ? (
-				subs.map((v, i) =>
-					subs.length == i + 1 ? (
-						<Cell
-							ref={lastAdElementRef}
-							onClick={() => props.openUser(v.vk_id)}
-							key={v.vk_id}
-							before={<Avatar size={36} src={v.photo_url} />}
-						>
-							{v.name + ' ' + v.surname}
-						</Cell>
-					) : (
-						<Cell
-							onClick={() => props.openUser(v.vk_id)}
-							key={v.vk_id}
-							before={<Avatar size={36} src={v.photo_url} />}
-						>
-							{v.name + ' ' + v.surname}
-						</Cell>
-					)
-				)
-			) : (
-				<InfoRow style={{ paddingLeft: '16px' }}> пусто</InfoRow>
-			)}
-		</Group>
+		<>
+			<Group header={<Header mode="secondary">Получатель</Header>}>
+				<Cell
+					multiline={true}
+					description={dealer ? <>Ожидание подтверждения получения вещи от пользователя.</> : ''}
+					onClick={() => {
+						cancel(dealer);
+					}}
+					key={dealer ? dealer.vk_id : ''}
+					before={<Avatar size={36} src={dealer ? dealer.photo_url : ''} />}
+					asideContent={dealer ? <Icon24Dismiss /> : ''}
+				>
+					<div>{dealer ? dealer.name + ' ' + dealer.surname : 'Никто не выбран'}</div>
+				</Cell>
+			</Group>
+
+			<Group header={<Header mode="secondary">Откликнулись</Header>}>
+				<CellButton before={<Icon24Shuffle />}>Случайный выбор</CellButton>
+				{subs.length > 0 ? (
+					subs.map((v, i) => (
+						<div key={v.vk_id} ref={subs.length == i + 1 ? lastAdElementRef : null}>
+							<Cell
+								onClick={() => {
+									userClick(setPopout, openUser, v, dealer, close, cancel);
+								}}
+								before={<Avatar size={36} src={v.photo_url} />}
+								asideContent={
+									!dealer || v.vk_id != dealer.vk_id ? (
+										<Icon24Gift />
+									) : (
+										<Icon24Gift style={{ color: 'var(--header_tint)' }} />
+									)
+								}
+							>
+								<div>{v.name + ' ' + v.surname}</div>
+							</Cell>
+						</div>
+					))
+				) : (
+					<InfoRow style={{ paddingLeft: '16px' }}> пусто</InfoRow>
+				)}
+			</Group>
+		</>
+	);
+}
+
+function close_ad(setPopout, setSnackbar, ad_id, subscriber, setDealer) {
+	Close(
+		setPopout,
+		setSnackbar,
+		ad_id,
+		subscriber.vk_id,
+		(data) => {
+			console.log('what i have done?', data);
+			setDealer(subscriber);
+		},
+		(e) => {
+			console.log('Close error', e);
+		}
+	);
+}
+
+function cancel_ad(setPopout, setSnackbar, ad_id, subscriber, setDealer, need_close) {
+	CancelClose(
+		setPopout,
+		setSnackbar,
+		ad_id,
+		(data) => {
+			if (need_close) {
+				close_ad(setPopout, setSnackbar, ad_id, subscriber, setDealer);
+			} else {
+				setDealer(null);
+			}
+		},
+		(e) => {},
+		true
 	);
 }
 
@@ -55,6 +157,7 @@ const NO_ID = -1;
 
 const Subs = (props) => {
 	const [subs, setSubs] = useState([]);
+	const [dealer, setDealer] = useState(null);
 	const [photos, setPhotos] = useState([]);
 	const [openFAQ, setOpenFAQ] = useState(false);
 
@@ -68,9 +171,22 @@ const Subs = (props) => {
 		(s) => {
 			console.log('i set', s);
 			setSubs(s);
-			setPhotos([...s, ...s, ...s].map((v) => v.photo_url));
+			setPhotos([...s].map((v) => v.photo_url));
+			getDeal(
+				props.setSnackbar,
+				props.ad.ad_id,
+				(data) => {
+					console.log('deal success', data);
+					const d = s.filter((v) => v.vk_id == data.subscriber_id)[0];
+					console.log('dealer success', dealer, data.subscriber_id);
+					setDealer(d);
+				},
+				(err) => {
+					console.log('deal fail', err);
+				}
+			);
 		},
-		() => {}
+		(e) => {}
 	);
 	console.log('subs', tsubs);
 
@@ -94,17 +210,14 @@ const Subs = (props) => {
 	}
 
 	return props.mini ? (
-		<Group header={<Header mode="secondary">Откликнулись</Header>}>
-			<UsersStack photos={photos} size="m">
-				<div style={{ display: 'flex' }}>
-					<CellButton onClick={props.openSubs}>открыть полный список</CellButton>
-				</div>
-				{/* {subs.length == 1
-					? subs[0].name + ' отликнулся'
+		<Group header={<Header aside={<Link onClick={props.openSubs}>Показать всех</Link>}>Откликнулись</Header>}>
+			<UsersStack onClick={props.openSubs} photos={photos} size="m">
+				{subs.length == 1
+					? subs[0].name
 					: subs.length == 2
-					? subs[0].name + ' и ' + subs[1].name + ' откликнулись'
+					? subs[0].name + ' и ' + subs[1].name
 					: subs.length == 3
-					? subs[0].name + ', ' + subs[1].name + ', ' + subs[2].name + ' откликнулись'
+					? subs[0].name + ', ' + subs[1].name + ', ' + subs[2].name
 					: subs[0].name +
 					  ', ' +
 					  subs[1].name +
@@ -112,7 +225,7 @@ const Subs = (props) => {
 					  subs[2].name +
 					  'и еще ' +
 					  subs.length +
-					  ' человек откликнулись'} */}
+					  ' человек откликнулись'}
 			</UsersStack>
 		</Group>
 	) : (
@@ -123,10 +236,34 @@ const Subs = (props) => {
 						onClick={() => {
 							setOpenFAQ(true);
 						}}
+						before={<Icon24Help />}
 					>
 						Как отдать вещь?
 					</CellButton>
-					{showSubs(props.setPopout, props.setSnackbar, lastAdElementRef, subs)}
+					{showSubs(
+						dealer,
+						props.setPopout,
+						lastAdElementRef,
+						subs,
+						props.openUser,
+						(subscriber) => {
+							if (dealer) {
+								cancel_ad(
+									props.setPopout,
+									props.setSnackbar,
+									props.ad.ad_id,
+									subscriber,
+									setDealer,
+									true
+								);
+								return;
+							}
+							close_ad(props.setPopout, props.setSnackbar, props.ad.ad_id, subscriber, setDealer);
+						},
+						(subscriber) => {
+							cancel_ad(props.setPopout, props.setSnackbar, props.ad.ad_id, subscriber, setDealer, false);
+						}
+					)}
 				</>
 			) : (
 				<>
@@ -144,10 +281,10 @@ const Subs = (props) => {
 						icon={<Icon44SmileOutline />}
 						header="Как отдать вещь?"
 					>
-						Кликните по одному из пользователей в списке откливнушихся, чтобы выбрать его в качестве получателя. Он получит
-						соответствующее уведомление и запрос на подтверждение получения вещи. После получения
-						подтверждения, обьявления автоматически закроется. Вы в любой момент можете отозвать предложение
-						или изменить получателя.
+						Кликните по одному из пользователей в списке откливнушихся, чтобы выбрать его в качестве
+						получателя. Он получит соответствующее уведомление и запрос на подтверждение получения вещи.
+						После получения подтверждения, обьявления автоматически закроется. Вы в любой момент можете
+						отозвать предложение или изменить получателя.
 					</Placeholder>
 				</>
 			)}

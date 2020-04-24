@@ -10,6 +10,7 @@ import {
 	osname,
 	IOS,
 	Avatar,
+	Link,
 } from '@vkontakte/vkui';
 
 import PANEL_ONE from './../../../../Main';
@@ -165,75 +166,93 @@ function showComments(
 	setSearch,
 	setEditableID,
 	setHide,
-	openUser
+	openUser,
+	mini,
+	openCommentaries
 ) {
+	if (nots.length == 0) {
+		return;
+	}
 	return (
-		<Group header={<Header mode="secondary">{'комментариев ' + nots.length}</Header>}>
-			{nots.map((v, index) => {
-				let inner = (
-					<Comment
-						onClick={() => {
-							console.log('compare', v.author.vk_id, myID);
-							if (v.author.vk_id != myID) {
-								openUser(v.author.vk_id);
-								return;
-							}
+		<Group
+			header={
+				mini ? (
+					<Header aside={mini ? <Link onClick={openCommentaries}>Показать все</Link> : ''}>
+						{'Комментарии'}
+					</Header>
+				) : (
+					''
+				)
+			}
+		>
+			{mini ? (
+				<Comment onClick={openCommentaries} v={nots[0]} />
+			) : (
+				nots.map((v, index) => {
+					let inner = (
+						<Comment
+							onClick={() => {
+								if (v.author.vk_id != myID) {
+									openUser(v.author.vk_id);
+									return;
+								}
 
-							setPopout(
-								<ActionSheet onClose={() => setPopout(null)}>
-									<ActionSheetItem
-										autoclose
-										onClick={() => {
-											setText(v.text);
-											setEditableID(v.comment_id);
-											setSearch('' + v.comment_id + v.text);
-										}}
-									>
-										Редактировать
-									</ActionSheetItem>
-									<ActionSheetItem
-										autoclose
-										mode="destructive"
-										onClick={() => {
-											setHide(true);
-											deleteComment(
-												setPopout,
-												setSnackbar,
-												v,
-												(vv) => {
-													setSearch('' + v.comment_id + 'deleted');
-												},
-												(e) => {},
-												() => {
-													setHide(false);
-												}
-											);
-										}}
-									>
-										Удалить
-									</ActionSheetItem>
-									{osname === IOS && (
-										<ActionSheetItem autoclose mode="cancel">
-											Отменить
+								setPopout(
+									<ActionSheet onClose={() => setPopout(null)}>
+										<ActionSheetItem
+											autoclose
+											onClick={() => {
+												setText(v.text);
+												setEditableID(v.comment_id);
+												setSearch('' + v.comment_id + v.text);
+											}}
+										>
+											Редактировать
 										</ActionSheetItem>
-									)}
-								</ActionSheet>
-							);
-						}}
-						v={v}
-					/>
-				);
-
-				if (nots.length === index + 1) {
-					return (
-						<div key={v.comment_id} ref={lastAdElementRef}>
-							{inner}
-						</div>
+										<ActionSheetItem
+											autoclose
+											mode="destructive"
+											onClick={() => {
+												setHide(true);
+												deleteComment(
+													setPopout,
+													setSnackbar,
+													v,
+													(vv) => {
+														setSearch('' + v.comment_id + 'deleted');
+													},
+													(e) => {},
+													() => {
+														setHide(false);
+													}
+												);
+											}}
+										>
+											Удалить
+										</ActionSheetItem>
+										{osname === IOS && (
+											<ActionSheetItem autoclose mode="cancel">
+												Отменить
+											</ActionSheetItem>
+										)}
+									</ActionSheet>
+								);
+							}}
+							v={v}
+						/>
 					);
-				} else {
-					return <div key={v.comment_id}>{inner}</div>;
-				}
-			})}
+
+					if (nots.length === index + 1) {
+						return (
+							<div key={v.comment_id} ref={lastAdElementRef}>
+								{inner}
+							</div>
+						);
+					} else {
+						return <div key={v.comment_id}>{inner}</div>;
+					}
+				})
+			)}
 		</Group>
 	);
 }
@@ -278,9 +297,9 @@ const Comments = (props) => {
 		[loading, hasMore]
 	);
 
-	useEffect(()=>{
-		setHide(props.hide)
-	}, [props.hide])
+	useEffect(() => {
+		setHide(props.hide);
+	}, [props.hide]);
 
 	function sendComment() {
 		setHide(true);
@@ -360,7 +379,9 @@ const Comments = (props) => {
 				setSearch,
 				setEditableID,
 				setHide,
-				props.openUser
+				props.openUser,
+				props.mini,
+				props.openCommentaries
 			)}
 
 			{hide ? (

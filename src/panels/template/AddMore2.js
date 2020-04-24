@@ -324,7 +324,7 @@ const AddMore2 = (props) => {
 			);
 		} else {
 			return statusWrapper(
-				<div style={{ width: '100%', color: 'rgb(220,220,220)', fontSize: '14px', padding: '2px' }}>
+				<div style={{ width: '100%', color: 'rgb(220,220,220)', fontSize: '13px', padding: '2px' }}>
 					<div style={{ display: 'flex' }}>
 						Ожидание подтверждения от
 						<div style={{ display: 'flex' }} onClick={() => props.openUser(getDealer().vk_id)}>
@@ -729,25 +729,7 @@ const AddMore2 = (props) => {
 						</tr>
 					</tbody>
 				</table>
-				{isAuthor() ? (
-					status != 'closed' && status != 'aborted' ? (
-						<Subs
-							setPopout={props.setPopout}
-							setSnackbar={props.setSnackbar}
-							openUser={props.openUser}
-							amount={2}
-							maxAmount={2}
-							openSubs={() => props.openSubs(ad)}
-							ad={ad}
-							mini={true}
-						/>
-					) : (
-						''
-					)
-				) : (
-					''
-				)}
-				<Group header={<Header mode="secondary">Автор</Header>}>
+				<Group header={<Header>Автор</Header>}>
 					<Cell
 						onClick={() => props.openUser(ad.author.vk_id)}
 						before={<Avatar size={36} src={ad.author.photo_url} />}
@@ -769,10 +751,32 @@ const AddMore2 = (props) => {
 						</div>
 					</Cell>
 				</Group>
+				{isAuthor() ? (
+					status != 'closed' && status != 'aborted' ? (
+						<Subs
+							setPopout={props.setPopout}
+							setSnackbar={props.setSnackbar}
+							openUser={props.openUser}
+							amount={2}
+							maxAmount={2}
+							openSubs={() => props.openSubs(ad)}
+							ad={ad}
+							mini={true}
+						/>
+					) : (
+						''
+					)
+				) : (
+					''
+				)}
 
 				{ad.feedback_type == 'comments' ? (
 					<>
 						<Comments
+							mini={true}
+							openCommentaries={() => {
+								props.openComments(ad);
+							}}
 							hide={true}
 							ad={ad}
 							amount={1}
@@ -782,13 +786,6 @@ const AddMore2 = (props) => {
 							myID={props.VkUser.getState().id}
 							openUser={props.openUser}
 						/>
-						<CellButton
-							onClick={() => {
-								props.openComments(ad);
-							}}
-						>
-							Посмотреть все
-						</CellButton>
 					</>
 				) : (
 					<Cell>

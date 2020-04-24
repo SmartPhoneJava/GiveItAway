@@ -303,22 +303,20 @@ const Main = () => {
 		});
 	}
 
-	// useEffect(() => {
-	// 	console.log('choosen', choosen.ad_id);
-	// 	if (choosen.ad_id == -1) {
-	// 		return;
-	// 	}
-	// 	centrifuge.disconnect();
-	// 	turnOnNotifications();
+	useEffect(() => {
+		console.log('choosen', choosen.ad_id);
+		if (choosen.ad_id == -1) {
+			return;
+		}
+		turnOnNotifications();
 
-	// 	oldChoosen = choosen;
-	// 	console.log('connecting', oldChoosen.ad_id);
-	// 	centrifuge.subscribe('ad_' + oldChoosen.ad_id, (note) => {
-	// 		console.log('centrifugu notenote', note);
-	// 		setwsNote(note)
-	// 	});
-	// 	centrifuge.connect();
-	// }, [choosen]);
+		const ad = choosen;
+		console.log('connecting', ad.ad_id);
+		centrifuge.subscribe('ad_' + ad.ad_id, (note) => {
+			console.log('centrifugu notenote', note);
+			setwsNote(note)
+		});
+	}, [choosen]);
 
 	useEffect(() => {
 		setPopout(<ScreenSpinner size="large" />);

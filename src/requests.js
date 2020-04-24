@@ -98,7 +98,7 @@ export async function adVisible(setPopout, setSnackbar, ad_id, callback) {
 	return err;
 }
 
-export async function getDeal(setSnackbar, ad_id, successCallback) {
+export async function getDeal(setSnackbar, ad_id, successCallback, failCallback) {
 	let err = false;
 	let cancel;
 	const deal = await axios({
@@ -120,6 +120,9 @@ export async function getDeal(setSnackbar, ad_id, successCallback) {
 		})
 		.catch(function (error) {
 			err = true;
+			if (failCallback) {
+				failCallback(error);
+			}
 		});
 	return { deal, err };
 }
@@ -201,7 +204,7 @@ export async function acceptDeal(setPopout, setSnackbar, deal_id, successCallbac
 	return err;
 }
 
-export async function CancelClose(setPopout, setSnackbar, ad_id) {
+export async function CancelClose(setPopout, setSnackbar, ad_id, successCallback, failCallback, blockSnackbar) {
 	getDeal(setSnackbar, ad_id, async (deal) => {
 		console.log('success', JSON.stringify(deal));
 		await denyDeal(
@@ -210,17 +213,25 @@ export async function CancelClose(setPopout, setSnackbar, ad_id) {
 			deal.deal_id,
 			(v) => {
 				console.log('success double');
-				sucessNoCancel('Запрос успешно отменен!', setSnackbar);
+				if (!blockSnackbar) {
+					sucessNoCancel('Запрос успешно отменен!', setSnackbar);
+				}
+				if (successCallback) {
+					successCallback(v)
+				}
 			},
 			(e) => {
-				console.log('faiil double');
+				console.log('fail double');
+				if (failCallback) {
+					failCallback(e)
+				}
 			}
 		);
 		console.log('after success');
 	});
 }
 
-export function Close(setPopout, setSnackbar, ad_id, subscriber_id) {
+export function Close(setPopout, setSnackbar, ad_id, subscriber_id, successCallback, failCallback) {
 	setPopout(<ScreenSpinner size="large" />);
 	let err = false;
 	let cancel;
@@ -244,8 +255,17 @@ export function Close(setPopout, setSnackbar, ad_id, subscriber_id) {
 			);
 			return response.data;
 		})
+		.then(function (data) {
+			if (successCallback) {
+				successCallback(data);
+			}
+			return data;
+		})
 		.catch(function (error) {
 			err = true;
+			if (error) {
+				failCallback(error);
+			}
 			fail('Нет соединения с сервером', () => {}, setSnackbar);
 			setPopout(null);
 		});
