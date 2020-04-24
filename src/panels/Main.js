@@ -15,7 +15,7 @@ import {
 
 import './main.css';
 
-import Subs from './story/adds/tabs/subs/subs'
+import Subs from './story/adds/tabs/subs/subs';
 
 import AddsTabs from './story/adds/AddsTabs';
 import CreateAdd from './story/create/CreateAdd';
@@ -130,6 +130,13 @@ const Main = () => {
 
 	const [createState, setCreateState] = useState({ inited: false });
 
+	function dropFilters() {
+		setCategory(CategoryNo);
+		setCity(NoRegion);
+		setCountry(NoRegion);
+		setSort('time');
+	}
+	
 	const onStoryChange = (e) => {
 		const isProfile = e.currentTarget.dataset.text == profileText;
 
@@ -139,6 +146,7 @@ const Main = () => {
 				setActivePanel(PANEL_USER);
 				setPrevActiveStory(no_prev);
 			} else {
+				dropFilters()
 				setActivePanel(PANEL_ADS);
 				setSavedAdState('');
 			}
@@ -314,7 +322,7 @@ const Main = () => {
 		console.log('connecting', ad.ad_id);
 		centrifuge.subscribe('ad_' + ad.ad_id, (note) => {
 			console.log('centrifugu notenote', note);
-			setwsNote(note)
+			setwsNote(note);
 		});
 	}, [choosen]);
 
@@ -470,12 +478,7 @@ const Main = () => {
 							openUser(id, PANEL_ADS);
 						}}
 						sort={sort}
-						dropFilters={() => {
-							setCategory(CategoryNo);
-							setCity(NoRegion);
-							setCountry(NoRegion);
-							setSort('time');
-						}}
+						dropFilters={dropFilters}
 						chooseAdd={(ad) => {
 							setChoosen(ad);
 						}}

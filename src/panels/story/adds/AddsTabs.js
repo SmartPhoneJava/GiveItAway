@@ -52,6 +52,7 @@ const AddsTabs = (props) => {
 	function select(e) {
 		setmode(e.currentTarget.dataset.mode);
 		setContextOpened(false);
+		props.dropFilters()
 	}
 
 	return (

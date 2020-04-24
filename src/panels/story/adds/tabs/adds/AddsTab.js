@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Group, ScreenSpinner, Button, Placeholder } from '@vkontakte/vkui';
+import { Search, Group, PanelHeaderButton, Avatar, Placeholder } from '@vkontakte/vkui';
 
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 
@@ -16,8 +16,13 @@ import useAdSearch from './useAdSearch';
 
 import './addsTab.css';
 
+import { NoRegion } from './../../../../template/Location';
+import { CategoryNo } from './../../../../template/Categories';
+
 import Error from './../../../../placeholders/error';
 import AdNotFound from './../../../../placeholders/adNotFound';
+
+import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';
 
 import Man from './../../../../../img/man.jpeg';
 import Cat from './../../../../../img/cat.jpg';
@@ -214,6 +219,15 @@ const AddsTab = (props) => {
 
 	const [pageNumber, setPageNumber] = useState(1);
 
+	const [filtersOn, setFiltersOn] = useState(false);
+	useEffect(() => {
+		if (props.country == NoRegion && props.city == NoRegion && props.category == CategoryNo) {
+			setFiltersOn(false);
+			return;
+		}
+		setFiltersOn(true);
+	}, [props.country, props.city, props.category]);
+
 	let { inited, loading, ads, error, hasMore, newPage } = useAdSearch(
 		props.setPopout,
 		searchR,
@@ -277,14 +291,27 @@ const AddsTab = (props) => {
 				whiteSpace: ads.length > 0 ? 'nowrap' : 'normal',
 			}}
 		>
-			<Search
-				disabled
-				placeholder="Поиск временно недоступен"
-				value={search}
-				onChange={handleSearch}
-				icon={<Icon24Filter />}
-				onIconClick={props.onFiltersClick}
-			/>
+			<div style={{ display: 'flex', background: 'var(--background_content)' }}>
+				<Search
+					disabled
+					placeholder="Поиск недоступен"
+					value={search}
+					onChange={handleSearch}
+					icon={<Icon24Filter />}
+					onIconClick={props.onFiltersClick}
+				/>
+				{filtersOn ? (
+					<PanelHeaderButton mode="secondary" size="m" onClick={()=>{
+						props.dropFilters()
+					}}>
+						<div style={{ paddingRight: '10px' }}>
+							<Avatar size={24}>
+								<Icon24Dismiss />
+							</Avatar>
+						</div>
+					</PanelHeaderButton>
+				) : null}
+			</div>
 			<Group>
 				{ads.length > 0 ? (
 					ads.map((ad, index) => {
