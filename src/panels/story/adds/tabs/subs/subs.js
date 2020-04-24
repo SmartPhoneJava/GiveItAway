@@ -72,6 +72,10 @@ function userClick(setPopout, openUser, v, dealer, close, cancel) {
 	}
 }
 
+function getRandomInt(max) {
+	return Math.floor(Math.random() * Math.floor(max));
+}
+
 function showSubs(dealer, setPopout, lastAdElementRef, subs, openUser, close, cancel) {
 	return (
 		<>
@@ -91,7 +95,9 @@ function showSubs(dealer, setPopout, lastAdElementRef, subs, openUser, close, ca
 			</Group>
 
 			<Group header={<Header mode="secondary">Откликнулись</Header>}>
-				<CellButton before={<Icon24Shuffle />}>Случайный выбор</CellButton>
+				<CellButton onClick={() => close(subs[getRandomInt(subs.length)])} before={<Icon24Shuffle />}>
+					Случайный выбор
+				</CellButton>
 				{subs.length > 0 ? (
 					subs.map((v, i) => (
 						<div key={v.vk_id} ref={subs.length == i + 1 ? lastAdElementRef : null}>
