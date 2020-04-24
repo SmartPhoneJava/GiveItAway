@@ -5,8 +5,8 @@
   "homepage": "./",
   "main": "bundle.js",
   "scripts": {
-    "start": "webpack-dev-server --mode development --open --hot",
-    "build": "webpack --mode production",
+    "start": "webpack-dev-server --hot",
+    "build": "webpack --optimize-minimize --mode production",
     "watch": "webpack --watch",
     "deploy": "vk-miniapps-deploy",
     "debug": "cross-env PORT=10888 HTTPS=true react-scripts start"
@@ -22,6 +22,7 @@
     "react-hot-loader": "^4.12.20",
     "react-scripts": "^3.4.0",
     "redux-devtools": "^3.5.0",
+    "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {

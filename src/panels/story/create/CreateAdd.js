@@ -13,8 +13,6 @@ import {
 	Avatar,
 } from '@vkontakte/vkui';
 
-import Geocoder from 'react-native-geocoding';
-
 import CreateItem from './components/CreateItem';
 import ChooseFeedback from './components/ChooseFeedback';
 
@@ -138,19 +136,6 @@ const CreateAdd = (props) => {
 		async function fetchData() {
 			const value = await bridge.send('VKWebAppGetGeodata');
 			setGeodata(value);
-
-			/*
-      Geocoder.init("no_code_here");
-      Geocoder.from(value.lat, value.long)
-        .then(json => {
-          var addressComponent = json.results[0].address_components[0];
-          console.log("addressComponent:", addressComponent);
-          setAdress(addressComponent);
-        })
-        .catch(error => {
-          console.warn(error);
-          setAdress("Город не обнаружен");
-        });*/
 		}
 
 		fetchData();

@@ -11,6 +11,7 @@ import Icon24Add from '@vkontakte/icons/dist/24/add';
 import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
+import { AD_LOADING } from './panels/template/AddMore2';
 
 let request_id = 0;
 
@@ -217,13 +218,13 @@ export async function CancelClose(setPopout, setSnackbar, ad_id, successCallback
 					sucessNoCancel('Запрос успешно отменен!', setSnackbar);
 				}
 				if (successCallback) {
-					successCallback(v)
+					successCallback(v);
 				}
 			},
 			(e) => {
 				console.log('fail double');
 				if (failCallback) {
-					failCallback(e)
+					failCallback(e);
 				}
 			}
 		);
@@ -320,8 +321,17 @@ export async function getDetails(setPopout, setSnackbar, ad_id, successCallback,
 			console.log('response from getDetails:', response);
 			return response.data;
 		})
+		.then(function (response) {
+			if (successCallback) {
+				successCallback(response);
+			}
+			return response;
+		})
 		.catch(function (error) {
 			err = true;
+			if (failCallback) {
+				failCallback(error);
+			}
 			fail(
 				'Нет соединения с сервером',
 				() => {
@@ -468,6 +478,7 @@ export async function CreateAd(obj, items, openAd, setSnackbar, setPopout) {
 			if (response.status != 201) {
 				throw new Error('Не тот код!');
 			}
+			openAd(AD_LOADING);
 			await CreateImages(
 				items,
 				response.data.ad_id,

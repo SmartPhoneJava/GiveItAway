@@ -136,7 +136,14 @@ const Main = () => {
 		setCountry(NoRegion);
 		setSort('time');
 	}
-	
+
+	function zeroHistory() {
+		setHistoryAds([])
+		setHistoryProfile([])
+		setHistoryLen(-1)
+		setHistory([PANEL_ADS]);
+	}
+
 	const onStoryChange = (e) => {
 		const isProfile = e.currentTarget.dataset.text == profileText;
 
@@ -146,14 +153,14 @@ const Main = () => {
 				setActivePanel(PANEL_USER);
 				setPrevActiveStory(no_prev);
 			} else {
-				dropFilters()
+				dropFilters();
 				setActivePanel(PANEL_ADS);
 				setSavedAdState('');
 			}
 		}
 		scroll();
 		setActiveStory(e.currentTarget.dataset.story);
-		setHistory([PANEL_ADS]);
+		zeroHistory();
 	};
 
 	useEffect(() => {
@@ -625,7 +632,13 @@ const Main = () => {
 							SetDeleteID(id);
 						}}
 						chooseCategory={() => setActiveModal2(MODAL_CATEGORIES)}
-						openAd={openAd}
+						openAd={(ad) => {
+							setActivePanel(PANEL_ONE)
+							setActiveStory(ads);
+							setChoosen(ad);
+							zeroHistory()
+							scroll();
+						}}
 					/>
 					{snackbar}
 				</Panel>

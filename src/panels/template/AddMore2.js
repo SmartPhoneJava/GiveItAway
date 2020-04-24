@@ -84,6 +84,27 @@ const COLOR_DEFAULT = 'rgba(0,0,0,0.6)';
 const COLOR_DONE = 'rgba(0,75,0,0.8)';
 const COLOR_CANCEL = 'rgba(75,0,0,0.8)';
 
+export const AD_LOADING = {
+	ad_id: -2,
+	status: 'loading',
+	header: 'Загрузка',
+	anonymous: false,
+	text: 'Загрузка',
+	creation_date: 'Загрузка',
+	feedback_type: 'Загрузка',
+	category: 'animals',
+	extra_field: '',
+	views_count: '0',
+	location: 'Загрузка',
+	pathes_to_photo: [],
+	author: {
+		vk_id: -1,
+		name: 'Загрузка',
+		surname: 'Загрузка',
+		photo_url: Man,
+	},
+};
+
 export const AdDefault = {
 	ad_id: -1,
 	status: 'offer',
@@ -119,10 +140,6 @@ const AddMore2 = (props) => {
 		setIsOpen(false);
 	};
 
-	const getThumbnailContent = (item) => {
-		return <img src={item.thumbnail} height={90} />;
-	};
-
 	const [ad, setAd] = useState(null);
 
 	const [photoIndex, setPhotoIndex] = useState(0);
@@ -148,6 +165,10 @@ const AddMore2 = (props) => {
 
 	const [request, setRequest] = useState('no');
 
+	function isNotValid(a) {
+		return a == null || a.ad_id == AD_LOADING.ad_id || a == saveInstance || a.ad_id == AdDefault.ad_id;
+	}
+
 	async function initSubscribers(id) {
 		getSubscribers(
 			props.setPopout,
@@ -162,42 +183,43 @@ const AddMore2 = (props) => {
 	}
 
 	useEffect(() => {
-		if (ad == null || ad == saveInstance || ad == AdDefault) {
+		if (isNotValid(ad)) {
 			return;
 		}
-		setImage(ad && ad.pathes_to_photo ? ad.pathes_to_photo[photoIndex].PhotoUrl : '');
+		setImage(ad.pathes_to_photo ? ad.pathes_to_photo[photoIndex].PhotoUrl : '');
 	}, [photoIndex, ad]);
 
 	useEffect(() => {
-		console.log('cheeeeck', ad, saveInstance, AdDefault);
-		// if (ad != null && props.ad.ad_id != AdDefault.ad_id) {
-		// 	setAd(saveInstance)
-		// 	return;
-		// }
+		if (isNotValid(props.ad)) {
+			return;
+		}
+		console.log("loooook", props.ad, props.ad.ad_id, props.ad.ad_id == AD_LOADING.ad_id )
 		async function init() {
-			const id = props.ad ? props.ad.ad_id : -1;
-			if (id < 0) {
-				setAd(AdDefault);
-			} else {
-				let { details, err } = await getDetails(props.setPopout, props.setSnackbar, id);
-				if (!err) {
+			const id = props.ad.ad_id;
+			getDetails(
+				props.setPopout,
+				props.setSnackbar,
+				id,
+				(details) => {
 					setAd(details);
-
-					initSubscribers(id);
-					console.log('detailed look', details);
-					console.log('i seeet', details.status);
 					setHidden(details.hidden);
 					setStatus(details.status);
+					initSubscribers(id);
 
-					let { deal, err } = await getDeal(props.setSnackbar, details.ad_id);
-					if (!err) {
-						console.log('isDealer', deal.subscriber_id, props.VkUser.getState().id);
-						setIsDealer(deal.subscriber_id == props.VkUser.getState().id);
-						setDeal(deal);
-					}
+					getDeal(
+						props.setSnackbar,
+						details.ad_id,
+						(deal) => {
+							setIsDealer(deal.subscriber_id == props.VkUser.getState().id);
+							setDeal(deal);
+						},
+						(e) => {}
+					);
+
 					// saveInstance = details;
-				}
-			}
+				},
+				(e) => {}
+			);
 		}
 		init();
 	}, [props.ad, request]);
@@ -373,16 +395,6 @@ const AddMore2 = (props) => {
 		return '';
 	}
 
-	function getContactsImage(type) {
-		switch (type) {
-			case 'email':
-				return <Icon24Mention />;
-			case 'phone':
-				return <Icon24Phone />;
-		}
-		return <Icon24Info />;
-	}
-
 	function getFeedback(pm, comments) {
 		if (pm) {
 			return (
@@ -418,7 +430,7 @@ const AddMore2 = (props) => {
 	// const [photoSwipeImgs, setPhotoSwipeImgs] = useState([]);
 
 	useEffect(() => {
-		if (!ad || ad.id == -1) {
+		if (isNotValid(ad)) {
 			return;
 		}
 		setImgs(ad.pathes_to_photo.map((v) => v.PhotoUrl));
@@ -489,56 +501,37 @@ const AddMore2 = (props) => {
 			}
 		);
 	}
+	if (isNotValid(ad) || isNotValid(props.ad)) {
+		return <Placeholder>Загрузка</Placeholder>;
+	}
 
-	if (ad) {
-		const photoSwipeImgs = ad.pathes_to_photo.map((v) => {
-			let img = new Image();
-			img.src = v.PhotoUrl;
-			let width = img.width;
-			let hight = img.height;
-			return {
-				src: v.PhotoUrl,
-				msrc: v.PhotoUrl,
-				w: width,
-				h: hight,
-				title: ad.header,
-				thumbnail: v.PhotoUrl,
-			};
-		});
-		return (
-			<div>
-				<PhotoSwipe
-					style={{ marginTop: '50px' }}
-					isOpen={isOpen}
-					items={photoSwipeImgs}
-					options={options}
-					onClose={handleClose}
-				/>
+	const photoSwipeImgs = ad.pathes_to_photo.map((v) => {
+		let img = new Image();
+		img.src = v.PhotoUrl;
+		let width = img.width;
+		let hight = img.height;
+		return {
+			src: v.PhotoUrl,
+			msrc: v.PhotoUrl,
+			w: width,
+			h: hight,
+			title: ad.header,
+			thumbnail: v.PhotoUrl,
+		};
+	});
+	return (
+		<div>
+			<PhotoSwipe
+				style={{ marginTop: '50px' }}
+				isOpen={isOpen}
+				items={photoSwipeImgs}
+				options={options}
+				onClose={handleClose}
+			/>
 
-				<div style={{ position: 'relative' }}>
-					<div style={{ right: '10px', position: 'absolute', top: '6px' }}>
-						<PanelHeaderButton
-							onClick={() => {
-								bridge
-									.send('VKWebAppShowImages', {
-										images: imgs,
-									})
-									.catch(function (error) {
-										console.log('photoIndex', photoIndex);
-										openPhotoSwipe(photoIndex);
-									});
-							}}
-							mode="secondary"
-							style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
-							size="m"
-						>
-							<Avatar style={{ background: 'rgba(0,0,0,0.7)' }} size={32}>
-								<Icon24VideoFill fill="var(--white)" />
-							</Avatar>
-						</PanelHeaderButton>
-					</div>
-					{showStatus()}
-					<img
+			<div style={{ position: 'relative' }}>
+				<div style={{ right: '10px', position: 'absolute', top: '6px' }}>
+					<PanelHeaderButton
 						onClick={() => {
 							bridge
 								.send('VKWebAppShowImages', {
@@ -549,93 +542,113 @@ const AddMore2 = (props) => {
 									openPhotoSwipe(photoIndex);
 								});
 						}}
-						srcSet={image}
-						style={{
-							width: '100%',
-							objectFit: 'cover',
-							maxHeight: '250px',
-							margin: 'auto',
-						}}
-					/>
+						mode="secondary"
+						style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
+						size="m"
+					>
+						<Avatar style={{ background: 'rgba(0,0,0,0.7)' }} size={32}>
+							<Icon24VideoFill fill="var(--white)" />
+						</Avatar>
+					</PanelHeaderButton>
 				</div>
+				{showStatus()}
+				<img
+					onClick={() => {
+						bridge
+							.send('VKWebAppShowImages', {
+								images: imgs,
+							})
+							.catch(function (error) {
+								console.log('photoIndex', photoIndex);
+								openPhotoSwipe(photoIndex);
+							});
+					}}
+					srcSet={image}
+					style={{
+						width: '100%',
+						objectFit: 'cover',
+						maxHeight: '250px',
+						margin: 'auto',
+					}}
+				/>
+			</div>
 
-				{!ad.pathes_to_photo || ad.pathes_to_photo.length <= 1 ? (
-					''
-				) : (
-					<HorizontalScroll>
-						<div style={{ display: 'flex' }}>
-							{ad.pathes_to_photo
-								? ad.pathes_to_photo.map((img, i) => {
-										return (
-											<div
-												key={img.AdPhotoId}
+			{!ad.pathes_to_photo || ad.pathes_to_photo.length <= 1 ? (
+				''
+			) : (
+				<HorizontalScroll>
+					<div style={{ display: 'flex' }}>
+						{ad.pathes_to_photo
+							? ad.pathes_to_photo.map((img, i) => {
+									return (
+										<div
+											key={img.AdPhotoId}
+											style={{
+												borderRadius: '10px',
+												alignItems: 'center',
+												justifyContent: 'center',
+												padding: '1px',
+											}}
+										>
+											<Button
+												mode="tertiary"
 												style={{
+													padding: '0px',
 													borderRadius: '10px',
-													alignItems: 'center',
-													justifyContent: 'center',
-													padding: '1px',
+												}}
+												onClick={() => {
+													setPhotoIndex(i);
 												}}
 											>
-												<Button
-													mode="tertiary"
+												<img
 													style={{
-														padding: '0px',
-														borderRadius: '10px',
+														filter: i == photoIndex ? 'brightness(40%)' : 'brightness(90%)',
 													}}
-													onClick={() => {
-														setPhotoIndex(i);
-													}}
-												>
-													<img
-														style={{
-															filter:
-																i == photoIndex ? 'brightness(40%)' : 'brightness(90%)',
-														}}
-														src={img.PhotoUrl}
-														className="small_img"
-													/>
-												</Button>
-											</div>
-										);
-								  })
-								: ''}
-						</div>
-					</HorizontalScroll>
-				)}
+													src={img.PhotoUrl}
+													className="small_img"
+												/>
+											</Button>
+										</div>
+									);
+							  })
+							: ''}
+					</div>
+				</HorizontalScroll>
+			)}
 
-				<div style={{ padding: '16px' }}>
-					<div style={{ display: 'block', alignItems: 'center' }}>
-						<div className="CellLeft__head">{ad.header}</div>
-						{isAuthor() ? (
-							<div style={{ display: 'block' }}>
-								<div style={{ display: 'flex' }}>
-									<CellButton
-										onClick={() => {
-											hidden
-												? adVisible(props.setPopout, props.setSnackbar, ad.ad_id, () => {
-														setHidden(false);
-												  })
-												: adHide(props.setPopout, props.setSnackbar, ad.ad_id, () => {
-														setHidden(true);
-												  });
-										}}
-										disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
-										before={hidden ? <Icon24Globe /> : <Icon24Hide />}
-									>
-										{hidden ? 'Сделать видимым' : 'Сделать невидимым'}
-									</CellButton>
-									<CellButton
-										mode="danger"
-										disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
-										before={<Icon24Delete />}
-										onClick={() => {
-											deleteAd(props.setPopout, ad.ad_id, props.setSnackbar, props.refresh);
-										}}
-									>
-										Удалить
-									</CellButton>
-								</div>
-								{/* <PanelHeaderButton
+			<div style={{ padding: '16px' }}>
+				<div style={{ display: 'block', alignItems: 'center' }}>
+					<div className="CellLeft__head">{ad.header}</div>
+					{isAuthor() ? (
+						<div style={{ display: 'block' }}>
+							<div style={{ display: 'flex' }}>
+								<CellButton
+									onClick={() => {
+										hidden
+											? adVisible(props.setPopout, props.setSnackbar, ad.ad_id, () => {
+													setHidden(false);
+											  })
+											: adHide(props.setPopout, props.setSnackbar, ad.ad_id, () => {
+													setHidden(true);
+											  });
+									}}
+									disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
+									before={hidden ? <Icon24Globe /> : <Icon24Hide />}
+								>
+									{hidden ? 'Сделать видимым' : 'Сделать невидимым'}
+								</CellButton>
+								<CellButton
+									mode="danger"
+									disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
+									before={<Icon24Delete />}
+									onClick={() => {
+										deleteAd(props.setPopout, ad.ad_id, props.setSnackbar, props.refresh);
+									}}
+								>
+									Удалить
+								</CellButton>
+							</div>
+							{/* <PanelHeaderButton
 									mode="primary"
 									size="l"
 									onClick={() => {
@@ -663,148 +676,146 @@ const AddMore2 = (props) => {
 										<Icon28SettingsOutline fill="var(--black)" />
 									</Avatar>
 								</PanelHeaderButton> */}
-								<Button
-									disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
-									mode="commerce"
-									size="xl"
-									onClick={() => props.openSubs(ad)}
-								>
-									Отдать
-								</Button>
-							</div>
-						) : (
-							''
-						)}
-					</div>
-				</div>
-				<Separator />
-				<div
-					style={{
-						display: 'flex',
-						paddingLeft: '16px',
-						margin: '0px',
-					}}
-				>
-					<Cell before={<Icon24Place />}>{ad.region + ', ' + ad.district}</Cell>
-				</div>
-				<Separator />
-				{isDealer || status == 'closed' || status == 'aborted' || isAuthor() ? (
-					''
-				) : isSub ? (
-					<div style={{ margin: '12px' }}>
-						<Button stretched size="xl" mode="destructive" onClick={unsub} before={<Icon24Cancel />}>
-							Отказаться
-						</Button>
-					</div>
-				) : (
-					<div style={{ margin: '12px' }}>
-						<Button
-							stretched
-							size="xl"
-							mode="primary"
-							onClick={sub}
-							before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
-						>
-							Хочу забрать!
-						</Button>
-					</div>
-				)}
-				<div style={{ marginTop: '10px', paddingLeft: '16px', paddingRight: '16px' }}>
-					<div className="CellLeft__block">{ad.text}</div>
-				</div>
-
-				<table>
-					<tbody>
-						<tr>
-							<td className="first">Категория</td>
-							<td>{GetCategoryText(ad.category)}</td>
-						</tr>
-						<tr>
-							<td className="first">Просмотров</td>
-							<td>{ad.views_count}</td>
-						</tr>
-						{status != 'closed' && status != 'aborted' ? (
-							<tr>
-								<td className="first">Отклинулось</td>
-								<td>{subs && subs.length > 0 ? subs.length : '0'}</td>
-							</tr>
-						) : (
-							''
-						)}
-
-						<tr>
-							<td className="first">Размещено</td>
-							<td>{time(ad.creation_date)}</td>
-						</tr>
-					</tbody>
-				</table>
-				<Group header={<Header>Автор</Header>}>
-					<Cell
-						onClick={() => props.openUser(ad.author.vk_id)}
-						before={<Avatar size={36} src={ad.author.photo_url} />}
-						description={ad.extra_field ? ad.extra_field : ''}
-					>
-						<div style={{ display: 'flex' }}>
-							{ad.author.name + ' ' + ad.author.surname}{' '}
-							{ad.feedback_type == 'ls' ? (
-								<Link
-									style={{ marginLeft: '15px' }}
-									href={'https://vk.com/im?sel=' + ad.author.vk_id}
-									target="_blank"
-								>
-									Написать
-								</Link>
-							) : (
-								''
-							)}
+							<Button
+								disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
+								mode="commerce"
+								size="xl"
+								onClick={() => props.openSubs(ad)}
+							>
+								Отдать
+							</Button>
 						</div>
-					</Cell>
-				</Group>
-				{isAuthor() ? (
-					status != 'closed' && status != 'aborted' ? (
-						<Subs
-							setPopout={props.setPopout}
-							setSnackbar={props.setSnackbar}
-							openUser={props.openUser}
-							amount={2}
-							maxAmount={2}
-							openSubs={() => props.openSubs(ad)}
-							ad={ad}
-							mini={true}
-						/>
 					) : (
 						''
-					)
+					)}
+				</div>
+			</div>
+			<Separator />
+			<div
+				style={{
+					display: 'flex',
+					paddingLeft: '16px',
+					margin: '0px',
+				}}
+			>
+				<Cell before={<Icon24Place />}>{ad.region + ', ' + ad.district}</Cell>
+			</div>
+			<Separator />
+			{isDealer || status == 'closed' || status == 'aborted' || isAuthor() ? (
+				''
+			) : isSub ? (
+				<div style={{ margin: '12px' }}>
+					<Button stretched size="xl" mode="destructive" onClick={unsub} before={<Icon24Cancel />}>
+						Отказаться
+					</Button>
+				</div>
+			) : (
+				<div style={{ margin: '12px' }}>
+					<Button
+						stretched
+						size="xl"
+						mode="primary"
+						onClick={sub}
+						before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
+					>
+						Хочу забрать!
+					</Button>
+				</div>
+			)}
+			<div style={{ marginTop: '10px', paddingLeft: '16px', paddingRight: '16px' }}>
+				<div className="CellLeft__block">{ad.text}</div>
+			</div>
+
+			<table>
+				<tbody>
+					<tr>
+						<td className="first">Категория</td>
+						<td>{GetCategoryText(ad.category)}</td>
+					</tr>
+					<tr>
+						<td className="first">Просмотров</td>
+						<td>{ad.views_count}</td>
+					</tr>
+					{status != 'closed' && status != 'aborted' ? (
+						<tr>
+							<td className="first">Отклинулось</td>
+							<td>{subs && subs.length > 0 ? subs.length : '0'}</td>
+						</tr>
+					) : (
+						''
+					)}
+
+					<tr>
+						<td className="first">Размещено</td>
+						<td>{time(ad.creation_date)}</td>
+					</tr>
+				</tbody>
+			</table>
+			<Group header={<Header>Автор</Header>}>
+				<Cell
+					onClick={() => props.openUser(ad.author.vk_id)}
+					before={<Avatar size={36} src={ad.author.photo_url} />}
+					description={ad.extra_field ? ad.extra_field : ''}
+				>
+					<div style={{ display: 'flex' }}>
+						{ad.author.name + ' ' + ad.author.surname}{' '}
+						{ad.feedback_type == 'ls' ? (
+							<Link
+								style={{ marginLeft: '15px' }}
+								href={'https://vk.com/im?sel=' + ad.author.vk_id}
+								target="_blank"
+							>
+								Написать
+							</Link>
+						) : (
+							''
+						)}
+					</div>
+				</Cell>
+			</Group>
+			{isAuthor() ? (
+				status != 'closed' && status != 'aborted' ? (
+					<Subs
+						setPopout={props.setPopout}
+						setSnackbar={props.setSnackbar}
+						openUser={props.openUser}
+						amount={2}
+						maxAmount={2}
+						openSubs={() => props.openSubs(ad)}
+						ad={ad}
+						mini={true}
+					/>
 				) : (
 					''
-				)}
+				)
+			) : (
+				''
+			)}
 
-				{ad.feedback_type == 'comments' ? (
-					<>
-						<Comments
-							mini={true}
-							openCommentaries={() => {
-								props.openComments(ad);
-							}}
-							hide={true}
-							ad={ad}
-							amount={1}
-							maxAmount={1}
-							setPopout={props.setPopout}
-							setSnackbar={props.setSnackbar}
-							myID={props.VkUser.getState().id}
-							openUser={props.openUser}
-						/>
-					</>
-				) : (
-					<Placeholder icon={<Icon56WriteOutline />} header="Комментарии закрыты"></Placeholder>
-				)}
-			</div>
-		);
-	}
-	return <Placeholder></Placeholder>;
+			{ad.feedback_type == 'comments' ? (
+				<>
+					<Comments
+						mini={true}
+						openCommentaries={() => {
+							props.openComments(ad);
+						}}
+						hide={true}
+						ad={ad}
+						amount={1}
+						maxAmount={1}
+						setPopout={props.setPopout}
+						setSnackbar={props.setSnackbar}
+						myID={props.VkUser.getState().id}
+						openUser={props.openUser}
+					/>
+				</>
+			) : (
+				<Placeholder icon={<Icon56WriteOutline />} header="Комментарии закрыты"></Placeholder>
+			)}
+		</div>
+	);
 };
 
-// 857
+// 857 -> 818
 
 export default AddMore2;
