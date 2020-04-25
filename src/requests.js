@@ -184,7 +184,7 @@ export async function denyDeal(setPopout, setSnackbar, deal_id, successCallback,
 			fail(
 				'Нет соединения с сервером',
 				() => {
-					denyDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end);
+					denyDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end, text);
 				},
 				setSnackbar,
 				end
@@ -251,6 +251,7 @@ export async function CancelClose(setPopout, setSnackbar, ad_id, successCallback
 					failCallback(e);
 				}
 			},
+			null,
 			"Предложение о передаче вещи отменено"
 		);
 	});
