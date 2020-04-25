@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import { ScreenSpinner } from '@vkontakte/vkui';
 
-import { Addr } from '../../../../../store/addr';
+import { Addr, BASE_USER } from '../../../../../store/addr';
 
 export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) {
 	const [inited, setInited] = useState(false);
@@ -28,10 +28,10 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 			rows_per_page: rowsPerPage,
 			page: pageNumber,
 		};
-		
+
 		axios({
 			method: 'GET',
-			url: Addr.getState() + '/api/user/'+user_id+'/given',
+			url: Addr.getState() + BASE_USER + user_id + '/given',
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
@@ -57,7 +57,7 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 				setInited(true);
 			});
 		return () => cancel();
-	}, [pageNumber,user_id]);
+	}, [pageNumber, user_id]);
 
 	return { given_loading: loading, given: ads, given_hasMore: hasMore, given_newPage: pageNumber };
 }

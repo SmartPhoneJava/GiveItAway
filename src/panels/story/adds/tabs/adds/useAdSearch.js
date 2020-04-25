@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import { ScreenSpinner } from '@vkontakte/vkui';
 
-import { Addr } from './../../../../../store/addr';
+import { Addr, BASE_AD } from './../../../../../store/addr';
 
 import { User } from './AddsTab/../../../../../../store/user';
 
@@ -65,8 +65,8 @@ export default function useAdSearch(
 		}
 
 		if (geodata) {
-			params.lat=geodata.lat
-			params.long=geodata.long
+			params.lat = geodata.lat;
+			params.long = geodata.long;
 		}
 
 		if (city && city.id != -1) {
@@ -78,11 +78,11 @@ export default function useAdSearch(
 			params.region = country.title;
 		}
 
-		let url = '/api/ad/find';
+		let url = BASE_AD + 'find';
 		if (mode != 'all' && mode != 'wanted') {
 			params.author_id = User.getState().vk_id;
 		} else if (mode == 'wanted') {
-			url = '/api/ad/wanted';
+			url = BASE_AD + 'wanted';
 		}
 
 		axios({
@@ -114,7 +114,6 @@ export default function useAdSearch(
 			});
 		return () => cancel();
 	}, [category, mode, query, pageNumber, city, country, sort, geodata]);
-
 
 	return { inited, newPage: pageNumber, ads, loading, error, hasMore };
 }

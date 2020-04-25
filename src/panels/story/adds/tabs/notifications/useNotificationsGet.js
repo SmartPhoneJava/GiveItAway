@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import { ScreenSpinner } from '@vkontakte/vkui';
 
-import { Addr } from '../../../../../store/addr';
+import { Addr, BASE } from '../../../../../store/addr';
 
 export default function useNotificationsGet(setPopout, query, pageNumber, rowsPerPage) {
 	const [inited, setInited] = useState(false);
@@ -26,7 +26,7 @@ export default function useNotificationsGet(setPopout, query, pageNumber, rowsPe
 
 		axios({
 			method: 'GET',
-			url: Addr.getState() + '/api/notifications',
+			url: Addr.getState() + BASE + '/api/notifications',
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
@@ -43,9 +43,9 @@ export default function useNotificationsGet(setPopout, query, pageNumber, rowsPe
 			})
 			.catch((e) => {
 				console.log('fail', e);
-				setError(true)
+				setError(true);
 				if (axios.isCancel(e)) return;
-				
+
 				setPopout(null);
 				setInited(true);
 			});

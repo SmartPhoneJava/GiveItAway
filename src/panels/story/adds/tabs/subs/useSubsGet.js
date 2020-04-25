@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import { ScreenSpinner } from '@vkontakte/vkui';
 
-import { Addr } from '../../../../../store/addr';
+import { Addr, BASE_AD } from '../../../../../store/addr';
 
 import { User } from '../../../../../store/user';
 
@@ -30,7 +30,6 @@ export default function useSubsGet(
 	}, []);
 
 	useEffect(() => {
-		
 		if (maxAmount && maxAmount > 0 && maxAmount <= (pageNumber - 1) * rowsPerPage) {
 			setHasMore(false);
 			return;
@@ -48,7 +47,7 @@ export default function useSubsGet(
 
 		axios({
 			method: 'GET',
-			url: Addr.getState() + '/api/ad/' + ad_id + '/subscribers',
+			url: Addr.getState() + BASE_AD + ad_id + '/subscribers',
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
@@ -65,14 +64,14 @@ export default function useSubsGet(
 				setLoading(false);
 				setPopout(null);
 				setInited(true);
-				successCallback(newNots)
+				successCallback(newNots);
 			})
 			.catch((e) => {
 				console.log('fail subs', e);
 				if (axios.isCancel(e)) return;
 
 				setPopout(null);
-				failCallback(e)
+				failCallback(e);
 				setInited(true);
 			});
 		return () => cancel();

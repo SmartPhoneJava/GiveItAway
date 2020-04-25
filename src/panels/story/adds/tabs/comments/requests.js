@@ -1,17 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { ScreenSpinner, Snackbar, Avatar } from '@vkontakte/vkui';
+import React from 'react';
+import { ScreenSpinner } from '@vkontakte/vkui';
 
-import bridge from '@vkontakte/vk-bridge';
 import axios from 'axios';
 
-import { Addr } from './../../../../../store/addr';
+import { Addr, BASE_AD, BASE_COMMENT } from './../../../../../store/addr';
 
 import { fail, success } from './../../../../../requests';
-
-import Icon24Add from '@vkontakte/icons/dist/24/add';
-import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
-import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
-import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
 
 let request_id = 0;
 
@@ -24,7 +18,7 @@ export async function postComment(setPopout, setSnackbar, ad_id, comment, succes
 		method: 'post',
 		withCredentials: true,
 		data: comment,
-		url: Addr.getState() + '/api/ad/' + ad_id + '/comments',
+		url: Addr.getState() + BASE_AD + ad_id + '/comments',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
@@ -34,7 +28,7 @@ export async function postComment(setPopout, setSnackbar, ad_id, comment, succes
 			setPopout(null);
 			successCallback(response);
 			// success('Комментарий отправлен', null, setSnackbar, end);
-			end()
+			end();
 			return response;
 		})
 		.catch(function (error) {
@@ -64,7 +58,7 @@ export async function deleteComment(setPopout, setSnackbar, comment, successCall
 		data: JSON.stringify({
 			comment: comment,
 		}),
-		url: Addr.getState() + '/api/comment/' + comment.comment_id,
+		url: Addr.getState() + BASE_COMMENT + comment.comment_id,
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
@@ -101,7 +95,7 @@ export async function editComment(setPopout, setSnackbar, id, comment, successCa
 		method: 'put',
 		withCredentials: true,
 		data: comment,
-		url: Addr.getState() + '/api/comment/' + id,
+		url: Addr.getState() + BASE_COMMENT + id,
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {

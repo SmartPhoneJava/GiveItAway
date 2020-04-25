@@ -22,6 +22,7 @@ import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 import Icon24Delete from '@vkontakte/icons/dist/24/delete';
 
 import Man from './../../../../img/man.jpeg';
+import { SNACKBAR_DURATION_DEFAULT } from '../../../../store/const';
 
 const nameLabel = 'Название';
 const categoryLabel = 'Категория';
@@ -38,6 +39,10 @@ const CreateItem = (props) => {
 	const [name, setName] = useState(props.name);
 	const [description, setDescription] = useState('');
 	const [photosUrl, setPhotosUrl] = useState([]);
+
+	function hideSnackbar() {
+		setSnackbar(null)
+	}
 
 	function handleFileSelect(f) {
 		var reader = new FileReader();
@@ -57,8 +62,8 @@ const CreateItem = (props) => {
 		if (!valid) {
 			setSnackbar(
 				<Snackbar
-					duration="2000"
-					onClose={() => setSnackbar(null)}
+					duration={SNACKBAR_DURATION_DEFAULT}
+					onClose={hideSnackbar}
 					before={
 						<Avatar size={24} style={{ background: 'orange' }}>
 							<Icon24Favorite fill="#fff" width={14} height={14} />
@@ -78,8 +83,8 @@ const CreateItem = (props) => {
 		if (!valid) {
 			setSnackbar(
 				<Snackbar
-					duration="2000"
-					onClose={() => setSnackbar(null)}
+					duration={SNACKBAR_DURATION_DEFAULT}
+					onClose={hideSnackbar}
 					before={
 						<Avatar size={24} style={{ background: 'orange' }}>
 							<Icon24Favorite fill="#fff" width={14} height={14} />
@@ -117,21 +122,21 @@ const CreateItem = (props) => {
 			});
 
 			handleFileSelect(file);
-			if (newLength == 3) {
-				props.setSnackbar(
-					<Snackbar
-						duration="1200"
-						onClose={() => props.setSnackbar(null)}
-						before={
-							<Avatar size={24} style={{ background: 'orange' }}>
-								<Icon24Favorite fill="#fff" width={14} height={14} />
-							</Avatar>
-						}
-					>
-						Достигнут лимит фотографий. Чтобы загрузить новые, удалите старые.
-					</Snackbar>
-				);
-			}
+			// if (newLength == 3) {
+			// 	props.setSnackbar(
+			// 		<Snackbar
+			// 			duration="1200"
+			// 			onClose={() => props.setSnackbar(null)}
+			// 			before={
+			// 				<Avatar size={24} style={{ background: 'orange' }}>
+			// 					<Icon24Favorite fill="#fff" width={14} height={14} />
+			// 				</Avatar>
+			// 			}
+			// 		>
+			// 			Достигнут лимит фотографий. Чтобы загрузить новые, удалите старые.
+			// 		</Snackbar>
+			// 	);
+			// }
 		}
 	};
 

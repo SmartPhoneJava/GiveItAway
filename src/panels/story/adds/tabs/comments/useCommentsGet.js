@@ -3,11 +3,7 @@ import axios from 'axios';
 
 import { ScreenSpinner } from '@vkontakte/vkui';
 
-import { Addr } from '../../../../../store/addr';
-
-import { User } from '../../../../../store/user';
-
-import { CategoryNo } from '../../../../template/Categories';
+import { Addr, BASE_AD } from '../../../../../store/addr';
 
 export default function useCommentsGet(setPopout, query, pageNumber, rowsPerPage, ad_id, maxAmount) {
 	const [inited, setInited] = useState(false);
@@ -22,9 +18,9 @@ export default function useCommentsGet(setPopout, query, pageNumber, rowsPerPage
 	}, [query]);
 
 	useEffect(() => {
-		if (maxAmount && maxAmount > 0 && maxAmount <= (pageNumber-1)*rowsPerPage) {
+		if (maxAmount && maxAmount > 0 && maxAmount <= (pageNumber - 1) * rowsPerPage) {
 			setHasMore(false);
-			return
+			return;
 		}
 		setPopout(<ScreenSpinner size="large" />);
 		setLoading(true);
@@ -39,7 +35,7 @@ export default function useCommentsGet(setPopout, query, pageNumber, rowsPerPage
 
 		axios({
 			method: 'GET',
-			url: Addr.getState() + '/api/ad/' + ad_id + '/comments',
+			url: Addr.getState() + BASE_AD + ad_id + '/comments',
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),

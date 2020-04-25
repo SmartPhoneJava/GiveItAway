@@ -36,6 +36,7 @@ import { postComment, deleteComment, editComment } from './requests';
 
 import './comment.css';
 import Comment from './comment';
+import { SNACKBAR_DURATION_DEFAULT } from '../../../../../store/const';
 
 const arr = [
 	{
@@ -333,7 +334,7 @@ const Comments = (props) => {
 			if (text.length == 0) {
 				props.setSnackbar(
 					<Snackbar
-						duration="2000"
+						duration={SNACKBAR_DURATION_DEFAULT}
 						onClose={() => {
 							props.setSnackbar(null);
 							setHide(false);

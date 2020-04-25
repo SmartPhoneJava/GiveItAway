@@ -8,6 +8,7 @@ import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import { getSubscribers } from './../../../requests';
 
 import { CancelClose, adVisible, adHide, deleteAd } from './../../../requests';
+import { SNACKBAR_DURATION_DEFAULT } from '../../../store/const';
 
 function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClosing, hidden, failedOpen) {
 	setPopout(
@@ -36,7 +37,7 @@ function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClo
 							(e) => {
 								setSnackbar(
 									<Snackbar
-										duration="2000"
+										duration={SNACKBAR_DURATION_DEFAULT}
 										onClose={() => {
 											setSnackbar(null);
 											if (failedOpen) {

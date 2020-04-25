@@ -66,14 +66,15 @@ const CreateAdd = (props) => {
 	const [pmOpen, setPmOpen] = useState(true);
 
 	useEffect(() => {
-		async function fetch() {
-			const canPM = await canWritePrivateMessage(props.myID, props.appID, props.apiVersion);
-			console.log('setPM', canPM);
-			if (canPM != undefined) {
+		canWritePrivateMessage(
+			props.myID,
+			props.appID,
+			props.apiVersion,
+			(canPM) => {
 				setPmOpen(canPM);
-			}
-		}
-		fetch();
+			},
+			(e) => {}
+		);
 	}, [props.myID, props.appID]);
 
 	useEffect(() => {
@@ -147,7 +148,7 @@ const CreateAdd = (props) => {
 	function saveCancel() {
 		props.setSnackbar(
 			<Snackbar
-				duration="1500"
+				duration={SNACKBAR_DURATION_DEFAULT}
 				onClose={() => props.setSnackbar(null)}
 				before={
 					<Avatar size={24} style={{ background: 'orange' }}>

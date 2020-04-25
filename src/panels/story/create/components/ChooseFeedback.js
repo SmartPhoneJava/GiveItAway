@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Textarea, Radio, Group, Header, Avatar, Snackbar, FormLayout } from '@vkontakte/vkui';
 
 import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
+import { SNACKBAR_DURATION_DEFAULT } from '../../../../store/const';
 
 const ChooseFeedback = (props) => {
 	return (
@@ -16,7 +17,7 @@ const ChooseFeedback = (props) => {
 						} else {
 							props.setSnackbar(
 								<Snackbar
-									duration="1500"
+									duration={SNACKBAR_DURATION_DEFAULT}
 									onClose={() => props.setSnackbar(null)}
 									before={
 										<Avatar size={24} style={{ background: 'orange' }}>

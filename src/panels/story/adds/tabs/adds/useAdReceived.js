@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import { ScreenSpinner } from '@vkontakte/vkui';
 
-import { Addr } from '../../../../../store/addr';
+import { Addr, BASE_USER } from '../../../../../store/addr';
 
 export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_id) {
 	const [inited, setInited] = useState(false);
@@ -31,7 +31,7 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 
 		axios({
 			method: 'GET',
-			url: Addr.getState() + '/api/user/' + user_id + '/received',
+			url: Addr.getState() + BASE_USER + user_id + '/received',
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),

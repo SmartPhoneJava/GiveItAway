@@ -4,7 +4,7 @@ import { ScreenSpinner, Snackbar, Avatar } from '@vkontakte/vkui';
 import bridge from '@vkontakte/vk-bridge';
 import axios from 'axios';
 
-import { Addr } from './../../../store/addr';
+import { Addr, BASE_USER } from './../../../store/addr';
 
 import { fail, success } from './../../../requests';
 
@@ -23,7 +23,7 @@ export async function getUser(setPopout, setSnackbar, user_id, successCallback, 
 	await axios({
 		method: 'get',
 		withCredentials: true,
-		url: Addr.getState() + '/api/user/' + user_id + '/profile',
+		url: Addr.getState() + BASE_USER + user_id + '/profile',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {

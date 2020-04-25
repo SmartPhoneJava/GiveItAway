@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ScreenSpinner, Snackbar, Avatar } from '@vkontakte/vkui';
 
 import bridge from '@vkontakte/vk-bridge';
 import axios from 'axios';
 
-import { Addr } from './store/addr';
+import { Addr, BASE_AD, BASE_DEAL, BASE_USER, BASE } from './store/addr';
 import { User } from './store/user';
 
-import Icon24Add from '@vkontakte/icons/dist/24/add';
-import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
 import { AD_LOADING } from './panels/template/AddMore2';
+import { SNACKBAR_DURATION_DEFAULT } from './store/const';
 
 let request_id = 0;
 
@@ -21,7 +20,7 @@ export async function getToken(setSnackbar, successCallback, failCallBack) {
 	const deal = await axios({
 		method: 'get',
 		withCredentials: true,
-		url: Addr.getState() + '/api/ws_token',
+		url: Addr.getState() + BASE + 'ws_token',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
@@ -48,7 +47,7 @@ export async function adHide(setPopout, setSnackbar, ad_id, callback) {
 	await axios({
 		method: 'post',
 		withCredentials: true,
-		url: Addr.getState() + '/api/ad/' + ad_id + '/set_hidden',
+		url: Addr.getState() + BASE_AD + ad_id + '/set_hidden',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
@@ -78,7 +77,7 @@ export async function adVisible(setPopout, setSnackbar, ad_id, callback) {
 	await axios({
 		method: 'post',
 		withCredentials: true,
-		url: Addr.getState() + '/api/ad/' + ad_id + '/set_visible',
+		url: Addr.getState() + BASE_AD + ad_id + '/set_visible',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
@@ -105,7 +104,7 @@ export async function getDeal(setSnackbar, ad_id, successCallback, failCallback)
 	const deal = await axios({
 		method: 'get',
 		withCredentials: true,
-		url: Addr.getState() + '/api/ad/' + ad_id + '/deal',
+		url: Addr.getState() + BASE_AD + ad_id + '/deal',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
@@ -134,7 +133,7 @@ export async function getCost(ad_id, successCallback, failCallback) {
 	axios({
 		method: 'get',
 		withCredentials: true,
-		url: Addr.getState() + '/api/ad/' + ad_id + '/bid_for_user',
+		url: Addr.getState() + BASE_AD + ad_id + '/bid_for_user',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
@@ -166,7 +165,7 @@ export async function denyDeal(setPopout, setSnackbar, deal_id, successCallback,
 	await axios({
 		method: 'post',
 		withCredentials: true,
-		url: Addr.getState() + '/api/deal/' + deal_id + '/cancel',
+		url: Addr.getState() + BASE_DEAL + deal_id + '/cancel',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
@@ -203,7 +202,7 @@ export async function acceptDeal(setPopout, setSnackbar, deal_id, successCallbac
 	await axios({
 		method: 'post',
 		withCredentials: true,
-		url: Addr.getState() + '/api/deal/' + deal_id + '/fulfill',
+		url: Addr.getState() + BASE_DEAL + deal_id + '/fulfill',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
@@ -234,13 +233,11 @@ export async function acceptDeal(setPopout, setSnackbar, deal_id, successCallbac
 
 export async function CancelClose(setPopout, setSnackbar, ad_id, successCallback, failCallback, blockSnackbar) {
 	getDeal(setSnackbar, ad_id, async (deal) => {
-		console.log('success', JSON.stringify(deal));
 		await denyDeal(
 			setPopout,
 			setSnackbar,
 			deal.deal_id,
 			(v) => {
-				console.log('success double');
 				if (!blockSnackbar) {
 					sucessNoCancel('Запрос успешно отменен!', setSnackbar);
 				}
@@ -249,13 +246,11 @@ export async function CancelClose(setPopout, setSnackbar, ad_id, successCallback
 				}
 			},
 			(e) => {
-				console.log('fail double');
 				if (failCallback) {
 					failCallback(e);
 				}
 			}
 		);
-		console.log('after success');
 	});
 }
 
@@ -263,12 +258,11 @@ export function Close(setPopout, setSnackbar, ad_id, subscriber_id, successCallb
 	setPopout(<ScreenSpinner size="large" />);
 	let err = false;
 	let cancel;
-	console.log('close info', ad_id, subscriber_id);
 	axios({
 		method: 'put',
 		withCredentials: true,
 		params: { subscriber_id: subscriber_id, type: 'choice' },
-		url: Addr.getState() + '/api/ad/' + ad_id + '/make_deal',
+		url: Addr.getState() + BASE_AD + ad_id + '/make_deal',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
@@ -308,7 +302,7 @@ export async function getSubscribers(setPopout, setSnackbar, ad_id, successCallb
 		method: 'get',
 		withCredentials: true,
 		params: { page: 1, rows_per_page: 1000 }, // todo поправить
-		url: Addr.getState() + '/api/ad/' + ad_id + '/subscribers',
+		url: Addr.getState() + BASE_AD + ad_id + '/subscribers',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
@@ -340,7 +334,7 @@ export async function getDetails(setPopout, setSnackbar, ad_id, successCallback,
 	const data = await axios({
 		method: 'get',
 		withCredentials: true,
-		url: Addr.getState() + '/api/ad/' + ad_id + '/details',
+		url: Addr.getState() + BASE_AD + ad_id + '/details',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
@@ -372,33 +366,47 @@ export async function getDetails(setPopout, setSnackbar, ad_id, successCallback,
 	return { details: data, err };
 }
 
-export async function canWritePrivateMessage(id, appID, apiVersion) {
+export async function canWritePrivateMessage(id, appID, apiVersion, successCallback, failCallback) {
 	console.log('before userdata', id, appID, apiVersion);
-	const el = await bridge.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' });
-
-	const userdata = await bridge
-		.send('VKWebAppCallAPIMethod', {
-			method: 'users.get',
-			request_id: 'canWritePrivateMessage' + request_id,
-			params: {
-				v: apiVersion,
-				user_ids: id,
-				fields: 'can_write_private_message',
-				access_token: '5e8cd08d5e8cd08d5e8cd08d8b5efc9eac55e8c5e8cd08d00e2599e1626b258c28f29dd',
-			},
-		})
-		.then(function (response) {
-			console.log('success canWritePrivateMessage:', response);
-			return response.response[0].can_write_private_message;
+	bridge
+		.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' })
+		.then((data) => {
+			bridge
+				.send('VKWebAppCallAPIMethod', {
+					method: 'users.get',
+					request_id: 'canWritePrivateMessage' + request_id,
+					params: {
+						v: apiVersion,
+						user_ids: id,
+						fields: 'is_closed',
+						access_token: data.access_token,
+					},
+				})
+				.then(function (response) {
+					console.log('success canWritePrivateMessage:', response);
+					return response.response[0].is_closed;
+				})
+				.then((data) => {
+					if (successCallback) {
+						successCallback(data);
+					}
+					return data;
+				})
+				.catch(function (error) {
+					if (failCallback) {
+						failCallback(error)
+					}
+					console.log('fail canWritePrivateMessage:', error);
+				});
+			return data;
 		})
 		.catch(function (error) {
-			console.log('fail canWritePrivateMessage:', error);
+			if (failCallback) {
+				failCallback(error)
+			}
+			console.log('fail VKWebAppGetAuthToken:', error);
 		});
-
-	console.log('after userdata', userdata);
 	request_id++;
-
-	return userdata;
 }
 
 export async function Auth(user, setSnackbar, setPopout, successCallback, failCallback) {
@@ -416,7 +424,7 @@ export async function Auth(user, setSnackbar, setPopout, successCallback, failCa
 			surname: user.last_name,
 			photo_url: user.photo_100,
 		}),
-		url: Addr.getState() + '/api/user/auth',
+		url: Addr.getState() + BASE_USER + 'auth',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
@@ -446,7 +454,7 @@ export async function CreateImages(items, id, goToAds, setSnackbar) {
 
 			await axios({
 				method: 'post',
-				url: Addr.getState() + '/api/ad/' + id + '/upload_image',
+				url: Addr.getState() + BASE_AD + id + '/upload_image',
 				withCredentials: true,
 				data: data,
 				cancelToken: new axios.CancelToken((c) => (cancel = c)),
@@ -456,7 +464,7 @@ export async function CreateImages(items, id, goToAds, setSnackbar) {
 					if (i == item.photos.length - 1 && l == items.length - 1) {
 						goToAds(
 							<Snackbar
-								duration="1500"
+							duration={SNACKBAR_DURATION_DEFAULT}
 								onClose={() => {
 									setSnackbar(null);
 								}}
@@ -494,7 +502,7 @@ export async function CreateAd(obj, items, openAd, setSnackbar, setPopout) {
 	let cancel;
 	await axios({
 		method: 'post',
-		url: Addr.getState() + '/api/ad/create',
+		url: Addr.getState() + BASE_AD + 'create',
 		withCredentials: true,
 		data: obj,
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
@@ -533,7 +541,7 @@ export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
 	axios({
 		method: 'post',
 		withCredentials: true,
-		url: Addr.getState() + '/api/ad/' + ad_id + '/delete',
+		url: Addr.getState() + BASE_AD + ad_id + '/delete',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
@@ -548,7 +556,7 @@ export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
 				refresh(ad_id);
 				setSnackbar(
 					<Snackbar
-						duration="1500"
+					duration={SNACKBAR_DURATION_DEFAULT}
 						onClose={() => {
 							setSnackbar(null);
 						}}
@@ -576,7 +584,7 @@ export function fail(err, repeat, setSnackbar, end) {
 		repeat
 			? setSnackbar(
 					<Snackbar
-						duration="2000"
+						duration={SNACKBAR_DURATION_DEFAULT}
 						onClose={() => {
 							setSnackbar(null);
 							if (end) {
@@ -599,7 +607,7 @@ export function fail(err, repeat, setSnackbar, end) {
 			  )
 			: setSnackbar(
 					<Snackbar
-						duration="2000"
+						duration={SNACKBAR_DURATION_DEFAULT}
 						onClose={() => setSnackbar(null)}
 						before={
 							<Avatar size={24} style={{ background: 'red' }}>
@@ -616,7 +624,7 @@ export function fail(err, repeat, setSnackbar, end) {
 export function success(text, cancelMe, setSnackbar, end) {
 	setSnackbar(
 		<Snackbar
-			duration="1500"
+			duration={SNACKBAR_DURATION_DEFAULT}
 			onClose={() => {
 				setSnackbar(null);
 				if (end) {
@@ -643,7 +651,7 @@ export function success(text, cancelMe, setSnackbar, end) {
 export function sucessNoCancel(text, setSnackbar, end) {
 	setSnackbar(
 		<Snackbar
-			duration="1500"
+			duration={SNACKBAR_DURATION_DEFAULT}
 			onClose={() => {
 				setSnackbar(null);
 				if (end) {
@@ -665,7 +673,7 @@ export function sendSnack(text, setSnackbar) {
 	setSnackbar(
 		<Snackbar
 			style={{ zIndex: '120' }}
-			duration="1500"
+			duration={SNACKBAR_DURATION_DEFAULT}
 			onClose={() => {
 				setSnackbar(null);
 			}}

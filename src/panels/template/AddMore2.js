@@ -236,6 +236,7 @@ const AddMore2 = (props) => {
 						details.ad_id,
 						(data) => {
 							setCost(data.bid);
+							props.setCost(data.bid-1);
 						},
 						(e) => {}
 					);

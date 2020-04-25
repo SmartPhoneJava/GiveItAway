@@ -3,7 +3,7 @@ import { ScreenSpinner, Snackbar, Avatar } from '@vkontakte/vkui';
 
 import axios from 'axios';
 
-import { Addr } from '../../../../../store/addr';
+import { Addr, BASE_AD } from '../../../../../store/addr';
 
 import { fail, success } from '../../../../../requests';
 
@@ -14,7 +14,7 @@ export function subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallba
 	axios({
 		method: 'post',
 		withCredentials: true,
-		url: Addr.getState() + '/api/ad/' + ad_id + '/subscribe',
+		url: Addr.getState() + BASE_AD + ad_id + '/subscribe',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
@@ -54,7 +54,7 @@ export function unsubscribe(setPopout, setSnackbar, ad_id, clCancel, successCall
 	axios({
 		method: 'post',
 		withCredentials: true,
-		url: Addr.getState() + '/api/ad/' + ad_id + '/unsubscribe',
+		url: Addr.getState() + BASE_AD + ad_id + '/unsubscribe',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {

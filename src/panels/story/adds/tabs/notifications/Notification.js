@@ -8,6 +8,7 @@ import { timeShort } from './../../../../../utils/time';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
 import Question50 from './../../../../../img/50/question.png';
+import { SNACKBAR_DURATION_DEFAULT } from '../../../../../store/const';
 
 function getImage(props) {
 	let photoURL = Question50;
@@ -32,6 +33,9 @@ function getImage(props) {
 }
 
 const Notification = (props) => {
+	function hideSnckbar() {
+		props.setSnackbar(null);
+	}
 	return (
 		<>
 			<Cell
@@ -41,10 +45,8 @@ const Notification = (props) => {
 					} else {
 						props.setSnackbar(
 							<Snackbar
-								duration="2000"
-								onClose={() => {
-									props.setSnackbar(null);
-								}}
+								duration={SNACKBAR_DURATION_DEFAULT}
+								onClose={hideSnckbar}
 								before={
 									<Avatar size={24} style={{ background: 'red' }}>
 										<Icon24Cancel fill="#fff" width={14} height={14} />

@@ -60,6 +60,11 @@ const AddsModal = (props) => {
 		return props.radius >= 0.5 && props.radius <= 100;
 	}
 
+	function stange() {
+		console.log('all info', props.cost, props.backUser);
+		return ""
+	}
+
 	return (
 		<ModalRoot activeModal={props.activeModal}>
 			<ModalPage
@@ -287,9 +292,9 @@ const AddsModal = (props) => {
 							}
 						>
 							<div style={{ color: props.cost > 0 ? 'var(--accent)' : 'var(--destructive)' }}>
-								{props.cost && props.backUser
+								{props.backUser
 									? props.backUser.carma - props.backUser.frozen_carma + props.cost + '' + K
-									: 'Информация недоступна'}
+									: 'Информация недоступна'+stange()}
 							</div>
 						</InfoRow>
 					</Cell>
