@@ -41,7 +41,14 @@ import { NoRegion } from './template/Location';
 
 import Profile from './story/profile/Profile';
 
-import AddsModal, { MODAL_FILTERS, MODAL_CATEGORIES, MODAL_SUBS, GEO_TYPE_FILTERS } from './story/adds/AddsModal';
+import AddsModal, {
+	MODAL_FILTERS,
+	MODAL_CATEGORIES,
+	MODAL_SUBS,
+	GEO_TYPE_FILTERS,
+	MODAL_COST,
+	MODAL_FROZEN,
+} from './story/adds/AddsModal';
 import CreateModal from './story/create/CreateModal';
 
 import { AddrWS } from './../store/addr_ws';
@@ -87,6 +94,9 @@ const Main = () => {
 
 	const [historyAds, setHistoryAds] = useState([]);
 	const [historyProfile, setHistoryProfile] = useState([]);
+
+	const [backUser, setbackUser] = useState(null);
+	const [cost, setCost] = useState(0);
 
 	const [profileID, setProfileID] = useState(0);
 	const [profileName, setProfileName] = useState('Профиль');
@@ -138,9 +148,9 @@ const Main = () => {
 	}
 
 	function zeroHistory() {
-		setHistoryAds([])
-		setHistoryProfile([])
-		setHistoryLen(-1)
+		setHistoryAds([]);
+		setHistoryProfile([]);
+		setHistoryLen(-1);
 		setHistory([PANEL_ADS]);
 	}
 
@@ -455,6 +465,8 @@ const Main = () => {
 						setPopout={setPopout}
 						setSnackbar={setSnackbar}
 						ad={choosen}
+						backUser={backUser}
+						cost={cost}
 					/>
 				}
 				header={false}
@@ -503,6 +515,7 @@ const Main = () => {
 					</PanelHeaderSimple>
 					{choosen ? (
 						<AddMore2
+							myID={myID}
 							wsNote={wsNote}
 							refresh={(id) => {
 								back();
@@ -526,6 +539,14 @@ const Main = () => {
 							VkUser={VkUser}
 							vkPlatform={vkPlatform}
 							onCloseClick={() => setActiveModal(MODAL_SUBS)}
+							onCarmaClick={() => {
+								setActiveModal(MODAL_COST);
+							}}
+							onFreezeClick={() => {
+								setActiveModal(MODAL_FROZEN);
+							}}
+							setbackUser={setbackUser}
+							setCost={setCost}
 						/>
 					) : (
 						Error
@@ -634,10 +655,10 @@ const Main = () => {
 						}}
 						chooseCategory={() => setActiveModal2(MODAL_CATEGORIES)}
 						openAd={(ad) => {
-							setActivePanel(PANEL_ONE)
+							setActivePanel(PANEL_ONE);
 							setActiveStory(ads);
 							setChoosen(ad);
-							zeroHistory()
+							zeroHistory();
 							scroll();
 						}}
 					/>

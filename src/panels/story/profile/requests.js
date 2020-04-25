@@ -49,7 +49,7 @@ export async function getUserVK(id, appID, apiVersion, successCallback, failCall
 	bridge
 		.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' })
 		.then((t) => {
-			const access_token = t
+			const access_token = t;
 			bridge
 				.send('VKWebAppCallAPIMethod', {
 					method: 'users.get',
@@ -75,8 +75,6 @@ export async function getUserVK(id, appID, apiVersion, successCallback, failCall
 			failCallback(error);
 			console.log('cant do VKWebAppGetAuthToken cause ', error);
 		});
-
-	return userdata;
 }
 
 export async function setOnline(appID, apiVersion, successCallback, failCallback) {

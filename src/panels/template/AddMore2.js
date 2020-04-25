@@ -16,6 +16,8 @@ import {
 	Placeholder,
 } from '@vkontakte/vkui';
 
+import { getUser } from './../../panels/story/profile/requests';
+
 import 'react-photoswipe/lib/photoswipe.css';
 import { PhotoSwipe, PhotoSwipeGallery } from 'react-photoswipe';
 
@@ -33,6 +35,7 @@ import Icon24Delete from '@vkontakte/icons/dist/24/delete';
 import Icon24CommentOutline from '@vkontakte/icons/dist/24/comment_outline';
 import Icon24Chats from '@vkontakte/icons/dist/24/chats';
 
+import Freeze24 from './../../img/24/freeze.png';
 import Icon24Phone from '@vkontakte/icons/dist/24/phone';
 import Icon24Mention from '@vkontakte/icons/dist/24/mention';
 import Icon24Info from '@vkontakte/icons/dist/24/info';
@@ -48,6 +51,13 @@ import Icon24Place from '@vkontakte/icons/dist/24/place';
 import Subs from './../story/adds/tabs/subs/subs';
 import { subscribe, unsubscribe } from './../story/adds/tabs/subs/requests';
 
+import { K } from './../story/profile/Profile';
+
+import Icon24Coins from '@vkontakte/icons/dist/24/coins';
+import Icon24Help from '@vkontakte/icons/dist/24/help';
+import Icon24MarketOutline from '@vkontakte/icons/dist/24/market_outline';
+import Icon24Market from '@vkontakte/icons/dist/24/market';
+
 import {
 	adVisible,
 	adHide,
@@ -57,6 +67,7 @@ import {
 	getDeal,
 	acceptDeal,
 	denyDeal,
+	getCost,
 } from './../../requests';
 
 import './addsTab.css';
@@ -165,21 +176,11 @@ const AddMore2 = (props) => {
 
 	const [request, setRequest] = useState('no');
 
+	const [cost, setCost] = useState(0);
+	const [backUser, setBackUser] = useState();
+
 	function isNotValid(a) {
 		return a == null || a.ad_id == AD_LOADING.ad_id || a.ad_id == AdDefault.ad_id;
-	}
-
-	async function initSubscribers(id) {
-		getSubscribers(
-			props.setPopout,
-			props.setSnackbar,
-			id,
-			(s) => {
-				setSubs(s);
-				setIsSub(isSubscriber(s));
-			},
-			(e) => {}
-		);
 	}
 
 	useEffect(() => {
@@ -188,6 +189,28 @@ const AddMore2 = (props) => {
 		}
 		setImage(ad.pathes_to_photo ? ad.pathes_to_photo[photoIndex].PhotoUrl : '');
 	}, [photoIndex, ad]);
+
+	useEffect(() => {
+		if (isSub) {
+			props.setCost(cost);
+			if (backUser) {
+				console.log('backUser valid treu', cost);
+				let b = backUser;
+				b.frozen_carma += cost;
+				setBackUser(b);
+				props.setbackUser(b);
+			}
+		} else {
+			props.setCost(-(cost-1));
+			if (backUser) {
+				console.log('backUser valid fale', cost);
+				let b = backUser;
+				b.frozen_carma -= (cost-1);
+				setBackUser(b);
+				props.setbackUser(b);
+			}
+		}
+	}, [isSub]);
 
 	useEffect(() => {
 		if (isNotValid(props.ad)) {
@@ -204,7 +227,14 @@ const AddMore2 = (props) => {
 					setAd(details);
 					setHidden(details.hidden);
 					setStatus(details.status);
-					initSubscribers(id);
+
+					getCost(
+						details.ad_id,
+						(data) => {
+							setCost(data.bid);
+						},
+						(e) => {}
+					);
 
 					getDeal(
 						props.setSnackbar,
@@ -212,6 +242,28 @@ const AddMore2 = (props) => {
 						(deal) => {
 							setIsDealer(deal.subscriber_id == props.VkUser.getState().id);
 							setDeal(deal);
+						},
+						(e) => {}
+					);
+
+					getUser(
+						props.setPopout,
+						props.setSnackbar,
+						props.myID,
+						(v) => {
+							props.setbackUser(v);
+							setBackUser(v);
+						},
+						(e) => {}
+					);
+
+					getSubscribers(
+						props.setPopout,
+						props.setSnackbar,
+						id,
+						(s) => {
+							setSubs(s);
+							setIsSub(isSubscriber(s));
 						},
 						(e) => {}
 					);
@@ -476,6 +528,7 @@ const AddMore2 = (props) => {
 			ad.ad_id,
 			sub,
 			(v) => {
+				setCost(cost - 1);
 				setIsSub(false);
 			},
 			(e) => {},
@@ -493,6 +546,7 @@ const AddMore2 = (props) => {
 			ad.ad_id,
 			unsub,
 			(v) => {
+				setCost(cost + 1);
 				setIsSub(true);
 			},
 			(e) => {},
@@ -708,22 +762,54 @@ const AddMore2 = (props) => {
 			{isDealer || status == 'closed' || status == 'aborted' || isAuthor() ? (
 				''
 			) : isSub ? (
-				<div style={{ margin: '12px' }}>
-					<Button stretched size="xl" mode="destructive" onClick={unsub} before={<Icon24Cancel />}>
-						Отказаться
-					</Button>
+				<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+					<div style={{ margin: '12px' }}>
+						<Button stretched size="m" mode="destructive" onClick={unsub} before={<Icon24MarketOutline />}>
+							Отказаться
+						</Button>
+					</div>
+					<PanelHeaderButton
+						onClick={() => {
+							props.onCarmaClick();
+						}}
+					>
+						<div style={{ fontSize: '20px', color: 'var(--destructive)' }}>
+							+{cost - 1}
+							{K}
+						</div>
+					</PanelHeaderButton>
+					<PanelHeaderButton
+						onClick={() => {
+							props.onFreezeClick();
+						}}
+					>
+						<Icon24Help fill="var(--destructive)" />
+					</PanelHeaderButton>
 				</div>
 			) : (
-				<div style={{ margin: '12px' }}>
-					<Button
-						stretched
-						size="xl"
-						mode="primary"
-						onClick={sub}
-						before={getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
+				<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+					<div style={{ margin: '12px' }}>
+						<Button stretched size="m" mode="primary" onClick={sub} before={<Icon24MarketOutline />}>
+							Хочу забрать!
+						</Button>
+					</div>
+					<PanelHeaderButton
+						onClick={() => {
+							props.onCarmaClick();
+						}}
 					>
-						Хочу забрать!
-					</Button>
+						<div style={{ fontSize: '20px', color: 'var(--header_tint)' }}>
+							-{cost}
+							{K}
+						</div>
+					</PanelHeaderButton>
+					<PanelHeaderButton
+						onClick={() => {
+							props.onFreezeClick();
+						}}
+					>
+						<Icon24Help fill="var(--header_tint)" />
+					</PanelHeaderButton>
 				</div>
 			)}
 			<div style={{ marginTop: '10px', paddingLeft: '16px', paddingRight: '16px' }}>
@@ -809,7 +895,7 @@ const AddMore2 = (props) => {
 						maxAmount={1}
 						setPopout={props.setPopout}
 						setSnackbar={props.setSnackbar}
-						myID={props.VkUser.getState().id}
+						myID={props.myID}
 						openUser={props.openUser}
 					/>
 				</>

@@ -9,10 +9,16 @@ import {
 	Cell,
 	CellButton,
 	Input,
+	List,
 	FormLayout,
-	FormLayoutGroup,
+	Avatar,
+	InfoRow,
 	Radio,
+	Placeholder,
+	ModalCard,
 } from '@vkontakte/vkui';
+
+import Freeze100 from './../../../img/100/freeze.png';
 
 import { CategoriesRB, CategoriesLabel } from './../../template/Categories';
 
@@ -21,11 +27,14 @@ import { ModalHeader } from './../../headers/modal';
 import { Location, NoRegion } from './../../template/Location';
 
 import { PeopleRB } from './../../template/People';
+import { K } from '../profile/Profile';
 
 export const MODAL_FILTERS = 'filters';
 export const MODAL_CATEGORIES = 'categories';
 export const MODAL_GEO = 'geoposition';
 export const MODAL_SUBS = 'subs';
+export const MODAL_COST = 'cost';
+export const MODAL_FROZEN = 'frozen';
 
 export const GEO_TYPE_FILTERS = 'filters';
 export const GEO_TYPE_NEAR = 'near';
@@ -253,6 +262,77 @@ const AddsModal = (props) => {
 					}}
 				/>
 			</ModalPage>
+			<ModalPage
+				onClose={() => props.setActiveModal(null)}
+				id={MODAL_COST}
+				header={<ModalHeader name="Моя карма" back={() => props.setActiveModal(null)} />}
+			>
+				<List>
+					<Cell>
+						<InfoRow header="Заморожено">
+							{props.backUser ? props.backUser.frozen_carma + '' + K : 'Информация недоступна'}
+						</InfoRow>
+					</Cell>
+					<Cell>
+						<InfoRow header="Доступно">
+							{props.backUser
+								? props.backUser.carma - props.backUser.frozen_carma + '' + K
+								: 'Информация недоступна'}
+						</InfoRow>
+					</Cell>
+					<Cell>
+						<InfoRow
+							header={
+								props.cost > 0 ? 'Станет доступно после разморозки' : 'Станет доступно после заморозки'
+							}
+						>
+							<div style={{ color: props.cost > 0 ? 'var(--accent)' : 'var(--destructive)' }}>
+								{props.cost && props.backUser
+									? props.backUser.carma - props.backUser.frozen_carma + props.cost + '' + K
+									: 'Информация недоступна'}
+							</div>
+						</InfoRow>
+					</Cell>
+				</List>
+			</ModalPage>
+			<ModalCard
+				id={MODAL_FROZEN}
+				onClose={() => props.setActiveModal(null)}
+				icon={
+					<Avatar mode="app" style={{ background: 'var(--background_content)' }} src={Freeze100} size={64} />
+				}
+				header="Замороженная карма"
+				caption={
+					'Получая вещи, вы жертвуете карму(' +
+					K +
+					'). Нажимая Хочу забрать, часть вашей кармы временно блокируется - замораживается. Эта сумма спишется, когда после того, как вы подтвердите получение вещи. Если получателем станет кто-то другой, обьявление будет удалено или вы отмените свой запрос, то замороженная карма разморозится.'
+				}
+				actions={[
+					{
+						title: 'Моя карма',
+						mode: 'primary',
+						action: () => {
+							props.setActiveModal(MODAL_COST);
+						},
+					},
+					{
+						title: 'Подробнее',
+						mode: 'secondary',
+						action: () => {
+							props.setActiveModal(null);
+						},
+					},
+				]}
+				actionsLayout="vertical"
+			/>
+			{/* <ModalPage id={MODAL_FROZEN} header={<ModalHeader name="Карма" back={() => props.setActiveModal(null)} />}>
+				<Placeholder icon={<Avatar size={60} src={Freeze100}></Avatar>} header="Замороженная карма">
+					Получая вещи, вы жертвуете карму({K}). Нажимая "Хочу забрать", часть вашей кармы временно
+					блокируется - замораживается. Эта сумма спишется, когда после того, как вы подтвердите получение
+					вещи. Если получателем станет кто-то другой, обьявление будет удалено или вы отмените свой запрос,
+					то замороженная карма разморозится. Нажмите по ({K})
+				</Placeholder>
+			</ModalPage> */}
 		</ModalRoot>
 	);
 };

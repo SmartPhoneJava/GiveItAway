@@ -128,6 +128,33 @@ export async function getDeal(setSnackbar, ad_id, successCallback, failCallback)
 	return { deal, err };
 }
 
+export async function getCost(ad_id, successCallback, failCallback) {
+	let err = false;
+	let cancel;
+	axios({
+		method: 'get',
+		withCredentials: true,
+		url: Addr.getState() + '/api/ad/' + ad_id + '/bid_for_user',
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(function (response) {
+			console.log('response from getCost:', response);
+			return response.data;
+		})
+		.then(function (response) {
+			if (successCallback) {
+				successCallback(response);
+			}
+			return response;
+		})
+		.catch(function (error) {
+			err = true;
+			if (failCallback) {
+				failCallback(error);
+			}
+		});
+}
+
 export async function denyDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end) {
 	console.log('denyDeall', deal_id);
 	let err = false;

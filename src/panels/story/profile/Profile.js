@@ -12,7 +12,7 @@ import {
 	Separator,
 } from '@vkontakte/vkui';
 
-import { RadialChart } from 'react-vis';
+import { RadialChart } from 'react-vis'; 
 
 // import 'react-vis/dist/style';
 
@@ -46,6 +46,8 @@ function getAuthorHref(backuser) {
 	const name = backuser.name + ' ' + backuser.surname;
 	return <div style={{ fontWeight: '600', fontSize: '16px' }}>{name}</div>;
 }
+
+export const K = "Ҝ"
 
 const Profile = (props) => {
 	const [backuser, setBackUser] = useState();
