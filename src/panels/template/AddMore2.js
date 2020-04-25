@@ -190,8 +190,8 @@ const AddMore2 = (props) => {
 		setImage(ad.pathes_to_photo ? ad.pathes_to_photo[photoIndex].PhotoUrl : '');
 	}, [photoIndex, ad]);
 
-	useEffect(() => {
-		if (isSub) {
+	function changeIsSub(isSubscriber) {
+		if (isSubscriber) {
 			props.setCost(cost);
 			if (backUser) {
 				console.log('backUser valid treu', cost);
@@ -200,17 +200,21 @@ const AddMore2 = (props) => {
 				setBackUser(b);
 				props.setbackUser(b);
 			}
+			setCost(cost + 1);
 		} else {
-			props.setCost(-(cost-1));
+			props.setCost(-(cost - 1));
 			if (backUser) {
 				console.log('backUser valid fale', cost);
 				let b = backUser;
-				b.frozen_carma -= (cost-1);
+				b.frozen_carma -= cost - 1;
 				setBackUser(b);
 				props.setbackUser(b);
 			}
+			setCost(cost - 1);
 		}
-	}, [isSub]);
+
+		setIsSub(isSubscriber);
+	}
 
 	useEffect(() => {
 		if (isNotValid(props.ad)) {
@@ -528,8 +532,7 @@ const AddMore2 = (props) => {
 			ad.ad_id,
 			sub,
 			(v) => {
-				setCost(cost - 1);
-				setIsSub(false);
+				changeIsSub(false);
 			},
 			(e) => {},
 			() => {
@@ -546,8 +549,7 @@ const AddMore2 = (props) => {
 			ad.ad_id,
 			unsub,
 			(v) => {
-				setCost(cost + 1);
-				setIsSub(true);
+				changeIsSub(true);
 			},
 			(e) => {},
 			() => {
