@@ -71,7 +71,7 @@ const CreateAdd = (props) => {
 			props.appID,
 			props.apiVersion,
 			(canPM) => {
-				setPmOpen(canPM);
+				setPmOpen(!canPM);
 			},
 			(e) => {}
 		);

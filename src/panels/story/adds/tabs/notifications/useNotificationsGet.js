@@ -26,7 +26,7 @@ export default function useNotificationsGet(setPopout, query, pageNumber, rowsPe
 
 		axios({
 			method: 'GET',
-			url: Addr.getState() + BASE + '/api/notifications',
+			url: Addr.getState() + BASE + 'notifications',
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),

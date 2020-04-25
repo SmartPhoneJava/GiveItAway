@@ -154,8 +154,9 @@ export async function getCost(ad_id, successCallback, failCallback) {
 		});
 }
 
-export async function denyDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end) {
+export async function denyDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end, text) {
 	console.log('denyDeall', deal_id);
+	let dtext = text || "Ваш отказ принят!"
 	let err = false;
 	let cancel;
 	setPopout(<ScreenSpinner size="large" />);
@@ -170,7 +171,7 @@ export async function denyDeal(setPopout, setSnackbar, deal_id, successCallback,
 	})
 		.then(function (response) {
 			console.log('response from denyDeal:', response);
-			sucessNoCancel('Ваш отказ принят!', setSnackbar, end);
+			sucessNoCancel(dtext, setSnackbar, end);
 			return response.data;
 		})
 		.then(function (response) {
@@ -249,7 +250,8 @@ export async function CancelClose(setPopout, setSnackbar, ad_id, successCallback
 				if (failCallback) {
 					failCallback(e);
 				}
-			}
+			},
+			"Предложение о передаче вещи отменено"
 		);
 	});
 }
