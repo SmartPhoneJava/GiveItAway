@@ -236,20 +236,39 @@ const AddMore2 = (props) => {
 						details.ad_id,
 						(data) => {
 							setCost(data.bid);
-							props.setCost(data.bid - 1);
+							getSubscribers(
+								props.setPopout,
+								props.setSnackbar,
+								id,
+								(s) => {
+									setSubs(s);
+									const is = isSubscriber(s);
+									setIsSub(is);
+									if (is) {
+										props.setCost(-data.bid);
+									} else {
+										props.setCost(data.bid - 1);
+									}
+								},
+								(e) => {
+									props.setCost(-data.bid);
+								}
+							);
 						},
 						(e) => {}
 					);
 
-					getDeal(
-						props.setSnackbar,
-						details.ad_id,
-						(deal) => {
-							setIsDealer(deal.subscriber_id == props.VkUser.getState().id);
-							setDeal(deal);
-						},
-						(e) => {}
-					);
+					if (details.status != 'offer') {
+						getDeal(
+							props.setSnackbar,
+							details.ad_id,
+							(deal) => {
+								setIsDealer(deal.subscriber_id == props.VkUser.getState().id);
+								setDeal(deal);
+							},
+							(e) => {}
+						);
+					}
 
 					getUser(
 						props.setPopout,
@@ -258,17 +277,6 @@ const AddMore2 = (props) => {
 						(v) => {
 							props.setbackUser(v);
 							setBackUser(v);
-						},
-						(e) => {}
-					);
-
-					getSubscribers(
-						props.setPopout,
-						props.setSnackbar,
-						id,
-						(s) => {
-							setSubs(s);
-							setIsSub(isSubscriber(s));
 						},
 						(e) => {}
 					);
