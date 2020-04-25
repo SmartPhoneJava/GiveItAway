@@ -49,7 +49,7 @@ export async function getUserVK(id, appID, apiVersion, successCallback, failCall
 	bridge
 		.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' })
 		.then((t) => {
-			const access_token = t;
+			const access_token = t.access_token;
 			bridge
 				.send('VKWebAppCallAPIMethod', {
 					method: 'users.get',
