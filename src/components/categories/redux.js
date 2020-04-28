@@ -1,0 +1,2 @@
+export const FORM_CREATE = 'REDUX_CATEGORIES_CREATE';
+export const FORM_ADS = 'REDUX_CATEGORIES_ADS';

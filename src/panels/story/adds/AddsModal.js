@@ -20,11 +20,12 @@ import {
 
 import Freeze100 from './../../../img/100/freeze.png';
 
-import { CategoriesRB, CategoriesLabel } from './../../template/Categories';
+import CategoriesLabel from './../../../components/categories/label';
 
 import { ModalHeader } from './../../headers/modal';
 
-import { Location, NoRegion } from './../../template/Location';
+import Location from './../../../components/location/label';
+import { NoRegion } from './../../../components/location/const';
 
 import { PeopleRB } from './../../template/People';
 import { K } from '../profile/Profile';
@@ -62,7 +63,7 @@ const AddsModal = (props) => {
 
 	function stange() {
 		console.log('all info', props.cost, props.backUser);
-		return ""
+		return '';
 	}
 
 	return (
@@ -163,13 +164,13 @@ const AddsModal = (props) => {
 					/>
 				}
 			>
-				<CategoriesRB
+				{/* <CategoriesRB
 					category={props.category}
 					choose={(cat) => {
 						props.setCategory(cat);
 						props.setActiveModal(null);
 					}}
-				/>
+				/> */}
 			</ModalPage>
 			<ModalPage
 				id={MODAL_GEO}
@@ -201,16 +202,17 @@ const AddsModal = (props) => {
 				</Radio>
 				<div>
 					{props.geoType == GEO_TYPE_FILTERS ? (
-						Location(
-							props.appID,
-							props.apiVersion,
-							props.vkPlatform,
-							props.country,
-							props.setCountry,
-							props.city,
-							props.setCity,
-							false
-						)
+						// Location(
+						// 	props.appID,
+						// 	props.apiVersion,
+						// 	props.vkPlatform,
+						// 	props.country,
+						// 	props.setCountry,
+						// 	props.city,
+						// 	props.setCity,
+						// 	false
+						// )
+						null
 					) : (
 						<FormLayout>
 							<Slider
@@ -294,7 +296,7 @@ const AddsModal = (props) => {
 							<div style={{ color: props.cost > 0 ? 'var(--accent)' : 'var(--destructive)' }}>
 								{props.backUser
 									? props.backUser.carma - props.backUser.frozen_carma + props.cost + '' + K
-									: 'Информация недоступна'+stange()}
+									: 'Информация недоступна' + stange()}
 							</div>
 						</InfoRow>
 					</Cell>
@@ -306,7 +308,7 @@ const AddsModal = (props) => {
 				icon={
 					<Avatar mode="app" style={{ background: 'var(--background_content)' }} src={Freeze100} size={64} />
 				}
-				header={props.cost+K}
+				header={props.cost + K}
 				caption={
 					'Получая вещи, вы жертвуете карму(' +
 					K +

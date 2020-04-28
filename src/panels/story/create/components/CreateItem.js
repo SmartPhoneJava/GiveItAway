@@ -1,334 +1,336 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import bridge from '@vkontakte/vk-bridge';
 import {
 	FormLayout,
 	Input,
-	Button,
+	Header,
 	Card,
 	CardGrid,
 	InfoRow,
-	Div,
+	Group,
 	Textarea,
 	File,
 	HorizontalScroll,
 	Avatar,
 	Snackbar,
+	Placeholder,
 } from '@vkontakte/vkui';
 
-import { CategoriesLabel } from './../../../template/Categories';
+import 'react-photoswipe/lib/photoswipe.css';
+import { PhotoSwipe, PhotoSwipeGallery } from 'react-photoswipe';
 
+import { setFormData } from './../../../../store/create_post/actions';
+import { CREATE_AD_ITEM } from './../../../../store/create_post/types';
+
+import CategoriesLabel from './../../../../components/categories/label';
+import { FORM_CREATE } from './../../../../components/categories/redux';
+
+import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24Camera from '@vkontakte/icons/dist/24/camera';
 import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
-import Icon24Delete from '@vkontakte/icons/dist/24/delete';
 
-import Man from './../../../../img/man.jpeg';
+import Icon48Camera from '@vkontakte/icons/dist/48/camera';
+
+import { connect } from 'react-redux';
+
 import { SNACKBAR_DURATION_DEFAULT } from '../../../../store/const';
+import { loadPhotos, MAX_FILE_SIZE } from '../../../../services/file';
+
+import './createItem.css';
 
 const nameLabel = 'Название';
-const categoryLabel = 'Категория';
 const descriptionLabel = 'Описание';
-
-const MAX_FILE_SIZE = 1024 * 1024 * 4;
 
 const PHOTO_TEXT = 'Не более трех фотографий (jpeg, png) размером 4мб';
 
-let KEY = 0;
-
+let defaultInputData = {
+	photoText: PHOTO_TEXT,
+	name: '',
+	description: '',
+	photosUrl: [],
+};
 const CreateItem = (props) => {
-	const [photoText, setPhotoText] = useState(PHOTO_TEXT);
-	const [name, setName] = useState(props.name);
-	const [description, setDescription] = useState('');
-	const [photosUrl, setPhotosUrl] = useState([]);
+	const [inputData, setInputData] = useState(props.inputData[CREATE_AD_ITEM] || defaultInputData);
+
+	const handleInput = (e) => {
+		let value = e.currentTarget.value;
+
+		console.log('loooook', e.currentTarget.name, value);
+		console.log('me.inputData ', inputData);
+		console.log('props.inputData ', props.inputData);
+
+		props.setFormData(CREATE_AD_ITEM, {
+			...inputData,
+			[e.currentTarget.name]: value,
+		});
+		setInputData({
+			...inputData,
+			[e.currentTarget.name]: value,
+		});
+	};
+
+	const [isOpen, setIsOpen] = useState(false);
+	const [options, setOptions] = useState({});
+
+	const handleClose = () => {
+		setIsOpen(false);
+	};
+
+	const openPhotoSwipe = (i) => {
+		setOptions({
+			closeOnScroll: false,
+			index: i,
+		});
+		setIsOpen(true);
+	};
+
+	const { platform } = props;
+
+	useEffect(() => {
+		console.log('inputData', inputData);
+	}, []);
 
 	function hideSnackbar() {
-		setSnackbar(null)
+		props.setSnackbar(null);
 	}
 
-	function handleFileSelect(f) {
-		var reader = new FileReader();
-		// Closure to capture the file information.
-		reader.onload = (function (theFile) {
-			return function (e) {
-				KEY++;
-				setPhotosUrl([...photosUrl, { src: e.target.result, id: KEY, origin: theFile }]);
-			};
-		})(f);
-		// Read in the image file as a data URL.
-		reader.readAsDataURL(f);
+	function handleWrongSize(file) {
+		setSnackbar(
+			<Snackbar
+				duration={SNACKBAR_DURATION_DEFAULT}
+				onClose={hideSnackbar}
+				before={
+					<Avatar size={24} style={{ background: 'orange' }}>
+						<Icon24Favorite fill="#fff" width={14} height={14} />
+					</Avatar>
+				}
+			>
+				Размер файла {(file.size / 1024 / 1024).toFixed(2)}МБ. Максимально допустимый размер:{' '}
+				{(MAX_FILE_SIZE / 1024 / 1024).toFixed(2)} МБ
+			</Snackbar>
+		);
 	}
 
-	function checkFileSize(setSnackbar, file) {
-		const valid = file.size <= MAX_FILE_SIZE;
-		if (!valid) {
-			setSnackbar(
-				<Snackbar
-					duration={SNACKBAR_DURATION_DEFAULT}
-					onClose={hideSnackbar}
-					before={
-						<Avatar size={24} style={{ background: 'orange' }}>
-							<Icon24Favorite fill="#fff" width={14} height={14} />
-						</Avatar>
-					}
-				>
-					Размер файла {(file.size / 1024 / 1024).toFixed(2)}МБ. Максимально допустимый размер:{' '}
-					{(MAX_FILE_SIZE / 1024 / 1024).toFixed(2)} МБ
-				</Snackbar>
-			);
-		}
-		return valid;
-	}
-
-	function checkFileType(setSnackbar, file) {
-		const valid = file.type.match('image.*');
-		if (!valid) {
-			setSnackbar(
-				<Snackbar
-					duration={SNACKBAR_DURATION_DEFAULT}
-					onClose={hideSnackbar}
-					before={
-						<Avatar size={24} style={{ background: 'orange' }}>
-							<Icon24Favorite fill="#fff" width={14} height={14} />
-						</Avatar>
-					}
-				>
-					Данный формат не поддержирвается. Используйте изображения формата .png, .jpg, .jpeg
-				</Snackbar>
-			);
-		}
-		return valid;
+	function handleWrongType(file) {
+		setSnackbar(
+			<Snackbar
+				duration={SNACKBAR_DURATION_DEFAULT}
+				onClose={hideSnackbar}
+				before={
+					<Avatar size={24} style={{ background: 'orange' }}>
+						<Icon24Favorite fill="#fff" width={14} height={14} />
+					</Avatar>
+				}
+			>
+				Данный формат не поддержирвается. Используйте изображения формата .png, .jpg, .jpeg
+			</Snackbar>
+		);
 	}
 
 	const loadPhoto = (e) => {
-		var files = e.target.files; // FileList object
-		// Loop through the FileList and render image files as thumbnails.
-		for (var i = 0, file; (file = files[i]); i++) {
-			if (!file) {
-				return;
+		loadPhotos(
+			e,
+			handleWrongSize,
+			handleWrongType,
+			(value) => {
+				setInputData({
+					...inputData,
+					photosUrl: [...inputData.photosUrl, value],
+				});
+				props.setFormData(CREATE_AD_ITEM, {
+					...inputData,
+					photosUrl: [...inputData.photosUrl, value],
+				});
+			},
+			() => {
+				setInputData({
+					...inputData,
+					photoText: PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length + 1) + '/3',
+				});
+				props.setFormData(CREATE_AD_ITEM, {
+					...inputData,
+					photoText: PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length + 1) + '/3',
+				});
 			}
-			if (!checkFileSize(props.setSnackbar, file)) {
-				return;
-			}
-			if (!checkFileType(props.setSnackbar, file)) {
-				return;
-			}
-
-			const newLength = photosUrl.length + 1;
-			setPhotoText(PHOTO_TEXT + '. Загружено ' + newLength + '/3');
-			props.setItems({
-				name,
-				category: props.category,
-				description: description,
-				photos: [...props.item.photos, file],
-			});
-
-			handleFileSelect(file);
-			// if (newLength == 3) {
-			// 	props.setSnackbar(
-			// 		<Snackbar
-			// 			duration="1200"
-			// 			onClose={() => props.setSnackbar(null)}
-			// 			before={
-			// 				<Avatar size={24} style={{ background: 'orange' }}>
-			// 					<Icon24Favorite fill="#fff" width={14} height={14} />
-			// 				</Avatar>
-			// 			}
-			// 		>
-			// 			Достигнут лимит фотографий. Чтобы загрузить новые, удалите старые.
-			// 		</Snackbar>
-			// 	);
-			// }
-		}
+		);
 	};
 
-	return (
-		<CardGrid>
-			<Card size="l">
-				{props.len > 1 ? (
-					<Div
-						style={{
-							display: 'flex',
-							justifyContent: 'flex-end',
-							padding: '5px',
-						}}
-					>
-						<Button
-							mode="destructive"
-							onClick={() => {
-								props.deleteMe();
-							}}
-						>
-							Удалить
-						</Button>
-					</Div>
-				) : (
-					<div />
-				)}
+	function deletePhoto(i) {
+		setInputData({
+			...inputData,
+			photoText: PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length - 1) + '/3',
+		});
+		setInputData({
+			...inputData,
+			photosUrl: [...inputData.photosUrl.slice(0, i), ...inputData.photosUrl.slice(i + 1)],
+		});
+		props.setFormData(CREATE_AD_ITEM, {
+			...inputData,
+			photoText: PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length - 1) + '/3',
+		});
+		props.setFormData(CREATE_AD_ITEM, {
+			...inputData,
+			photoText: PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length - 1) + '/3',
+		});
+	}
 
-				<div
-					style={{
-						display: props.vkPlatform == 'desktop_web' ? 'flex' : 'block',
-						alignItems: 'flex-start',
-					}}
-				>
+	function openPhotos(i) {
+	
+		// if (platform != 'desktop_web' && platform != 'mobile_web') {
+		// 	bridge.send('VKWebAppShowImages', {
+		// 		images: inputData.photosUrl.map((v) => v.src),
+		// 	});
+		// } else {
+			openPhotoSwipe(i);
+		// }
+	}
+
+	const photoSwipeImgs = inputData.photosUrl.map((v) => {
+		let img = new Image();
+		img.src = v.src;
+		let width = img.width;
+		let hight = img.height;
+		return {
+			src: v.src,
+			msrc: v.src,
+			w: width,
+			h: hight,
+			thumbnail: v.src,
+		};
+	});
+
+	return (
+		<>
+			<PhotoSwipe
+				style={{ marginTop: '50px' }}
+				isOpen={isOpen}
+				items={photoSwipeImgs}
+				options={options}
+				onClose={handleClose}
+			/>
+			<CardGrid>
+				<Card size="l">
 					<div
 						style={{
-							paddingLeft: '10px',
+							display: platform == 'desktop_web' ? 'flex' : 'block',
+							alignItems: 'flex-start',
 						}}
 					>
-						<CategoriesLabel category={props.category} open={props.choose} />
-					</div>
-					<FormLayout>
-						<Input
-							top={nameLabel}
-							name={nameLabel}
-							size="50"
-							placeholder="футбольный мяч"
-							value={name}
-							onChange={(e) => {
-								const { _, value } = e.currentTarget;
-								setName(value);
-								props.setItems({
-									name: value,
-									caregory: props.category,
-									description,
-									photos: props.item.photos,
-								});
+						<div
+							style={{
+								paddingLeft: '10px',
 							}}
-							// status={name && name.length < 100 ? 'valid' : 'error'}
-						/>
-					</FormLayout>
-				</div>
-				<Div
+						>
+							<CategoriesLabel open={props.openCategories} redux_form={FORM_CREATE} />
+						</div>
+						<FormLayout>
+							<Input
+								top={nameLabel}
+								name="name"
+								size="50"
+								placeholder="футбольный мяч"
+								value={inputData.name}
+								onChange={handleInput}
+							/>
+						</FormLayout>
+					</div>
+					<div>
+						<FormLayout>
+							<Textarea
+								top={descriptionLabel}
+								name="description"
+								placeholder="Количество, состояние, габариты, дата покупки, особенности и т.д."
+								value={inputData.description}
+								onChange={handleInput}
+							/>
+						</FormLayout>
+					</div>
+				</Card>
+			</CardGrid>
+			<FormLayout>
+				<Group
+					header={<Header>Снимки</Header>}
 					style={{
-						padding: '0px',
+						display: platform == 'desktop_web' ? 'flex' : 'block',
+						textAlign: 'center',
 					}}
 				>
-					<FormLayout>
-						<Textarea
-							top={descriptionLabel}
-							name={descriptionLabel}
-							placeholder="Количество, состояние, габариты, дата покупки, особенности и т.д."
-							value={description}
-							onChange={(e) => {
-								const { _, value } = e.currentTarget;
-								setDescription(value);
-								props.setItems({
-									name,
-									category: props.category,
-									description: value,
-									photos: props.item.photos,
-								});
-							}}
-							// status={description && description.length < 1500 ? 'valid' : 'error'}
-						/>
-					</FormLayout>
-				</Div>
-				<FormLayout>
-					<Div
-						top="Снимки"
-						style={{
-							display: props.vkPlatform == 'desktop_web' ? 'flex' : 'block',
-							padding: '0px',
-							textAlign: 'center',
-						}}
-					>
-						<File
-							top="Снимки вещей"
-							before={<Icon24Camera />}
-							disabled={photosUrl.length == 3}
-							mode={photosUrl.length == 3 ? 'secondary' : 'primary'}
-							onChange={loadPhoto}
+					{inputData.photosUrl.length > 0 ? (
+						<>
+							<File
+								before={<Icon24Camera />}
+								disabled={inputData.photosUrl.length == 3}
+								mode={inputData.photosUrl.length == 3 ? 'secondary' : 'primary'}
+								onChange={loadPhoto}
+							>
+								Загрузить
+							</File>
+							<InfoRow
+								style={{
+									color: 'var(--text_secondary)',
+									marginTop: '6px',
+									paddingLeft: '6px',
+									paddingRight: '6px',
+								}}
+							>
+								{inputData.photoText}
+							</InfoRow>
+							<HorizontalScroll>
+								<div style={{ display: 'flex', marginLeft: '10px', marginRight: '10px' }}>
+									{inputData.photosUrl.map((img, i) => {
+										return (
+											<div key={img.id} style={{ padding: '4px' }}>
+												<div className="create-photo-panel">
+													<img
+														onClick={() => openPhotos(i)}
+														src={img.src}
+														className="create-photo"
+													/>
+													<div onClick={() => deletePhoto(i)} className="create-photo-delete">
+														<Icon24Cancel />
+													</div>
+												</div>
+											</div>
+										);
+									})}
+								</div>
+							</HorizontalScroll>
+						</>
+					) : (
+						<Placeholder
+							header="Ничего не загружено"
+							icon={<Icon48Camera />}
+							action={
+								<File
+									top="Снимки вещей"
+									disabled={inputData.photosUrl.length == 3}
+									mode={inputData.photosUrl.length == 3 ? 'secondary' : 'primary'}
+									onChange={loadPhoto}
+								>
+									Загрузить
+								</File>
+							}
 						>
-							Открыть галерею
-						</File>
-						<InfoRow
-							style={{
-								color: 'var(--text_secondary)',
-								marginTop: '6px',
-								paddingLeft: '6px',
-								paddingRight: '6px',
-							}}
-						>
-							{photoText}
-						</InfoRow>
-					</Div>
-					<Div
-						style={{
-							display: 'flex',
-							alignItems: 'flex-start',
-							padding: '0px',
-						}}
-					>
-						<HorizontalScroll>
-							<div style={{ display: 'flex' }}>
-								{photosUrl.map((img, i) => {
-									return (
-										<div
-											key={img.id}
-											style={{
-												alignItems: 'center',
-												justifyContent: 'center',
-												padding: '10px',
-											}}
-										>
-											<Button
-												mode="secondary"
-												style={{
-													height: '120px',
-												}}
-												onClick={() => {
-													if (props.vkPlatform != 'desktop_web') {
-														bridge.send('VKWebAppShowImages', {
-															images: photosUrl.map((v) => v.src),
-														});
-													} else {
-														var image = new Image();
-														image.src = img.src;
-
-														var w = window.open('');
-														w.document.write(image.outerHTML);
-													}
-												}}
-											>
-												<img
-													src={img.src}
-													style={{
-														height: '120px',
-													}}
-												/>
-											</Button>
-
-											<Button
-												before={<Icon24Delete />}
-												mode="destructive"
-												onClick={() => {
-													setPhotoText(
-														PHOTO_TEXT + '. Загружено ' + (photosUrl.length - 1) + '/3'
-													);
-													setPhotosUrl([...photosUrl.slice(0, i), ...photosUrl.slice(i + 1)]);
-													props.setItems({
-														name: name,
-														caregory: props.category,
-														description,
-														photos: [
-															...props.item.photos.slice(0, i),
-															...props.item.photos.slice(i + 1),
-														],
-													});
-												}}
-											>
-												Удалить
-											</Button>
-										</div>
-									);
-								})}
-							</div>
-						</HorizontalScroll>
-					</Div>
-				</FormLayout>
-			</Card>
-		</CardGrid>
+							{inputData.photoText}
+						</Placeholder>
+					)}
+				</Group>
+			</FormLayout>
+		</>
 	);
 };
 
-export default CreateItem;
+const mapStateToProps = (state) => {
+	return {
+		platform: state.vkui.platform,
+		inputData: state.formData.forms,
+	};
+};
+
+const mapDispatchToProps = {
+	setFormData,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateItem);
+
+// 342 -> 296 -> 336

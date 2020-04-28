@@ -27,6 +27,15 @@ img.atiled {
 	justify-content: center;
 }
 
+.light-close {
+	position: absolute;
+	top: 4px;
+	left: 72px;
+	color: rgb(240, 240, 240);
+	background: rgba(0, 0, 0, 0.9);
+	border-radius: 15px;
+}
+
 .light-name {
 	position: absolute;
 	top: 60px;

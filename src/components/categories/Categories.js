@@ -109,8 +109,6 @@ export const CategoryPencil = 'pencil';
 export const CategoryPlay = 'play';
 export const CategorySport = 'sport';
 
-import './categories.css';
-
 // export function GetCategory400(category) {
 // 	let image = Another400;
 // 	switch (category) {

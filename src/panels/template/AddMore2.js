@@ -74,7 +74,7 @@ import './addsTab.css';
 
 import './styles.css';
 
-import PANEL_ONE from './../../panels/Main';
+import PANEL_ONE from '../App';
 
 import Cat from './../../img/cat.jpg';
 import Man from './../../img/man.jpeg';

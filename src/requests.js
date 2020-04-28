@@ -156,7 +156,7 @@ export async function getCost(ad_id, successCallback, failCallback) {
 
 export async function denyDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end, text) {
 	console.log('denyDeall', deal_id);
-	let dtext = text || "Ваш отказ принят!"
+	let dtext = text || 'Ваш отказ принят!';
 	let err = false;
 	let cancel;
 	setPopout(<ScreenSpinner size="large" />);
@@ -252,7 +252,7 @@ export async function CancelClose(setPopout, setSnackbar, ad_id, successCallback
 				}
 			},
 			null,
-			"Предложение о передаче вещи отменено"
+			'Предложение о передаче вещи отменено'
 		);
 	});
 }
@@ -397,7 +397,7 @@ export async function canWritePrivateMessage(id, appID, apiVersion, successCallb
 				})
 				.catch(function (error) {
 					if (failCallback) {
-						failCallback(error)
+						failCallback(error);
 					}
 					console.log('fail canWritePrivateMessage:', error);
 				});
@@ -405,7 +405,7 @@ export async function canWritePrivateMessage(id, appID, apiVersion, successCallb
 		})
 		.catch(function (error) {
 			if (failCallback) {
-				failCallback(error)
+				failCallback(error);
 			}
 			console.log('fail VKWebAppGetAuthToken:', error);
 		});
@@ -447,60 +447,58 @@ export async function Auth(user, setSnackbar, setPopout, successCallback, failCa
 	return getUser;
 }
 
-export async function CreateImages(items, id, goToAds, setSnackbar) {
+export async function CreateImages(photos, id, goToAds, setSnackbar) {
 	let err = false;
-	items.forEach((item, l) => {
-		item.photos.forEach(async (photo, i) => {
-			const data = new FormData();
-			data.append('file', photo);
-			let cancel;
+	photos.forEach(async (photo, i) => {
+		const data = new FormData();
+		data.append('file', photo);
+		let cancel;
 
-			await axios({
-				method: 'post',
-				url: Addr.getState() + BASE_AD + id + '/upload_image',
-				withCredentials: true,
-				data: data,
-				cancelToken: new axios.CancelToken((c) => (cancel = c)),
-			})
-				.then(function (response) {
-					console.log('success uploaded', response);
-					if (i == item.photos.length - 1 && l == items.length - 1) {
-						goToAds(
-							<Snackbar
+		await axios({
+			method: 'post',
+			url: Addr.getState() + BASE_AD + id + '/upload_image',
+			withCredentials: true,
+			data: data,
+			cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		})
+			.then(function (response) {
+				console.log('success uploaded', response);
+				if (i == photos.length - 1) {
+					goToAds(
+						<Snackbar
 							duration={SNACKBAR_DURATION_DEFAULT}
-								onClose={() => {
-									setSnackbar(null);
-								}}
-								action="Отменить"
-								onActionClick={() => {
-									deleteAd(setPopout, id, setSnackbar, refresh);
-								}}
-								before={
-									<Avatar size={24} style={{ background: 'green' }}>
-										<Icon24DoneOutline fill="#fff" width={14} height={14} />
-									</Avatar>
-								}
-							>
-								Объявление создано! Спасибо, что делаете мир лучше :)
-							</Snackbar>
-						);
-					}
-				})
-				.catch(function (error) {
-					console.log('failed uploaded', error);
-					err = true;
-				});
-			if (err) {
-				throw new Error('Ошибка у изображения!');
-			}
-		});
+							onClose={() => {
+								setSnackbar(null);
+							}}
+							action="Отменить"
+							onActionClick={() => {
+								deleteAd(setPopout, id, setSnackbar, refresh);
+							}}
+							before={
+								<Avatar size={24} style={{ background: 'green' }}>
+									<Icon24DoneOutline fill="#fff" width={14} height={14} />
+								</Avatar>
+							}
+						>
+							Объявление создано! Спасибо, что делаете мир лучше :)
+						</Snackbar>
+					);
+				}
+			})
+			.catch(function (error) {
+				console.log('failed uploaded', error);
+				err = true;
+			});
 		if (err) {
 			throw new Error('Ошибка у изображения!');
 		}
 	});
+	if (err) {
+		throw new Error('Ошибка у изображения!');
+	}
 }
 
-export async function CreateAd(obj, items, openAd, setSnackbar, setPopout) {
+export async function CreateAd(obj, photos, openAd, setSnackbar, setPopout) {
 	setPopout(<ScreenSpinner size="large" />);
 	let cancel;
 	await axios({
@@ -518,7 +516,7 @@ export async function CreateAd(obj, items, openAd, setSnackbar, setPopout) {
 			}
 			openAd(AD_LOADING);
 			await CreateImages(
-				items,
+				photos,
 				response.data.ad_id,
 				() => {
 					openAd({ ad_id: response.data.ad_id });
@@ -559,7 +557,7 @@ export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
 				refresh(ad_id);
 				setSnackbar(
 					<Snackbar
-					duration={SNACKBAR_DURATION_DEFAULT}
+						duration={SNACKBAR_DURATION_DEFAULT}
 						onClose={() => {
 							setSnackbar(null);
 						}}

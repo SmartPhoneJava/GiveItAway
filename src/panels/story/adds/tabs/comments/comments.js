@@ -15,7 +15,7 @@ import {
 	Link,
 } from '@vkontakte/vkui';
 
-import PANEL_ONE from './../../../../Main';
+import PANEL_ONE from '../../../../App';
 
 import useCommentsGet from './useCommentsGet';
 
