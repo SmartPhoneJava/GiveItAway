@@ -1,24 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { setFormData } from './../../store/create_post/actions';
+import { FORM_LOCATION_CREATE } from './../../components/location/redux';
 import { SelectMimicry, FormLayout } from '@vkontakte/vkui';
 import { connect } from 'react-redux';
-import { FORM_LOCATION_CREATE } from './redux';
 
 const Location = (props) => {
+	const [applied, setApplied] = useState(false);
 	const { redux_form } = props;
-	const country = props.inputData[redux_form] ? props.inputData[redux_form].country.title : 'Не определена';
-	const city = props.inputData[redux_form] ? props.inputData[redux_form].city.title : 'Не определен';
+	const country = props.inputData[redux_form]
+		? props.inputData[redux_form].country.title
+		: props.myUser.country
+		? props.myUser.country.title
+		: 'Не определена';
+	const city = props.inputData[redux_form]
+		? props.inputData[redux_form].city.title
+		: props.myUser.city
+		? props.myUser.city.title
+		: 'Не определен';
 
-	useEffect(() => {
-		if (props.useMine) {
-			console.log('myuser', props.myUser);
-			props.setFormData(FORM_LOCATION_CREATE, {
-				...props.inputData[FORM_LOCATION_CREATE],
-				country: props.myUser.country,
-				city: props.myUser.city,
-			});
-		}
-	}, []);
+	// useEffect(() => {
+	// 	console.log("hi here ", applied)
+	// 	if (applied) {
+	// 		return;
+	// 	}
+	// 	if (props.useMine) {
+	// 		props.setFormData(FORM_LOCATION_CREATE, {
+	// 			...props.inputData[FORM_LOCATION_CREATE],
+	// 			country: props.myUser.country,
+	// 			city: props.myUser.city,
+	// 		});
+	// 		setApplied(true);
+	// 	}
+	// }, []);
 
 	const width = document.body.clientWidth;
 

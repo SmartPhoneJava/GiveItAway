@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import bridge from '@vkontakte/vk-bridge';
 import {
 	FormLayout,
 	Input,
@@ -43,14 +42,9 @@ const descriptionLabel = 'Описание';
 
 const PHOTO_TEXT = 'Не более трех фотографий (jpeg, png) размером 4мб';
 
-let defaultInputData = {
-	photoText: PHOTO_TEXT,
-	name: '',
-	description: '',
-	photosUrl: [],
-};
 const CreateItem = (props) => {
-	const [inputData, setInputData] = useState(props.inputData[CREATE_AD_ITEM] || defaultInputData);
+	console.log("props.defaultInputData", props.defaultInputData)
+	const [inputData, setInputData] = useState(props.inputData[CREATE_AD_ITEM] || props.defaultInputData);
 
 	const handleInput = (e) => {
 		let value = e.currentTarget.value;
@@ -175,13 +169,12 @@ const CreateItem = (props) => {
 	}
 
 	function openPhotos(i) {
-	
 		// if (platform != 'desktop_web' && platform != 'mobile_web') {
 		// 	bridge.send('VKWebAppShowImages', {
 		// 		images: inputData.photosUrl.map((v) => v.src),
 		// 	});
 		// } else {
-			openPhotoSwipe(i);
+		openPhotoSwipe(i);
 		// }
 	}
 

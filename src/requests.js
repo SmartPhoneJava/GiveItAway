@@ -451,7 +451,7 @@ export async function CreateImages(photos, id, goToAds, setSnackbar) {
 	let err = false;
 	photos.forEach(async (photo, i) => {
 		const data = new FormData();
-		data.append('file', photo);
+		data.append('file', photo.origin);
 		let cancel;
 
 		await axios({
@@ -498,7 +498,7 @@ export async function CreateImages(photos, id, goToAds, setSnackbar) {
 	}
 }
 
-export async function CreateAd(obj, photos, openAd, setSnackbar, setPopout) {
+export async function CreateAd(obj, photos, openAd, setSnackbar, setPopout, successcallback) {
 	setPopout(<ScreenSpinner size="large" />);
 	let cancel;
 	await axios({
@@ -520,6 +520,9 @@ export async function CreateAd(obj, photos, openAd, setSnackbar, setPopout) {
 				response.data.ad_id,
 				() => {
 					openAd({ ad_id: response.data.ad_id });
+					if (successcallback) {
+						successcallback()
+					}
 				},
 				setSnackbar
 			);

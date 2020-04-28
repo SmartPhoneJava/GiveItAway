@@ -8,7 +8,7 @@ import Icon24Done from '@vkontakte/icons/dist/24/done';
 
 const FormPanel = (props) => {
 	const { redux_form, array, getImage, getText, field, back, none_value, defaultInputData } = props;
-	const [inputData, setInputData] = useState(props.inputData[redux_form] || defaultInputData);
+
 	const [search, setSearch] = useState('');
 
 	const filterFunc = props.filterFunc || ((v) => v);
@@ -30,12 +30,14 @@ const FormPanel = (props) => {
 							onClick={() => {
 								if (props.clear) {
 									props.setFormData(redux_form, {
-                                        ...defaultInputData,
-                                        [field]: cat,
+										...defaultInputData,
+										stopMe: true,
+										[field]: cat,
 									});
 								} else {
+									console.log('props.inputData', props.inputData, redux_form);
 									props.setFormData(redux_form, {
-										...inputData,
+										...props.inputData[redux_form],
 										[field]: cat,
 									});
 								}

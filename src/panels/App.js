@@ -31,7 +31,7 @@ import { FORM_LOCATION_CREATE } from './../components/location/redux';
 import Subs from './story/adds/tabs/subs/subs';
 
 import AddsTabs from './story/adds/AddsTabs';
-import CreateAddRedux from './story/create/components/CreateAddRedux';
+import Create from './../containers/create/create';
 
 import Icon28User from '@vkontakte/icons/dist/28/user';
 import Icon24MoreHorizontal from '@vkontakte/icons/dist/24/more_horizontal';
@@ -682,7 +682,7 @@ const App = (props) => {
 				>
 					<Panel id={PANEL_CREATE}>
 						<PanelHeader>{addText}</PanelHeader>
-						<CreateAddRedux
+						<Create
 							setCreateState={setCreateState}
 							vkPlatform={platform}
 							myID={myID}
