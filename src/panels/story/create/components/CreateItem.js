@@ -43,16 +43,10 @@ const descriptionLabel = 'Описание';
 const PHOTO_TEXT = 'Не более трех фотографий (jpeg, png) размером 4мб';
 
 const CreateItem = (props) => {
-	console.log("props.defaultInputData", props.defaultInputData)
 	const [inputData, setInputData] = useState(props.inputData[CREATE_AD_ITEM] || props.defaultInputData);
 
 	const handleInput = (e) => {
 		let value = e.currentTarget.value;
-
-		console.log('loooook', e.currentTarget.name, value);
-		console.log('me.inputData ', inputData);
-		console.log('props.inputData ', props.inputData);
-
 		props.setFormData(CREATE_AD_ITEM, {
 			...inputData,
 			[e.currentTarget.name]: value,
@@ -79,10 +73,6 @@ const CreateItem = (props) => {
 	};
 
 	const { platform } = props;
-
-	useEffect(() => {
-		console.log('inputData', inputData);
-	}, []);
 
 	function hideSnackbar() {
 		props.setSnackbar(null);

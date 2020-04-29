@@ -186,6 +186,8 @@ const mapStateToProps = (state) => {
 	return {
 		inputData: state.formData.forms,
 		myUser: state.vkui.myUser,
+		appID: state.vkui.appID,
+		apiVersion: state.vkui.apiVersion,
 
 		defaultInputData,
 		isValid,

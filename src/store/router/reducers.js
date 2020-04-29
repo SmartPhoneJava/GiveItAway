@@ -1,313 +1,359 @@
 import {
-    SET_PAGE,
-    GO_BACK,
-    OPEN_POPOUT,
-    CLOSE_POPOUT,
-    OPEN_MODAL,
-    CLOSE_MODAL,
-    SET_STORY
+	ADD_PROFILE,
+	ADD_AD,
+	SET_PAGE,
+	GO_BACK,
+	OPEN_POPOUT,
+	CLOSE_POPOUT,
+	OPEN_MODAL,
+	CLOSE_MODAL,
+	SET_STORY,
+	SET_PROFILE,
+	SET_AD,
 } from './actionTypes';
 
-import * as VK from "../../services/VK";
-import {smoothScrollToTop} from "../../services/_functions";
+import * as VK from '../../services/VK';
+import { smoothScrollToTop } from '../../services/_functions';
+import { STORY_ADS, STORY_CREATE } from './storyTypes';
+import { PANEL_ADS, PANEL_CREATE, PANEL_USER, PANEL_ONE } from './panelTypes';
+import { AdDefault } from '../../panels/template/AddMore2';
 
 const initialState = {
-    activeStory: null,
-    activeView: null,
-    activePanel: null,
+	activeStory: STORY_ADS,
+	storiesHistory: [STORY_ADS],
 
-    storiesHistory: [],
-    viewsHistory: [],
-    panelsHistory: [],
+	activePanels: {
+		[STORY_ADS]: PANEL_ADS,
+		[STORY_CREATE]: PANEL_CREATE,
+	},
+	panelsHistory: {
+		[STORY_ADS]: [PANEL_ADS],
+		[STORY_CREATE]: [PANEL_CREATE],
+	},
 
-    activeModals: [],
-    modalHistory: [],
-    popouts: [],
+	activeProfile: -1,
+	profileHistory: [],
 
-    scrollPosition: []
+	activeAd: AdDefault,
+	adHistory: [],
+
+	activeModals: {
+		[STORY_ADS]: null,
+		[STORY_CREATE]: null,
+	},
+	modalHistory: {
+		[STORY_ADS]: [],
+		[STORY_CREATE]: [],
+	},
+
+	popouts: [],
+
+	scrollPosition: [],
 };
 
 export const routerReducer = (state = initialState, action) => {
+	switch (action.type) {
+		case SET_PAGE: {
+			window.history.pushState(null, null);
 
-    switch (action.type) {
+			let panel = action.payload.panel;
 
-        case SET_PAGE: {
-            let View = action.payload.view;
-            let Panel = action.payload.panel;
+			let Story = state.activeStory;
+			let Panels = state.panelsHistory[Story] || [];
+			Panels = [...Panels, panel];
 
-            window.history.pushState(null, null);
+			console.log('page is here', Story, panel, Panels);
+			VK.swipeBackOn();
 
-            let panelsHistory = state.panelsHistory[View] || [];
-            let viewsHistory = state.viewsHistory[state.activeStory] || [];
+			return {
+				...state,
 
-            const viewIndexInHistory = viewsHistory.indexOf(View);
+				activePanels: {
+					...state.activePanels,
+					[Story]: panel,
+				},
+				panelsHistory: {
+					...state.panelsHistory,
+					[Story]: Panels,
+				},
 
-            if (viewIndexInHistory !== -1) {
-                viewsHistory.splice(viewIndexInHistory, 1);
-            }
+				scrollPosition: [...state.scrollPosition, window.pageYOffset],
+			};
+		}
 
-            if (panelsHistory.indexOf(Panel) === -1) {
-                panelsHistory = [...panelsHistory, Panel];
-            }
+		case ADD_PROFILE: {
+			let profile = action.payload.profile;
+			let Profiles = state.profileHistory;
+			Profiles = state.activeProfile ? [...Profiles, state.activeProfile] : Profiles;
+			console.log('set activeProfile', profile);
+			return {
+				...state,
+				activeProfile: profile,
+				profileHistory: Profiles,
+			};
+		}
 
-            if (panelsHistory.length > 1) {
-                VK.swipeBackOn();
-            }
+		case SET_PROFILE: {
+			window.history.pushState(null, null);
 
-            return {
-                ...state,
-                activeView: View,
-                activePanel: Panel,
+			let panel = action.payload.panel;
+			let profile = action.payload.profile;
 
-                panelsHistory: {
-                    ...state.panelsHistory,
-                    [View]: panelsHistory,
-                },
-                viewsHistory: {
-                    ...state.viewsHistory,
-                    [state.activeStory]: [...viewsHistory, View]
-                },
-                scrollPosition: {
-                    ...state.scrollPosition,
-                    [state.activeStory + "_" + state.activeView + "_" + state.activePanel]: window.pageYOffset
-                }
-            };
-        }
+			let Story = state.activeStory;
+			let Panels = state.panelsHistory[Story] || [];
+			let Profiles = state.profileHistory;
 
-        case SET_STORY: {
-            window.history.pushState(null, null);
+			Panels = [...Panels, panel];
+			Profiles = state.activeProfile ? [...Profiles, state.activeProfile] : Profiles;
 
-            let viewsHistory = state.viewsHistory[action.payload.story] || [action.payload.story];
+			VK.swipeBackOn();
 
-            let storiesHistory = state.storiesHistory;
-            let activeView = viewsHistory[viewsHistory.length - 1];
-            let panelsHistory = state.panelsHistory[activeView] || [action.payload.initial_panel];
-            let activePanel = panelsHistory[panelsHistory.length - 1];
+			return {
+				...state,
 
-            if (action.payload.story === state.activeStory) {
-                if (panelsHistory.length > 1) {
-                    let firstPanel = panelsHistory.shift();
-                    panelsHistory = [firstPanel];
+				activePanels: {
+					...state.activePanels,
+					[Story]: panel,
+				},
+				panelsHistory: {
+					...state.panelsHistory,
+					[Story]: Panels,
+				},
 
-                    activePanel = panelsHistory[panelsHistory.length - 1];
-                } else if (viewsHistory.length > 1) {
-                    let firstView = viewsHistory.shift();
-                    viewsHistory = [firstView];
+				activeProfile: profile,
+				profileHistory: Profiles,
 
-                    activeView = viewsHistory[viewsHistory.length - 1];
-                    panelsHistory = state.panelsHistory[activeView];
-                    activePanel = panelsHistory[panelsHistory.length - 1];
-                }
-            }
+				scrollPosition: [...state.scrollPosition, window.pageYOffset],
+			};
+		}
 
-            if (action.payload.story === state.activeStory && panelsHistory.length === 1 && window.pageYOffset > 0) {
-                window.scrollTo(0, 30);
+		case ADD_AD: {
+			let ad = action.payload.ad;
+			let Ads = state.adHistory;
+			Ads = state.activeAd ? [...Ads, state.activeAd] : Ads;
+			return {
+				...state,
+				activeAd: ad,
+				adHistory: Ads,
+			};
+		}
 
-                smoothScrollToTop();
-            }
+		case SET_AD: {
+			window.history.pushState(null, null);
 
-            const storiesIndexInHistory = storiesHistory.indexOf(action.payload.story);
+			let panel = action.payload.panel;
+			let ad = action.payload.ad;
 
-            if (storiesIndexInHistory === -1 || (storiesHistory[0] === action.payload.story && storiesHistory[storiesHistory.length - 1] !== action.payload.story)) {
-                storiesHistory = [...storiesHistory, action.payload.story];
-            }
+			let Story = state.activeStory;
+			let Panels = state.panelsHistory[Story] || [];
+			let Ads = state.adHistory;
 
-            return {
-                ...state,
-                activeStory: action.payload.story,
-                activeView: activeView,
-                activePanel: activePanel,
+			Panels = [...Panels, panel];
+			Ads = state.activeAd ? [...Ads, state.activeAd] : Ads;
 
-                storiesHistory: storiesHistory,
-                viewsHistory: {
-                    ...state.viewsHistory,
-                    [activeView]: viewsHistory
-                },
-                panelsHistory: {
-                    ...state.panelsHistory,
-                    [activeView]: panelsHistory
-                },
+			VK.swipeBackOn();
 
-                scrollPosition: {
-                    ...state.scrollPosition,
-                    [state.activeStory + "_" + state.activeView + "_" + state.activePanel]: window.pageYOffset
-                }
-            };
-        }
+			return {
+				...state,
 
-        case GO_BACK: {
-            let setView = state.activeView;
-            let setPanel = state.activePanel;
-            let setStory = state.activeStory;
+				activePanels: {
+					...state.activePanels,
+					[Story]: panel,
+				},
+				panelsHistory: {
+					...state.panelsHistory,
+					[Story]: Panels,
+				},
 
-            let popoutsData = state.popouts;
+				activeAd: ad,
+				adHistory: Ads,
 
-            if (popoutsData[setView]) {
-                popoutsData[setView] = null;
+				scrollPosition: [...state.scrollPosition, window.pageYOffset],
+			};
+		}
 
-                return {
-                    ...state,
-                    popouts: {
-                        ...state.popouts, popoutsData
-                    }
-                };
-            }
+		case SET_STORY: {
+			window.history.pushState(null, null);
 
-            let viewModalsHistory = state.modalHistory[setView];
+			VK.swipeBackOff();
 
-            if (viewModalsHistory !== undefined && viewModalsHistory.length !== 0) {
-                let activeModal = viewModalsHistory[viewModalsHistory.length - 2] || null;
+			let story = action.payload.story;
 
-                if (activeModal === null) {
-                    viewModalsHistory = [];
-                } else if (viewModalsHistory.indexOf(activeModal) !== -1) {
-                    viewModalsHistory = viewModalsHistory.splice(0, viewModalsHistory.indexOf(activeModal) + 1);
-                } else {
-                    viewModalsHistory.push(activeModal);
-                }
+			return {
+				...initialState,
+				activeStory: story,
+				scrollPosition: [window.pageYOffset],
+			};
+		}
 
-                return {
-                    ...state,
-                    activeModals: {
-                        ...state.activeModals,
-                        [setView]: activeModal
-                    },
-                    modalHistory: {
-                        ...state.modalHistory,
-                        [setView]: viewModalsHistory
-                    }
-                };
-            }
+		case GO_BACK: {
+			let Panel = state.activePanel;
+			let Story = state.activeStory;
 
-            let panelsHistory = state.panelsHistory[setView] || [];
-            let viewsHistory = state.viewsHistory[state.activeStory] || [];
-            let storiesHistory = state.storiesHistory;
+			let popoutsData = state.popouts;
 
-            if (panelsHistory.length > 1) {
-                panelsHistory.pop();
+			// если были открытые попауты
+			if (popoutsData.length > 0) {
+				popoutsData.pop();
 
-                setPanel = panelsHistory[panelsHistory.length - 1];
-            } else if (viewsHistory.length > 1) {
-                viewsHistory.pop();
+				return {
+					...state,
+					popouts: popoutsData,
+				};
+			}
 
-                setView = viewsHistory[viewsHistory.length - 1];
-                let panelsHistoryNew = state.panelsHistory[setView];
+			let Modals = state.modalHistory[Story];
 
-                setPanel = panelsHistoryNew[panelsHistoryNew.length - 1];
-            } else if (storiesHistory.length > 1) {
-                storiesHistory.pop();
+			// если были открытые модальные окна
+			if (Modals.length > 0) {
+				Modals.pop();
+				let activeModal = null;
+				if (Modals.length > 0) {
+					activeModal = Modals[Modals.length - 1];
+				}
 
-                setStory = storiesHistory[storiesHistory.length - 1];
-                setView = state.viewsHistory[setStory][state.viewsHistory[setStory].length - 1];
+				return {
+					...state,
+					activeModal: {
+						...state.activeModal,
+						[Story]: activeModal,
+					},
+					modalHistory: {
+						...state.modalHistory,
+						[Story]: Modals,
+					},
+				};
+			}
 
-                let panelsHistoryNew = state.panelsHistory[setView];
+			let Panels = state.panelsHistory[Story] || [Story];
+			let Stories = state.storiesHistory;
+			Panels.pop();
 
-                if (panelsHistoryNew.length > 1) {
-                    setPanel = panelsHistoryNew[panelsHistoryNew.length - 1];
-                } else {
-                    setPanel = panelsHistoryNew[0];
-                }
-            } else {
-                VK.closeApp();
-            }
+			let finish = false;
 
-            if (panelsHistory.length === 1) {
-                VK.swipeBackOff();
-            }
+			if (Panels.length > 0) {
+				Panel = Panels[Panels.length - 1];
+			} else {
+				Stories.pop();
+				if (Stories.length > 0) {
+					Story = Stories[Stories.length - 1];
 
-            return {
-                ...state,
-                activeView: setView,
-                activePanel: setPanel,
-                activeStory: setStory,
+					Panels = state.panelsHistory[Story];
+					Panel = Panels[Panels.length - 1];
+				} else {
+					finish = true;
+				}
+			}
 
-                viewsHistory: {
-                    ...state.viewsHistory,
-                    [state.activeView]: viewsHistory
-                },
-                panelsHistory: {
-                    ...state.panelsHistory,
-                    [state.activeView]: panelsHistory
-                }
-            };
-        }
+			if (finish) {
+				VK.closeApp();
+				return;
+			}
+			// VK.swipeBackOff();
 
-        case OPEN_POPOUT: {
-            window.history.pushState(null, null);
+			let Profile = state.activeProfile;
+			let Profiles = state.profileHistory;
+			if (state.activePanel == PANEL_USER) {
+				Profiles.pop();
+				Profile = Profiles[Profiles.length - 1];
+			}
 
-            return {
-                ...state,
-                popouts: {
-                    ...state.popouts,
-                    [state.activeView]: action.payload.popout
-                }
-            };
-        }
+			let Ad = state.activeAd;
+			let Ads = state.adHistory;
+			if (state.activePanel == PANEL_ONE) {
+				Ads.pop();
+				Ad = Ads[Ads.length - 1];
+			}
 
-        case CLOSE_POPOUT: {
-            return {
-                ...state,
-                popouts: {
-                    ...state.popouts,
-                    [state.activeView]: null
-                }
-            };
-        }
+			return {
+				...state,
 
-        case OPEN_MODAL: {
-            window.history.pushState(null, null);
+				activePanels: {
+					...state.activePanels,
+					[Story]: Panel,
+				},
+				panelsHistory: {
+					...state.panelsHistory,
+					[Story]: Panels,
+				},
 
-            let activeModal = action.payload.id || null;
-            let modalsHistory = state.modalHistory[state.activeView] ? [...state.modalHistory[state.activeView]] : [];
+				activeStory: Story,
 
-            if (activeModal === null) {
-                modalsHistory = [];
-            } else if (modalsHistory.indexOf(activeModal) !== -1) {
-                modalsHistory = modalsHistory.splice(0, modalsHistory.indexOf(activeModal) + 1);
-            } else {
-                modalsHistory.push(activeModal);
-            }
+				activeAd: Ad,
+				activeProfile: Profile,
 
-            return {
-                ...state,
-                activeModals: {
-                    ...state.activeModals,
-                    [state.activeView]: activeModal
-                },
-                modalHistory: {
-                    ...state.modalHistory,
-                    [state.activeView]: modalsHistory
-                }
-            };
-        }
+				profileHistory: Profiles,
+				adHistory: Ads,
+			};
+		}
 
-        case CLOSE_MODAL: {
-            let activeModal = state.modalHistory[state.activeView][state.modalHistory[state.activeView].length - 2] || null;
-            let modalsHistory = state.modalHistory[state.activeView] ? [...state.modalHistory[state.activeView]] : [];
+		case OPEN_POPOUT: {
+			window.history.pushState(null, null);
 
-            if (activeModal === null) {
-                modalsHistory = [];
-            } else if (modalsHistory.indexOf(activeModal) !== -1) {
-                modalsHistory = modalsHistory.splice(0, modalsHistory.indexOf(activeModal) + 1);
-            } else {
-                modalsHistory.push(activeModal);
-            }
+			return {
+				...state,
+				popouts: {
+					...state.popouts,
+					[state.activeStory]: action.payload.popout,
+				},
+			};
+		}
 
-            return {
-                ...state,
-                activeModals: {
-                    ...state.activeModals,
-                    [state.activeView]: activeModal
-                },
-                modalHistory: {
-                    ...state.modalHistory,
-                    [state.activeView]: modalsHistory
-                }
-            };
-        }
+		case CLOSE_POPOUT: {
+			return {
+				...state,
+				popouts: {
+					...state.popouts,
+					[state.activeStory]: null,
+				},
+			};
+		}
 
-        default: {
-            return state;
-        }
-    }
+		case OPEN_MODAL: {
+			window.history.pushState(null, null);
+
+			let Story = state.activeStory;
+			let modal = action.payload.modal;
+			let Modals = state.modalHistory[Story] || [];
+
+			return {
+				...state,
+				activeModals: {
+					...state.activeModals,
+					[Story]: modal,
+				},
+				modalHistory: {
+					...state.modalHistory,
+					[Story]: [...Modals, modal],
+				},
+			};
+		}
+
+		case CLOSE_MODAL: {
+			let Story = state.activeStory;
+			let modal = null;
+			let Modals = state.modalHistory[Story] || [modal];
+			Modals.pop();
+
+			if (Modals.length > 0) {
+				modal = Modals[Modals.length - 1];
+			}
+
+			return {
+				...state,
+				activeModals: {
+					...state.activeModals,
+					[Story]: modal,
+				},
+				modalHistory: {
+					...state.modalHistory,
+					[Story]: Modals,
+				},
+			};
+		}
+
+		default: {
+			return state;
+		}
+	}
 };

@@ -274,7 +274,6 @@ const AddsTab = (props) => {
 				refresh={props.refresh}
 				myID={props.myID}
 				onCloseClick={props.onCloseClick}
-				chooseAdd={props.chooseAdd}
 			/>
 		);
 	}
@@ -302,9 +301,13 @@ const AddsTab = (props) => {
 					onIconClick={props.onFiltersClick}
 				/>
 				{filtersOn ? (
-					<PanelHeaderButton mode="secondary" size="m" onClick={()=>{
-						props.dropFilters()
-					}}>
+					<PanelHeaderButton
+						mode="secondary"
+						size="m"
+						onClick={() => {
+							props.dropFilters();
+						}}
+					>
 						<div style={{ paddingRight: '10px' }}>
 							<Avatar size={24}>
 								<Icon24Dismiss />

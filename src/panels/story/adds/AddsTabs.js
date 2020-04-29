@@ -52,7 +52,7 @@ const AddsTabs = (props) => {
 	function select(e) {
 		setmode(e.currentTarget.dataset.mode);
 		setContextOpened(false);
-		props.dropFilters()
+		props.dropFilters();
 	}
 
 	return (
@@ -173,7 +173,6 @@ const AddsTabs = (props) => {
 					onFiltersClick={props.onFiltersClick}
 					onCloseClick={props.onCloseClick}
 					setSnackbar={props.setSnackbar}
-					chooseAdd={props.chooseAdd}
 				></AddsTab>
 			)}
 		</React.Fragment>

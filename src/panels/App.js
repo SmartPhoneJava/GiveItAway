@@ -9,20 +9,46 @@ import {
 	TabbarItem,
 	PanelHeaderSimple,
 	ScreenSpinner,
-	Counter,
 	ConfigProvider,
-	Placeholder,
-	Button,
 } from '@vkontakte/vkui';
+
+import { STORY_ADS, STORY_CREATE } from './../store/router/storyTypes';
+import {
+	PANEL_ADS,
+	PANEL_ONE,
+	PANEL_USER,
+	PANEL_SUBS,
+	PANEL_COMMENTS,
+	PANEL_CREATE,
+	PANEL_CATEGORIES,
+	PANEL_CITIES,
+	PANEL_COUNTRIES,
+} from './../store/router/panelTypes';
+
+import {
+	MODAL_ADS_FILTERS,
+	MODAL_ADS_GEO,
+	MODAL_ADS_SUBS,
+	MODAL_ADS_COST,
+	MODAL_ADS_FROZEN,
+} from './../store/router/modalTypes';
 
 import './main.css';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { goBack, closeModal, setStory } from '../store/router/actions';
+import {
+	goBack,
+	closeModal,
+	setStory,
+	openModal,
+	setProfile,
+	setAd,
+	setPage,
+	addProfile,
+} from '../store/router/actions';
 import * as VK from '../services/VK';
 import { setAppID, setPlatform } from '../store/vk/actions';
-import bridge from '@vkontakte/vk-bridge';
 
 import CategoriesPanel from './../components/categories/panel';
 import Countries from './../components/location/countries';
@@ -46,6 +72,8 @@ import AddMore, { AdDefault } from './template/AddMore';
 import AddMore2 from './template/AddMore2';
 import { CategoryNo } from './template/Categories';
 
+import AddsModal, { GEO_TYPE_FILTERS } from './story/adds/AddsModal';
+
 import { Auth, getToken } from '../requests';
 
 import Error from './placeholders/error';
@@ -55,16 +83,6 @@ import { NoRegion } from './template/Location';
 
 import Profile from './story/profile/Profile';
 
-import AddsModal, {
-	MODAL_FILTERS,
-	MODAL_CATEGORIES,
-	MODAL_SUBS,
-	GEO_TYPE_FILTERS,
-	MODAL_COST,
-	MODAL_FROZEN,
-} from './story/adds/AddsModal';
-import CreateModal from './story/create/CreateModal';
-
 import { AddrWS } from '../store/addr_ws';
 
 import Comments from './story/adds/tabs/comments/comments';
@@ -72,28 +90,11 @@ import Comments from './story/adds/tabs/comments/comments';
 import { inputArgs } from '../utils/window';
 
 import Centrifuge from 'centrifuge';
-import continuousSizeLegend from 'react-vis/dist/legends/continuous-size-legend';
 import { FORM_CREATE } from '../components/categories/redux';
 
-const PANEL_ADS = 'ads';
-const PANEL_ONE = 'one';
-const PANEL_USER = 'user';
-const PANEL_SUBS = 'subs';
-const PANEL_COMMENTS = 'comments';
-const PANEL_CATEGORIES = 'categories';
-const PANEL_CREATE = 'create';
-const PANEL_CITIES = 'cities';
-const PANEL_COUNTRIES = 'countries';
-
-const ads = 'ads';
 const adsText = 'Объявления';
-
-const add = 'add';
 const addText = 'Создать обьявление';
-
 const profileText = 'Профиль';
-
-const no_prev = 'no prev';
 
 const addr = AddrWS.getState() + '/connection/websocket';
 let centrifuge = new Centrifuge(addr);
@@ -102,39 +103,23 @@ let notsCounterrr = 0;
 
 const App = (props) => {
 	const { colorScheme, appID, myID, apiVersion, platform } = props;
+	const { activeStory, goBack, setAd, setPage, setStory, setProfile, openModal, closeModal, addProfile } = props;
 
 	const [popout, setPopout] = useState(null); //<ScreenSpinner size="large" />
 	const [inited, setInited] = useState(false);
 
 	const [adsMode, setAdsMode] = useState('all');
 
-	const [history, setHistory] = useState([PANEL_ADS]);
-	const [historyLen, setHistoryLen] = useState(1);
-
-	const [historyAds, setHistoryAds] = useState([]);
-	const [historyProfile, setHistoryProfile] = useState([]);
-
 	const [backUser, setbackUser] = useState(null);
 	const [cost, setCost] = useState(0);
 
-	const [profileID, setProfileID] = useState(0);
 	const [profileName, setProfileName] = useState('Профиль');
 
 	const [notsCounterr, setNotsCounterr] = useState(notsCounterr);
 
-	const [prevActiveStory, setPrevActiveStory] = useState(no_prev);
-	const [activeStory, setActiveStory] = useState(ads);
 	const [category, setCategory] = useState(CategoryNo);
-	const [category2, setCategory2] = useState(CategoryNo);
 
-	const [activePanel, setActivePanel] = useState(PANEL_ADS);
-	const [createActivePanel, setCreateActivePanel] = useState(PANEL_CREATE);
-
-	const [activeModal, setActiveModal] = useState(null);
-	const [activeModal2, setActiveModal2] = useState(null);
 	const [snackbar, setSnackbar] = useState(null);
-
-	const [choosen, setChoosen] = useState(AdDefault);
 
 	const [deleteID, SetDeleteID] = useState(-1);
 
@@ -154,8 +139,6 @@ const App = (props) => {
 
 	const [geoType, setGeoType] = useState(GEO_TYPE_FILTERS);
 
-	const [createState, setCreateState] = useState({ inited: false });
-
 	function dropFilters() {
 		setCategory(CategoryNo);
 		setCity(NoRegion);
@@ -163,143 +146,20 @@ const App = (props) => {
 		setSort('time');
 	}
 
-	function zeroHistory() {
-		setHistoryAds([]);
-		setHistoryProfile([]);
-		setHistoryLen(-1);
-		setHistory([PANEL_ADS]);
-	}
-
 	const onStoryChange = (e) => {
 		const isProfile = e.currentTarget.dataset.text == profileText;
-
-		if (e.currentTarget.dataset.story == ads) {
+		setStory(e.currentTarget.dataset.story);
+		if (e.currentTarget.dataset.story == STORY_ADS) {
 			if (isProfile) {
-				setProfileID(myID);
-				setActivePanel(PANEL_USER);
-				setPrevActiveStory(no_prev);
+				setProfile(myID);
+				setPage(PANEL_USER);
 			} else {
 				dropFilters();
-				setActivePanel(PANEL_ADS);
+				setPage(PANEL_ADS);
 				setSavedAdState('');
 			}
 		}
-		scroll();
-		setActiveStory(e.currentTarget.dataset.story);
-		zeroHistory();
 	};
-
-	useEffect(() => {
-		if (profileID != 0) {
-			setActivePanel(PANEL_USER);
-		}
-	}, [profileID]);
-
-	useEffect(() => {
-		if (choosen.ad_id != -1) {
-			setActivePanel(PANEL_ONE);
-		} else {
-			setActivePanel(PANEL_ADS);
-		}
-	}, [choosen]);
-
-	function next(currPanel, newPanel, ad, profileID) {
-		console.log('nextnext', currPanel, newPanel);
-		window.history.pushState({ currPanel: newPanel, ad: ad, profileID: profileID }, currPanel);
-		setHistoryLen(history.length + 1);
-		let a = history.slice();
-		a.push(currPanel);
-		setHistory(a);
-		setActivePanel(newPanel);
-	}
-
-	function back() {
-		// window.history.back();
-		let a = history.slice();
-		let panel = a.pop();
-		setHistory(a);
-		setActivePanel(panel);
-	}
-
-	function openAd(ad, currPanel) {
-		setActiveStory(ads);
-		setChoosen(ad);
-		if (currPanel) {
-			next(currPanel, PANEL_ONE, ad, null);
-
-			let a = historyAds.slice();
-			a.push(ad);
-			setHistoryAds(a);
-		}
-
-		scroll();
-	}
-
-	function openComments(ad) {
-		setActiveStory(ads);
-		next(PANEL_ONE, PANEL_COMMENTS, ad, null);
-		let a = historyAds.slice();
-		a.push(ad);
-		setHistoryAds(a);
-		scroll();
-	}
-
-	function openSubs(ad) {
-		setActiveStory(ads);
-		next(PANEL_ONE, PANEL_SUBS, ad, null);
-		let a = historyAds.slice();
-		a.push(ad);
-		setHistoryAds(a);
-		scroll();
-	}
-
-	function openUser(id, currPanel) {
-		setActiveStory(ads);
-		setProfileID(id);
-		setPrevActiveStory('ads');
-		next(currPanel, PANEL_USER, null, id);
-
-		let a = historyProfile.slice();
-		a.push(id);
-		setHistoryProfile(a);
-
-		scroll();
-	}
-
-	useEffect(() => {
-		console.log('history change', historyLen, history.length, window.history.length);
-		if (historyLen == history.length || history.length == 1) {
-			return;
-		}
-		const adsLength = history.filter((v) => {
-			v == PANEL_ONE;
-		}).length;
-		const usersLength = history.filter((v) => {
-			v == PANEL_USER;
-		}).length;
-
-		const a = historyAds.slice();
-		const p = historyProfile.slice();
-
-		if (adsLength != a.length) {
-			const ad = a.pop();
-			setChoosen(ad);
-			setHistoryAds(a);
-		}
-
-		if (usersLength != p.length) {
-			const id = p.pop();
-			setProfileID(id);
-			setHistoryProfile(p);
-		}
-	}, [history]);
-
-	function goToAds(snack) {
-		setActiveStory(ads);
-		if (snack != undefined) {
-			setSnackbar(snack);
-		}
-	}
 
 	async function scroll() {
 		// await bridge.send('VKWebAppScroll', { top: 10000, speed: 600 });
@@ -326,20 +186,20 @@ const App = (props) => {
 		});
 	}
 
-	useEffect(() => {
-		console.log('choosen', choosen.ad_id);
-		if (choosen.ad_id == -1) {
-			return;
-		}
-		turnOnNotifications();
+	// useEffect(() => {
+	// 	console.log('choosen', choosen.ad_id);
+	// 	if (choosen.ad_id == -1) {
+	// 		return;
+	// 	}
+	// 	turnOnNotifications();
 
-		const ad = choosen;
-		console.log('connecting', ad.ad_id);
-		centrifuge.subscribe('ad_' + ad.ad_id, (note) => {
-			console.log('centrifugu notenote', note);
-			setwsNote(note);
-		});
-	}, [choosen]);
+	// 	const ad = choosen;
+	// 	console.log('connecting', ad.ad_id);
+	// 	centrifuge.subscribe('ad_' + ad.ad_id, (note) => {
+	// 		console.log('centrifugu notenote', note);
+	// 		setwsNote(note);
+	// 	});
+	// }, [choosen]);
 
 	useEffect(() => {
 		setPopout(<ScreenSpinner size="large" />);
@@ -367,28 +227,18 @@ const App = (props) => {
 
 		window.history.pushState({ currPanel: PANEL_ADS, ad: AdDefault }, PANEL_ADS);
 		window.onpopstate = function (event) {
-			if (!event.state) {
-				VK.closeApp();
-				return;
-			}
-			const currPanel = event.state.currPanel;
-			setActivePanel(currPanel);
-			if (currPanel == PANEL_USER) {
-				setProfileID(event.state.profileID);
-			} else if (currPanel == PANEL_ONE) {
-				setChoosen(event.state.ad);
-			}
+			goBack();
 		};
 
 		dispatch(
 			VK.getuser((us) => {
-				console.log('looook at us', us);
 				Auth(
 					us,
 					setSnackbar,
 					setPopout,
 					(v) => {
 						setInited(true);
+						dispatch(addProfile(us.id));
 						getToken(
 							setSnackbar,
 							(v) => {
@@ -408,6 +258,17 @@ const App = (props) => {
 		);
 	}, []);
 
+	let adPanels = props.panelsHistory[STORY_ADS];
+	const canGoBack = adPanels.length > 3;
+	let adActivePanel = props.activePanels[STORY_ADS];
+	let adActiveModal = props.activeModals[STORY_ADS];
+
+	let createPanels = props.panelsHistory[STORY_CREATE];
+	let createActivePanel = props.activePanels[STORY_CREATE];
+
+	let choosen = props.activeAd;
+	console.log('adPanels', adPanels, canGoBack);
+
 	if (!inited) {
 		return snackbar;
 	}
@@ -424,12 +285,11 @@ const App = (props) => {
 					<Tabbar>
 						<TabbarItem
 							onClick={onStoryChange}
-							selected={activeStory === ads && activePanel != PANEL_USER}
-							data-story={ads}
+							selected={activeStory === STORY_ADS && adActivePanel != PANEL_USER}
+							data-story={STORY_ADS}
 							data-text={adsText}
 							text={adsText}
 							label={notsCounterrr == 0 ? null : notsCounterrr}
-							after={<Counter>100</Counter>}
 							// after={notsCounter == 0 ? '' : <Counter>notsCounter</Counter>}
 						>
 							<Icon28NewsfeedOutline onClick={onStoryChange} />
@@ -438,16 +298,16 @@ const App = (props) => {
 						<TabbarItem
 							onClick={onStoryChange}
 							data-text={addText}
-							selected={activeStory === add}
-							data-story={add}
+							selected={activeStory === STORY_CREATE}
+							data-story={STORY_CREATE}
 							text={addText}
 						>
 							<Icon28Add onClick={onStoryChange} />
 						</TabbarItem>
 						<TabbarItem
 							onClick={onStoryChange}
-							selected={activeStory === ads && activePanel == PANEL_USER}
-							data-story={ads}
+							selected={activeStory === STORY_ADS && adActivePanel == PANEL_USER}
+							data-story={STORY_ADS}
 							data-text={profileText}
 							text={profileText}
 						>
@@ -458,10 +318,10 @@ const App = (props) => {
 			>
 				<View
 					popout={popout}
-					id={ads}
-					activePanel={activePanel}
-					onSwipeBack={back}
-					history={history}
+					id={STORY_ADS}
+					activePanel={adActivePanel}
+					onSwipeBack={goBack}
+					history={adPanels}
 					modal={
 						<AddsModal
 							geoType={geoType}
@@ -469,8 +329,7 @@ const App = (props) => {
 							appID={appID}
 							apiVersion={apiVersion}
 							vkPlatform={platform}
-							activeModal={activeModal}
-							setActiveModal={setActiveModal}
+							activeModal={adActiveModal}
 							category={category}
 							setCategory={setCategory}
 							city={city}
@@ -500,9 +359,9 @@ const App = (props) => {
 							adsMode={adsMode}
 							setSavedAdState={setSavedAdState}
 							savedAdState={savedAdState}
-							onFiltersClick={() => setActiveModal(MODAL_FILTERS)}
+							onFiltersClick={() => openModal(MODAL_ADS_FILTERS)}
 							onCloseClick={(act) => {
-								setActiveModal(MODAL_SUBS);
+								openModal(MODAL_ADS_SUBS);
 								scroll();
 							}}
 							notsCounter={notsCounterrr}
@@ -517,23 +376,16 @@ const App = (props) => {
 							city={city}
 							country={country}
 							myID={myID}
-							openUser={(id) => {
-								openUser(id, PANEL_ADS);
-							}}
+							openUser={setProfile}
 							sort={sort}
 							dropFilters={dropFilters}
-							chooseAdd={(ad) => {
-								setChoosen(ad);
-							}}
-							openAd={(ad) => {
-								openAd(ad, PANEL_ADS);
-							}}
+							openAd={setAd}
 							vkPlatform={platform}
 						/>
 						{snackbar}
 					</Panel>
 					<Panel id={PANEL_ONE}>
-						<PanelHeaderSimple left={<PanelHeaderBack onClick={back} />}>
+						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
 							{choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошбка'}
 						</PanelHeaderSimple>
 						{choosen ? (
@@ -541,32 +393,29 @@ const App = (props) => {
 								myID={myID}
 								wsNote={wsNote}
 								refresh={(id) => {
-									back();
+									goBack();
 									SetDeleteID(id);
 									scroll();
 								}}
-								back={back}
-								openUser={(id) => {
-									console.log('PANEL_ONE', id);
-									openUser(id, PANEL_ONE);
-								}}
+								back={goBack}
+								openUser={setProfile}
 								openComments={(ad) => {
-									openComments(ad);
+									setPage(PANEL_COMMENTS);
 								}}
 								openSubs={(ad) => {
-									openSubs(ad);
+									setPage(PANEL_SUBS);
 								}}
 								ad={choosen}
 								setPopout={setPopout}
 								setSnackbar={setSnackbar}
 								VkUser={VkUser}
 								vkPlatform={platform}
-								onCloseClick={() => setActiveModal(MODAL_SUBS)}
+								onCloseClick={() => openModal(MODAL_ADS_SUBS)}
 								onCarmaClick={() => {
-									setActiveModal(MODAL_COST);
+									openModal(MODAL_ADS_COST);
 								}}
 								onFreezeClick={() => {
-									setActiveModal(MODAL_FROZEN);
+									openModal(MODAL_ADS_FROZEN);
 								}}
 								setbackUser={setbackUser}
 								setCost={setCost}
@@ -577,9 +426,7 @@ const App = (props) => {
 						{snackbar}
 					</Panel>
 					<Panel id={PANEL_USER}>
-						<PanelHeaderSimple
-							left={prevActiveStory == no_prev ? null : <PanelHeaderBack onClick={back} />}
-						>
+						<PanelHeaderSimple left={!canGoBack ? null : <PanelHeaderBack onClick={goBack} />}>
 							<p className="panel-header"> {profileName} </p>
 						</PanelHeaderSimple>
 						<Profile
@@ -587,27 +434,18 @@ const App = (props) => {
 							setPopout={setPopout}
 							setProfileName={setProfileName}
 							setSnackbar={setSnackbar}
-							myID={myID}
-							profileID={profileID}
-							appID={appID}
-							apiVersion={apiVersion}
 							goToAdds={() => {
-								setActiveStory(ads);
-								setActivePanel(PANEL_ADS);
-								scroll();
+								setStory(STORY_ADS);
 							}}
 							goToCreate={() => {
-								setActiveStory(add);
-								scroll();
+								setStory(STORY_CREATE);
 							}}
-							openAd={(ad) => {
-								openAd(ad, PANEL_USER);
-							}}
+							openAd={setAd}
 						/>
 						{snackbar}
 					</Panel>
 					<Panel id={PANEL_COMMENTS}>
-						<PanelHeaderSimple left={<PanelHeaderBack onClick={back} />}>
+						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
 							{choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошбка'}
 						</PanelHeaderSimple>
 						{choosen ? (
@@ -620,9 +458,7 @@ const App = (props) => {
 								setPopout={setPopout}
 								setSnackbar={setSnackbar}
 								myID={myID}
-								openUser={(id) => {
-									openUser(id, PANEL_ADS);
-								}}
+								openUser={setProfile}
 							/>
 						) : (
 							Error
@@ -630,14 +466,14 @@ const App = (props) => {
 						{snackbar}
 					</Panel>
 					<Panel id={PANEL_SUBS}>
-						<PanelHeaderSimple left={<PanelHeaderBack onClick={back} />}>
+						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
 							{choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошбка'}
 						</PanelHeaderSimple>
 						{choosen ? (
 							<Subs
 								setPopout={setPopout}
 								setSnackbar={setSnackbar}
-								openUser={openUser}
+								openUser={setProfile}
 								amount={5}
 								maxAmount={-1}
 								ad={choosen}
@@ -648,130 +484,60 @@ const App = (props) => {
 						{snackbar}
 					</Panel>
 					<Panel id={PANEL_CATEGORIES}>
-						<PanelHeaderSimple
-							left={
-								<PanelHeaderBack
-									onClick={() => {
-										setActiveStory(add);
-									}}
-								/>
-							}
-						>
-							{choosen ? <p className="panel-header">Всем привет</p> : 'Произошла ошбка'}
+						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
+							Выберите категорию
 						</PanelHeaderSimple>
-						<CategoriesPanel
-							back={() => {
-								setActiveStory(add);
-							}}
-						/>
+						<CategoriesPanel back={goBack} redux_form={FORM_CREATE} />
 					</Panel>
 				</View>
 
 				<View
-					id={add}
+					id={STORY_CREATE}
 					activePanel={createActivePanel}
 					popout={popout}
-					modal={
-						<CreateModal
-							activeModal={activeModal2}
-							setActiveModal={setActiveModal2}
-							category={category2}
-							setCategory={setCategory2}
-						/>
-					}
+					onSwipeBack={goBack}
+					history={createPanels}
 				>
 					<Panel id={PANEL_CREATE}>
 						<PanelHeader>{addText}</PanelHeader>
 						<Create
-							setCreateState={setCreateState}
-							vkPlatform={platform}
-							myID={myID}
-							appID={appID}
-							apiVersion={apiVersion}
 							setPopout={setPopout}
-							goToAds={goToAds}
 							snackbar={snackbar}
 							setSnackbar={setSnackbar}
-							category={category2}
-							refresh={(id) => {
-								SetDeleteID(id);
-							}}
-							chooseCategory={() => setActiveModal2(MODAL_CATEGORIES)}
 							openAd={(ad) => {
-								setActivePanel(PANEL_ONE);
-								setActiveStory(ads);
-								setChoosen(ad);
-								zeroHistory();
+								setStory(STORY_ADS);
+								setAd(ad);
 								scroll();
 							}}
 							openCategories={() => {
-								setCreateActivePanel(PANEL_CATEGORIES);
+								setPage(PANEL_CATEGORIES);
 							}}
 							openCities={() => {
-								setCreateActivePanel(PANEL_CITIES);
+								setPage(PANEL_CITIES);
 							}}
 							openCountries={() => {
-								setCreateActivePanel(PANEL_COUNTRIES);
+								setPage(PANEL_COUNTRIES);
 							}}
 						/>
 						{snackbar}
 					</Panel>
 					<Panel id={PANEL_CATEGORIES}>
-						<PanelHeaderSimple
-							left={
-								<PanelHeaderBack
-									onClick={() => {
-										setCreateActivePanel(PANEL_CREATE);
-									}}
-								/>
-							}
-						>
+						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
 							Выберите категорию
 						</PanelHeaderSimple>
-						<CategoriesPanel
-							back={() => {
-								setCreateActivePanel(PANEL_CREATE);
-							}}
-							redux_form={FORM_CREATE}
-						/>
+						<CategoriesPanel back={goBack} redux_form={FORM_CREATE} />
 					</Panel>
 					<Panel id={PANEL_COUNTRIES}>
-						<PanelHeaderSimple
-							left={
-								<PanelHeaderBack
-									onClick={() => {
-										setCreateActivePanel(PANEL_CREATE);
-									}}
-								/>
-							}
-						>
+						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
 							Выберите страну
 						</PanelHeaderSimple>
-						<Countries
-							back={() => {
-								setCreateActivePanel(PANEL_CREATE);
-							}}
-							redux_form={FORM_LOCATION_CREATE}
-						/>
+						<Countries back={goBack} redux_form={FORM_LOCATION_CREATE} />
 					</Panel>
 					<Panel id={PANEL_CITIES}>
-						<PanelHeaderSimple
-							left={
-								<PanelHeaderBack
-									onClick={() => {
-										setCreateActivePanel(PANEL_CREATE);
-									}}
-								/>
-							}
-						>
+						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
 							Выберите город
 						</PanelHeaderSimple>
-						<Cities
-							back={() => {
-								setCreateActivePanel(PANEL_CREATE);
-							}}
-							redux_form={FORM_LOCATION_CREATE}
-						/>
+						<Cities back={goBack} redux_form={FORM_LOCATION_CREATE} />
 					</Panel>
 				</View>
 			</Epic>
@@ -781,10 +547,11 @@ const App = (props) => {
 
 const mapStateToProps = (state) => {
 	return {
-		activeView: state.router.activeView,
+		activePanels: state.router.activePanels,
 		activeStory: state.router.activeStory,
 		panelsHistory: state.router.panelsHistory,
 		activeModals: state.router.activeModals,
+		activeAd: state.router.activeAd,
 		popouts: state.router.popouts,
 		scrollPosition: state.router.scrollPosition,
 
@@ -799,10 +566,22 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
 	return {
 		dispatch,
-		...bindActionCreators({ setStory, goBack, closeModal }, dispatch),
+		...bindActionCreators(
+			{
+				setStory,
+				setPage,
+				setProfile,
+				setAd,
+				goBack,
+				closeModal,
+				openModal,
+				addProfile,
+			},
+			dispatch
+		),
 	};
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
 
-// 477 -> 516 -> 674 -> 703 -> 795
+// 477 -> 516 -> 674 -> 703 -> 795 -> 749 -> 587

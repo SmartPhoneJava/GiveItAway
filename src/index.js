@@ -20,8 +20,6 @@ import '@vkontakte/vkui/dist/vkui.css';
 
 export const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)));
 
-store.dispatch(setStory('home', 'base'));
-
 ReactDOM.render(
 	<Provider store={store}>
 		<App />

@@ -1,20 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import {
-	Avatar,
-	CellButton,
-	Link,
-	Button,
-	Cell,
-	Header,
-	Group,
-	Placeholder,
-	HorizontalScroll,
-	Separator,
-} from '@vkontakte/vkui';
+import { Avatar, Link, Button, Cell, Header, Group, Placeholder, HorizontalScroll, Separator } from '@vkontakte/vkui';
 
-import { RadialChart } from 'react-vis'; 
+import { connect } from 'react-redux';
 
-// import 'react-vis/dist/style';
+import { RadialChart } from 'react-vis';
 
 import { getUser, getUserVK } from './requests';
 
@@ -47,9 +36,11 @@ function getAuthorHref(backuser) {
 	return <div style={{ fontWeight: '600', fontSize: '16px' }}>{name}</div>;
 }
 
-export const K = "Ҝ"
+export const K = 'Ҝ';
 
 const Profile = (props) => {
+	const profileID = props.activeProfile || -1;
+
 	const [backuser, setBackUser] = useState();
 	const [vkUser, setVkUser] = useState('');
 
@@ -62,7 +53,7 @@ const Profile = (props) => {
 		props.setPopout,
 		givenPageNumber,
 		10,
-		props.profileID
+		profileID
 	);
 
 	const [receivedPageNumber, setReceivedPageNumber] = useState(1);
@@ -70,7 +61,7 @@ const Profile = (props) => {
 		props.setPopout,
 		receivedPageNumber,
 		10,
-		props.profileID
+		profileID
 	);
 
 	const given_observer = useRef();
@@ -107,7 +98,7 @@ const Profile = (props) => {
 		getUser(
 			props.setPopout,
 			props.setSnackbar,
-			props.profileID,
+			profileID,
 			(v) => {
 				setBackUser(v);
 				props.setProfileName(v.name + ' ' + v.surname);
@@ -118,7 +109,7 @@ const Profile = (props) => {
 		);
 
 		getUserVK(
-			props.profileID,
+			profileID,
 			props.appID,
 			props.apiVersion,
 			(v) => {
@@ -128,7 +119,7 @@ const Profile = (props) => {
 		);
 		setGivenPageNumber(1);
 		setReceivedPageNumber(1);
-	}, [props.profileID]);
+	}, [profileID]);
 
 	function Ad(ad) {
 		const image = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : '';
@@ -185,7 +176,7 @@ const Profile = (props) => {
 		);
 	}
 
-	console.log('we want update', props.profileID);
+	console.log('we want update', profileID);
 
 	if (backuser) {
 		return (
@@ -200,17 +191,13 @@ const Profile = (props) => {
 						vkUser.can_write_private_message == 1 ? (
 							<Link
 								style={{ marginLeft: '15px' }}
-								href={'https://vk.com/im?sel=' + props.profileID}
+								href={'https://vk.com/im?sel=' + profileID}
 								target="_blank"
 							>
 								Написать
 							</Link>
 						) : (
-							<Link
-								style={{ marginLeft: '15px' }}
-								href={'https://vk.com/id' + props.profileID}
-								target="_blank"
-							>
+							<Link style={{ marginLeft: '15px' }} href={'https://vk.com/id' + profileID} target="_blank">
 								Написать
 							</Link>
 						)
@@ -231,11 +218,11 @@ const Profile = (props) => {
 				</Cell>
 
 				<Group header={<Header mode="primary">Карма - {backuser.carma} Ҝ</Header>}>
-					{props.profileID == props.myID ? (
+					{profileID == props.myID ? (
 						<div style={{ display: width < 450 ? 'block' : 'flex' }}>
 							<Cell
 								onClick={() => {
-									if (props.profileID == props.myID) {
+									if (profileID == props.myID) {
 										props.goToAdds();
 										props.setAdsMode('wanted');
 									}
@@ -411,7 +398,7 @@ const Profile = (props) => {
 					getUser(
 						props.setPopout,
 						props.setSnackbar,
-						props.profileID,
+						profileID,
 						(v) => {
 							setBackUser(v);
 							setFailed(false);
@@ -427,6 +414,17 @@ const Profile = (props) => {
 	return <></>;
 };
 
-export default Profile;
+const mapStateToProps = (state) => {
+	return {
+		myID: state.vkui.myID,
+		apiVersion: state.vkui.apiVersion,
+		appID: state.vkui.appID,
+		activeProfile: state.router.activeProfile,
+	};
+};
 
-// 337
+const mapDispatchToProps = {};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Profile);
+
+// 337 -> 431

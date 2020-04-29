@@ -14,7 +14,6 @@ import {
 	Avatar,
 	InfoRow,
 	Radio,
-	Placeholder,
 	ModalCard,
 } from '@vkontakte/vkui';
 
@@ -24,18 +23,19 @@ import CategoriesLabel from './../../../components/categories/label';
 
 import { ModalHeader } from './../../headers/modal';
 
-import Location from './../../../components/location/label';
 import { NoRegion } from './../../../components/location/const';
 
 import { PeopleRB } from './../../template/People';
 import { K } from '../profile/Profile';
 
-export const MODAL_FILTERS = 'filters';
-export const MODAL_CATEGORIES = 'categories';
-export const MODAL_GEO = 'geoposition';
-export const MODAL_SUBS = 'subs';
-export const MODAL_COST = 'cost';
-export const MODAL_FROZEN = 'frozen';
+import {
+	MODAL_ADS_FILTERS,
+	MODAL_ADS_GEO,
+	MODAL_ADS_CATEGORIES,
+	MODAL_ADS_SUBS,
+	MODAL_ADS_COST,
+	MODAL_ADS_FROZEN,
+} from './../../../store/router/modalTypes';
 
 export const GEO_TYPE_FILTERS = 'filters';
 export const GEO_TYPE_NEAR = 'near';
@@ -69,19 +69,19 @@ const AddsModal = (props) => {
 	return (
 		<ModalRoot activeModal={props.activeModal}>
 			<ModalPage
-				id={MODAL_FILTERS}
+				id={MODAL_ADS_FILTERS}
 				onClose={hideModal}
 				header={<ModalHeader name="Фильтры" back={() => hideModal()} />}
 			>
 				<CategoriesLabel
 					leftMargin="10px"
 					category={props.category}
-					open={() => props.setActiveModal(MODAL_CATEGORIES)}
+					open={() => props.setActiveModal(MODAL_ADS_CATEGORIES)}
 				/>
 				<Group separator="show" header={<Header mode="secondary">Местоположение объявления</Header>}>
 					<CellButton
 						onClick={() => {
-							props.setActiveModal(MODAL_GEO);
+							props.setActiveModal(MODAL_ADS_GEO);
 						}}
 					>
 						{props.geoType == GEO_TYPE_FILTERS
@@ -154,13 +154,13 @@ const AddsModal = (props) => {
 				</Group>
 			</ModalPage>
 			<ModalPage
-				id={MODAL_CATEGORIES}
-				onClose={() => props.setActiveModal(MODAL_FILTERS)}
+				id={MODAL_ADS_CATEGORIES}
+				onClose={() => props.setActiveModal(MODAL_ADS_FILTERS)}
 				header={
 					<ModalHeader
 						isBack={true}
 						name="Выберите категорию"
-						back={() => props.setActiveModal(MODAL_FILTERS)}
+						back={() => props.setActiveModal(MODAL_ADS_FILTERS)}
 					/>
 				}
 			>
@@ -173,10 +173,14 @@ const AddsModal = (props) => {
 				/> */}
 			</ModalPage>
 			<ModalPage
-				id={MODAL_GEO}
-				onClose={() => props.setActiveModal(MODAL_FILTERS)}
+				id={MODAL_ADS_GEO}
+				onClose={() => props.setActiveModal(MODAL_ADS_FILTERS)}
 				header={
-					<ModalHeader isBack={true} name="Где искать?" back={() => props.setActiveModal(MODAL_FILTERS)} />
+					<ModalHeader
+						isBack={true}
+						name="Где искать?"
+						back={() => props.setActiveModal(MODAL_ADS_FILTERS)}
+					/>
 				}
 			>
 				<Radio
@@ -201,19 +205,15 @@ const AddsModal = (props) => {
 					Недалеко от меня
 				</Radio>
 				<div>
-					{props.geoType == GEO_TYPE_FILTERS ? (
-						// Location(
-						// 	props.appID,
-						// 	props.apiVersion,
-						// 	props.vkPlatform,
-						// 	props.country,
-						// 	props.setCountry,
-						// 	props.city,
-						// 	props.setCity,
-						// 	false
-						// )
-						null
-					) : (
+					{props.geoType == GEO_TYPE_FILTERS ? // 	props.apiVersion, // 	props.appID, // Location(
+					// 	props.vkPlatform,
+					// 	props.country,
+					// 	props.setCountry,
+					// 	props.city,
+					// 	props.setCity,
+					// 	false
+					// )
+					null : (
 						<FormLayout>
 							<Slider
 								step={0.5}
@@ -255,7 +255,7 @@ const AddsModal = (props) => {
 				</div>
 			</ModalPage>
 			<ModalPage
-				id={MODAL_SUBS}
+				id={MODAL_ADS_SUBS}
 				onClose={() => props.setActiveModal(null)}
 				header={<ModalHeader name="Выберите человека" back={() => props.setActiveModal(null)} />}
 				dynamicContentHeight
@@ -271,7 +271,7 @@ const AddsModal = (props) => {
 			</ModalPage>
 			<ModalPage
 				onClose={() => props.setActiveModal(null)}
-				id={MODAL_COST}
+				id={MODAL_ADS_COST}
 				header={<ModalHeader name="Моя карма" back={() => props.setActiveModal(null)} />}
 			>
 				<List>
@@ -303,7 +303,7 @@ const AddsModal = (props) => {
 				</List>
 			</ModalPage>
 			<ModalCard
-				id={MODAL_FROZEN}
+				id={MODAL_ADS_FROZEN}
 				onClose={() => props.setActiveModal(null)}
 				icon={
 					<Avatar mode="app" style={{ background: 'var(--background_content)' }} src={Freeze100} size={64} />

@@ -17,7 +17,7 @@ const CreateAddRedux = (props) => {
 	const [pmOpen, setPmOpen] = useState(true);
 	useEffect(() => {
 		canWritePrivateMessage(
-			props.myID,
+			props.myUser.id,
 			props.appID,
 			props.apiVersion,
 			(isClosed) => {
