@@ -7,17 +7,18 @@ import { connect } from 'react-redux';
 const Location = (props) => {
 	const [applied, setApplied] = useState(false);
 	const { redux_form } = props;
-	const country = props.inputData[redux_form]
-		? props.inputData[redux_form].country.title
-		: props.myUser.country
-		? props.myUser.country.title
-		: 'Не определена';
-	const city = props.inputData[redux_form]
-		? props.inputData[redux_form].city.title
-		: props.myUser.city
-		? props.myUser.city.title
-		: 'Не определен';
-
+	const country =
+		props.inputData[redux_form] && props.inputData[redux_form].country
+			? props.inputData[redux_form].country.title
+			: props.useMine && props.myUser.country
+			? props.myUser.country.title
+			: 'Не определена';
+	const city =
+		props.inputData[redux_form] && props.inputData[redux_form].city
+			? props.inputData[redux_form].city.title
+			: props.useMine && props.myUser.city
+			? props.myUser.city.title
+			: 'Не определен';
 	// useEffect(() => {
 	// 	console.log("hi here ", applied)
 	// 	if (applied) {

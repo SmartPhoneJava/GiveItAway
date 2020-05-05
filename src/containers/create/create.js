@@ -1,5 +1,8 @@
 import { connect } from 'react-redux';
 
+import { setPage, openPopout, openSnackbar, closeSnackbar, setStory, setAd } from '../../store/router/actions';
+import { PANEL_CATEGORIES, PANEL_CITIES, PANEL_COUNTRIES } from '../../store/router/actionTypes';
+
 import { setFormData } from '../../store/create_post/actions';
 import { CREATE_AD_MAIN, CREATE_AD_ITEM } from '../../store/create_post/types';
 
@@ -11,6 +14,8 @@ import { CategoryNo } from '../../components/categories/Categories';
 import { NoRegion } from '../../components/location/const';
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { FORM_CREATE } from '../../components/categories/redux';
+import { setDetailedAd, setExtraInfo } from '../../store/detailed_ad/actions';
+import { STORY_ADS } from '../../store/router/storyTypes';
 
 const PHOTO_TEXT = 'Не более трех фотографий (jpeg, png) размером 4мб';
 
@@ -27,11 +32,12 @@ let defaultInputData = {
 	country: NoRegion,
 };
 
-const clearForm = () => {
-	setFormData(FORM_LOCATION_CREATE, { ...defaultInputData });
-	setFormData(FORM_CREATE, { ...defaultInputData });
-	setFormData(CREATE_AD_MAIN, { ...defaultInputData });
-	setFormData(CREATE_AD_ITEM, { ...defaultInputData });
+const clearForm = (dispatch) => {
+	console.log('clicked clearForm');
+	dispatch(setFormData(FORM_LOCATION_CREATE, { ...defaultInputData }));
+	dispatch(setFormData(FORM_CREATE, { ...defaultInputData }));
+	dispatch(setFormData(CREATE_AD_MAIN, { ...defaultInputData }));
+	dispatch(setFormData(CREATE_AD_ITEM, { ...defaultInputData }));
 };
 
 const getMainInfo = (inputData) => {
@@ -60,9 +66,9 @@ const getAd = (myUser, inputData, tgeodata) => {
 		author_id: myUser.id,
 		header: item.name,
 		text: item.description,
-		feedback_type: "comments",
+		feedback_type: 'comments',
 		// feedback_type: (main.ls ? ' ls' : '') + (main.comments ? ' comments' : ''),
-		extra_field: main ? main.type : "choice",
+		extra_field: main ? main.type : 'choice',
 		category: category.category,
 		region: location.country.title,
 		district: location.city.title,
@@ -71,12 +77,42 @@ const getAd = (myUser, inputData, tgeodata) => {
 	};
 };
 
-const createAd = (myUser, inputData, tgeodata, openAd, setSnackbar, setPopout) => {
-	const obj = JSON.stringify(getAd(myUser, inputData, tgeodata));
+const openCategories = () => {
+	setPage(PANEL_CATEGORIES);
+};
+
+const openCountries = () => {
+	setPage(PANEL_COUNTRIES);
+};
+
+const openCities = () => {
+	setPage(PANEL_CITIES);
+};
+
+const openAd = (ad, dispatch) => {
+	dispatch(setStory(STORY_ADS));
+	dispatch(setAd(ad));
+};
+const loadAd = (ad, dispatch) => {
+	dispatch(setExtraInfo(ad));
+};
+
+const createAd = (myUser, inputData, tgeodata, dispatch) => {
+	const ad = getAd(myUser, inputData, tgeodata);
+	const obj = JSON.stringify(ad);
+	const photos = getItemInfo(inputData).photosUrl;
 	console.log('objection', getItemInfo(inputData).photosUrl);
-	CreateAd(obj, getItemInfo(inputData).photosUrl, openAd, setSnackbar, setPopout, () => {
-		clearForm();
-	});
+
+	CreateAd(
+		ad,
+		obj,
+		photos,
+		(ad) => openAd(ad, dispatch),
+		(ad) => loadAd(ad, dispatch),
+		openSnackbar,
+		openPopout,
+		() => clearForm(dispatch)
+	);
 };
 
 const isValid = (inputData) => {
@@ -189,14 +225,22 @@ const mapStateToProps = (state) => {
 		appID: state.vkui.appID,
 		apiVersion: state.vkui.apiVersion,
 
+		snackbar: state.router.snackbars[state.router.activeStory],
+
 		defaultInputData,
 		isValid,
-		createAd,
 	};
 };
 
-const mapDispatchToProps = {
-	setFormData,
+const mapDispatchToProps = (dispatch) => {
+	return {
+		setFormData: (p, s) => dispatch(setFormData(p, s)),
+		setPage: (p) => dispatch(setPage(p)),
+		openSnackbar: (p) => dispatch(openSnackbar(p)),
+		openPopout: (p) => dispatch(openPopout(p)),
+		closeSnackbar: () => dispatch(closeSnackbar()),
+		createAd: (myUser, inputData, tgeodata) => createAd(myUser, inputData, tgeodata, dispatch),
+	};
 };
 
 const Create = connect(mapStateToProps, mapDispatchToProps)(CreateAddRedux);

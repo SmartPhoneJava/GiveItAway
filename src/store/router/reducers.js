@@ -5,18 +5,21 @@ import {
 	GO_BACK,
 	OPEN_POPOUT,
 	CLOSE_POPOUT,
+	OPEN_SNACKBAR,
+	CLOSE_SNACKBAR,
 	OPEN_MODAL,
 	CLOSE_MODAL,
+	CLOSE_ALL_MODALS,
 	SET_STORY,
 	SET_PROFILE,
 	SET_AD,
+	SET_DUMMY,
 } from './actionTypes';
 
 import * as VK from '../../services/VK';
-import { smoothScrollToTop } from '../../services/_functions';
 import { STORY_ADS, STORY_CREATE } from './storyTypes';
 import { PANEL_ADS, PANEL_CREATE, PANEL_USER, PANEL_ONE } from './panelTypes';
-import { AdDefault } from '../../panels/template/AddMore2';
+import { AdDefault } from '../../const/ads';
 
 const initialState = {
 	activeStory: STORY_ADS,
@@ -46,7 +49,13 @@ const initialState = {
 		[STORY_CREATE]: [],
 	},
 
-	popouts: [],
+	popouts: {
+		[STORY_ADS]: null,
+		[STORY_CREATE]: null,
+	},
+	snackbars: {},
+
+	dummies: {},
 
 	scrollPosition: [],
 };
@@ -81,10 +90,29 @@ export const routerReducer = (state = initialState, action) => {
 			};
 		}
 
+		case SET_DUMMY: {
+			let dummy = action.payload.dummy;
+
+			let Story = state.activeStory;
+			let dummies = state.dummies[Story] || [];
+
+			return {
+				...state,
+				dummies: {
+					...state.dummies,
+					[Story]: [...dummies, dummy],
+				},
+			};
+		}
+
 		case ADD_PROFILE: {
 			let profile = action.payload.profile;
+			let Profile = state.activeProfile;
 			let Profiles = state.profileHistory;
-			Profiles = state.activeProfile ? [...Profiles, state.activeProfile] : Profiles;
+			if (Profile == -1) {
+				Profile = profile
+			}
+			Profiles = Profile ? [...Profiles, Profile] : Profiles;
 			console.log('set activeProfile', profile);
 			return {
 				...state,
@@ -105,6 +133,8 @@ export const routerReducer = (state = initialState, action) => {
 
 			Panels = [...Panels, panel];
 			Profiles = state.activeProfile ? [...Profiles, state.activeProfile] : Profiles;
+
+			console.log("SET_PROFILE", state.activeProfile, Profiles);
 
 			VK.swipeBackOn();
 
@@ -190,15 +220,29 @@ export const routerReducer = (state = initialState, action) => {
 			let Panel = state.activePanel;
 			let Story = state.activeStory;
 
-			let popoutsData = state.popouts;
+			let Popout = state.popouts[Story];
 
-			// если были открытые попауты
-			if (popoutsData.length > 0) {
-				popoutsData.pop();
-
+			let Dummies = state.dummies[Story] || [];
+			// если были открытые заглушки
+			if (Dummies.length > 0) {
+				Dummies.pop();
 				return {
 					...state,
-					popouts: popoutsData,
+					dummies: {
+						...state.dummies,
+						[Story]: Dummies,
+					},
+				};
+			}
+
+			// если были открытые попауты
+			if (Popout) {
+				return {
+					...state,
+					popouts: {
+						...state.popouts,
+						[state.activeStory]: null,
+					},
 				};
 			}
 
@@ -290,21 +334,55 @@ export const routerReducer = (state = initialState, action) => {
 		case OPEN_POPOUT: {
 			window.history.pushState(null, null);
 
+			const Story = state.activeStory;
+			const popout = action.payload.popout;
+
 			return {
 				...state,
 				popouts: {
 					...state.popouts,
-					[state.activeStory]: action.payload.popout,
+					[Story]: popout,
 				},
 			};
 		}
 
 		case CLOSE_POPOUT: {
+			const Story = state.activeStory;
 			return {
 				...state,
 				popouts: {
 					...state.popouts,
-					[state.activeStory]: null,
+					[Story]: null,
+				},
+			};
+		}
+
+		case OPEN_SNACKBAR: {
+			window.history.pushState(null, null);
+
+			const Story = state.activeStory;
+			const Panel = state.activePanels[Story];
+			const snackbar = action.payload.snackbar;
+
+			// console.log('we set snackbar', snackbar)
+
+			return {
+				...state,
+				snackbars: {
+					...state.snackbars,
+					[Panel]: snackbar,
+				},
+			};
+		}
+
+		case CLOSE_SNACKBAR: {
+			const Story = state.activeStory;
+			const Panel = state.activePanels[Story];
+			return {
+				...state,
+				snackbars: {
+					...state.snackbars,
+					[Panel]: null,
 				},
 			};
 		}
@@ -348,6 +426,22 @@ export const routerReducer = (state = initialState, action) => {
 				modalHistory: {
 					...state.modalHistory,
 					[Story]: Modals,
+				},
+			};
+		}
+
+		case CLOSE_ALL_MODALS: {
+			let Story = state.activeStory;
+
+			return {
+				...state,
+				activeModals: {
+					...state.activeModals,
+					[Story]: null,
+				},
+				modalHistory: {
+					...state.modalHistory,
+					[Story]: [],
 				},
 			};
 		}

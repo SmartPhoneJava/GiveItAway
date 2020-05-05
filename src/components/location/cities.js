@@ -45,6 +45,7 @@ const Cities = (props) => {
 		<FormPanel
 			redux_form={props.redux_form}
 			array={cities}
+			goBack={props.goBack}
 			field={'city'}
 			getText={(v) => {
 				return v.title;
@@ -52,7 +53,6 @@ const Cities = (props) => {
 			filterFunc={(v) => {
 				return v.title;
 			}}
-			back={props.back}
 			none_value={NoRegion}
 			defaultInputData={DefaultInputData}
 		/>

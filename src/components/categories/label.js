@@ -7,8 +7,9 @@ import { GetCategoryImage, GetCategoryText, CategoryNo } from './Categories';
 
 const CategoriesLabel = (props) => {
 	const { redux_form } = props;
-	const category = props.inputData[redux_form] ? props.inputData[redux_form].category : CategoryNo;
+	const category = props.inputData[redux_form] && props.inputData[redux_form].category ? props.inputData[redux_form].category : CategoryNo;
 
+	console.log("categoryyyy", category, props.inputData[redux_form], redux_form)
 	return (
 		<div
 			style={{

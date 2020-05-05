@@ -8,18 +8,33 @@ import ChooseType from './../../../../components/create/ChooseType';
 
 import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 
+import { PANEL_CITIES, PANEL_CATEGORIES, PANEL_COUNTRIES } from './../../../../store/router/panelTypes';
+
 import Location from '../../../../components/location/label';
 
 import { canWritePrivateMessage } from '../../../../requests';
 import { FORM_LOCATION_CREATE } from '../../../../components/location/redux';
+import { SNACKBAR_DURATION_DEFAULT } from '../../../../store/const';
 
 const CreateAddRedux = (props) => {
+	const {
+		openPopout,
+		openSnackbar,
+		closeSnackbar,
+		myUser,
+		appID,
+		apiVersion,
+		setFormData,
+		setPage,
+		snackbar,
+	} = props;
+
 	const [pmOpen, setPmOpen] = useState(true);
 	useEffect(() => {
 		canWritePrivateMessage(
-			props.myUser.id,
-			props.appID,
-			props.apiVersion,
+			myUser.id,
+			appID,
+			apiVersion,
 			(isClosed) => {
 				setPmOpen(!isClosed);
 			},
@@ -31,10 +46,10 @@ const CreateAddRedux = (props) => {
 			stop = props.inputData[FORM_LOCATION_CREATE].stopMe;
 		}
 		if (!stop) {
-			props.setFormData(FORM_LOCATION_CREATE, {
+			setFormData(FORM_LOCATION_CREATE, {
 				...props.inputData[FORM_LOCATION_CREATE],
-				country: props.myUser.country,
-				city: props.myUser.city,
+				country: myUser.country,
+				city: myUser.city,
 				stopMe: true,
 			});
 		}
@@ -68,10 +83,10 @@ const CreateAddRedux = (props) => {
 	}, []);
 
 	function saveCancel() {
-		props.setSnackbar(
+		openSnackbar(
 			<Snackbar
 				duration={SNACKBAR_DURATION_DEFAULT}
-				onClose={() => props.setSnackbar(null)}
+				onClose={closeSnackbar}
 				before={
 					<Avatar size={24} style={{ background: 'orange' }}>
 						<Icon24Favorite fill="#fff" width={14} height={14} />
@@ -83,10 +98,10 @@ const CreateAddRedux = (props) => {
 		);
 	}
 
-	function createAd(setPopout) {
+	function createAd() {
 		if (valid) {
-			setPopout(<ScreenSpinner size="large" />);
-			props.createAd(props.myUser, props.inputData, geodata, props.openAd, props.setSnackbar, props.setPopout);
+			openPopout(<ScreenSpinner size="large" />);
+			props.createAd(myUser, props.inputData, geodata);
 		} else {
 			saveCancel();
 		}
@@ -96,21 +111,27 @@ const CreateAddRedux = (props) => {
 			<Group separator="hide" header={<Header mode="secondary">Опишите выставляемые предметы</Header>}>
 				<CreateItem
 					defaultInputData={props.defaultInputData}
-					setSnackbar={props.setSnackbar}
-					openCategories={props.openCategories}
+					setSnackbar={openSnackbar}
+					openCategories={() => {
+						setPage(PANEL_CATEGORIES);
+					}}
 				/>
 			</Group>
 
 			<Group separator="hide" header={<Header>Мое местоположение</Header>}>
 				<Location
 					redux_form={FORM_LOCATION_CREATE}
-					openCountries={props.openCountries}
-					openCities={props.openCities}
+					openCountries={() => {
+						setPage(PANEL_COUNTRIES);
+					}}
+					openCities={() => {
+						setPage(PANEL_CITIES);
+					}}
 					useMine={true}
 				/>
 			</Group>
 
-			<ChooseFeedback setSnackbar={props.setSnackbar} pmOpen={pmOpen} />
+			<ChooseFeedback setSnackbar={openSnackbar} pmOpen={pmOpen} />
 			<ChooseType />
 			{valid ? (
 				''
@@ -122,15 +143,11 @@ const CreateAddRedux = (props) => {
 				</div>
 			)}
 			<Div style={{ display: 'flex' }}>
-				<Button
-					onClick={() => createAd(props.setPopout)}
-					mode={valid ? 'commerce' : 'secondary'}
-					size="l"
-					stretched
-				>
+				<Button onClick={createAd} mode={valid ? 'commerce' : 'secondary'} size="l" stretched>
 					Добавить
 				</Button>
 			</Div>
+			{snackbar}
 		</div>
 	);
 };

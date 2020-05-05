@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Avatar, Cell, FormLayout, FormLayoutGroup, Radio, SelectMimicry } from '@vkontakte/vkui';
 import { withModalRootContext } from '@vkontakte/vkui';
 
-import Icon24Done from '@vkontakte/icons/dist/24/done';
+import { connect } from 'react-redux';
 
 import { Draft } from './../../store/draft';
 
@@ -22,7 +22,7 @@ export const PeopleList = (subs) => {
 	}
 };
 
-export const PeopleRB = withModalRootContext((props) => {
+export const PeopleRBI = withModalRootContext((props) => {
 	const [subs, setSubs] = useState([]);
 
 	useEffect(() => {
@@ -62,3 +62,13 @@ export const PeopleRB = withModalRootContext((props) => {
 		</>
 	);
 });
+
+const mapStateToProps = (state) => {
+	return {
+		ad: state.ad,
+	};
+};
+
+const mapDispatchToProps = {};
+
+export const PeopleRB = connect(mapStateToProps, mapDispatchToProps)(PeopleRBI);

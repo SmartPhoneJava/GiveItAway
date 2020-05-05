@@ -16,6 +16,9 @@ import {
 	Placeholder,
 } from '@vkontakte/vkui';
 
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+
 import { getUser } from './../../panels/story/profile/requests';
 
 import 'react-photoswipe/lib/photoswipe.css';
@@ -31,15 +34,6 @@ import Icon24Globe from '@vkontakte/icons/dist/24/globe';
 import Icon24VideoFill from '@vkontakte/icons/dist/24/video_fill';
 
 import Icon24Delete from '@vkontakte/icons/dist/24/delete';
-
-import Icon24CommentOutline from '@vkontakte/icons/dist/24/comment_outline';
-import Icon24Chats from '@vkontakte/icons/dist/24/chats';
-
-import Freeze24 from './../../img/24/freeze.png';
-import Icon24Phone from '@vkontakte/icons/dist/24/phone';
-import Icon24Mention from '@vkontakte/icons/dist/24/mention';
-import Icon24Info from '@vkontakte/icons/dist/24/info';
-import Icon24Message from '@vkontakte/icons/dist/24/message';
 
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
@@ -74,76 +68,75 @@ import './addsTab.css';
 
 import './styles.css';
 
-import PANEL_ONE from '../App';
-
-import Cat from './../../img/cat.jpg';
-import Man from './../../img/man.jpeg';
-import Kitten from './../../img/kitten.jpeg';
-import Jins from './../../img/jins.jpg';
-import Tea from './../../img/tea.jpg';
-import Playstein from './../../img/playstein.jpg';
-import Bb from './../../img/bb.jpg';
-
 import Comments from './../story/adds/tabs/comments/comments';
 
-import OpenActions from './components/actions';
-
 import { time } from './../../utils/time';
-import { shortText } from './../../utils/short_text';
+import { setDummy, openModal, setPage, setAd } from '../../store/router/actions';
+import { PANEL_IMAGE, PANEL_COMMENTS, PANEL_SUBS } from './../../store/router/panelTypes';
+import { MODAL_ADS_COST, MODAL_ADS_FROZEN } from '../../store/router/modalTypes';
+import {
+	setCost,
+	setIsSub,
+	setSubs,
+	setIsDealer,
+	setDeal,
+	setDetailedAd,
+	setPhotos,
+	setIsHidden,
+	setExtraInfo,
+	setIsAuthor,
+} from '../../store/detailed_ad/actions';
+import {
+	AdDefault,
+	AD_LOADING,
+	COLOR_DEFAULT,
+	COLOR_DONE,
+	COLOR_CANCEL,
+	STATUS_OFFER,
+	STATUS_CHOSEN,
+	STATUS_CLOSED,
+	STATUS_ABORTED,
+} from '../../const/ads';
 
-const COLOR_DEFAULT = 'rgba(0,0,0,0.6)';
-const COLOR_DONE = 'rgba(0,75,0,0.8)';
-const COLOR_CANCEL = 'rgba(75,0,0,0.8)';
+const AddMore2r = (props) => {
+	const { myID, dispatch } = props;
+	const {
+		setCost,
+		setIsSub,
+		setSubs,
+		setIsDealer,
+		setDeal,
+		setIsAuthor,
+		setPhotos,
+		setIsHidden,
+		setExtraInfo,
+	} = props;
+	const { setPage, openModal, setDummy, AD } = props;
+	console.log('ADDDDDDDD', AD);
+	const {
+		isDealer,
+		isAuthor,
+		isSubscriber,
+		status,
+		deal,
+		pathes_to_photo,
+		photos,
+		header,
+		ad_id,
+		subs,
+		district,
+		region,
+		text,
+		category,
+		views_count,
+		creation_date,
+		author,
+		feedback_type,
+		extra_field,
+		cost,
+		hidden,
+	} = AD;
 
-export const AD_LOADING = {
-	ad_id: -2,
-	status: 'loading',
-	header: 'Загрузка',
-	anonymous: false,
-	text: 'Загрузка',
-	creation_date: 'Загрузка',
-	feedback_type: 'Загрузка',
-	category: 'animals',
-	extra_field: '',
-	views_count: '0',
-	location: 'Загрузка',
-	pathes_to_photo: [],
-	author: {
-		vk_id: -1,
-		name: 'Загрузка',
-		surname: 'Загрузка',
-		photo_url: Man,
-	},
-};
-
-export const AdDefault = {
-	ad_id: -1,
-	status: 'offer',
-	header: 'Тест',
-	anonymous: false,
-	text: 'Описание',
-	creation_date: '13.12.2012',
-	feedback_type: 'ls',
-	category: 'animals',
-	extra_field: '',
-	views_count: '87',
-	location: 'Барнаул, Яблочная улица',
-	pathes_to_photo: [
-		{ AdPhotoId: 1, PhotoUrl: Kitten },
-		{ AdPhotoId: 2, PhotoUrl: Jins },
-		{ AdPhotoId: 3, PhotoUrl: Tea },
-	],
-	author: {
-		vk_id: 2,
-		name: 'Алёна',
-		surname: 'Чернышева',
-		photo_url: Man,
-	},
-};
-
-let saveInstance = null;
-
-const AddMore2 = (props) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [options, setOptions] = useState({});
 
@@ -151,10 +144,21 @@ const AddMore2 = (props) => {
 		setIsOpen(false);
 	};
 
-	const [ad, setAd] = useState(null);
+	console.log('ADADADADAD', AD);
 
 	const [photoIndex, setPhotoIndex] = useState(0);
 	const [image, setImage] = useState('');
+
+	const openImage = (imgs) => {
+		bridge
+			.send('VKWebAppShowImages', {
+				images: imgs,
+			})
+			.catch(function (error) {
+				setDummy('imager');
+				openPhotoSwipe(photoIndex);
+			});
+	};
 
 	const openPhotoSwipe = (i) => {
 		setOptions({
@@ -164,35 +168,46 @@ const AddMore2 = (props) => {
 		setIsOpen(true);
 	};
 
-	const [subs, setSubs] = useState(0);
-	const [hide, setHide] = useState(false);
+	console.log('props.myID', myID);
 
-	const [hidden, setHidden] = useState(false);
-	const [isSub, setIsSub] = useState(false);
-	const [isDealer, setIsDealer] = useState(false);
-	const [status, setStatus] = useState('unknown');
-
-	const [Deal, setDeal] = useState({});
-
-	const [request, setRequest] = useState('no');
-
-	const [cost, setCost] = useState(0);
 	const [backUser, setBackUser] = useState();
 
-	function isNotValid(a) {
-		return a == null || a.ad_id == AD_LOADING.ad_id || a.ad_id == AdDefault.ad_id;
+	function isNotValid() {
+		return AD == null || AD.ad_id == AD_LOADING.ad_id || AD.ad_id == AdDefault.ad_id;
+	}
+
+	function getImage() {
+		return AD.pathes_to_photo && AD.pathes_to_photo.length > 0 ? AD.pathes_to_photo[photoIndex].PhotoUrl : '';
 	}
 
 	useEffect(() => {
-		if (isNotValid(ad)) {
+		if (isNotValid()) {
 			return;
 		}
-		setImage(ad.pathes_to_photo ? ad.pathes_to_photo[photoIndex].PhotoUrl : '');
-	}, [photoIndex, ad]);
+		const photoSwipeImgs = pathes_to_photo.map((v) => {
+			let img = new Image();
+			img.src = v.PhotoUrl;
+			let width = img.width;
+			let hight = img.height;
+			return {
+				src: v.PhotoUrl,
+				msrc: v.PhotoUrl,
+				w: width,
+				h: hight,
+				title: header,
+				thumbnail: v.PhotoUrl,
+			};
+		});
+		setPhotos(photoSwipeImgs);
+		setImage(getImage());
+	}, [photoIndex, pathes_to_photo]);
 
-	function changeIsSub(isSubscriber) {
-		if (isSubscriber) {
-			props.setCost(cost);
+	function changeIsSub(isSub) {
+		if (isNotValid()) {
+			return;
+		}
+		if (isSub) {
+			// props.setCost(cost);
 			if (backUser) {
 				console.log('backUser valid treu', cost);
 				let b = backUser;
@@ -202,7 +217,7 @@ const AddMore2 = (props) => {
 			}
 			setCost(cost + 1);
 		} else {
-			props.setCost(-(cost - 1));
+			// props.setCost(-(cost - 1));
 			if (backUser) {
 				console.log('backUser valid fale', cost);
 				let b = backUser;
@@ -212,68 +227,72 @@ const AddMore2 = (props) => {
 			}
 			setCost(cost - 1);
 		}
-
-		setIsSub(isSubscriber);
+		console.log('isSubscriber', isSub);
+		setIsSub(isSub);
 	}
 
 	useEffect(() => {
-		if (isNotValid(props.ad)) {
-			setImage('');
-			return;
-		}
-		async function init() {
-			const id = props.ad.ad_id;
+		// if (isNotValid(props.ad)) {
+		// 	setImage('');
+		// 	return;
+		// }
+		const init = () => (dispatch) => {
+			const id = AD.ad_id;
+
 			getDetails(
-				props.setPopout,
+				(s) => {},
 				props.setSnackbar,
 				id,
 				(details) => {
-					setAd(details);
-					setHidden(details.hidden);
-					setStatus(details.status);
+					console.log('looooook', details);
+					// setDetailedAd(details);
+					setExtraInfo(details);
+					setIsAuthor(details.author.vk_id == myID);
+					// dispatch(setIsHidden(false));
 
 					getCost(
 						details.ad_id,
 						(data) => {
 							setCost(data.bid);
 							getSubscribers(
-								props.setPopout,
+								(e) => {},
 								props.setSnackbar,
 								id,
 								(s) => {
-									setSubs(s);
-									const is = isSubscriber(s);
-									setIsSub(is);
-									if (is) {
-										props.setCost(-data.bid);
-									} else {
-										props.setCost(data.bid - 1);
+									console.log('suuubs', s);
+									updateSubsInfo(s);
+									if (details.status != STATUS_OFFER) {
+										getDeal(
+											props.setSnackbar,
+											details.ad_id,
+											(deal) => {
+												updateDealInfo(s, deal);
+												setIsDealer(deal.subscriber_id == myID);
+												setDeal(deal);
+											},
+											(e) => {}
+										);
 									}
+									// if (is) {
+									// 	props.setCost(-data.bid);
+									// } else {
+									// 	props.setCost(data.bid - 1);
+									// }
 								},
 								(e) => {
-									props.setCost(-data.bid);
+									// props.setCost(-data.bid);
 								}
 							);
 						},
-						(e) => {}
+						(e) => {
+							console.log('some err', e);
+						}
 					);
-
-					if (details.status != 'offer') {
-						getDeal(
-							props.setSnackbar,
-							details.ad_id,
-							(deal) => {
-								setIsDealer(deal.subscriber_id == props.VkUser.getState().id);
-								setDeal(deal);
-							},
-							(e) => {}
-						);
-					}
 
 					getUser(
 						props.setPopout,
 						props.setSnackbar,
-						props.myID,
+						myID,
 						(v) => {
 							props.setbackUser(v);
 							setBackUser(v);
@@ -285,9 +304,9 @@ const AddMore2 = (props) => {
 				},
 				(e) => {}
 			);
-		}
-		init();
-	}, [props.ad, request]);
+		};
+		dispatch(init());
+	}, []);
 
 	function statusWrapper(block, color) {
 		color = color || COLOR_DEFAULT;
@@ -308,22 +327,18 @@ const AddMore2 = (props) => {
 		);
 	}
 
-	function getDealer() {
-		if (!subs) {
-			return {
-				vk_id: '',
-				photo_url: '',
-				name: '',
-				surname: '',
-			};
-		}
-		return subs.filter((v) => v.vk_id == Deal.subscriber_id).length > 0
-			? subs.filter((v) => v.vk_id == Deal.subscriber_id)[0]
-			: '';
+	function updateDealInfo(subs, deal) {
+		setDeal(deal);
+		setIsDealer(deal.subscriber_id == myID);
+		setDealer(
+			subs.filter((v) => v.vk_id == deal.subscriber_id).length > 0
+				? subs.filter((v) => v.vk_id == deal.subscriber_id)[0]
+				: null
+		);
 	}
 
 	function showClosed() {
-		if (isAuthor()) {
+		if (isAuthor) {
 			return statusWrapper(
 				<InfoRow className="status-text">Спасибо за помощь другим людям!</InfoRow>,
 				COLOR_DONE
@@ -336,7 +351,7 @@ const AddMore2 = (props) => {
 	}
 
 	function showAborted() {
-		if (isAuthor()) {
+		if (isAuthor) {
 			return statusWrapper(
 				<InfoRow className="status-text">Вторая сторона отказалась от сделки</InfoRow>,
 				COLOR_CANCEL
@@ -349,8 +364,8 @@ const AddMore2 = (props) => {
 	}
 
 	function showChosen() {
-		console.log('showOffer', isDealer, !isAuthor());
-		if (isDealer && !isAuthor()) {
+		console.log('showOffer', isDealer, !isAuthor);
+		if (isDealer && !isAuthor) {
 			return statusWrapper(
 				<>
 					<InfoRow style={{ padding: '10px', color: 'rgb(200,200,200)', textAlign: 'center' }}>
@@ -366,7 +381,7 @@ const AddMore2 = (props) => {
 								acceptDeal(
 									props.setPopout,
 									props.setSnackbar,
-									Deal.deal_id,
+									deal.deal_id,
 									(v) => {
 										props.back();
 									},
@@ -391,7 +406,7 @@ const AddMore2 = (props) => {
 								denyDeal(
 									props.setPopout,
 									props.setSnackbar,
-									Deal.deal_id,
+									deal.deal_id,
 									(v) => {
 										props.back();
 									},
@@ -412,7 +427,7 @@ const AddMore2 = (props) => {
 				COLOR_DEFAULT
 			);
 		}
-		if (!isAuthor()) {
+		if (!isAuthor) {
 			return statusWrapper(
 				<InfoRow
 					style={{
@@ -450,55 +465,45 @@ const AddMore2 = (props) => {
 
 	function showStatus() {
 		switch (status) {
-			case 'chosen':
+			case STATUS_CHOSEN:
 				return showChosen();
-			case 'closed':
+			case STATUS_CLOSED:
 				return showClosed();
-			case 'aborted':
+			case STATUS_ABORTED:
 				return showAborted();
 		}
 		return '';
 	}
 
-	function getFeedback(pm, comments) {
-		if (pm) {
-			return (
-				<Icon24Chats
-					onClick={() => {
-						props.openAd();
-					}}
-					fill="var(--white)"
-				/>
-			);
-		}
-		if (comments) {
-			return (
-				<Icon24CommentOutline
-					onClick={() => {
-						props.openAd();
-					}}
-					fill="var(--white)"
-				/>
-			);
-		}
-		return (
-			<Icon24Info
-				onClick={() => {
-					props.openAd();
-				}}
-				fill="var(--white)"
-			/>
-		);
-	}
+	const openSubs = () => {
+		setPage(PANEL_SUBS);
+	};
+
+	const openComments = () => {
+		console.log('open comments!');
+		setPage(PANEL_COMMENTS);
+	};
+
+	const onCarmaClick = () => {
+		openModal(MODAL_ADS_COST);
+	};
+
+	const onFreezeClick = () => {
+		openModal(MODAL_ADS_FROZEN);
+	};
+
+	const isFinished = () => {
+		return status !== STATUS_OFFER && status !== STATUS_CHOSEN;
+	};
 
 	const [imgs, setImgs] = useState([]);
 	// const [photoSwipeImgs, setPhotoSwipeImgs] = useState([]);
 
 	useEffect(() => {
-		if (isNotValid(ad)) {
+		if (isNotValid(AD)) {
 			return;
 		}
-		setImgs(ad.pathes_to_photo.map((v) => v.PhotoUrl));
+		setImgs(pathes_to_photo.map((v) => v.PhotoUrl));
 		// setPhotoSwipeImgs(
 		// 	ad.pathes_to_photo.map((v) => {
 		// 		let img = new Image();
@@ -515,22 +520,11 @@ const AddMore2 = (props) => {
 		// 		};
 		// 	})
 		// );
-	}, [ad]);
+	}, [AD]);
 
-	function isAuthor() {
-		if (!ad) {
-			return false;
-		}
-		return props.VkUser.getState().id == ad.author.vk_id;
-	}
-
-	function isSubscriber(subscribers) {
-		return (
-			!isAuthor() &&
-			subscribers &&
-			subscribers.length > 0 &&
-			subscribers.filter((v) => v.vk_id == props.VkUser.getState().id).length > 0
-		);
+	function updateSubsInfo(s) {
+		setSubs(s);
+		setIsSub(s.filter((v) => v.vk_id == myID).length > 0);
 	}
 
 	function unsub() {
@@ -538,7 +532,7 @@ const AddMore2 = (props) => {
 		unsubscribe(
 			props.setPopout,
 			props.setSnackbar,
-			ad.ad_id,
+			ad_id,
 			sub,
 			(v) => {
 				changeIsSub(false);
@@ -555,7 +549,7 @@ const AddMore2 = (props) => {
 		subscribe(
 			props.setPopout,
 			props.setSnackbar,
-			ad.ad_id,
+			ad_id,
 			unsub,
 			(v) => {
 				changeIsSub(true);
@@ -566,7 +560,7 @@ const AddMore2 = (props) => {
 			}
 		);
 	}
-	if (isNotValid(ad) || isNotValid(props.ad)) {
+	if (isNotValid(AD)) {
 		return (
 			<Placeholder stretched header="Загрузка объявления">
 				<ScreenSpinner size="large" />
@@ -574,42 +568,27 @@ const AddMore2 = (props) => {
 		);
 	}
 
-	const photoSwipeImgs = ad.pathes_to_photo.map((v) => {
-		let img = new Image();
-		img.src = v.PhotoUrl;
-		let width = img.width;
-		let hight = img.height;
-		return {
-			src: v.PhotoUrl,
-			msrc: v.PhotoUrl,
-			w: width,
-			h: hight,
-			title: ad.header,
-			thumbnail: v.PhotoUrl,
-		};
-	});
+	// console.log("details info", isDealer, status, status == 'aborted' || isAuthor() ? (
+	// 	''
+	// ) : isSub )
+
 	return (
 		<div>
-			<PhotoSwipe
-				style={{ marginTop: '50px' }}
-				isOpen={isOpen}
-				items={photoSwipeImgs}
-				options={options}
-				onClose={handleClose}
-			/>
+			<div onClick={() => {}}>
+				<PhotoSwipe
+					style={{ marginTop: '50px' }}
+					isOpen={isOpen}
+					items={photos}
+					options={options}
+					onClose={handleClose}
+				/>
+			</div>
 
 			<div style={{ position: 'relative' }}>
 				<div style={{ right: '10px', position: 'absolute', top: '6px' }}>
 					<PanelHeaderButton
 						onClick={() => {
-							bridge
-								.send('VKWebAppShowImages', {
-									images: imgs,
-								})
-								.catch(function (error) {
-									console.log('photoIndex', photoIndex);
-									openPhotoSwipe(photoIndex);
-								});
+							openImage(imgs);
 						}}
 						mode="secondary"
 						style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
@@ -623,14 +602,7 @@ const AddMore2 = (props) => {
 				{showStatus()}
 				<img
 					onClick={() => {
-						bridge
-							.send('VKWebAppShowImages', {
-								images: imgs,
-							})
-							.catch(function (error) {
-								console.log('photoIndex', photoIndex);
-								openPhotoSwipe(photoIndex);
-							});
+						openImage(imgs);
 					}}
 					srcSet={image}
 					style={{
@@ -642,76 +614,74 @@ const AddMore2 = (props) => {
 				/>
 			</div>
 
-			{!ad.pathes_to_photo || ad.pathes_to_photo.length <= 1 ? (
+			{pathes_to_photo.length <= 1 ? (
 				''
 			) : (
 				<HorizontalScroll>
 					<div style={{ display: 'flex' }}>
-						{ad.pathes_to_photo
-							? ad.pathes_to_photo.map((img, i) => {
-									return (
-										<div
-											key={img.AdPhotoId}
+						{pathes_to_photo.map((img, i) => {
+							return (
+								<div
+									key={img.AdPhotoId}
+									style={{
+										borderRadius: '10px',
+										alignItems: 'center',
+										justifyContent: 'center',
+										padding: '1px',
+									}}
+								>
+									<Button
+										mode="tertiary"
+										style={{
+											padding: '0px',
+											borderRadius: '10px',
+										}}
+										onClick={() => {
+											setPhotoIndex(i);
+										}}
+									>
+										<img
 											style={{
-												borderRadius: '10px',
-												alignItems: 'center',
-												justifyContent: 'center',
-												padding: '1px',
+												filter: i == photoIndex ? 'brightness(40%)' : 'brightness(90%)',
 											}}
-										>
-											<Button
-												mode="tertiary"
-												style={{
-													padding: '0px',
-													borderRadius: '10px',
-												}}
-												onClick={() => {
-													setPhotoIndex(i);
-												}}
-											>
-												<img
-													style={{
-														filter: i == photoIndex ? 'brightness(40%)' : 'brightness(90%)',
-													}}
-													src={img.PhotoUrl}
-													className="small_img"
-												/>
-											</Button>
-										</div>
-									);
-							  })
-							: ''}
+											src={img.PhotoUrl}
+											className="small_img"
+										/>
+									</Button>
+								</div>
+							);
+						})}
 					</div>
 				</HorizontalScroll>
 			)}
 
 			<div style={{ padding: '16px' }}>
 				<div style={{ display: 'block', alignItems: 'center' }}>
-					<div className="CellLeft__head">{ad.header}</div>
-					{isAuthor() ? (
+					<div className="CellLeft__head">{header}</div>
+					{isAuthor ? (
 						<div style={{ display: 'block' }}>
 							<div style={{ display: 'flex' }}>
 								<CellButton
 									onClick={() => {
 										hidden
-											? adVisible(props.setPopout, props.setSnackbar, ad.ad_id, () => {
-													setHidden(false);
+											? adVisible(props.setPopout, props.setSnackbar, ad_id, () => {
+													setIsHidden(false);
 											  })
-											: adHide(props.setPopout, props.setSnackbar, ad.ad_id, () => {
-													setHidden(true);
+											: adHide(props.setPopout, props.setSnackbar, ad_id, () => {
+													setIsHidden(true);
 											  });
 									}}
-									disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
+									disabled={isFinished()}
 									before={hidden ? <Icon24Globe /> : <Icon24Hide />}
 								>
 									{hidden ? 'Сделать видимым' : 'Сделать невидимым'}
 								</CellButton>
 								<CellButton
 									mode="danger"
-									disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
+									disabled={isFinished()}
 									before={<Icon24Delete />}
 									onClick={() => {
-										deleteAd(props.setPopout, ad.ad_id, props.setSnackbar, props.refresh);
+										deleteAd(props.setPopout, ad_id, props.setSnackbar, props.refresh);
 									}}
 								>
 									Удалить
@@ -745,13 +715,8 @@ const AddMore2 = (props) => {
 										<Icon28SettingsOutline fill="var(--black)" />
 									</Avatar>
 								</PanelHeaderButton> */}
-							<Button
-								disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
-								mode="commerce"
-								size="xl"
-								onClick={() => props.openSubs(ad)}
-							>
-								{ad.status == 'offer' ? 'Отдать' : 'Изменить получателя'}
+							<Button disabled={isFinished()} mode="commerce" size="xl" onClick={openSubs}>
+								{status == STATUS_OFFER ? 'Отдать' : 'Изменить получателя'}
 							</Button>
 						</div>
 					) : (
@@ -767,33 +732,25 @@ const AddMore2 = (props) => {
 					margin: '0px',
 				}}
 			>
-				<Cell before={<Icon24Place />}>{ad.region + ', ' + ad.district}</Cell>
+				<Cell before={<Icon24Place />}>{region + ', ' + district}</Cell>
 			</div>
 			<Separator />
-			{isDealer || status == 'closed' || status == 'aborted' || isAuthor() ? (
+			{isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED || isAuthor ? (
 				''
-			) : isSub ? (
+			) : isSubscriber ? (
 				<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 					<div style={{ margin: '12px' }}>
 						<Button stretched size="m" mode="destructive" onClick={unsub} before={<Icon24MarketOutline />}>
 							Отказаться
 						</Button>
 					</div>
-					<PanelHeaderButton
-						onClick={() => {
-							props.onCarmaClick();
-						}}
-					>
+					<PanelHeaderButton onClick={onCarmaClick}>
 						<div style={{ fontSize: '20px', color: 'var(--destructive)' }}>
 							+{cost - 1}
 							{K}
 						</div>
 					</PanelHeaderButton>
-					<PanelHeaderButton
-						onClick={() => {
-							props.onFreezeClick();
-						}}
-					>
+					<PanelHeaderButton onClick={onFreezeClick}>
 						<Icon24Help fill="var(--destructive)" />
 					</PanelHeaderButton>
 				</div>
@@ -804,43 +761,35 @@ const AddMore2 = (props) => {
 							Хочу забрать!
 						</Button>
 					</div>
-					<PanelHeaderButton
-						onClick={() => {
-							props.onCarmaClick();
-						}}
-					>
+					<PanelHeaderButton onClick={onCarmaClick}>
 						<div style={{ fontSize: '20px', color: 'var(--header_tint)' }}>
 							-{cost}
 							{K}
 						</div>
 					</PanelHeaderButton>
-					<PanelHeaderButton
-						onClick={() => {
-							props.onFreezeClick();
-						}}
-					>
+					<PanelHeaderButton onClick={onFreezeClick}>
 						<Icon24Help fill="var(--header_tint)" />
 					</PanelHeaderButton>
 				</div>
 			)}
 			<div style={{ marginTop: '10px', paddingLeft: '16px', paddingRight: '16px' }}>
-				<div className="CellLeft__block">{ad.text}</div>
+				<div className="CellLeft__block">{text}</div>
 			</div>
 
 			<table>
 				<tbody>
 					<tr>
 						<td className="first">Категория</td>
-						<td>{GetCategoryText(ad.category)}</td>
+						<td>{GetCategoryText(category)}</td>
 					</tr>
 					<tr>
 						<td className="first">Просмотров</td>
-						<td>{ad.views_count}</td>
+						<td>{views_count}</td>
 					</tr>
-					{status != 'closed' && status != 'aborted' ? (
+					{!isFinished() ? (
 						<tr>
 							<td className="first">Отклинулось</td>
-							<td>{subs && subs.length > 0 ? subs.length : '0'}</td>
+							<td>{subs.length > 0 ? subs.length : '0'}</td>
 						</tr>
 					) : (
 						''
@@ -848,22 +797,22 @@ const AddMore2 = (props) => {
 
 					<tr>
 						<td className="first">Размещено</td>
-						<td>{time(ad.creation_date)}</td>
+						<td>{time(creation_date)}</td>
 					</tr>
 				</tbody>
 			</table>
 			<Group header={<Header>Автор</Header>}>
 				<Cell
-					onClick={() => props.openUser(ad.author.vk_id)}
-					before={<Avatar size={36} src={ad.author.photo_url} />}
-					description={ad.extra_field ? ad.extra_field : ''}
+					onClick={() => props.openUser(author.vk_id)}
+					before={<Avatar size={36} src={author.photo_url} />}
+					description={extra_field ? extra_field : ''}
 				>
 					<div style={{ display: 'flex' }}>
-						{ad.author.name + ' ' + ad.author.surname}{' '}
-						{ad.feedback_type == 'ls' ? (
+						{author.name + ' ' + author.surname}{' '}
+						{feedback_type == 'ls' ? (
 							<Link
 								style={{ marginLeft: '15px' }}
-								href={'https://vk.com/im?sel=' + ad.author.vk_id}
+								href={'https://vk.com/im?sel=' + author.vk_id}
 								target="_blank"
 							>
 								Написать
@@ -874,39 +823,31 @@ const AddMore2 = (props) => {
 					</div>
 				</Cell>
 			</Group>
-			{isAuthor() ? (
-				status != 'closed' && status != 'aborted' ? (
-					<Subs
-						setPopout={props.setPopout}
-						setSnackbar={props.setSnackbar}
-						openUser={props.openUser}
-						amount={2}
-						maxAmount={2}
-						openSubs={() => props.openSubs(ad)}
-						ad={ad}
-						mini={true}
-					/>
-				) : (
-					''
-				)
-			) : (
-				''
-			)}
+			{isAuthor && isFinished ? (
+				<Subs
+					setPopout={props.setPopout}
+					setSnackbar={props.setSnackbar}
+					openUser={props.openUser}
+					amount={2}
+					maxAmount={2}
+					openSubs={openSubs}
+					ad={AD}
+					mini={true}
+				/>
+			) : null}
 
-			{ad.feedback_type == 'comments' ? (
+			{feedback_type == 'comments' ? (
 				<>
 					<Comments
 						mini={true}
-						openCommentaries={() => {
-							props.openComments(ad);
-						}}
+						openCommentaries={openComments}
 						hide={true}
-						ad={ad}
+						AD={AD}
 						amount={1}
 						maxAmount={1}
 						setPopout={props.setPopout}
 						setSnackbar={props.setSnackbar}
-						myID={props.myID}
+						myID={myID}
 						openUser={props.openUser}
 					/>
 				</>
@@ -917,6 +858,49 @@ const AddMore2 = (props) => {
 	);
 };
 
-// 857 -> 818
+const mapStateToProps = (state) => {
+	return {
+		AD: state.ad,
+		myID: state.vkui.myID,
+	};
+};
+
+const mapDispatchToProps = (dispatch) => {
+	return {
+		dispatch,
+		...bindActionCreators(
+			{
+				setDummy,
+				openModal,
+				setPage,
+				adVisible,
+				adHide,
+				deleteAd,
+				getSubscribers,
+				getDetails,
+				getDeal,
+				acceptDeal,
+				denyDeal,
+				getCost,
+
+				setCost,
+				setIsSub,
+				setSubs,
+				setIsDealer,
+				setDeal,
+
+				setPhotos,
+				setIsHidden,
+				setIsAuthor,
+				setExtraInfo,
+			},
+			dispatch
+		),
+	};
+};
+
+const AddMore2 = connect(mapStateToProps, mapDispatchToProps)(AddMore2r);
 
 export default AddMore2;
+
+// 857 -> 936

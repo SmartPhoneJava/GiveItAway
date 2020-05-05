@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Search, Group, PanelHeaderButton, Avatar, Placeholder } from '@vkontakte/vkui';
 
+import { connect } from 'react-redux';
+
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 
 import Add from './../../../../template/Add';
@@ -31,6 +33,8 @@ import Jins from './../../../../../img/jins.jpg';
 import Tea from './../../../../../img/tea.jpg';
 import Playstein from './../../../../../img/playstein.jpg';
 import Bb from './../../../../../img/bb.jpg';
+import { SORT_TIME, GEO_TYPE_FILTERS } from '../../../../../const/ads';
+import { ADS_FILTERS } from '../../../../../store/create_post/types';
 
 const addsArrDD = [
 	{
@@ -203,6 +207,8 @@ const addsArrDD = [
 
 let i = 0;
 
+const SEARCH_WAIT = 500
+
 const AddsTab = (props) => {
 	const [search, setSearch] = useState('');
 	const [searchR, setSearchR] = useState('');
@@ -214,32 +220,43 @@ const AddsTab = (props) => {
 			if (j == i) {
 				setSearchR(search);
 			}
-		}, 500);
+		}, SEARCH_WAIT);
 	}, [search]);
+
+	const { inputData } = props;
+
+	const geoType = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geotype : null) || GEO_TYPE_FILTERS;
+	const radius = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].radius : null) || 0;
+	const geodata = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geodata : null) || null;
+	const country = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].country : null) || NoRegion;
+	const city = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].city : null) || NoRegion;
+	const category = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].category : null) || CategoryNo;
+	const sort = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].sort : null) || SORT_TIME;
 
 	const [pageNumber, setPageNumber] = useState(1);
 
 	const [filtersOn, setFiltersOn] = useState(false);
 	useEffect(() => {
-		if (props.country == NoRegion && props.city == NoRegion && props.category == CategoryNo) {
+		console.log("country, city, category", country, city, category)
+		if (country == NoRegion && city == NoRegion && category == CategoryNo) {
 			setFiltersOn(false);
 			return;
 		}
 		setFiltersOn(true);
-	}, [props.country, props.city, props.category]);
+	}, [country, city, category]);
 
 	let { inited, loading, ads, error, hasMore, newPage } = useAdSearch(
 		props.setPopout,
 		searchR,
-		props.category,
+		category,
 		props.mode,
 		pageNumber,
 		5,
 		props.deleteID,
-		props.city,
-		props.country,
-		props.sort,
-		props.geodata
+		city,
+		country,
+		sort,
+		geodata
 	);
 
 	const observer = useRef();
@@ -382,5 +399,21 @@ const AddsTab = (props) => {
 	);
 };
 
-export default AddsTab;
+const mapStateToProps = (state) => {
+	return {
+		appID: state.vkui.appID,
+		myID: state.vkui.myID,
+		apiVersion: state.vkui.apiVersion,
+		platform: state.vkui.platform,
+
+		inputData: state.formData.forms,
+	};
+};
+
+function mapDispatchToProps() {
+	return {}
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddsTab);
+
 //283 -> 380

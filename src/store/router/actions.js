@@ -8,8 +8,12 @@ import {
 	CLOSE_POPOUT,
 	OPEN_MODAL,
 	CLOSE_MODAL,
+	OPEN_SNACKBAR,
+	CLOSE_SNACKBAR,
 	SET_PROFILE,
 	SET_AD,
+	SET_DUMMY,
+	CLOSE_ALL_MODALS,
 } from './actionTypes';
 import { PANEL_USER, PANEL_ONE } from './panelTypes';
 
@@ -17,6 +21,13 @@ export const setStory = (story) => ({
 	type: SET_STORY,
 	payload: {
 		story: story,
+	},
+});
+
+export const setDummy = (dummy) => ({
+	type: SET_DUMMY,
+	payload: {
+		dummy,
 	},
 });
 
@@ -30,14 +41,14 @@ export const setPage = (panel) => ({
 export const addProfile = (profile) => ({
 	type: ADD_PROFILE,
 	payload: {
-		profile: profile,
+		profile,
 	},
 });
 
 export const addAd = (ad) => ({
 	type: ADD_AD,
 	payload: {
-		ad: ad,
+		ad,
 	},
 });
 
@@ -64,12 +75,23 @@ export const goBack = () => ({
 export const openPopout = (popout) => ({
 	type: OPEN_POPOUT,
 	payload: {
-		popout: popout,
+		popout,
 	},
 });
 
 export const closePopout = () => ({
 	type: CLOSE_POPOUT,
+});
+
+export const openSnackbar = (snackbar) => ({
+	type: OPEN_SNACKBAR,
+	payload: {
+		snackbar,
+	},
+});
+
+export const closeSnackbar = () => ({
+	type: CLOSE_SNACKBAR,
 });
 
 export const openModal = (modal) => ({
@@ -81,4 +103,8 @@ export const openModal = (modal) => ({
 
 export const closeModal = () => ({
 	type: CLOSE_MODAL,
+});
+
+export const closeAllModals = () => ({
+	type: CLOSE_ALL_MODALS,
 });

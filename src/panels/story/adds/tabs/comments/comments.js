@@ -15,7 +15,9 @@ import {
 	Link,
 } from '@vkontakte/vkui';
 
-import PANEL_ONE from '../../../../App';
+import { connect } from 'react-redux';
+
+import { setPage } from './../../../../../store/router/actions';
 
 import useCommentsGet from './useCommentsGet';
 
@@ -37,6 +39,7 @@ import { postComment, deleteComment, editComment } from './requests';
 import './comment.css';
 import Comment from './comment';
 import { SNACKBAR_DURATION_DEFAULT } from '../../../../../store/const';
+import { PANEL_COMMENTS } from '../../../../../store/router/panelTypes';
 
 const arr = [
 	{
@@ -264,12 +267,14 @@ function showComments(
 
 const NO_ID = -1;
 
-const Comments = (props) => {
+const CommentsI = (props) => {
 	const [text, setText] = useState('');
 	const [search, setSearch] = useState('');
 	const [hide, setHide] = useState(false);
 
 	const [editableID, setEditableID] = useState(NO_ID);
+
+	const { AD } = props;
 
 	const [pageNumber, setPageNumber] = useState(1);
 	let { inited, loading, tnots, error, hasMore, newPage } = useCommentsGet(
@@ -277,7 +282,7 @@ const Comments = (props) => {
 		search,
 		pageNumber,
 		props.amount,
-		props.ad.ad_id,
+		AD.ad_id,
 		props.maxAmount
 	);
 	const [nots, setNots] = useState([]);
@@ -358,7 +363,7 @@ const Comments = (props) => {
 			postComment(
 				props.setPopout,
 				props.setSnackbar,
-				props.ad.ad_id,
+				AD.ad_id,
 				obj,
 				(v) => {
 					setSearch(text);
@@ -372,13 +377,17 @@ const Comments = (props) => {
 		}
 	}
 
+	const openCommentaries = () => {
+		props.setPage(PANEL_COMMENTS);
+	};
+
 	return (
 		<div>
 			{nots.length == 0 ? (
 				<Placeholder
 					action={
 						props.mini ? (
-							<Button size="l" onClick={props.openCommentaries}>
+							<Button size="l" onClick={openCommentaries}>
 								Написать
 							</Button>
 						) : null
@@ -425,5 +434,17 @@ const Comments = (props) => {
 		</div>
 	);
 };
+
+const mapStateToProps = (state) => {
+	return {
+		AD: state.ad,
+	};
+};
+
+const mapDispatchToProps = {
+	setPage,
+};
+
+const Comments = connect(mapStateToProps, mapDispatchToProps)(CommentsI);
 
 export default Comments;

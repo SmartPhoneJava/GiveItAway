@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import bridge from '@vkontakte/vk-bridge';
 import {
 	ModalRoot,
 	ModalPage,
@@ -17,6 +16,8 @@ import {
 	ModalCard,
 } from '@vkontakte/vkui';
 
+import Icon24BrowserForward from '@vkontakte/icons/dist/24/browser_forward';
+
 import Freeze100 from './../../../img/100/freeze.png';
 
 import CategoriesLabel from './../../../components/categories/label';
@@ -24,6 +25,7 @@ import CategoriesLabel from './../../../components/categories/label';
 import { ModalHeader } from './../../headers/modal';
 
 import { NoRegion } from './../../../components/location/const';
+import Location from './../../../components/location/label';
 
 import { PeopleRB } from './../../template/People';
 import { K } from '../profile/Profile';
@@ -37,198 +39,152 @@ import {
 	MODAL_ADS_FROZEN,
 } from './../../../store/router/modalTypes';
 
-export const GEO_TYPE_FILTERS = 'filters';
-export const GEO_TYPE_NEAR = 'near';
+import { ADS_FILTERS } from './../../../store/create_post/types';
+import { STORY_ADS } from '../../../store/router/storyTypes';
+
+import { GEO_TYPE_FILTERS, GEO_TYPE_NEAR, SORT_TIME, SORT_GEO } from './../../../const/ads';
 
 const AddsModal = (props) => {
-	// let geoType = GEO_TYPE_FILTERS
+	const { closeModal, inputData } = props;
+	const {
+		openGeoSearch,
+		openCountries,
+		openCities,
+		openCategories,
+		openCarma,
+	} = props;
 
-	// const [cancelledRadius, setCancelledRadius] = useState(props.radius);
-
-	function hideModal() {
-		props.setActiveModal(null);
+	const applyTimeSort = () => {
+		props.applyTimeSort(inputData)
 	}
 
-	function applyGeo(e) {
-		props.setSort(e.currentTarget.value);
-		bridge.send('VKWebAppGetGeodata').then((value) => {
-			props.setGeodata(value);
-			console.log('VKWebAppGetGeodata', value);
-		});
+	const setRadius = (r) => {
+		props.setRadius(inputData, r)
 	}
+
+	const applyGeoSort = () => {
+		props.applyGeoSort(inputData)
+	}
+
+	const setGeoFilters = () => {
+		props.setGeoFilters(inputData)
+	}
+
+	const setGeoNear = () => {
+		props.setGeoNear(inputData)
+	}
+
+	const geoType = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geotype : null) || GEO_TYPE_FILTERS;
+	const radius = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].radius : null) || 0;
+	const geodata = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geodata : null) || null;
+	const country = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].country : null) || NoRegion;
+	const city = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].city : null) || NoRegion;
+	const sort = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].sort : null) || SORT_TIME;
+	const activeModal = props.activeModals[STORY_ADS];
 
 	function isRadiusValid() {
-		return props.radius >= 0.5 && props.radius <= 100;
+		return radius >= 0.5 && radius <= 100;
 	}
 
-	function stange() {
-		console.log('all info', props.cost, props.backUser);
-		return '';
+	function getGeoData() {
+		if (geoType == GEO_TYPE_FILTERS) {
+			if (country.id == NoRegion.id && city.id == NoRegion.id) {
+				return 'Не задано';
+			}
+			if (city.id != NoRegion.id) {
+				return country.title + ', ' + city.title;
+			}
+			return country.title;
+		}
+		return 'Поиск по радиусу временно недоступен';
 	}
 
 	return (
-		<ModalRoot activeModal={props.activeModal}>
+		<ModalRoot activeModal={activeModal}>
 			<ModalPage
 				id={MODAL_ADS_FILTERS}
-				onClose={hideModal}
-				header={<ModalHeader name="Фильтры" back={() => hideModal()} />}
+				onClose={closeModal}
+				header={<ModalHeader name="Фильтры" back={closeModal} />}
 			>
-				<CategoriesLabel
-					leftMargin="10px"
-					category={props.category}
-					open={() => props.setActiveModal(MODAL_ADS_CATEGORIES)}
-				/>
+				<CategoriesLabel redux_form={ADS_FILTERS} leftMargin="10px" open={openCategories} />
 				<Group separator="show" header={<Header mode="secondary">Местоположение объявления</Header>}>
-					<CellButton
-						onClick={() => {
-							props.setActiveModal(MODAL_ADS_GEO);
-						}}
-					>
-						{props.geoType == GEO_TYPE_FILTERS
-							? props.country == NoRegion && props.city == NoRegion
-								? 'Не задано'
-								: props.country != NoRegion && props.city != NoRegion
-								? props.country.title + ', ' + props.city.title
-								: props.country == NoRegion
-								? props.city.title
-								: props.country.title
-							: 'Поиск по радиусу временно недоступен'}
-					</CellButton>
+					<div style={{ display: 'flex', alignItems: 'center' }}>
+						<CellButton onClick={openGeoSearch}>{getGeoData()}</CellButton>
+						<div
+							style={{
+								alignItems: 'center',
+								flex: 'center',
+								justifyContent: 'center',
+								marginRight: '20px',
+								color: 'var(--accent)',
+							}}
+							onClick={openGeoSearch}
+						>
+							<Icon24BrowserForward />
+						</div>
+					</div>
 				</Group>
 
-				<Group separator="show" header={<Header mode="secondary">Отсортировтаь по</Header>}>
-					{props.sort == 'time' ? (
-						<div>
-							{' '}
-							<Radio
-								key="1"
-								value="time"
-								name="sort"
-								defaultChecked
-								onClick={(e) => {
-									props.setSort(e.currentTarget.value);
-									props.setActiveModal(null);
-								}}
-							>
-								По времени
-							</Radio>
-							<Radio
-								key="2"
-								value="geo"
-								name="sort"
-								onClick={(e) => {
-									applyGeo(e);
-									props.setActiveModal(null);
-								}}
-							>
-								По близости
-							</Radio>
-						</div>
-					) : (
-						<div>
-							<Radio
-								key="3"
-								value="time"
-								name="sort"
-								onClick={(e) => {
-									props.setSort(e.currentTarget.value);
-									props.setActiveModal(null);
-								}}
-							>
-								По времени
-							</Radio>
-							<Radio
-								key="4"
-								value="geo"
-								name="sort"
-								defaultChecked
-								onClick={(e) => {
-									applyGeo(e);
-									props.setActiveModal(null);
-								}}
-							>
-								По близости
-							</Radio>
-						</div>
-					)}
+				<Group separator="show" header={<Header mode="secondary">Отсортировать по</Header>}>
+					<Radio checked={sort == SORT_TIME} key="1" value={SORT_TIME} name="sort" onChange={applyTimeSort}>
+						По времени
+					</Radio>
+					<Radio checked={sort == SORT_GEO} key="2" value={SORT_GEO} name="sort" onChange={applyGeoSort}>
+						По близости
+					</Radio>
 				</Group>
 			</ModalPage>
 			<ModalPage
 				id={MODAL_ADS_CATEGORIES}
-				onClose={() => props.setActiveModal(MODAL_ADS_FILTERS)}
-				header={
-					<ModalHeader
-						isBack={true}
-						name="Выберите категорию"
-						back={() => props.setActiveModal(MODAL_ADS_FILTERS)}
-					/>
-				}
-			>
-				{/* <CategoriesRB
-					category={props.category}
-					choose={(cat) => {
-						props.setCategory(cat);
-						props.setActiveModal(null);
-					}}
-				/> */}
-			</ModalPage>
+				onClose={closeModal}
+				header={<ModalHeader isBack={true} name="Выберите категорию" back={closeModal} />}
+			></ModalPage>
 			<ModalPage
 				id={MODAL_ADS_GEO}
-				onClose={() => props.setActiveModal(MODAL_ADS_FILTERS)}
-				header={
-					<ModalHeader
-						isBack={true}
-						name="Где искать?"
-						back={() => props.setActiveModal(MODAL_ADS_FILTERS)}
-					/>
-				}
+				onClose={closeModal}
+				header={<ModalHeader isBack={true} name="Где искать?" back={closeModal} />}
 			>
 				<Radio
 					name="radio"
 					value={GEO_TYPE_FILTERS}
-					defaultChecked={props.geoType == GEO_TYPE_FILTERS}
-					onClick={(e) => {
-						props.setGeoType(GEO_TYPE_FILTERS);
-					}}
+					defaultChecked={geoType == GEO_TYPE_FILTERS}
+					onClick={setGeoFilters}
 				>
 					В указанных стране и городе
 				</Radio>
 				<Radio
 					name="radio"
-					defaultChecked={props.geoType == GEO_TYPE_NEAR}
+					defaultChecked={geoType == GEO_TYPE_NEAR}
 					value={GEO_TYPE_NEAR}
-					onClick={(e) => {
-						props.setGeoType(GEO_TYPE_NEAR);
-					}}
+					onClick={setGeoNear}
 					description="Необходимо предоставить доступ к GPS"
 				>
 					Недалеко от меня
 				</Radio>
 				<div>
-					{props.geoType == GEO_TYPE_FILTERS ? // 	props.apiVersion, // 	props.appID, // Location(
-					// 	props.vkPlatform,
-					// 	props.country,
-					// 	props.setCountry,
-					// 	props.city,
-					// 	props.setCity,
-					// 	false
-					// )
-					null : (
+					{geoType == GEO_TYPE_FILTERS ? (
+						<Location
+							redux_form={ADS_FILTERS}
+							openCountries={openCountries}
+							openCities={openCities}
+							useMine={false}
+						/>
+					) : (
 						<FormLayout>
 							<Slider
 								step={0.5}
 								min={0.5}
 								max={100}
-								value={props.radius}
-								onChange={(v) => props.setRadius(v)}
-								top={'Область поиска: ' + props.radius + ' км'}
+								value={radius}
+								onChange={setRadius}
+								top={'Область поиска: ' + radius + ' км'}
 							/>
 							<Input
 								placeholder="радиус круга поиска"
 								status={isRadiusValid() ? 'valid' : 'error'}
 								bottom={!isRadiusValid() ? 'Введите число километров от 0.5 до 100' : ''}
-								value={String(props.radius)}
-								onChange={(e) => props.setRadius(e.target.value)}
+								value={String(radius)}
+								onChange={(e) => setRadius(e.target.value)}
 								type="number"
 							/>
 						</FormLayout>
@@ -243,12 +199,7 @@ const AddsModal = (props) => {
 						>
 							<div style={{ textAlign: 'center' }}>Отменить</div>
 						</CellButton> */}
-						<CellButton
-							mode="primary"
-							onClick={() => {
-								props.setActiveModal(null);
-							}}
-						>
+						<CellButton mode="primary" onClick={closeModal}>
 							Сохранить
 						</CellButton>
 					</div>
@@ -256,23 +207,20 @@ const AddsModal = (props) => {
 			</ModalPage>
 			<ModalPage
 				id={MODAL_ADS_SUBS}
-				onClose={() => props.setActiveModal(null)}
-				header={<ModalHeader name="Выберите человека" back={() => props.setActiveModal(null)} />}
+				onClose={closeModal}
+				header={<ModalHeader name="Выберите человека" back={closeModal} />}
 				dynamicContentHeight
 			>
 				<PeopleRB
 					setPopout={props.setPopout}
 					setSnackbar={props.setSnackbar}
-					ad_id={props.ad.ad_id}
-					back={(s) => {
-						props.setActiveModal(null);
-					}}
+					back={closeModal}
 				/>
 			</ModalPage>
 			<ModalPage
-				onClose={() => props.setActiveModal(null)}
+				onClose={closeModal}
 				id={MODAL_ADS_COST}
-				header={<ModalHeader name="Моя карма" back={() => props.setActiveModal(null)} />}
+				header={<ModalHeader name="Моя карма" back={closeModal} />}
 			>
 				<List>
 					<Cell>
@@ -296,7 +244,7 @@ const AddsModal = (props) => {
 							<div style={{ color: props.cost > 0 ? 'var(--accent)' : 'var(--destructive)' }}>
 								{props.backUser
 									? props.backUser.carma - props.backUser.frozen_carma + props.cost + '' + K
-									: 'Информация недоступна' + stange()}
+									: 'Информация недоступна'}
 							</div>
 						</InfoRow>
 					</Cell>
@@ -304,7 +252,7 @@ const AddsModal = (props) => {
 			</ModalPage>
 			<ModalCard
 				id={MODAL_ADS_FROZEN}
-				onClose={() => props.setActiveModal(null)}
+				onClose={closeModal}
 				icon={
 					<Avatar mode="app" style={{ background: 'var(--background_content)' }} src={Freeze100} size={64} />
 				}
@@ -318,30 +266,20 @@ const AddsModal = (props) => {
 					{
 						title: 'Моя карма',
 						mode: 'primary',
-						action: () => {
-							props.setActiveModal(MODAL_COST);
-						},
+						action: openCarma,
 					},
 					{
 						title: 'Подробнее',
 						mode: 'secondary',
-						action: () => {
-							props.setActiveModal(null);
-						},
+						action: closeModal,
 					},
 				]}
 				actionsLayout="vertical"
 			/>
-			{/* <ModalPage id={MODAL_FROZEN} header={<ModalHeader name="Карма" back={() => props.setActiveModal(null)} />}>
-				<Placeholder icon={<Avatar size={60} src={Freeze100}></Avatar>} header="Замороженная карма">
-					Получая вещи, вы жертвуете карму({K}). Нажимая "Хочу забрать", часть вашей кармы временно
-					блокируется - замораживается. Эта сумма спишется после того, как вы подтвердите получение
-					вещи. Если будет выбран другой получатель или обьявление будет удалено,
-					то замороженная карма разморозится. Нажмите по ({K})
-				</Placeholder>
-			</ModalPage> */}
 		</ModalRoot>
 	);
 };
 
 export default AddsModal;
+
+// 373 -> 273

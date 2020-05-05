@@ -25,13 +25,7 @@ import {
 	PANEL_COUNTRIES,
 } from './../store/router/panelTypes';
 
-import {
-	MODAL_ADS_FILTERS,
-	MODAL_ADS_GEO,
-	MODAL_ADS_SUBS,
-	MODAL_ADS_COST,
-	MODAL_ADS_FROZEN,
-} from './../store/router/modalTypes';
+import { MODAL_ADS_FILTERS, MODAL_ADS_GEO, MODAL_ADS_SUBS } from './../store/router/modalTypes';
 
 import './main.css';
 
@@ -46,14 +40,18 @@ import {
 	setAd,
 	setPage,
 	addProfile,
+	openSnackbar,
 } from '../store/router/actions';
 import * as VK from '../services/VK';
 import { setAppID, setPlatform } from '../store/vk/actions';
+
+import { setDetailedAd } from '../store/detailed_ad/actions';
 
 import CategoriesPanel from './../components/categories/panel';
 import Countries from './../components/location/countries';
 import Cities from './../components/location/cities';
 import { FORM_LOCATION_CREATE } from './../components/location/redux';
+
 import Subs from './story/adds/tabs/subs/subs';
 
 import AddsTabs from './story/adds/AddsTabs';
@@ -68,13 +66,12 @@ import { VkUser } from '../store/vkUser';
 
 import { handleNotifications } from './story/adds/tabs/notifications/notifications';
 
-import AddMore, { AdDefault } from './template/AddMore';
 import AddMore2 from './template/AddMore2';
 import { CategoryNo } from './template/Categories';
 
-import AddsModal, { GEO_TYPE_FILTERS } from './story/adds/AddsModal';
+import { GEO_TYPE_FILTERS, AdDefault } from './../const/ads';
 
-import { Auth, getToken } from '../requests';
+import { Auth, getToken, fail } from '../requests';
 
 import Error from './placeholders/error';
 import NotHere from './placeholders/NotHere';
@@ -90,7 +87,10 @@ import Comments from './story/adds/tabs/comments/comments';
 import { inputArgs } from '../utils/window';
 
 import Centrifuge from 'centrifuge';
-import { FORM_CREATE } from '../components/categories/redux';
+import { FORM_CREATE, FORM_ADS } from '../components/categories/redux';
+import { setFormData } from '../store/create_post/actions';
+import { ADS_FILTERS } from '../store/create_post/types';
+import AdsModal from '../containers/ads/modal';
 
 const adsText = 'Объявления';
 const addText = 'Создать обьявление';
@@ -103,7 +103,19 @@ let notsCounterrr = 0;
 
 const App = (props) => {
 	const { colorScheme, appID, myID, apiVersion, platform } = props;
-	const { activeStory, goBack, setAd, setPage, setStory, setProfile, openModal, closeModal, addProfile } = props;
+	const {
+		activeStory,
+		goBack,
+		setAd,
+		setPage,
+		setStory,
+		setProfile,
+		openModal,
+		closeModal,
+		addProfile,
+		setFormData,
+		openSnackbar,
+	} = props;
 
 	const [popout, setPopout] = useState(null); //<ScreenSpinner size="large" />
 	const [inited, setInited] = useState(false);
@@ -140,17 +152,18 @@ const App = (props) => {
 	const [geoType, setGeoType] = useState(GEO_TYPE_FILTERS);
 
 	function dropFilters() {
-		setCategory(CategoryNo);
-		setCity(NoRegion);
-		setCountry(NoRegion);
-		setSort('time');
+		setFormData(ADS_FILTERS, null);
 	}
 
 	const onStoryChange = (e) => {
 		const isProfile = e.currentTarget.dataset.text == profileText;
 		setStory(e.currentTarget.dataset.story);
+		addProfile(myID);
 		if (e.currentTarget.dataset.story == STORY_ADS) {
 			if (isProfile) {
+				console.log('myID', myID);
+				console.log('SET_PROFILE11', props.activeProfile, props.profileHistory);
+
 				setProfile(myID);
 				setPage(PANEL_USER);
 			} else {
@@ -250,13 +263,29 @@ const App = (props) => {
 						);
 					},
 					(e) => {
-						fetchData();
+						fail('Не удалось получить ваши данные', null, openSnackbar);
 					}
 				);
 				return us;
 			})
 		);
 	}, []);
+
+	function setReduxAd(ad) {
+		console.log('you ask to do this', ad);
+		setAd(ad);
+		setDetailedAd(ad);
+	}
+
+	function backToAdsFilters() {
+		goBack();
+		openModal(MODAL_ADS_FILTERS);
+	}
+
+	function backToGeoFilters() {
+		backToAdsFilters();
+		openModal(MODAL_ADS_GEO);
+	}
 
 	let adPanels = props.panelsHistory[STORY_ADS];
 	const canGoBack = adPanels.length > 3;
@@ -265,9 +294,8 @@ const App = (props) => {
 
 	let createPanels = props.panelsHistory[STORY_CREATE];
 	let createActivePanel = props.activePanels[STORY_CREATE];
-
 	let choosen = props.activeAd;
-	console.log('adPanels', adPanels, canGoBack);
+	console.log('activeProfile', props.activeProfile, props.profileHistory);
 
 	if (!inited) {
 		return snackbar;
@@ -323,27 +351,7 @@ const App = (props) => {
 					onSwipeBack={goBack}
 					history={adPanels}
 					modal={
-						<AddsModal
-							geoType={geoType}
-							setGeoType={setGeoType}
-							appID={appID}
-							apiVersion={apiVersion}
-							vkPlatform={platform}
-							activeModal={adActiveModal}
-							category={category}
-							setCategory={setCategory}
-							city={city}
-							country={country}
-							// region={region}
-							setCity={setCity}
-							setCountry={setCountry}
-							radius={radius}
-							setRadius={setRadius}
-							geodata={geodata}
-							setGeodata={setGeodata}
-							// setRegion={setRegion}
-							sort={sort}
-							setSort={setSort}
+						<AdsModal
 							setPopout={setPopout}
 							setSnackbar={setSnackbar}
 							ad={choosen}
@@ -355,8 +363,6 @@ const App = (props) => {
 				>
 					<Panel id={PANEL_ADS} separator={false}>
 						<AddsTabs
-							geodata={geodata}
-							adsMode={adsMode}
 							setSavedAdState={setSavedAdState}
 							savedAdState={savedAdState}
 							onFiltersClick={() => openModal(MODAL_ADS_FILTERS)}
@@ -370,17 +376,11 @@ const App = (props) => {
 							}}
 							setPopout={setPopout}
 							setSnackbar={setSnackbar}
-							category={category}
 							refresh={SetDeleteID}
 							deleteID={deleteID}
-							city={city}
-							country={country}
-							myID={myID}
 							openUser={setProfile}
-							sort={sort}
 							dropFilters={dropFilters}
-							openAd={setAd}
-							vkPlatform={platform}
+							openAd={setReduxAd}
 						/>
 						{snackbar}
 					</Panel>
@@ -399,24 +399,11 @@ const App = (props) => {
 								}}
 								back={goBack}
 								openUser={setProfile}
-								openComments={(ad) => {
-									setPage(PANEL_COMMENTS);
-								}}
-								openSubs={(ad) => {
-									setPage(PANEL_SUBS);
-								}}
 								ad={choosen}
 								setPopout={setPopout}
 								setSnackbar={setSnackbar}
 								VkUser={VkUser}
 								vkPlatform={platform}
-								onCloseClick={() => openModal(MODAL_ADS_SUBS)}
-								onCarmaClick={() => {
-									openModal(MODAL_ADS_COST);
-								}}
-								onFreezeClick={() => {
-									openModal(MODAL_ADS_FROZEN);
-								}}
 								setbackUser={setbackUser}
 								setCost={setCost}
 							/>
@@ -440,7 +427,7 @@ const App = (props) => {
 							goToCreate={() => {
 								setStory(STORY_CREATE);
 							}}
-							openAd={setAd}
+							openAd={setReduxAd}
 						/>
 						{snackbar}
 					</Panel>
@@ -484,10 +471,22 @@ const App = (props) => {
 						{snackbar}
 					</Panel>
 					<Panel id={PANEL_CATEGORIES}>
-						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
+						<PanelHeaderSimple left={<PanelHeaderBack onClick={backToAdsFilters} />}>
 							Выберите категорию
 						</PanelHeaderSimple>
-						<CategoriesPanel back={goBack} redux_form={FORM_CREATE} />
+						<CategoriesPanel goBack={backToAdsFilters} redux_form={ADS_FILTERS} />
+					</Panel>
+					<Panel id={PANEL_COUNTRIES}>
+						<PanelHeaderSimple left={<PanelHeaderBack onClick={backToGeoFilters} />}>
+							Выберите страну
+						</PanelHeaderSimple>
+						<Countries goBack={backToGeoFilters} redux_form={ADS_FILTERS} />
+					</Panel>
+					<Panel id={PANEL_CITIES}>
+						<PanelHeaderSimple left={<PanelHeaderBack onClick={backToGeoFilters} />}>
+							Выберите город
+						</PanelHeaderSimple>
+						<Cities goBack={backToGeoFilters} redux_form={ADS_FILTERS} />
 					</Panel>
 				</View>
 
@@ -500,44 +499,26 @@ const App = (props) => {
 				>
 					<Panel id={PANEL_CREATE}>
 						<PanelHeader>{addText}</PanelHeader>
-						<Create
-							setPopout={setPopout}
-							snackbar={snackbar}
-							setSnackbar={setSnackbar}
-							openAd={(ad) => {
-								setStory(STORY_ADS);
-								setAd(ad);
-								scroll();
-							}}
-							openCategories={() => {
-								setPage(PANEL_CATEGORIES);
-							}}
-							openCities={() => {
-								setPage(PANEL_CITIES);
-							}}
-							openCountries={() => {
-								setPage(PANEL_COUNTRIES);
-							}}
-						/>
+						<Create />
 						{snackbar}
 					</Panel>
 					<Panel id={PANEL_CATEGORIES}>
 						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
 							Выберите категорию
 						</PanelHeaderSimple>
-						<CategoriesPanel back={goBack} redux_form={FORM_CREATE} />
+						<CategoriesPanel redux_form={FORM_CREATE} goBack={goBack} />
 					</Panel>
 					<Panel id={PANEL_COUNTRIES}>
 						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
 							Выберите страну
 						</PanelHeaderSimple>
-						<Countries back={goBack} redux_form={FORM_LOCATION_CREATE} />
+						<Countries redux_form={FORM_LOCATION_CREATE} goBack={goBack} />
 					</Panel>
 					<Panel id={PANEL_CITIES}>
 						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
 							Выберите город
 						</PanelHeaderSimple>
-						<Cities back={goBack} redux_form={FORM_LOCATION_CREATE} />
+						<Cities redux_form={FORM_LOCATION_CREATE} goBack={goBack} />
 					</Panel>
 				</View>
 			</Epic>
@@ -554,6 +535,9 @@ const mapStateToProps = (state) => {
 		activeAd: state.router.activeAd,
 		popouts: state.router.popouts,
 		scrollPosition: state.router.scrollPosition,
+
+		profileHistory: state.router.profileHistory,
+		activeProfile: state.router.activeProfile,
 
 		colorScheme: state.vkui.colorScheme,
 		appID: state.vkui.appID,
@@ -576,6 +560,9 @@ function mapDispatchToProps(dispatch) {
 				closeModal,
 				openModal,
 				addProfile,
+				setFormData,
+				openSnackbar,
+				setDetailedAd,
 			},
 			dispatch
 		),

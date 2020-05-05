@@ -9,7 +9,7 @@ import { User } from './store/user';
 
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
-import { AD_LOADING } from './panels/template/AddMore2';
+import { AD_LOADING } from './const/ads';
 import { SNACKBAR_DURATION_DEFAULT } from './store/const';
 
 let request_id = 0;
@@ -449,12 +449,15 @@ export async function Auth(user, setSnackbar, setPopout, successCallback, failCa
 
 export async function CreateImages(photos, id, goToAds, setSnackbar) {
 	let err = false;
-	photos.forEach(async (photo, i) => {
+	let s = 0;
+	photos.forEach((photo, i) => {
 		const data = new FormData();
 		data.append('file', photo.origin);
 		let cancel;
 
-		await axios({
+		
+
+		axios({
 			method: 'post',
 			url: Addr.getState() + BASE_AD + id + '/upload_image',
 			withCredentials: true,
@@ -462,8 +465,9 @@ export async function CreateImages(photos, id, goToAds, setSnackbar) {
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
 		})
 			.then(function (response) {
-				console.log('success uploaded', response);
-				if (i == photos.length - 1) {
+				console.log('success uploaded', s, photos.length - 1);
+				s++;
+				if (s == photos.length - 1) {
 					goToAds(
 						<Snackbar
 							duration={SNACKBAR_DURATION_DEFAULT}
@@ -498,7 +502,7 @@ export async function CreateImages(photos, id, goToAds, setSnackbar) {
 	}
 }
 
-export async function CreateAd(obj, photos, openAd, setSnackbar, setPopout, successcallback) {
+export async function CreateAd(ad, obj, photos, openAd, loadAd, setSnackbar, setPopout, successcallback) {
 	setPopout(<ScreenSpinner size="large" />);
 	let cancel;
 	await axios({
@@ -510,19 +514,22 @@ export async function CreateAd(obj, photos, openAd, setSnackbar, setPopout, succ
 	})
 		.then(async function (response) {
 			setPopout(null);
-			console.log('createAddddd', response.data);
+
 			if (response.status != 201) {
 				throw new Error('Не тот код!');
 			}
-			openAd(AD_LOADING);
+			ad.ad_id = response.data.ad_id;
+			console.log('createAddddd', photos);
+			// loadAd(ad)
+			openAd(ad);
 			await CreateImages(
 				photos,
 				response.data.ad_id,
 				() => {
-					openAd({ ad_id: response.data.ad_id });
 					if (successcallback) {
-						successcallback()
+						successcallback();
 					}
+					getDetails(setPopout, setSnackbar, response.data.ad_id, (e) => loadAd(e));
 				},
 				setSnackbar
 			);
@@ -551,7 +558,7 @@ export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
 		.then(function (response) {
 			setPopout(null);
 			if (response.status != 200) {
-				saveFail(
+				fail(
 					response.status + ' - ' + response.statusText,
 					() => deleteAd(setPopout, ad_id, setSnackbar, refresh),
 					setSnackbar
@@ -579,12 +586,13 @@ export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
 		.catch(function (error) {
 			console.log('Request failed', error);
 			setPopout(null);
-			saveFail('Нет соединения с сервером', () => deleteAd(setPopout, ad_id, setSnackbar, refresh), setSnackbar);
+			fail('Нет соединения с сервером', () => deleteAd(setPopout, ad_id, setSnackbar, refresh), setSnackbar);
 		});
 };
 
 export function fail(err, repeat, setSnackbar, end) {
 	{
+		console.log('we wanna set snackbar', err);
 		repeat
 			? setSnackbar(
 					<Snackbar

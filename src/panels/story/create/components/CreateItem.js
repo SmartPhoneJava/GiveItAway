@@ -117,44 +117,48 @@ const CreateItem = (props) => {
 			handleWrongSize,
 			handleWrongType,
 			(value) => {
+				const photosUrl = [...inputData.photosUrl, value];
 				setInputData({
 					...inputData,
-					photosUrl: [...inputData.photosUrl, value],
+					photosUrl,
 				});
 				props.setFormData(CREATE_AD_ITEM, {
 					...inputData,
-					photosUrl: [...inputData.photosUrl, value],
+					photosUrl,
 				});
 			},
 			() => {
+				const photoText = PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length + 1) + '/3';
 				setInputData({
 					...inputData,
-					photoText: PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length + 1) + '/3',
+					photoText,
 				});
 				props.setFormData(CREATE_AD_ITEM, {
 					...inputData,
-					photoText: PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length + 1) + '/3',
+					photoText,
 				});
 			}
 		);
 	};
 
 	function deletePhoto(i) {
+		const photoText = PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length - 1) + '/3';
+		const photosUrl = [...inputData.photosUrl.slice(0, i), ...inputData.photosUrl.slice(i + 1)];
 		setInputData({
 			...inputData,
-			photoText: PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length - 1) + '/3',
+			photoText,
 		});
 		setInputData({
 			...inputData,
-			photosUrl: [...inputData.photosUrl.slice(0, i), ...inputData.photosUrl.slice(i + 1)],
+			photosUrl,
 		});
 		props.setFormData(CREATE_AD_ITEM, {
 			...inputData,
-			photoText: PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length - 1) + '/3',
+			photoText,
 		});
 		props.setFormData(CREATE_AD_ITEM, {
 			...inputData,
-			photoText: PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length - 1) + '/3',
+			photosUrl,
 		});
 	}
 

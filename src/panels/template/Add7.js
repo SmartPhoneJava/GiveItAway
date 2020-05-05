@@ -16,7 +16,6 @@ import Icon16Clear from '@vkontakte/icons/dist/16/clear';
 import OpenActions from './components/actions';
 
 import { time } from '../../utils/time';
-import { shortText } from '../../utils/short_text';
 
 import { Draft } from '../../store/draft';
 
