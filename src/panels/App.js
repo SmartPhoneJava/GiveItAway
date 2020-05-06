@@ -41,6 +41,7 @@ import {
 	setPage,
 	addProfile,
 	openSnackbar,
+	openPopout,
 } from '../store/router/actions';
 import * as VK from '../services/VK';
 import { setAppID, setPlatform } from '../store/vk/actions';
@@ -67,7 +68,6 @@ import { VkUser } from '../store/vkUser';
 import { handleNotifications } from './story/adds/tabs/notifications/notifications';
 
 import AddMore2 from './template/AddMore2';
-import { CategoryNo } from './template/Categories';
 
 import { GEO_TYPE_FILTERS, AdDefault } from './../const/ads';
 
@@ -75,8 +75,6 @@ import { Auth, getToken, fail } from '../requests';
 
 import Error from './placeholders/error';
 import NotHere from './placeholders/NotHere';
-
-import { NoRegion } from './template/Location';
 
 import Profile from './story/profile/Profile';
 
@@ -115,61 +113,47 @@ const App = (props) => {
 		addProfile,
 		setFormData,
 		openSnackbar,
+		activePanels,
+		panelsHistory,
+		popouts,
+		openPopout,
+		snackbars,
 	} = props;
 
-	const [popout, setPopout] = useState(null); //<ScreenSpinner size="large" />
+	const adPopout = popouts[STORY_ADS];
+	const createPopout = popouts[STORY_CREATE];
+
 	const [inited, setInited] = useState(false);
 
-	const [adsMode, setAdsMode] = useState('all');
-
 	const [backUser, setbackUser] = useState(null);
-	const [cost, setCost] = useState(0);
 
 	const [profileName, setProfileName] = useState('Профиль');
 
 	const [notsCounterr, setNotsCounterr] = useState(notsCounterr);
 
-	const [category, setCategory] = useState(CategoryNo);
-
-	const [snackbar, setSnackbar] = useState(null);
-
 	const [deleteID, SetDeleteID] = useState(-1);
 
-	const [geodata, setGeodata] = useState({
-		long: -1,
-		lat: -1,
-	});
+	const historyLen = panelsHistory ? (panelsHistory[STORY_ADS] ? panelsHistory[STORY_ADS].length : 0) : 0;
 
-	const [radius, setRadius] = useState(5);
-
-	const [city, setCity] = useState(NoRegion);
-	const [country, setCountry] = useState(NoRegion);
-
-	const [sort, setSort] = useState('time');
-
-	const [savedAdState, setSavedAdState] = useState('');
-
-	const [geoType, setGeoType] = useState(GEO_TYPE_FILTERS);
-
+	console.log('historyLen historyLen', historyLen, panelsHistory[STORY_ADS]);
 	function dropFilters() {
 		setFormData(ADS_FILTERS, null);
 	}
 
 	const onStoryChange = (e) => {
 		const isProfile = e.currentTarget.dataset.text == profileText;
-		setStory(e.currentTarget.dataset.story);
+		const story = e.currentTarget.dataset.story;
+		if (story == STORY_CREATE) {
+			setStory(story);
+		} else {
+			setStory(story, isProfile ? PANEL_USER : null);
+		}
 		addProfile(myID);
 		if (e.currentTarget.dataset.story == STORY_ADS) {
 			if (isProfile) {
-				console.log('myID', myID);
-				console.log('SET_PROFILE11', props.activeProfile, props.profileHistory);
-
-				setProfile(myID);
-				setPage(PANEL_USER);
+				// setPage(PANEL_USER);
 			} else {
 				dropFilters();
-				setPage(PANEL_ADS);
-				setSavedAdState('');
 			}
 		}
 	};
@@ -195,7 +179,7 @@ const App = (props) => {
 			setNotsCounterr(notsCounterrr);
 			console.log('user#' + id + ' ' + note);
 
-			handleNotifications(note, setSnackbar);
+			handleNotifications(note, openSnackbar);
 		});
 	}
 
@@ -215,7 +199,7 @@ const App = (props) => {
 	// }, [choosen]);
 
 	useEffect(() => {
-		setPopout(<ScreenSpinner size="large" />);
+		openPopout(<ScreenSpinner size="large" />);
 		const { dispatch } = props;
 		dispatch(VK.initApp());
 
@@ -247,13 +231,13 @@ const App = (props) => {
 			VK.getuser((us) => {
 				Auth(
 					us,
-					setSnackbar,
-					setPopout,
+					openSnackbar,
+					openPopout,
 					(v) => {
 						setInited(true);
 						dispatch(addProfile(us.id));
 						getToken(
-							setSnackbar,
+							openSnackbar,
 							(v) => {
 								centrifuge.setToken(v.token);
 								turnOnNotifications(us.id);
@@ -288,9 +272,7 @@ const App = (props) => {
 	}
 
 	let adPanels = props.panelsHistory[STORY_ADS];
-	const canGoBack = adPanels.length > 3;
 	let adActivePanel = props.activePanels[STORY_ADS];
-	let adActiveModal = props.activeModals[STORY_ADS];
 
 	let createPanels = props.panelsHistory[STORY_CREATE];
 	let createActivePanel = props.activePanels[STORY_CREATE];
@@ -298,7 +280,7 @@ const App = (props) => {
 	console.log('activeProfile', props.activeProfile, props.profileHistory);
 
 	if (!inited) {
-		return snackbar;
+		return <ScreenSpinner size="large" />;
 	}
 
 	if (notHere) {
@@ -345,44 +327,27 @@ const App = (props) => {
 				}
 			>
 				<View
-					popout={popout}
+					popout={adPopout}
 					id={STORY_ADS}
 					activePanel={adActivePanel}
 					onSwipeBack={goBack}
 					history={adPanels}
-					modal={
-						<AdsModal
-							setPopout={setPopout}
-							setSnackbar={setSnackbar}
-							ad={choosen}
-							backUser={backUser}
-							cost={cost}
-						/>
-					}
+					modal={<AdsModal backUser={backUser} />}
 					header={false}
 				>
 					<Panel id={PANEL_ADS} separator={false}>
 						<AddsTabs
-							setSavedAdState={setSavedAdState}
-							savedAdState={savedAdState}
-							onFiltersClick={() => openModal(MODAL_ADS_FILTERS)}
-							onCloseClick={(act) => {
-								openModal(MODAL_ADS_SUBS);
-								scroll();
-							}}
 							notsCounter={notsCounterrr}
 							zeroNots={() => {
 								notsCounterrr = 0;
 							}}
-							setPopout={setPopout}
-							setSnackbar={setSnackbar}
 							refresh={SetDeleteID}
 							deleteID={deleteID}
 							openUser={setProfile}
 							dropFilters={dropFilters}
 							openAd={setReduxAd}
 						/>
-						{snackbar}
+						{snackbars[PANEL_ADS]}
 					</Panel>
 					<Panel id={PANEL_ONE}>
 						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
@@ -390,7 +355,6 @@ const App = (props) => {
 						</PanelHeaderSimple>
 						{choosen ? (
 							<AddMore2
-								myID={myID}
 								wsNote={wsNote}
 								refresh={(id) => {
 									goBack();
@@ -399,37 +363,20 @@ const App = (props) => {
 								}}
 								back={goBack}
 								openUser={setProfile}
-								ad={choosen}
-								setPopout={setPopout}
-								setSnackbar={setSnackbar}
 								VkUser={VkUser}
-								vkPlatform={platform}
 								setbackUser={setbackUser}
-								setCost={setCost}
 							/>
 						) : (
 							Error
 						)}
-						{snackbar}
+						{snackbars[PANEL_ONE]}
 					</Panel>
 					<Panel id={PANEL_USER}>
-						<PanelHeaderSimple left={!canGoBack ? null : <PanelHeaderBack onClick={goBack} />}>
+						<PanelHeaderSimple left={historyLen <= 1 ? null : <PanelHeaderBack onClick={goBack} />}>
 							<p className="panel-header"> {profileName} </p>
 						</PanelHeaderSimple>
-						<Profile
-							setAdsMode={setAdsMode}
-							setPopout={setPopout}
-							setProfileName={setProfileName}
-							setSnackbar={setSnackbar}
-							goToAdds={() => {
-								setStory(STORY_ADS);
-							}}
-							goToCreate={() => {
-								setStory(STORY_CREATE);
-							}}
-							openAd={setReduxAd}
-						/>
-						{snackbar}
+						<Profile setProfileName={setProfileName} setSnackbar={openSnackbar} openAd={setReduxAd} />
+						{snackbars[PANEL_USER]}
 					</Panel>
 					<Panel id={PANEL_COMMENTS}>
 						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
@@ -442,15 +389,15 @@ const App = (props) => {
 								panel={PANEL_COMMENTS}
 								amount={5}
 								maxAmount={-1}
-								setPopout={setPopout}
-								setSnackbar={setSnackbar}
+								setPopout={openPopout}
+								setSnackbar={openSnackbar}
 								myID={myID}
 								openUser={setProfile}
 							/>
 						) : (
 							Error
 						)}
-						{snackbar}
+						{snackbars[PANEL_COMMENTS]}
 					</Panel>
 					<Panel id={PANEL_SUBS}>
 						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
@@ -458,8 +405,8 @@ const App = (props) => {
 						</PanelHeaderSimple>
 						{choosen ? (
 							<Subs
-								setPopout={setPopout}
-								setSnackbar={setSnackbar}
+								setPopout={openPopout}
+								setSnackbar={openSnackbar}
 								openUser={setProfile}
 								amount={5}
 								maxAmount={-1}
@@ -468,7 +415,7 @@ const App = (props) => {
 						) : (
 							Error
 						)}
-						{snackbar}
+						{snackbars[PANEL_SUBS]}
 					</Panel>
 					<Panel id={PANEL_CATEGORIES}>
 						<PanelHeaderSimple left={<PanelHeaderBack onClick={backToAdsFilters} />}>
@@ -493,14 +440,14 @@ const App = (props) => {
 				<View
 					id={STORY_CREATE}
 					activePanel={createActivePanel}
-					popout={popout}
+					popout={createPopout}
 					onSwipeBack={goBack}
 					history={createPanels}
 				>
 					<Panel id={PANEL_CREATE}>
 						<PanelHeader>{addText}</PanelHeader>
 						<Create />
-						{snackbar}
+						{snackbars[PANEL_CREATE]}
 					</Panel>
 					<Panel id={PANEL_CATEGORIES}>
 						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
@@ -538,6 +485,8 @@ const mapStateToProps = (state) => {
 
 		profileHistory: state.router.profileHistory,
 		activeProfile: state.router.activeProfile,
+		activePanels: state.router.activePanels,
+		snackbars: state.router.snackbars,
 
 		colorScheme: state.vkui.colorScheme,
 		appID: state.vkui.appID,
@@ -563,6 +512,7 @@ function mapDispatchToProps(dispatch) {
 				setFormData,
 				openSnackbar,
 				setDetailedAd,
+				openPopout,
 			},
 			dispatch
 		),
@@ -571,4 +521,4 @@ function mapDispatchToProps(dispatch) {
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
 
-// 477 -> 516 -> 674 -> 703 -> 795 -> 749 -> 587
+// 477 -> 516 -> 674 -> 703 -> 795 -> 749 -> 587 -> 524

@@ -67,3 +67,13 @@ export const AdDefault = {
 		photo_url: Man,
 	},
 };
+
+export const TAB_ADS = 'adds';
+export const TAB_ADS_TEXT = 'Объявления';
+
+export const TAB_NOTIFICATIONS = 'notifications';
+export const TAB_NOTIFICATIONS_TEXT = 'Уведомления';
+
+export const MODE_ALL = "all"
+export const MODE_WANTED = "wanted"
+export const MODE_GIVEN = "managed"

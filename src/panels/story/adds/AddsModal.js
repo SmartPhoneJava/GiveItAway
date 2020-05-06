@@ -46,33 +46,27 @@ import { GEO_TYPE_FILTERS, GEO_TYPE_NEAR, SORT_TIME, SORT_GEO } from './../../..
 
 const AddsModal = (props) => {
 	const { closeModal, inputData } = props;
-	const {
-		openGeoSearch,
-		openCountries,
-		openCities,
-		openCategories,
-		openCarma,
-	} = props;
+	const { openGeoSearch, openCountries, openCities, openCategories, openCarma } = props;
 
 	const applyTimeSort = () => {
-		props.applyTimeSort(inputData)
-	}
+		props.applyTimeSort(inputData);
+	};
 
 	const setRadius = (r) => {
-		props.setRadius(inputData, r)
-	}
+		props.setRadius(inputData, r);
+	};
 
 	const applyGeoSort = () => {
-		props.applyGeoSort(inputData)
-	}
+		props.applyGeoSort(inputData);
+	};
 
 	const setGeoFilters = () => {
-		props.setGeoFilters(inputData)
-	}
+		props.setGeoFilters(inputData);
+	};
 
 	const setGeoNear = () => {
-		props.setGeoNear(inputData)
-	}
+		props.setGeoNear(inputData);
+	};
 
 	const geoType = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geotype : null) || GEO_TYPE_FILTERS;
 	const radius = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].radius : null) || 0;
@@ -81,6 +75,11 @@ const AddsModal = (props) => {
 	const city = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].city : null) || NoRegion;
 	const sort = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].sort : null) || SORT_TIME;
 	const activeModal = props.activeModals[STORY_ADS];
+
+	const cost = props.ad.cost || 0;
+	const isSubscriber = props.ad.isSub || 0;
+
+	console.log('looook at cost', props.ad);
 
 	function isRadiusValid() {
 		return radius >= 0.5 && radius <= 100;
@@ -97,6 +96,10 @@ const AddsModal = (props) => {
 			return country.title;
 		}
 		return 'Поиск по радиусу временно недоступен';
+	}
+
+	function getCost() {
+		return props.ad ? (isSubscriber ? cost - 1 + '' + K : cost + '' + K) : 'Информация недоступна';
 	}
 
 	return (
@@ -211,43 +214,34 @@ const AddsModal = (props) => {
 				header={<ModalHeader name="Выберите человека" back={closeModal} />}
 				dynamicContentHeight
 			>
-				<PeopleRB
-					setPopout={props.setPopout}
-					setSnackbar={props.setSnackbar}
-					back={closeModal}
-				/>
+				<PeopleRB setPopout={props.openPopout} setSnackbar={props.openSnackbar} back={closeModal} />
 			</ModalPage>
 			<ModalPage
 				onClose={closeModal}
 				id={MODAL_ADS_COST}
-				header={<ModalHeader name="Моя карма" back={closeModal} />}
+				header={<ModalHeader name={isSubscriber ? 'Отказаться' : 'Хочу забрать!'} back={closeModal} />}
 			>
 				<List>
 					<Cell>
-						<InfoRow header="Заморожено">
-							{props.backUser ? props.backUser.frozen_carma + '' + K : 'Информация недоступна'}
-						</InfoRow>
-					</Cell>
-					<Cell>
-						<InfoRow header="Доступно">
+						<InfoRow header="Моя карма">
 							{props.backUser
 								? props.backUser.carma - props.backUser.frozen_carma + '' + K
 								: 'Информация недоступна'}
 						</InfoRow>
 					</Cell>
+
 					<Cell>
-						<InfoRow
-							header={
-								props.cost > 0 ? 'Станет доступно после разморозки' : 'Станет доступно после заморозки'
-							}
-						>
-							<div style={{ color: props.cost > 0 ? 'var(--accent)' : 'var(--destructive)' }}>
-								{props.backUser
-									? props.backUser.carma - props.backUser.frozen_carma + props.cost + '' + K
-									: 'Информация недоступна'}
+						<InfoRow header={isSubscriber ? 'Будет возвращено' : 'Будет заморожено'}>
+							<div style={{ color: isSubscriber ? 'var(--accent)' : 'var(--destructive)' }}>
+								{getCost()}
 							</div>
 						</InfoRow>
 					</Cell>
+					{/* <Cell>
+						<InfoRow header="Заморожено в других обьявлениях">
+							{props.backUser ? props.backUser.frozen_carma + '' + K : 'Информация недоступна'}
+						</InfoRow>
+					</Cell> */}
 				</List>
 			</ModalPage>
 			<ModalCard
@@ -256,7 +250,7 @@ const AddsModal = (props) => {
 				icon={
 					<Avatar mode="app" style={{ background: 'var(--background_content)' }} src={Freeze100} size={64} />
 				}
-				header={props.cost + K}
+				header={cost + K}
 				caption={
 					'Получая вещи, вы жертвуете карму(' +
 					K +

@@ -71,7 +71,7 @@ import './styles.css';
 import Comments from './../story/adds/tabs/comments/comments';
 
 import { time } from './../../utils/time';
-import { setDummy, openModal, setPage, setAd } from '../../store/router/actions';
+import { setDummy, openModal, setPage, setAd, openSnackbar, openPopout } from '../../store/router/actions';
 import { PANEL_IMAGE, PANEL_COMMENTS, PANEL_SUBS } from './../../store/router/panelTypes';
 import { MODAL_ADS_COST, MODAL_ADS_FROZEN } from '../../store/router/modalTypes';
 import {
@@ -110,13 +110,15 @@ const AddMore2r = (props) => {
 		setPhotos,
 		setIsHidden,
 		setExtraInfo,
+		openSnackbar,
+		openPopout,
 	} = props;
 	const { setPage, openModal, setDummy, AD } = props;
 	console.log('ADDDDDDDD', AD);
 	const {
 		isDealer,
 		isAuthor,
-		isSubscriber,
+		isSub,
 		status,
 		deal,
 		pathes_to_photo,
@@ -202,33 +204,33 @@ const AddMore2r = (props) => {
 		setImage(getImage());
 	}, [photoIndex, pathes_to_photo]);
 
-	function changeIsSub(isSub) {
+	function changeIsSub(isSubs, c) {
 		if (isNotValid()) {
 			return;
 		}
-		if (isSub) {
+		if (isSubs) {
 			// props.setCost(cost);
 			if (backUser) {
 				console.log('backUser valid treu', cost);
 				let b = backUser;
-				b.frozen_carma += cost;
+				b.frozen_carma += c;
 				setBackUser(b);
 				props.setbackUser(b);
 			}
-			setCost(cost + 1);
+			setCost(c + 1);
 		} else {
 			// props.setCost(-(cost - 1));
 			if (backUser) {
 				console.log('backUser valid fale', cost);
 				let b = backUser;
-				b.frozen_carma -= cost - 1;
+				b.frozen_carma -= c - 1;
 				setBackUser(b);
 				props.setbackUser(b);
 			}
-			setCost(cost - 1);
+			setCost(c - 1);
 		}
-		console.log('isSubscriber', isSub);
-		setIsSub(isSub);
+		console.log('isSubscriber', isSubs);
+		setIsSub(isSubs);
 	}
 
 	useEffect(() => {
@@ -238,10 +240,58 @@ const AddMore2r = (props) => {
 		// }
 		const init = () => (dispatch) => {
 			const id = AD.ad_id;
+			getCost(
+				ad_id,
+				(data) => {
+					setCost(data.bid);
+					getSubscribers(
+						(e) => {},
+						openSnackbar,
+						id,
+						(s) => {
+							console.log('suuubs', s);
+							updateSubsInfo(s);
+							if (status != STATUS_OFFER) {
+								getDeal(
+									openSnackbar,
+									ad_id,
+									(deal) => {
+										updateDealInfo(s, deal);
+										setIsDealer(deal.subscriber_id == myID);
+										setDeal(deal);
+									},
+									(e) => {}
+								);
+							}
+							// if (is) {
+							// 	props.setCost(-data.bid);
+							// } else {
+							// 	props.setCost(data.bid - 1);
+							// }
+						},
+						(e) => {
+							// props.setCost(-data.bid);
+						}
+					);
+				},
+				(e) => {
+					console.log('some err', e);
+				}
+			);
 
+			getUser(
+				openPopout,
+				openSnackbar,
+				myID,
+				(v) => {
+					props.setbackUser(v);
+					setBackUser(v);
+				},
+				(e) => {}
+			);
 			getDetails(
 				(s) => {},
-				props.setSnackbar,
+				openSnackbar,
 				id,
 				(details) => {
 					console.log('looooook', details);
@@ -249,56 +299,6 @@ const AddMore2r = (props) => {
 					setExtraInfo(details);
 					setIsAuthor(details.author.vk_id == myID);
 					// dispatch(setIsHidden(false));
-
-					getCost(
-						details.ad_id,
-						(data) => {
-							setCost(data.bid);
-							getSubscribers(
-								(e) => {},
-								props.setSnackbar,
-								id,
-								(s) => {
-									console.log('suuubs', s);
-									updateSubsInfo(s);
-									if (details.status != STATUS_OFFER) {
-										getDeal(
-											props.setSnackbar,
-											details.ad_id,
-											(deal) => {
-												updateDealInfo(s, deal);
-												setIsDealer(deal.subscriber_id == myID);
-												setDeal(deal);
-											},
-											(e) => {}
-										);
-									}
-									// if (is) {
-									// 	props.setCost(-data.bid);
-									// } else {
-									// 	props.setCost(data.bid - 1);
-									// }
-								},
-								(e) => {
-									// props.setCost(-data.bid);
-								}
-							);
-						},
-						(e) => {
-							console.log('some err', e);
-						}
-					);
-
-					getUser(
-						props.setPopout,
-						props.setSnackbar,
-						myID,
-						(v) => {
-							props.setbackUser(v);
-							setBackUser(v);
-						},
-						(e) => {}
-					);
 
 					// saveInstance = details;
 				},
@@ -377,18 +377,15 @@ const AddMore2r = (props) => {
 							size="l"
 							mode="commerce"
 							onClick={() => {
-								setHide(true);
 								acceptDeal(
-									props.setPopout,
-									props.setSnackbar,
+									openPopout,
+									openSnackbar,
 									deal.deal_id,
 									(v) => {
 										props.back();
 									},
 									(e) => {},
-									() => {
-										setHide(false);
-									}
+									() => {}
 								);
 							}}
 							style
@@ -404,8 +401,8 @@ const AddMore2r = (props) => {
 							onClick={() => {
 								setHide(true);
 								denyDeal(
-									props.setPopout,
-									props.setSnackbar,
+									openPopout,
+									openSnackbar,
 									deal.deal_id,
 									(v) => {
 										props.back();
@@ -527,37 +524,31 @@ const AddMore2r = (props) => {
 		setIsSub(s.filter((v) => v.vk_id == myID).length > 0);
 	}
 
-	function unsub() {
-		setHide(true);
+	function unsub(c) {
 		unsubscribe(
-			props.setPopout,
-			props.setSnackbar,
+			openPopout,
+			openSnackbar,
 			ad_id,
-			sub,
+			() => sub(c-1),
 			(v) => {
-				changeIsSub(false);
+				changeIsSub(false, c);
 			},
 			(e) => {},
-			() => {
-				setHide(false);
-			}
+			() => {}
 		);
 	}
 
-	function sub() {
-		setHide(true);
+	function sub(c) {
 		subscribe(
-			props.setPopout,
-			props.setSnackbar,
+			openPopout,
+			openSnackbar,
 			ad_id,
-			unsub,
+			() => unsub(c+1),
 			(v) => {
-				changeIsSub(true);
+				changeIsSub(true, c);
 			},
 			(e) => {},
-			() => {
-				setHide(false);
-			}
+			() => {}
 		);
 	}
 	if (isNotValid(AD)) {
@@ -664,10 +655,10 @@ const AddMore2r = (props) => {
 								<CellButton
 									onClick={() => {
 										hidden
-											? adVisible(props.setPopout, props.setSnackbar, ad_id, () => {
+											? adVisible(openPopout, openSnackbar, ad_id, () => {
 													setIsHidden(false);
 											  })
-											: adHide(props.setPopout, props.setSnackbar, ad_id, () => {
+											: adHide(openPopout, openSnackbar, ad_id, () => {
 													setIsHidden(true);
 											  });
 									}}
@@ -681,8 +672,9 @@ const AddMore2r = (props) => {
 									disabled={isFinished()}
 									before={<Icon24Delete />}
 									onClick={() => {
-										deleteAd(props.setPopout, ad_id, props.setSnackbar, props.refresh);
+										deleteAd(openPopout, ad_id, openSnackbar, props.refresh);
 									}}
+									э
 								>
 									Удалить
 								</CellButton>
@@ -737,16 +729,22 @@ const AddMore2r = (props) => {
 			<Separator />
 			{isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED || isAuthor ? (
 				''
-			) : isSubscriber ? (
+			) : isSub ? (
 				<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 					<div style={{ margin: '12px' }}>
-						<Button stretched size="m" mode="destructive" onClick={unsub} before={<Icon24MarketOutline />}>
+						<Button
+							stretched
+							size="m"
+							mode="destructive"
+							onClick={() => unsub(cost)}
+							before={<Icon24MarketOutline />}
+						>
 							Отказаться
 						</Button>
 					</div>
 					<PanelHeaderButton onClick={onCarmaClick}>
 						<div style={{ fontSize: '20px', color: 'var(--destructive)' }}>
-							+{cost - 1}
+							{cost - 1}
 							{K}
 						</div>
 					</PanelHeaderButton>
@@ -757,13 +755,19 @@ const AddMore2r = (props) => {
 			) : (
 				<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 					<div style={{ margin: '12px' }}>
-						<Button stretched size="m" mode="primary" onClick={sub} before={<Icon24MarketOutline />}>
+						<Button
+							stretched
+							size="m"
+							mode="primary"
+							onClick={() => sub(cost)}
+							before={<Icon24MarketOutline />}
+						>
 							Хочу забрать!
 						</Button>
 					</div>
 					<PanelHeaderButton onClick={onCarmaClick}>
 						<div style={{ fontSize: '20px', color: 'var(--header_tint)' }}>
-							-{cost}
+							{cost}
 							{K}
 						</div>
 					</PanelHeaderButton>
@@ -825,8 +829,8 @@ const AddMore2r = (props) => {
 			</Group>
 			{isAuthor && isFinished ? (
 				<Subs
-					setPopout={props.setPopout}
-					setSnackbar={props.setSnackbar}
+					setPopout={openPopout}
+					setSnackbar={openSnackbar}
 					openUser={props.openUser}
 					amount={2}
 					maxAmount={2}
@@ -845,8 +849,8 @@ const AddMore2r = (props) => {
 						AD={AD}
 						amount={1}
 						maxAmount={1}
-						setPopout={props.setPopout}
-						setSnackbar={props.setSnackbar}
+						setPopout={openPopout}
+						setSnackbar={openSnackbar}
 						myID={myID}
 						openUser={props.openUser}
 					/>
@@ -893,6 +897,9 @@ const mapDispatchToProps = (dispatch) => {
 				setIsHidden,
 				setIsAuthor,
 				setExtraInfo,
+
+				openPopout,
+				openSnackbar,
 			},
 			dispatch
 		),

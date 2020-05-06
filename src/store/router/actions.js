@@ -14,13 +14,15 @@ import {
 	SET_AD,
 	SET_DUMMY,
 	CLOSE_ALL_MODALS,
+	SET_TAB,
 } from './actionTypes';
 import { PANEL_USER, PANEL_ONE } from './panelTypes';
 
-export const setStory = (story) => ({
+export const setStory = (story, panel) => ({
 	type: SET_STORY,
 	payload: {
-		story: story,
+		story,
+		panel,
 	},
 });
 
@@ -56,7 +58,7 @@ export const setProfile = (profile) => ({
 	type: SET_PROFILE,
 	payload: {
 		panel: PANEL_USER,
-		profile: profile,
+		profile,
 	},
 });
 
@@ -64,7 +66,14 @@ export const setAd = (ad) => ({
 	type: SET_AD,
 	payload: {
 		panel: PANEL_ONE,
-		ad: ad,
+		ad,
+	},
+});
+
+export const setTab = (tab) => ({
+	type: SET_TAB,
+	payload: {
+		tab,
 	},
 });
 

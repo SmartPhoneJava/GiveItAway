@@ -14,12 +14,16 @@ import {
 	SET_PROFILE,
 	SET_AD,
 	SET_DUMMY,
+	SET_TAB,
 } from './actionTypes';
 
 import * as VK from '../../services/VK';
 import { STORY_ADS, STORY_CREATE } from './storyTypes';
 import { PANEL_ADS, PANEL_CREATE, PANEL_USER, PANEL_ONE } from './panelTypes';
-import { AdDefault } from '../../const/ads';
+import { AdDefault, TAB_ADS } from '../../const/ads';
+
+import { store } from '../../index';
+import { backToPrevAd } from '../detailed_ad/actions';
 
 const initialState = {
 	activeStory: STORY_ADS,
@@ -32,6 +36,9 @@ const initialState = {
 	panelsHistory: {
 		[STORY_ADS]: [PANEL_ADS],
 		[STORY_CREATE]: [PANEL_CREATE],
+	},
+	activeTabs: {
+		[STORY_ADS]: TAB_ADS,
 	},
 
 	activeProfile: -1,
@@ -110,7 +117,7 @@ export const routerReducer = (state = initialState, action) => {
 			let Profile = state.activeProfile;
 			let Profiles = state.profileHistory;
 			if (Profile == -1) {
-				Profile = profile
+				Profile = profile;
 			}
 			Profiles = Profile ? [...Profiles, Profile] : Profiles;
 			console.log('set activeProfile', profile);
@@ -134,7 +141,7 @@ export const routerReducer = (state = initialState, action) => {
 			Panels = [...Panels, panel];
 			Profiles = state.activeProfile ? [...Profiles, state.activeProfile] : Profiles;
 
-			console.log("SET_PROFILE", state.activeProfile, Profiles);
+			console.log('SET_PROFILE', state.activeProfile, Profiles);
 
 			VK.swipeBackOn();
 
@@ -208,10 +215,21 @@ export const routerReducer = (state = initialState, action) => {
 			VK.swipeBackOff();
 
 			let story = action.payload.story;
+			let panel = action.payload.panel || initialState.activePanels[story];
+
+			console.log('looook', panel);
 
 			return {
 				...initialState,
 				activeStory: story,
+				activePanels: {
+					...initialState.activePanels,
+					[story]: panel,
+				},
+				panelsHistory: {
+					...initialState.panelsHistory,
+					[story]: [panel],
+				},
 				scrollPosition: [window.pageYOffset],
 			};
 		}
@@ -307,6 +325,7 @@ export const routerReducer = (state = initialState, action) => {
 			if (state.activePanel == PANEL_ONE) {
 				Ads.pop();
 				Ad = Ads[Ads.length - 1];
+				store.dispatch(backToPrevAd());
 			}
 
 			return {
@@ -328,6 +347,21 @@ export const routerReducer = (state = initialState, action) => {
 
 				profileHistory: Profiles,
 				adHistory: Ads,
+			};
+		}
+
+		case SET_TAB: {
+			window.history.pushState(null, null);
+
+			const Story = state.activeStory;
+			const tab = action.payload.tab;
+
+			return {
+				...state,
+				activeTabs: {
+					...state.activeTabs,
+					[Story]: tab,
+				},
 			};
 		}
 

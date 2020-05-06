@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 
 import { setPage, openPopout, openSnackbar, closeSnackbar, setStory, setAd } from '../../store/router/actions';
-import { PANEL_CATEGORIES, PANEL_CITIES, PANEL_COUNTRIES } from '../../store/router/actionTypes';
+import { PANEL_CATEGORIES, PANEL_CITIES, PANEL_COUNTRIES } from '../../store/router/panelTypes';
 
 import { setFormData } from '../../store/create_post/actions';
 import { CREATE_AD_MAIN, CREATE_AD_ITEM } from '../../store/create_post/types';
@@ -111,7 +111,9 @@ const createAd = (myUser, inputData, tgeodata, dispatch) => {
 		(ad) => loadAd(ad, dispatch),
 		openSnackbar,
 		openPopout,
-		() => clearForm(dispatch)
+		() => {
+			clearForm(dispatch);
+		}
 	);
 };
 

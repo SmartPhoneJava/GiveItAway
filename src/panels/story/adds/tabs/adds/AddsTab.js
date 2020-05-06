@@ -33,8 +33,12 @@ import Jins from './../../../../../img/jins.jpg';
 import Tea from './../../../../../img/tea.jpg';
 import Playstein from './../../../../../img/playstein.jpg';
 import Bb from './../../../../../img/bb.jpg';
-import { SORT_TIME, GEO_TYPE_FILTERS } from '../../../../../const/ads';
+import { SORT_TIME, GEO_TYPE_FILTERS, MODE_ALL, MODE_GIVEN } from '../../../../../const/ads';
 import { ADS_FILTERS } from '../../../../../store/create_post/types';
+import { openSnackbar, openPopout, closePopout } from '../../../../../store/router/actions';
+import AdNoWanted from '../../../../placeholders/adNoWanted';
+import { setFormData } from '../../../../../store/create_post/actions';
+import AdNoGiven from '../../../../placeholders/adNoGiven';
 
 const addsArrDD = [
 	{
@@ -207,23 +211,25 @@ const addsArrDD = [
 
 let i = 0;
 
-const SEARCH_WAIT = 500
+const SEARCH_WAIT = 500;
 
 const AddsTab = (props) => {
 	const [search, setSearch] = useState('');
 	const [searchR, setSearchR] = useState('');
 
 	useEffect(() => {
+		let cleanupFunction = false;
 		i++;
 		let j = i;
 		setTimeout(() => {
-			if (j == i) {
+			if (j == i && !cleanupFunction) {
 				setSearchR(search);
 			}
 		}, SEARCH_WAIT);
+		return () => (cleanupFunction = true);
 	}, [search]);
 
-	const { inputData } = props;
+	const { inputData, openPopout, openSnackbar, closePopout, setFormData } = props;
 
 	const geoType = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geotype : null) || GEO_TYPE_FILTERS;
 	const radius = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].radius : null) || 0;
@@ -232,12 +238,12 @@ const AddsTab = (props) => {
 	const city = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].city : null) || NoRegion;
 	const category = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].category : null) || CategoryNo;
 	const sort = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].sort : null) || SORT_TIME;
+	const mode = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].mode : null) || MODE_ALL;
 
 	const [pageNumber, setPageNumber] = useState(1);
 
 	const [filtersOn, setFiltersOn] = useState(false);
 	useEffect(() => {
-		console.log("country, city, category", country, city, category)
 		if (country == NoRegion && city == NoRegion && category == CategoryNo) {
 			setFiltersOn(false);
 			return;
@@ -245,11 +251,19 @@ const AddsTab = (props) => {
 		setFiltersOn(true);
 	}, [country, city, category]);
 
+	const [isMounted, setIsMounted] = useState(true);
+	useEffect(() => {
+		setIsMounted(true);
+		return () => {
+			setIsMounted(false);
+		};
+	}, []);
+
 	let { inited, loading, ads, error, hasMore, newPage } = useAdSearch(
-		props.setPopout,
+		isMounted,
 		searchR,
 		category,
-		props.mode,
+		mode,
 		pageNumber,
 		5,
 		props.deleteID,
@@ -276,8 +290,12 @@ const AddsTab = (props) => {
 
 	function handleSearch(e) {
 		setSearch(e.target.value);
-		props.setPopout(null);
+		closePopout();
 	}
+
+	const setAllMode = () => {
+		setFormData(ADS_FILTERS, { ...inputData, mode: MODE_ALL });
+	};
 
 	function Ad(ad) {
 		return (
@@ -286,8 +304,8 @@ const AddsTab = (props) => {
 				openUser={props.openUser}
 				openAd={() => props.openAd(ad)}
 				ad={ad}
-				setPopout={props.setPopout}
-				setSnackbar={props.setSnackbar}
+				setPopout={openPopout}
+				setSnackbar={openSnackbar}
 				refresh={props.refresh}
 				myID={props.myID}
 				onCloseClick={props.onCloseClick}
@@ -297,105 +315,111 @@ const AddsTab = (props) => {
 
 	const width = document.body.clientWidth;
 	return (
-		<div
-			style={{
-				height: 'auto',
-				display: 'flex',
-				background: 'var(--background_page)',
-				flexDirection: 'column',
-				overflow: 'hidden',
-				textOverflow: 'ellipsis',
-				whiteSpace: ads.length > 0 ? 'nowrap' : 'normal',
-			}}
-		>
-			<div style={{ display: 'flex', background: 'var(--background_content)' }}>
-				<Search
-					disabled
-					placeholder="Поиск недоступен"
-					value={search}
-					onChange={handleSearch}
-					icon={<Icon24Filter />}
-					onIconClick={props.onFiltersClick}
-				/>
-				{filtersOn ? (
-					<PanelHeaderButton
-						mode="secondary"
-						size="m"
-						onClick={() => {
-							props.dropFilters();
-						}}
-					>
-						<div style={{ paddingRight: '10px' }}>
-							<Avatar size={24}>
-								<Icon24Dismiss />
-							</Avatar>
-						</div>
-					</PanelHeaderButton>
-				) : null}
-			</div>
-			<Group>
-				{ads.length > 0 ? (
-					ads.map((ad, index) => {
-						if (!width || width < 500) {
-							if (ads.length === index + 1) {
+		<>
+			<div
+				style={{
+					height: 'auto',
+					display: 'flex',
+					background: 'var(--background_page)',
+					flexDirection: 'column',
+					overflow: 'hidden',
+					textOverflow: 'ellipsis',
+					whiteSpace: ads.length > 0 ? 'nowrap' : 'normal',
+				}}
+			>
+				<div style={{ display: 'flex', background: 'var(--background_content)' }}>
+					<Search
+						disabled
+						placeholder="Поиск недоступен"
+						value={search}
+						onChange={handleSearch}
+						icon={<Icon24Filter />}
+						onIconClick={props.onFiltersClick}
+					/>
+					{filtersOn ? (
+						<PanelHeaderButton
+							mode="secondary"
+							size="m"
+							onClick={() => {
+								props.dropFilters();
+							}}
+						>
+							<div style={{ paddingRight: '10px' }}>
+								<Avatar size={24}>
+									<Icon24Dismiss />
+								</Avatar>
+							</div>
+						</PanelHeaderButton>
+					) : null}
+				</div>
+				<Group>
+					{ads.length > 0 ? (
+						ads.map((ad, index) => {
+							if (!width || width < 500) {
+								if (ads.length === index + 1) {
+									return (
+										<div key={ad.ad_id} ref={lastAdElementRef}>
+											{Ad(ad)}
+										</div>
+									);
+								}
+								return <div key={ad.ad_id}>{Ad(ad)}</div>;
+							}
+							if (index % 2) {
+								const prev = ads[index - 1];
+								const first = (
+									<div className="one-block" key={prev.ad_id}>
+										{Ad(prev)}
+									</div>
+								);
+
+								let second = (
+									<div className="one-block" key={ad.ad_id}>
+										{Ad(ad)}
+									</div>
+								);
+
+								if (ads.length === index + 1) {
+									second = (
+										<div className="one-block" key={ad.ad_id} ref={lastAdElementRef}>
+											{Ad(ad)}
+										</div>
+									);
+								}
+								return (
+									<div className="flex-blocks">
+										{first} {second}
+									</div>
+								);
+							}
+							if (index % 2 == 0 && ads.length - 1 == index) {
 								return (
 									<div key={ad.ad_id} ref={lastAdElementRef}>
 										{Ad(ad)}
 									</div>
 								);
 							}
-							return <div key={ad.ad_id}>{Ad(ad)}</div>;
-						}
-						if (index % 2) {
-							const prev = ads[index - 1];
-							const first = (
-								<div className="one-block" key={prev.ad_id}>
-									{Ad(prev)}
-								</div>
-							);
-
-							let second = (
-								<div className="one-block" key={ad.ad_id}>
-									{Ad(ad)}
-								</div>
-							);
-
-							if (ads.length === index + 1) {
-								second = (
-									<div className="one-block" key={ad.ad_id} ref={lastAdElementRef}>
-										{Ad(ad)}
-									</div>
-								);
-							}
-							return (
-								<div className="flex-blocks">
-									{first} {second}
-								</div>
-							);
-						}
-						if (index % 2 == 0 && ads.length - 1 == index) {
-							return (
-								<div key={ad.ad_id} ref={lastAdElementRef}>
-									{Ad(ad)}
-								</div>
-							);
-						}
-					})
-				) : error ? (
-					<Error />
-				) : // addsArrDD.map((ad) => {
-				// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
-				// })
-				// addsArrDD.map(ad => {
-				// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
-				// })
-				!inited ? (
-					''
-				) : (
-					<AdNotFound dropFilters={props.dropFilters} />
-				)}
-			</Group>
-		</div>
+						})
+					) : error ? (
+						<Error />
+					) : // addsArrDD.map((ad) => {
+					// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
+					// })
+					// addsArrDD.map(ad => {
+					// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
+					// })
+					!inited ? (
+						''
+					) : mode == MODE_ALL ? (
+						<AdNotFound dropFilters={props.dropFilters} />
+					) : mode == MODE_GIVEN ? (
+						<AdNoGiven setAllMode={setAllMode} />
+					) : (
+						<AdNoWanted setAllMode={setAllMode} />
+					)}
+				</Group>
+			</div>
+		</>
 	);
 };
 
@@ -410,9 +434,12 @@ const mapStateToProps = (state) => {
 	};
 };
 
-function mapDispatchToProps() {
-	return {}
-}
+const mapDispatchToProps = {
+	openSnackbar,
+	openPopout,
+	closePopout,
+	setFormData,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddsTab);
 

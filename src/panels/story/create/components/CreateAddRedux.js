@@ -31,12 +31,15 @@ const CreateAddRedux = (props) => {
 
 	const [pmOpen, setPmOpen] = useState(true);
 	useEffect(() => {
+		let cleanupFunction = false;
 		canWritePrivateMessage(
 			myUser.id,
 			appID,
 			apiVersion,
 			(isClosed) => {
-				setPmOpen(!isClosed);
+				if (!cleanupFunction) {
+					setPmOpen(!isClosed);
+				}
 			},
 			(e) => {}
 		);
@@ -53,6 +56,7 @@ const CreateAddRedux = (props) => {
 				stopMe: true,
 			});
 		}
+		return () => (cleanupFunction = true);
 	}, []);
 
 	const [errorHeader, setErrorHeader] = useState('');
@@ -72,14 +76,18 @@ const CreateAddRedux = (props) => {
 	}, [props.inputData]);
 
 	useEffect(() => {
+		let cleanupFunction = false;
 		bridge
 			.send('VKWebAppGetGeodata')
 			.then((value) => {
-				setGeodata(value);
+				if (!cleanupFunction) {
+					setGeodata(value);
+				}
 			})
 			.catch((error) => {
 				console.log('VKWebAppGetGeodata error', error);
 			});
+		return () => (cleanupFunction = true);
 	}, []);
 
 	function saveCancel() {

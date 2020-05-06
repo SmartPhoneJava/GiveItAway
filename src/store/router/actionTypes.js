@@ -4,6 +4,7 @@ export const SET_AD = 'SET_AD';
 export const ADD_PROFILE = 'ADD_PROFILE';
 export const ADD_AD = 'ADD_AD';
 
+export const SET_TAB = 'SET_TAB';
 export const SET_STORY = 'SET_STORY';
 export const GO_BACK = 'GO_BACK';
 

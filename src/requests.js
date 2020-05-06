@@ -519,17 +519,17 @@ export async function CreateAd(ad, obj, photos, openAd, loadAd, setSnackbar, set
 				throw new Error('Не тот код!');
 			}
 			ad.ad_id = response.data.ad_id;
-			console.log('createAddddd', photos);
-			// loadAd(ad)
 			openAd(ad);
 			await CreateImages(
 				photos,
 				response.data.ad_id,
-				() => {
+				(snackbar) => {
 					if (successcallback) {
 						successcallback();
 					}
+					setSnackbar(snackbar)
 					getDetails(setPopout, setSnackbar, response.data.ad_id, (e) => loadAd(e));
+					
 				},
 				setSnackbar
 			);

@@ -9,8 +9,13 @@ import { User } from './AddsTab/../../../../../../store/user';
 
 import { CategoryNo } from './../../../../template/Categories';
 
+import { store } from "./../../../../../index"
+import { STORY_ADS } from '../../../../../store/router/storyTypes';
+import { openPopout, closePopout } from '../../../../../store/router/actions';
+import { MODE_WANTED, MODE_ALL } from '../../../../../const/ads';
+
 export default function useAdSearch(
-	setPopout,
+	isMounted,
 	query,
 	category,
 	mode,
@@ -45,7 +50,9 @@ export default function useAdSearch(
 	}, [deleteID]);
 
 	useEffect(() => {
-		setPopout(<ScreenSpinner size="large" />);
+		let cleanupFunction = false;
+		store.dispatch(openPopout(<ScreenSpinner size="large" />))
+		
 		setLoading(true);
 		setError(false);
 		setInited(false);
@@ -79,11 +86,13 @@ export default function useAdSearch(
 		}
 
 		let url = BASE_AD + 'find';
-		if (mode != 'all' && mode != 'wanted') {
+		if (mode != MODE_ALL && mode != MODE_WANTED) {
 			params.author_id = User.getState().vk_id;
-		} else if (mode == 'wanted') {
+		} else if (mode == MODE_WANTED) {
 			url = BASE_AD + 'wanted';
 		}
+
+		console.log('use cleanupFunction ', cleanupFunction);
 
 		axios({
 			method: 'GET',
@@ -93,14 +102,18 @@ export default function useAdSearch(
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
 		})
 			.then((res) => {
+				console.log('look cleanupFunction ', cleanupFunction);
 				console.log('useAdsearch', res);
 				const newAds = res.data;
+				if (cleanupFunction || !isMounted) {
+					return
+				}
 				setAds((prev) => {
 					return [...new Set([...prev, ...newAds])];
 				});
 				setHasMore(newAds.length > 0);
 				setLoading(false);
-				setPopout(null);
+				store.dispatch(closePopout())
 				setInited(true);
 			})
 			.catch((e) => {
@@ -109,10 +122,13 @@ export default function useAdSearch(
 				if (('' + e).indexOf('404') == -1) {
 					setError(true);
 				}
-				setPopout(null);
+				store.dispatch(closePopout())
 				setInited(true);
 			});
-		return () => cancel();
+		return () => {
+			cancel()
+			cleanupFunction = true
+		}
 	}, [category, mode, query, pageNumber, city, country, sort, geodata]);
 
 	return { inited, newPage: pageNumber, ads, loading, error, hasMore };

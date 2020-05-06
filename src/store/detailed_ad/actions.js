@@ -19,6 +19,7 @@ import {
 	SET_SWIPE_IMAGES,
 	CLEAR,
 	SET_DEALER,
+	GO_BACK,
 } from './actionTypes';
 
 export const setComments = (comments) => ({
@@ -124,6 +125,14 @@ export const setCost = (cost) => ({
 	payload: {
 		cost,
 	},
+});
+
+export const backToPrevAd = () => ({
+	type: GO_BACK,
+});
+
+export const clearAds = () => ({
+	type: CLEAR,
 });
 
 export const setDetailedAd = (ad) => ({

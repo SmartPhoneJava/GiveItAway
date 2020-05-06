@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import {
 	PanelHeaderSimple,
 	List,
@@ -25,34 +26,38 @@ import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 import Notifications from './tabs/notifications/notifications';
 
 import AddsTab from './tabs/adds/AddsTab';
-
-const tabAdds = 'adds';
-const tabAddsText = 'Объявления';
-
-const tabNotification = 'notification';
-const tabNotificationText = 'Уведомления';
+import { setFormData } from '../../../store/create_post/actions';
+import { ADS_FILTERS } from '../../../store/create_post/types';
+import { TAB_ADS, TAB_NOTIFICATIONS, MODE_ALL, MODE_WANTED, MODE_GIVEN } from '../../../const/ads';
+import { setTab, openPopout, openModal, openSnackbar } from '../../../store/router/actions';
+import { MODAL_ADS_FILTERS, MODAL_ADS_SUBS } from '../../../store/router/modalTypes';
 
 const AddsTabs = (props) => {
+	const { setFormData, setTab, openPopout, openSnackbar, openModal, inputData, activeTabs, activeStory } = props;
+	const mode = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].mode : null) || MODE_ALL;
+	const activeTab = activeTabs[activeStory] || TAB_ADS;
 	const [contextOpened, setContextOpened] = useState(false);
-	const [mode, setmode] = useState('all');
-	const [activeTab, setActiveTab] = useState(props.savedAdState == '' ? tabAdds : props.savedAdState);
 
-	useEffect(() => {
-		if (props.adsMode == '') {
-			return;
-		}
-		setmode(props.adsMode);
-	}, [props.adsMode]);
-
-	useEffect(() => {
-		if (props.savedAdState != '') {
-			setActiveTab(props.savedAdState);
-		}
-	}, [props.savedAdState]);
 	function select(e) {
-		setmode(e.currentTarget.dataset.mode);
-		setContextOpened(false);
 		props.dropFilters();
+		setFormData(ADS_FILTERS, {
+			...inputData,
+			mode: e.currentTarget.dataset.mode,
+		});
+		setContextOpened(false);
+	}
+
+	function onTabAdsClick() {
+		if (activeTab === TAB_ADS) {
+			setContextOpened(!contextOpened);
+		}
+		setTab(TAB_ADS);
+	}
+
+	function onTabNotsClick() {
+		setTab(TAB_NOTIFICATIONS);
+		console.log('onTabNotsClick');
+		setContextOpened(false);
 	}
 
 	return (
@@ -60,14 +65,8 @@ const AddsTabs = (props) => {
 			<PanelHeaderSimple left={<PanelHeaderButton />} separator={false}>
 				<Tabs>
 					<TabsItem
-						label={100}
-						onClick={() => {
-							if (activeTab === tabAdds) {
-								setContextOpened(!contextOpened);
-							}
-							setActiveTab(tabAdds);
-						}}
-						selected={activeTab === tabAdds}
+						onClick={onTabAdsClick}
+						selected={activeTab === TAB_ADS}
 						after={
 							<Icon16Dropdown
 								fill="var(--accent)"
@@ -79,17 +78,14 @@ const AddsTabs = (props) => {
 							/>
 						}
 					>
-						{mode == 'all' ? 'Все' : mode == 'wanted' ? 'Хочу забрать' : 'Отдаю'}
+						{mode == MODE_ALL ? 'Все' : mode == MODE_WANTED ? 'Хочу забрать' : 'Отдаю'}
 					</TabsItem>
 					<TabsItem
 						// label={props.notsCounter == 0 ? null : props.notsCounter}
-						onClick={() => {
-							setActiveTab(tabNotification);
-							setContextOpened(false);
-						}}
-						selected={activeTab === tabNotification}
+						onClick={onTabNotsClick}
+						selected={activeTab === TAB_NOTIFICATIONS}
 					>
-						<TabbarItem data-story="feed" label={props.notsCounter == 0 ? null : props.notsCounter}>
+						<TabbarItem label={props.notsCounter == 0 ? null : props.notsCounter}>
 							<Icon28Notifications />
 						</TabbarItem>
 					</TabsItem>
@@ -104,79 +100,76 @@ const AddsTabs = (props) => {
 				<List>
 					<Cell
 						before={<Icon28LiveOutline />}
-						asideContent={mode === 'all' ? <Icon24Done fill="var(--accent)" /> : null}
+						asideContent={mode === MODE_ALL ? <Icon24Done fill="var(--accent)" /> : null}
 						onClick={select}
-						data-mode="all"
+						data-mode={MODE_ALL}
 					>
 						Все
 					</Cell>
 					<Cell
 						before={<Icon28UserCircleOutline />}
-						asideContent={mode === 'managed' ? <Icon24Done fill="var(--accent)" /> : null}
+						asideContent={mode === MODE_GIVEN ? <Icon24Done fill="var(--accent)" /> : null}
 						onClick={select}
-						data-mode="managed"
+						data-mode={MODE_GIVEN}
 					>
 						Отдаю
 					</Cell>
 					<Cell
 						before={<Icon28CubeBoxOutline />}
-						asideContent={mode === 'wanted' ? <Icon24Done fill="var(--accent)" /> : null}
+						asideContent={mode === { MODE_WANTED } ? <Icon24Done fill="var(--accent)" /> : null}
 						onClick={select}
-						data-mode="wanted"
+						data-mode={MODE_WANTED}
 					>
 						Хочу забрать
 					</Cell>
 				</List>
 			</PanelHeaderContext>
-			{activeTab === tabNotification ? (
+			{activeTab === TAB_NOTIFICATIONS ? (
 				<Notifications
-					setSnackbar={props.setSnackbar}
+					setSnackbar={openSnackbar}
 					zeroNots={props.zeroNots}
-					openUser={(u) => {
-						props.openUser(u);
-						props.setSavedAdState(tabNotification);
-					}}
-					openAd={(v) => {
-						props.openAd(v);
-						props.setSavedAdState(tabNotification);
-					}}
+					openUser={props.openUser}
+					openAd={props.openAd}
 					goToAds={() => {
-						setActiveTab(tabAdds);
+						setTab(TAB_ADS);
 					}}
-					setPopout={props.setPopout}
+					setPopout={openPopout}
 				/>
 			) : (
 				<AddsTab
-					vkPlatform={props.vkPlatform}
-					openAd={(v) => {
-						props.openAd(v);
-						props.setSavedAdState(tabAdds);
-					}}
-					dropFilters={() => {
-						props.dropFilters();
-						setmode('all');
-					}}
-					category={props.category}
-					mode={mode}
+					openAd={props.openAd}
+					dropFilters={props.dropFilters}
 					deleteID={props.deleteID}
-					myID={props.myID}
-					city={props.city}
-					openUser={(u) => {
-						props.openUser(u);
-						setActiveTab(tabAdds);
-					}}
-					geodata={props.geodata}
-					country={props.country}
-					sort={props.sort}
+					openUser={props.openUser}
 					refresh={props.refresh}
-					setPopout={props.setPopout}
-					onFiltersClick={props.onFiltersClick}
-					onCloseClick={props.onCloseClick}
-					setSnackbar={props.setSnackbar}
+					onFiltersClick={() => {
+						openModal(MODAL_ADS_FILTERS);
+					}}
+					onCloseClick={() => {
+						openModal(MODAL_ADS_SUBS);
+					}}
 				></AddsTab>
 			)}
 		</React.Fragment>
 	);
 };
 
-export default AddsTabs;
+const mapStateToProps = (state) => {
+	return {
+		inputData: state.formData.forms,
+		activeTabs: state.router.activeTabs,
+		activeStory: state.router.activeStory,
+	};
+};
+
+const mapDispatchToProps = {
+	setFormData,
+	setTab,
+	openPopout,
+	openModal,
+	openSnackbar,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddsTabs);
+
+// 184

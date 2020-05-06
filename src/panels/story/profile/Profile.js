@@ -19,6 +19,11 @@ import Error from './../../placeholders/error';
 import { old, time, fromSeconds } from './../../../utils/time';
 
 import './profile.css';
+import { setFormData } from '../../../store/create_post/actions';
+import { setStory, openPopout, openSnackbar } from '../../../store/router/actions';
+import { STORY_ADS, STORY_CREATE } from '../../../store/router/storyTypes';
+import { ADS_FILTERS } from '../../../store/create_post/types';
+import { MODE_WANTED } from '../../../const/ads';
 
 function getImage(backuser) {
 	if (!backuser || !backuser.photo_url) {
@@ -39,7 +44,10 @@ function getAuthorHref(backuser) {
 export const K = 'Ҝ';
 
 const Profile = (props) => {
+	const { setFormData, setStory, openPopout, openSnackbar, popouts, story, activePanels } = props;
 	const profileID = props.activeProfile || -1;
+
+	const popout = popouts ? popouts[story] : null;
 
 	const [backuser, setBackUser] = useState();
 	const [vkUser, setVkUser] = useState('');
@@ -49,16 +57,11 @@ const Profile = (props) => {
 	const width = document.body.clientWidth;
 
 	const [givenPageNumber, setGivenPageNumber] = useState(1);
-	let { given_loading, given, given_hasMore, given_newPage } = useAdGiven(
-		props.setPopout,
-		givenPageNumber,
-		10,
-		profileID
-	);
+	let { given_loading, given, given_hasMore, given_newPage } = useAdGiven(openPopout, givenPageNumber, 10, profileID);
 
 	const [receivedPageNumber, setReceivedPageNumber] = useState(1);
 	let { received_loading, received, received_hasMore, received_newPage } = useAdReceived(
-		props.setPopout,
+		openPopout,
 		receivedPageNumber,
 		10,
 		profileID
@@ -95,15 +98,22 @@ const Profile = (props) => {
 	);
 
 	useEffect(() => {
+		let cleanupFunction = false;
 		getUser(
-			props.setPopout,
-			props.setSnackbar,
+			openPopout,
+			openSnackbar,
 			profileID,
 			(v) => {
+				if (cleanupFunction) {
+					return
+				}
 				setBackUser(v);
 				props.setProfileName(v.name + ' ' + v.surname);
 			},
 			(e) => {
+				if (cleanupFunction) {
+					return
+				}
 				setFailed(true);
 			}
 		);
@@ -112,13 +122,17 @@ const Profile = (props) => {
 			profileID,
 			props.appID,
 			props.apiVersion,
-			(v) => {
-				setVkUser(v);
+			(r) => {
+				if (cleanupFunction) {
+					return
+				}
+				setVkUser(r);
 			},
 			(e) => {}
 		);
 		setGivenPageNumber(1);
 		setReceivedPageNumber(1);
+		return () => (cleanupFunction = true);
 	}, [profileID]);
 
 	function Ad(ad) {
@@ -178,34 +192,60 @@ const Profile = (props) => {
 
 	console.log('we want update', profileID);
 
+	function getUserVK() {
+		return 'https://vk.com/id' + profileID;
+	}
+
+	function openUserVK() {
+		window.open(getUserVK(), '_blank');
+	}
+
+	function getUserDialog() {
+		return 'https://vk.com/im?sel=' + profileID;
+	}
+
+	function getUserOnline() {
+		return !vkUser ? '' : vkUser.online ? 'online' : 'был(а) в сети ' + fromSeconds(vkUser.last_seen.time);
+	}
+
+	function openFreeze() {
+		if (profileID == props.myID) {
+			setStory(STORY_ADS);
+			setFormData(ADS_FILTERS, {
+				mode: MODE_WANTED,
+			});
+		}
+	}
+
+	function openCreateStory() {
+		setStory(STORY_CREATE);
+	}
+
+	function openAdsStory() {
+		setStory(STORY_ADS);
+	}
+
 	if (backuser) {
 		return (
 			<>
+				{popout}
 				<Cell
-					onClick={() => {
-						window.open('https://vk.com/id' + backuser.vk_id, '_blank');
-					}}
+					onClick={openUserVK}
 					size="l"
 					multiline="true"
 					asideContent={
 						vkUser.can_write_private_message == 1 ? (
-							<Link
-								style={{ marginLeft: '15px' }}
-								href={'https://vk.com/im?sel=' + profileID}
-								target="_blank"
-							>
+							<Link style={{ marginLeft: '15px' }} href={getUserDialog()} target="_blank">
 								Написать
 							</Link>
 						) : (
-							<Link style={{ marginLeft: '15px' }} href={'https://vk.com/id' + profileID} target="_blank">
+							<Link style={{ marginLeft: '15px' }} href={getUserVK()} target="_blank">
 								Написать
 							</Link>
 						)
 					}
 					before={getImage(backuser)}
-					description={
-						!vkUser ? '' : vkUser.online ? 'online' : 'был(а) в сети ' + fromSeconds(vkUser.last_seen.time)
-					}
+					description={getUserOnline()}
 				>
 					<div className="profile-block">
 						{getAuthorHref(backuser)}
@@ -221,12 +261,7 @@ const Profile = (props) => {
 					{profileID == props.myID ? (
 						<div style={{ display: width < 450 ? 'block' : 'flex' }}>
 							<Cell
-								onClick={() => {
-									if (profileID == props.myID) {
-										props.goToAdds();
-										props.setAdsMode('wanted');
-									}
-								}}
+								onClick={openFreeze}
 								className="profile-carma-label"
 								indicator={<span>{backuser.frozen_carma + ' Ҝ'}</span>}
 							>
@@ -258,12 +293,7 @@ const Profile = (props) => {
 							icon={<Icon56DoNotDisturbOutline />}
 							header="Пусто"
 							action={
-								<Button
-									size="l"
-									onClick={() => {
-										props.goToCreate();
-									}}
-								>
+								<Button size="l" onClick={openCreateStory}>
 									Отдать даром
 								</Button>
 							}
@@ -284,12 +314,7 @@ const Profile = (props) => {
 							icon={<Icon56DoNotDisturbOutline />}
 							header="Пусто"
 							action={
-								<Button
-									size="l"
-									onClick={() => {
-										props.goToAdds();
-									}}
-								>
+								<Button size="l" onClick={openAdsStory}>
 									Получить даром
 								</Button>
 							}
@@ -393,25 +418,28 @@ const Profile = (props) => {
 	}
 	if (failed) {
 		return (
-			<Error
-				action={() => {
-					getUser(
-						props.setPopout,
-						props.setSnackbar,
-						profileID,
-						(v) => {
-							setBackUser(v);
-							setFailed(false);
-						},
-						(e) => {
-							setFailed(true);
-						}
-					);
-				}}
-			/>
+			<>
+				{popout}
+				<Error
+					action={() => {
+						getUser(
+							openPopout,
+							openSnackbar,
+							profileID,
+							(v) => {
+								setBackUser(v);
+								setFailed(false);
+							},
+							(e) => {
+								setFailed(true);
+							}
+						);
+					}}
+				/>
+			</>
 		);
 	}
-	return <></>;
+	return <>{popout}</>;
 };
 
 const mapStateToProps = (state) => {
@@ -420,10 +448,19 @@ const mapStateToProps = (state) => {
 		apiVersion: state.vkui.apiVersion,
 		appID: state.vkui.appID,
 		activeProfile: state.router.activeProfile,
+		popouts: state.router.popouts,
+		story: state.router.activeStory,
+
+		inputData: state.formData.forms,
 	};
 };
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = {
+	setFormData,
+	setStory,
+	openPopout,
+	openSnackbar,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);
 

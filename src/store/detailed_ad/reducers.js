@@ -18,6 +18,7 @@ import {
 	CLEAR,
 	SET_DEALER,
 	SET_EXTRA_INFO,
+	GO_BACK,
 } from './actionTypes';
 
 const initialState = {
@@ -52,6 +53,8 @@ const initialState = {
 	isDealer: false,
 	dealer: null,
 	hidden: false,
+
+	history: [],
 
 	cost: 0,
 };
@@ -209,7 +212,7 @@ export const adReducer = (state = initialState, action) => {
 			const category = ad.category || state.category;
 			const extra_field = ad.extra_field || state.extra_field;
 			const views_count = ad.views_count || state.views_count;
-			
+
 			const region = ad.region || state.region;
 			const district = ad.district || state.district;
 			const pathes_to_photo = ad.pathes_to_photo || state.pathes_to_photo;
@@ -246,12 +249,18 @@ export const adReducer = (state = initialState, action) => {
 			const category = ad.category || state.category;
 			const extra_field = ad.extra_field || state.extra_field;
 			const views_count = ad.views_count || state.views_count;
-			
+
 			const region = ad.region || state.region;
 			const district = ad.district || state.district;
 			const pathes_to_photo = ad.pathes_to_photo || state.pathes_to_photo;
 			const hidden = ad.hidden || state.hidden;
 			const author = ad.author || state.author;
+
+			let history = state.history || [];
+			const Ad_id = state.ad_id || 0;
+			if (Ad_id > 0) {
+				history = [...history, state];
+			}
 
 			return {
 				...state,
@@ -269,9 +278,23 @@ export const adReducer = (state = initialState, action) => {
 				hidden,
 				region,
 				district,
+				history,
 			};
 		}
 
+		case GO_BACK: {
+			const history = state.history || [];
+			let newState = state;
+			if (history.length > 0) {
+				newState = history[history.length - 1];
+			}
+			history.pop();
+			newState.history = history;
+
+			return {
+				...newState,
+			};
+		}
 
 		case CLEAR: {
 			return {

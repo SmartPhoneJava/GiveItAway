@@ -6,7 +6,7 @@ import { MODAL_ADS_GEO, MODAL_ADS_COST } from './../../store/router/modalTypes';
 
 import { ADS_FILTERS } from './../../store/create_post/types';
 
-import { openModal, closeModal, setPage, closeAllModals } from './../../store/router/actions';
+import { openModal, closeModal, setPage, closeAllModals, openSnackbar, openPopout } from './../../store/router/actions';
 
 import { PANEL_CATEGORIES, PANEL_COUNTRIES, PANEL_CITIES } from '../../store/router/panelTypes';
 import { setFormData } from '../../store/create_post/actions';
@@ -99,11 +99,14 @@ const mapStateToProps = (state) => {
 	return {
 		activeModals: state.router.activeModals,
 		inputData: state.formData.forms,
+		ad: state.ad,
 	};
 };
 
 const mapDispatchToProps = (dispatch) => {
 	return {
+		openSnackbar: ()=>dispatch(openSnackbar()),
+		openPopout: ()=>dispatch(openPopout()),
 		closeModal: () => dispatch(closeModal()),
 		closeAllModals: () => dispatch(closeAllModals()),
 		setRadius: (inputData, radius) => setRadius(inputData, radius, dispatch),
