@@ -674,7 +674,6 @@ const AddMore2r = (props) => {
 									onClick={() => {
 										deleteAd(openPopout, ad_id, openSnackbar, props.refresh);
 									}}
-									э
 								>
 									Удалить
 								</CellButton>

@@ -7,9 +7,3 @@
 	width: 64px;
 	height: 64px;
 }
-
-.block_in {
-	margin-bottom: 4px;
-
-	background: var(--background_content);
-}

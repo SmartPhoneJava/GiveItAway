@@ -46,7 +46,7 @@ import {
 import * as VK from '../services/VK';
 import { setAppID, setPlatform } from '../store/vk/actions';
 
-import { setDetailedAd } from '../store/detailed_ad/actions';
+import { setDetailedAd, addComment } from '../store/detailed_ad/actions';
 
 import CategoriesPanel from './../components/categories/panel';
 import Countries from './../components/location/countries';
@@ -65,7 +65,7 @@ import Icon28Add from '@vkontakte/icons/dist/28/add_outline';
 
 import { VkUser } from '../store/vkUser';
 
-import { handleNotifications } from './story/adds/tabs/notifications/notifications';
+import { handleNotifications, NT_COMMENT } from './story/adds/tabs/notifications/notifications';
 
 import AddMore2 from './template/AddMore2';
 
@@ -118,6 +118,8 @@ const App = (props) => {
 		popouts,
 		openPopout,
 		snackbars,
+		AD,
+		addComment,
 	} = props;
 
 	const adPopout = popouts[STORY_ADS];
@@ -183,20 +185,34 @@ const App = (props) => {
 		});
 	}
 
-	// useEffect(() => {
-	// 	console.log('choosen', choosen.ad_id);
-	// 	if (choosen.ad_id == -1) {
-	// 		return;
-	// 	}
-	// 	turnOnNotifications();
+	useEffect(() => {
+		// console.log('choosen', choosen.ad_id);
+		// if (choosen.ad_id == -1) {
+		// 	return;
+		// }
+		// turnOnNotifications();
 
-	// 	const ad = choosen;
-	// 	console.log('connecting', ad.ad_id);
-	// 	centrifuge.subscribe('ad_' + ad.ad_id, (note) => {
-	// 		console.log('centrifugu notenote', note);
-	// 		setwsNote(note);
-	// 	});
-	// }, [choosen]);
+		// const ad = choosen;
+		console.log('connecting useEffect ', AD.ad_id);
+		if (AD.ad_id <= 0) {
+			return
+		}
+		console.log('connecting', AD);
+		centrifuge.subscribe('ad_' + AD.ad_id, (note) => {
+			const noteType = note.data.type
+			const noteValue = note.data.payload
+			console.log("look at", noteType, noteValue)
+			switch(noteType) {
+				case NT_COMMENT: {
+					console.log("we setttttt ")
+					addComment(noteValue)
+				}
+			}
+			console.log('centrifugu notenote', note);
+			
+			// setwsNote(note);
+		});
+	}, [AD.ad_id]);
 
 	useEffect(() => {
 		openPopout(<ScreenSpinner size="large" />);
@@ -240,8 +256,9 @@ const App = (props) => {
 							openSnackbar,
 							(v) => {
 								centrifuge.setToken(v.token);
-								turnOnNotifications(us.id);
 								centrifuge.connect();
+								turnOnNotifications(us.id);
+							
 							},
 							(e) => {}
 						);
@@ -488,6 +505,8 @@ const mapStateToProps = (state) => {
 		activePanels: state.router.activePanels,
 		snackbars: state.router.snackbars,
 
+		AD: state.ad,
+
 		colorScheme: state.vkui.colorScheme,
 		appID: state.vkui.appID,
 		myID: state.vkui.myID,
@@ -513,6 +532,7 @@ function mapDispatchToProps(dispatch) {
 				openSnackbar,
 				setDetailedAd,
 				openPopout,
+				addComment,
 			},
 			dispatch
 		),

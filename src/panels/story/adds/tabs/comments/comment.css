@@ -22,7 +22,7 @@
 	margin-right: 2px;
 }
 
-.write-button {
+.comment-button {
 	position: fixed;
 	margin-bottom: 72px;
 	margin-right: 20px;
@@ -30,4 +30,15 @@
 	bottom: 0;
 	right: 0;
 	z-index: 101;
+}
+
+.comment-button1 {
+	padding-left: '100px';
+	/* position: fixed;
+	margin-bottom: 72px;
+	margin-right: 20px;
+	height: auto;
+	bottom: 0;
+	right: 0;
+	z-index: 101; */
 }

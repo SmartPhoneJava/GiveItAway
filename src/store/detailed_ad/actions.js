@@ -36,7 +36,7 @@ export const addComment = (comment) => ({
 	},
 });
 
-export const deleteComment = (id) => ({
+export const deleteCommentByID = (id) => ({
 	type: DELETE_COMMENT,
 	payload: {
 		id,

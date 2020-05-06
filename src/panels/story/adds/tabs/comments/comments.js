@@ -40,6 +40,7 @@ import './comment.css';
 import Comment from './comment';
 import { SNACKBAR_DURATION_DEFAULT } from '../../../../../store/const';
 import { PANEL_COMMENTS } from '../../../../../store/router/panelTypes';
+import { deleteCommentByID } from '../../../../../store/detailed_ad/actions';
 
 const arr = [
 	{
@@ -171,18 +172,19 @@ function showComments(
 	lastAdElementRef,
 	myID,
 	setText,
-	setSearch,
 	setEditableID,
 	setHide,
 	openUser,
 	mini,
-	openCommentaries
+	openCommentaries,
+	deleteCommentByID,
 ) {
 	if (nots.length == 0) {
 		return;
 	}
 	return (
 		<Group
+			style={{ marginBottom: mini ? '0px' : '52px' }}
 			header={
 				mini ? (
 					<Header aside={mini ? <Link onClick={openCommentaries}>Показать все</Link> : ''}>
@@ -212,7 +214,6 @@ function showComments(
 											onClick={() => {
 												setText(v.text);
 												setEditableID(v.comment_id);
-												setSearch('' + v.comment_id + v.text);
 											}}
 										>
 											Редактировать
@@ -227,7 +228,7 @@ function showComments(
 													setSnackbar,
 													v,
 													(vv) => {
-														setSearch('' + v.comment_id + 'deleted');
+														deleteCommentByID(v.comment_id);
 													},
 													(e) => {},
 													() => {
@@ -267,30 +268,37 @@ function showComments(
 
 const NO_ID = -1;
 
+let i = 0;
+
 const CommentsI = (props) => {
+	const { AD, deleteCommentByID } = props;
+
+	const nots = AD.comments || [];
+
 	const [text, setText] = useState('');
-	const [search, setSearch] = useState('');
 	const [hide, setHide] = useState(false);
 
 	const [editableID, setEditableID] = useState(NO_ID);
 
-	const { AD } = props;
-
 	const [pageNumber, setPageNumber] = useState(1);
 	let { inited, loading, tnots, error, hasMore, newPage } = useCommentsGet(
 		props.setPopout,
-		search,
+		'',
 		pageNumber,
-		props.amount,
+		10,
 		AD.ad_id,
 		props.maxAmount
 	);
-	const [nots, setNots] = useState([]);
-	useEffect(() => {
-		if (tnots && tnots.length != 0) {
-			setNots(tnots);
-		}
-	});
+	// const [nots, setNots] = useState([]);
+	// useEffect(() => {
+	// 	console.log('hasMore', i, hasMore, tnots);
+	// 	i++;
+	// 	if (tnots.length != 0 && !hasMore && i < 80) {
+	// 		// setNots(tnots);
+	// 		console.log('i seeeet');
+	// 		setComments(tnots);
+	// 	}
+	// }, [nots]);
 
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
@@ -366,7 +374,6 @@ const CommentsI = (props) => {
 				AD.ad_id,
 				obj,
 				(v) => {
-					setSearch(text);
 					setText('');
 				},
 				(e) => {},
@@ -403,32 +410,32 @@ const CommentsI = (props) => {
 				lastAdElementRef,
 				props.myID,
 				setText,
-				setSearch,
 				setEditableID,
 				setHide,
 				props.openUser,
 				props.mini,
-				props.openCommentaries
+				props.openCommentaries,
+				deleteCommentByID,
 			)}
 
-			{hide ? (
-				''
-			) : (
+			{hide ? null : (
 				<div className="write">
 					<Input
 						style={{ paddingRight: '30px' }}
 						placeholder="Комментарий"
 						value={text}
 						onChange={(e) => {
-							const { _, value } = e.currentTarget;
-							setText(value);
+							setText(e.currentTarget.value);
 						}}
 					/>
-					<PanelHeaderButton className="write-button" onClick={sendComment}>
-						<Avatar size="20">
-							<Icon24Send style={{ color: '#0071B8' }} size="24" />
-						</Avatar>
-					</PanelHeaderButton>
+
+					<div className="comment-button">
+						<PanelHeaderButton onClick={sendComment}>
+							<Avatar size="20">
+								<Icon24Send style={{ color: '#0071B8' }} size="24" />
+							</Avatar>
+						</PanelHeaderButton>
+					</div>
 				</div>
 			)}
 		</div>
@@ -443,6 +450,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
 	setPage,
+	deleteCommentByID,
 };
 
 const Comments = connect(mapStateToProps, mapDispatchToProps)(CommentsI);

@@ -31,8 +31,6 @@ import { getDeal, Close, CancelClose } from './../../../../../requests';
 
 import Icon44SmileOutline from '@vkontakte/icons/dist/44/smile_outline';
 
-import './subs.css';
-
 function userClick(setPopout, openUser, v, dealer, close, cancel) {
 	if (v) {
 		setPopout(

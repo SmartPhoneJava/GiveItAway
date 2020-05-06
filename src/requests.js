@@ -455,8 +455,6 @@ export async function CreateImages(photos, id, goToAds, setSnackbar) {
 		data.append('file', photo.origin);
 		let cancel;
 
-		
-
 		axios({
 			method: 'post',
 			url: Addr.getState() + BASE_AD + id + '/upload_image',
@@ -527,9 +525,8 @@ export async function CreateAd(ad, obj, photos, openAd, loadAd, setSnackbar, set
 					if (successcallback) {
 						successcallback();
 					}
-					setSnackbar(snackbar)
+					setSnackbar(snackbar);
 					getDetails(setPopout, setSnackbar, response.data.ad_id, (e) => loadAd(e));
-					
 				},
 				setSnackbar
 			);
@@ -635,28 +632,43 @@ export function fail(err, repeat, setSnackbar, end) {
 
 export function success(text, cancelMe, setSnackbar, end) {
 	setSnackbar(
-		<Snackbar
-			duration={SNACKBAR_DURATION_DEFAULT}
-			onClose={() => {
-				setSnackbar(null);
-				if (end) {
-					end();
+		cancelMe ? (
+			<Snackbar
+				duration={SNACKBAR_DURATION_DEFAULT}
+				onClose={() => {
+					setSnackbar(null);
+					if (end) {
+						end();
+					}
+				}}
+				action="Отменить"
+				onActionClick={cancelMe}
+				before={
+					<Avatar size={24} style={{ background: 'green' }}>
+						<Icon24DoneOutline fill="#fff" width={14} height={14} />
+					</Avatar>
 				}
-			}}
-			action="Отменить"
-			onActionClick={() => {
-				if (cancelMe) {
-					cancelMe();
+			>
+				{text}
+			</Snackbar>
+		) : (
+			<Snackbar
+				duration={SNACKBAR_DURATION_DEFAULT}
+				onClose={() => {
+					setSnackbar(null);
+					if (end) {
+						end();
+					}
+				}}
+				before={
+					<Avatar size={24} style={{ background: 'green' }}>
+						<Icon24DoneOutline fill="#fff" width={14} height={14} />
+					</Avatar>
 				}
-			}}
-			before={
-				<Avatar size={24} style={{ background: 'green' }}>
-					<Icon24DoneOutline fill="#fff" width={14} height={14} />
-				</Avatar>
-			}
-		>
-			{text}
-		</Snackbar>
+			>
+				{text}
+			</Snackbar>
+		)
 	);
 }
 

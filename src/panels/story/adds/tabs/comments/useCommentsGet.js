@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { store } from './../../../../../index';
 
 import { ScreenSpinner } from '@vkontakte/vkui';
 
 import { Addr, BASE_AD } from '../../../../../store/addr';
+import { setComments, addComment } from '../../../../../store/detailed_ad/actions';
 
 export default function useCommentsGet(setPopout, query, pageNumber, rowsPerPage, ad_id, maxAmount) {
 	const [inited, setInited] = useState(false);
@@ -14,6 +16,7 @@ export default function useCommentsGet(setPopout, query, pageNumber, rowsPerPage
 
 	useEffect(() => {
 		setNots([]);
+		store.dispatch(setComments([]))
 		pageNumber = 1;
 	}, [query]);
 
@@ -46,8 +49,15 @@ export default function useCommentsGet(setPopout, query, pageNumber, rowsPerPage
 
 				setNots((prev) => {
 					const v = [...new Set([...prev, ...newNots])];
+
 					return v;
 				});
+				
+					newNots.forEach((comment) => {
+						store.dispatch(addComment(comment))
+						
+					});
+				
 				setHasMore(newNots.length > 0);
 				setLoading(false);
 				setPopout(null);

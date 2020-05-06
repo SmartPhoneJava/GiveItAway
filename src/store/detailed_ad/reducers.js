@@ -71,12 +71,13 @@ export const adReducer = (state = initialState, action) => {
 		}
 
 		case ADD_COMMENT: {
-			const comments = state.comments || [];
+			let comments = state.comments || [];
 			const comment = action.payload.comment;
+			comments = [...comments.filter((v) => v.comment_id != comment.comment_id), comment];
 
 			return {
 				...state,
-				comments: [...comments, comment],
+				comments,
 			};
 		}
 
