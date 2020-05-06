@@ -3,6 +3,7 @@ import bridge from '@vkontakte/vk-bridge';
 import { store } from '../index';
 
 import { setColorScheme, setAccessToken, setMyID, setMyUser } from '../store/vk/actions';
+import { success, fail } from '../requests';
 
 export const initApp = () => (dispatch) => {
 	const bridgeCallback = (e) => {
@@ -113,6 +114,21 @@ export const getuser = (success) => (dispatch) => {
 			return data;
 		})
 		.catch((error) => {
+			return error;
+		});
+};
+
+export const shareInVK = (openSnackbar) => {
+	const appID = store.getState().vkui.appID;
+	const adID = store.getState().ad.ad_id;
+	return bridge
+		.send('VKWebAppShare', { link: 'https://vk.com/app' + appID + '#' + adID })
+		.then((data) => {
+			success('Вы успешно поделились объявлением', null, openSnackbar);
+			return data;
+		})
+		.catch((error) => {
+			fail('Не удалось поделиться объявлением', null, openSnackbar);
 			return error;
 		});
 };

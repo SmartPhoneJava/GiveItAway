@@ -1,9 +1,11 @@
 .CellLeft__head {
-	font-size: 20px;
+	font-size: 24px;
 	color: var(--text_primary);
 
+	padding-top: 20px;
 	line-height: 22px;
 	margin: 4px;
+	text-align: center;
 	overflow: hidden;
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;
@@ -14,6 +16,10 @@
 	color: var(--text_subhead);
 	line-height: 19px;
 	margin: 4px;
+	margin-top: 10px;
+	padding-left: 16px;
+	padding-right: 16px;
+	padding-bottom: 20px;
 	overflow: hidden;
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;

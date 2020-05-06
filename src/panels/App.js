@@ -33,12 +33,10 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import {
 	goBack,
-	closeModal,
 	setStory,
 	openModal,
 	setProfile,
 	setAd,
-	setPage,
 	addProfile,
 	openSnackbar,
 	openPopout,
@@ -46,7 +44,7 @@ import {
 import * as VK from '../services/VK';
 import { setAppID, setPlatform } from '../store/vk/actions';
 
-import { setDetailedAd, addComment } from '../store/detailed_ad/actions';
+import { setDetailedAd, addComment, addSub } from '../store/detailed_ad/actions';
 
 import CategoriesPanel from './../components/categories/panel';
 import Countries from './../components/location/countries';
@@ -65,7 +63,7 @@ import Icon28Add from '@vkontakte/icons/dist/28/add_outline';
 
 import { VkUser } from '../store/vkUser';
 
-import { handleNotifications, NT_COMMENT } from './story/adds/tabs/notifications/notifications';
+import { handleNotifications, NT_COMMENT, NT_RESPOND } from './story/adds/tabs/notifications/notifications';
 
 import AddMore2 from './template/AddMore2';
 
@@ -100,16 +98,14 @@ let centrifuge = new Centrifuge(addr);
 let notsCounterrr = 0;
 
 const App = (props) => {
-	const { colorScheme, appID, myID, apiVersion, platform } = props;
+	const { colorScheme, myID } = props;
 	const {
 		activeStory,
 		goBack,
 		setAd,
-		setPage,
 		setStory,
 		setProfile,
 		openModal,
-		closeModal,
 		addProfile,
 		setFormData,
 		openSnackbar,
@@ -120,6 +116,7 @@ const App = (props) => {
 		snackbars,
 		AD,
 		addComment,
+		addSub,
 	} = props;
 
 	const adPopout = popouts[STORY_ADS];
@@ -153,7 +150,6 @@ const App = (props) => {
 		addProfile(myID);
 		if (e.currentTarget.dataset.story == STORY_ADS) {
 			if (isProfile) {
-				// setPage(PANEL_USER);
 			} else {
 				dropFilters();
 			}
@@ -171,47 +167,51 @@ const App = (props) => {
 		// );
 	}
 
-	const [wsNote, setwsNote] = useState({ notification_type: 'no' });
 	const [notHere, setNotHere] = useState(false);
+	const [subscription, setSubscription] = useState(null);
 
 	function turnOnNotifications(id) {
 		console.log('user#' + id);
+
 		centrifuge.subscribe('user#' + id, (note) => {
 			notsCounterrr++;
 			setNotsCounterr(notsCounterrr);
-			console.log('user#' + id + ' ' + note);
+			const noteType = note.data.notification_type;
+			const noteValue = note.data.payload.author;
+			console.log('look noties', noteType, noteValue, note);
+			switch (noteType) {
+				case NT_RESPOND: {
+					addSub(noteValue);
+				}
+			}
 
 			handleNotifications(note, openSnackbar);
 		});
 	}
 
 	useEffect(() => {
-		// console.log('choosen', choosen.ad_id);
-		// if (choosen.ad_id == -1) {
-		// 	return;
-		// }
-		// turnOnNotifications();
-
-		// const ad = choosen;
 		console.log('connecting useEffect ', AD.ad_id);
 		if (AD.ad_id <= 0) {
-			return
+			return;
 		}
-		console.log('connecting', AD);
-		centrifuge.subscribe('ad_' + AD.ad_id, (note) => {
-			const noteType = note.data.type
-			const noteValue = note.data.payload
-			console.log("look at", noteType, noteValue)
-			switch(noteType) {
-				case NT_COMMENT: {
-					console.log("we setttttt ")
-					addComment(noteValue)
+
+		if (subscription) {
+			subscription.unsubscribe();
+			subscription.removeAllListeners();
+		}
+		setSubscription(
+			centrifuge.subscribe('ad_' + AD.ad_id, (note) => {
+				const noteType = note.data.type;
+				const noteValue = note.data.payload;
+				console.log('look at', noteType, noteValue);
+				switch (noteType) {
+					case NT_COMMENT: {
+						addComment(noteValue);
+					}
 				}
-			}
-			console.log('centrifugu notenote', note);
-			
-			// setwsNote(note);
-		});
+				console.log('centrifugu notenote', note);
+			})
+		);
 	}, [AD.ad_id]);
 
 	useEffect(() => {
@@ -219,11 +219,16 @@ const App = (props) => {
 		const { dispatch } = props;
 		dispatch(VK.initApp());
 
-		const { vk_platform, app_id } = inputArgs();
+		const { vk_platform, app_id, hash } = inputArgs();
 		if (!app_id) {
 			setInited(true);
 			setNotHere(true);
 			return;
+		}
+
+		if (hash) {
+			console.log('we set hash', hash);
+			setReduxAd({ ad_id: Number(hash) });
 		}
 
 		dispatch(setPlatform(vk_platform));
@@ -258,7 +263,6 @@ const App = (props) => {
 								centrifuge.setToken(v.token);
 								centrifuge.connect();
 								turnOnNotifications(us.id);
-							
 							},
 							(e) => {}
 						);
@@ -274,8 +278,9 @@ const App = (props) => {
 
 	function setReduxAd(ad) {
 		console.log('you ask to do this', ad);
-		setAd(ad);
+
 		setDetailedAd(ad);
+		setAd(ad);
 	}
 
 	function backToAdsFilters() {
@@ -372,7 +377,6 @@ const App = (props) => {
 						</PanelHeaderSimple>
 						{choosen ? (
 							<AddMore2
-								wsNote={wsNote}
 								refresh={(id) => {
 									goBack();
 									SetDeleteID(id);
@@ -399,39 +403,14 @@ const App = (props) => {
 						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
 							{choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошбка'}
 						</PanelHeaderSimple>
-						{choosen ? (
-							<Comments
-								hide={false}
-								ad={choosen}
-								panel={PANEL_COMMENTS}
-								amount={5}
-								maxAmount={-1}
-								setPopout={openPopout}
-								setSnackbar={openSnackbar}
-								myID={myID}
-								openUser={setProfile}
-							/>
-						) : (
-							Error
-						)}
+						{choosen ? <Comments amount={5} maxAmount={-1} openUser={setProfile} /> : Error}
 						{snackbars[PANEL_COMMENTS]}
 					</Panel>
 					<Panel id={PANEL_SUBS}>
 						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
 							{choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошбка'}
 						</PanelHeaderSimple>
-						{choosen ? (
-							<Subs
-								setPopout={openPopout}
-								setSnackbar={openSnackbar}
-								openUser={setProfile}
-								amount={5}
-								maxAmount={-1}
-								ad={choosen}
-							/>
-						) : (
-							Error
-						)}
+						{choosen ? <Subs openUser={setProfile} amount={5} maxAmount={-1} /> : Error}
 						{snackbars[PANEL_SUBS]}
 					</Panel>
 					<Panel id={PANEL_CATEGORIES}>
@@ -508,10 +487,7 @@ const mapStateToProps = (state) => {
 		AD: state.ad,
 
 		colorScheme: state.vkui.colorScheme,
-		appID: state.vkui.appID,
 		myID: state.vkui.myID,
-		apiVersion: state.vkui.apiVersion,
-		platform: state.vkui.platform,
 	};
 };
 
@@ -521,11 +497,9 @@ function mapDispatchToProps(dispatch) {
 		...bindActionCreators(
 			{
 				setStory,
-				setPage,
 				setProfile,
 				setAd,
 				goBack,
-				closeModal,
 				openModal,
 				addProfile,
 				setFormData,
@@ -533,6 +507,7 @@ function mapDispatchToProps(dispatch) {
 				setDetailedAd,
 				openPopout,
 				addComment,
+				addSub,
 			},
 			dispatch
 		),

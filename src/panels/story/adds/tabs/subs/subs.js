@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { connect } from 'react-redux';
 import {
 	Header,
 	Group,
@@ -6,7 +7,6 @@ import {
 	Cell,
 	UsersStack,
 	Placeholder,
-	Snackbar,
 	Button,
 	osname,
 	IOS,
@@ -25,164 +25,173 @@ import Icon24Message from '@vkontakte/icons/dist/24/message';
 import Icon24Gift from '@vkontakte/icons/dist/24/gift';
 import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';
 
+import Icon36Done from '@vkontakte/icons/dist/36/done';
+import Icon36Cancel from '@vkontakte/icons/dist/36/cancel';
+
 import useSubsGet from './useSubsGet';
 
 import { getDeal, Close, CancelClose } from './../../../../../requests';
 
 import Icon44SmileOutline from '@vkontakte/icons/dist/44/smile_outline';
-
-function userClick(setPopout, openUser, v, dealer, close, cancel) {
-	if (v) {
-		setPopout(
-			<ActionSheet onClose={() => setPopout(null)}>
-				{!dealer || v.vk_id != dealer.vk_id ? (
-					<ActionSheetItem autoclose onClick={() => close(v)}>
-						Отдать
-					</ActionSheetItem>
-				) : (
-					<ActionSheetItem autoclose onClick={() => cancel(v)}>
-						Отменить
-					</ActionSheetItem>
-				)}
-				<ActionSheetItem
-					autoclose
-					onClick={() => {
-						if (dealer) {
-							openUser(dealer.vk_id);
-						}
-					}}
-				>
-					Перейти в профиль
-				</ActionSheetItem>
-				<ActionSheetItem
-					autoclose
-					onClick={() => {
-						window.open('https://vk.com/im?sel=' + dealer.vk_id);
-					}}
-				>
-					Написать
-				</ActionSheetItem>
-				{osname === IOS && (
-					<ActionSheetItem autoclose mode="cancel">
-						Отменить
-					</ActionSheetItem>
-				)}
-			</ActionSheet>
-		);
-	}
-}
-
-function getRandomInt(max) {
-	return Math.floor(Math.random() * Math.floor(max));
-}
-
-function showSubs(dealer, setPopout, lastAdElementRef, subs, openUser, close, cancel) {
-	return (
-		<>
-			<Group header={<Header mode="secondary">Получатель</Header>}>
-				<Cell
-					multiline={true}
-					description={dealer ? <>Ожидание подтверждения получения вещи от пользователя.</> : ''}
-					onClick={() => {
-						if (dealer) {
-							cancel(dealer);
-						}
-					}}
-					key={dealer ? dealer.vk_id : ''}
-					before={<Avatar size={36} src={dealer ? dealer.photo_url : ''} />}
-					asideContent={dealer ? <Icon24Dismiss /> : ''}
-				>
-					<div>{dealer ? dealer.name + ' ' + dealer.surname : 'Никто не выбран'}</div>
-				</Cell>
-			</Group>
-
-			<Group header={<Header mode="secondary">Откликнулись</Header>}>
-				<CellButton onClick={() => close(subs[getRandomInt(subs.length)])} before={<Icon24Shuffle />}>
-					Случайный выбор
-				</CellButton>
-				{subs.length > 0 ? (
-					subs.map((v, i) => (
-						<div key={v.vk_id} ref={subs.length == i + 1 ? lastAdElementRef : null}>
-							<Cell
-								onClick={() => {
-									userClick(setPopout, openUser, v, dealer, close, cancel);
-								}}
-								before={<Avatar size={36} src={v.photo_url} />}
-								asideContent={
-									!dealer || v.vk_id != dealer.vk_id ? (
-										<Icon24Gift />
-									) : (
-										<Icon24Gift style={{ color: 'var(--header_tint)' }} />
-									)
-								}
-							>
-								<div>{v.name + ' ' + v.surname}</div>
-							</Cell>
-						</div>
-					))
-				) : (
-					<InfoRow style={{ paddingLeft: '16px' }}> пусто</InfoRow>
-				)}
-			</Group>
-		</>
-	);
-}
-
-function close_ad(setPopout, setSnackbar, ad_id, subscriber, setDealer) {
-	Close(
-		setPopout,
-		setSnackbar,
-		ad_id,
-		subscriber.vk_id,
-		(data) => {
-			console.log('what i have done?', data);
-			setDealer(subscriber);
-		},
-		(e) => {
-			console.log('Close error', e);
-		}
-	);
-}
-
-function cancel_ad(setPopout, setSnackbar, ad_id, subscriber, setDealer, need_close) {
-	CancelClose(
-		setPopout,
-		setSnackbar,
-		ad_id,
-		(data) => {
-			if (need_close) {
-				close_ad(setPopout, setSnackbar, ad_id, subscriber, setDealer);
-			} else {
-				setDealer(null);
-			}
-		},
-		(e) => {},
-		true
-	);
-}
-
-const NO_ID = -1;
+import { openPopout, closePopout, openSnackbar, setPage } from '../../../../../store/router/actions';
+import { setDealer } from '../../../../../store/detailed_ad/actions';
+import { PANEL_SUBS } from '../../../../../store/router/panelTypes';
+import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED } from '../../../../../const/ads';
 
 const Subs = (props) => {
-	const [subs, setSubs] = useState([]);
-	const [dealer, setDealer] = useState(null);
+	const { openPopout, closePopout, setDealer, openUser, setPage, AD } = props;
+	const { dealer, subs, ad_id } = AD;
+	const status = AD.status || STATUS_OFFER;
+
+	console.log('look at dealer', status, AD);
+
 	const [photos, setPhotos] = useState([]);
 	const [openFAQ, setOpenFAQ] = useState(false);
-
 	const [pageNumber, setPageNumber] = useState(1);
-	let { inited, loading, tsubs, error, hasMore, newPage } = useSubsGet(
-		props.setPopout,
+
+	function onClickOpen() {
+		if (dealer) {
+			openUser(dealer.vk_id);
+		}
+	}
+
+	function onClickWrite() {
+		if (dealer) {
+			window.open('https://vk.com/im?sel=' + dealer.vk_id);
+		}
+	}
+
+	function userClick(v, close, cancel) {
+		if (v) {
+			openPopout(
+				<ActionSheet onClose={closePopout}>
+					{!dealer || v.vk_id != dealer.vk_id ? (
+						<ActionSheetItem autoclose onClick={() => close(v)}>
+							Отдать
+						</ActionSheetItem>
+					) : (
+						<ActionSheetItem autoclose onClick={() => cancel(v)}>
+							Отменить
+						</ActionSheetItem>
+					)}
+					<ActionSheetItem autoclose onClick={onClickOpen}>
+						Перейти в профиль
+					</ActionSheetItem>
+					<ActionSheetItem autoclose onClick={onClickWrite}>
+						Написать
+					</ActionSheetItem>
+					{osname === IOS && (
+						<ActionSheetItem autoclose mode="cancel">
+							Отменить
+						</ActionSheetItem>
+					)}
+				</ActionSheet>
+			);
+		}
+	}
+
+	function getRandomInt(max) {
+		return Math.floor(Math.random() * Math.floor(max));
+	}
+
+	const given = (
+		<Group header={<Header>Получатель</Header>}>
+			<Cell
+				multiline={true}
+				description={dealer ? <>Ждём подтверждение получения вещи</> : ''}
+				key={dealer ? dealer.vk_id : ''}
+				before={<Avatar size={36} src={dealer ? dealer.photo_url : ''} />}
+				asideContent={dealer ? <Icon24Dismiss /> : ''}
+			>
+				<div>{dealer ? dealer.name + ' ' + dealer.surname : 'Никто не выбран'}</div>
+			</Cell>
+		</Group>
+	);
+
+	function showSubs(lastAdElementRef, close, cancel) {
+		return (
+			<>
+				{given}
+
+				<Group header={<Header mode="secondary">Откликнулись</Header>}>
+					<CellButton onClick={() => close(subs[getRandomInt(subs.length)])} before={<Icon24Shuffle />}>
+						Случайный выбор
+					</CellButton>
+					{subs.length > 0 ? (
+						subs.map((v, i) => (
+							<div key={v.vk_id} ref={subs.length == i + 1 ? lastAdElementRef : null}>
+								<Cell
+									onClick={() => {
+										userClick(v, close, cancel);
+									}}
+									before={<Avatar size={36} src={v.photo_url} />}
+									asideContent={
+										!dealer || v.vk_id != dealer.vk_id ? (
+											<Icon24Gift />
+										) : (
+											<Icon24Gift style={{ color: 'var(--header_tint)' }} />
+										)
+									}
+								>
+									<div>{v.name + ' ' + v.surname}</div>
+								</Cell>
+							</div>
+						))
+					) : (
+						<InfoRow style={{ paddingLeft: '16px' }}> пусто</InfoRow>
+					)}
+				</Group>
+			</>
+		);
+	}
+
+	function close_ad(subscriber) {
+		Close(
+			openPopout,
+			openSnackbar,
+			ad_id,
+			subscriber.vk_id,
+			(data) => {
+				console.log('what i have done?', data);
+				setDealer(subscriber);
+			},
+			(e) => {
+				console.log('Close error', e);
+			}
+		);
+	}
+
+	function cancel_ad(subscriber, need_close) {
+		CancelClose(
+			openPopout,
+			openSnackbar,
+			ad_id,
+			(data) => {
+				if (need_close) {
+					close_ad(subscriber);
+				} else {
+					setDealer(null);
+				}
+			},
+			(e) => {},
+			true
+		);
+	}
+	function openSubs() {
+		setPage(PANEL_SUBS);
+	}
+
+	let { inited, loading, error, hasMore, newPage } = useSubsGet(
+		openPopout,
 		pageNumber,
 		props.amount,
-		props.ad.ad_id,
+		ad_id,
 		props.maxAmount,
 		(s) => {
-			console.log('i set', s);
-			setSubs(s);
 			setPhotos([...s].map((v) => v.photo_url));
 			getDeal(
-				props.setSnackbar,
-				props.ad.ad_id,
+				openSnackbar,
+				ad_id,
 				(data) => {
 					console.log('deal success', data);
 					const d = s.filter((v) => v.vk_id == data.subscriber_id)[0];
@@ -196,7 +205,6 @@ const Subs = (props) => {
 		},
 		(e) => {}
 	);
-	console.log('subs', tsubs);
 
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
@@ -213,32 +221,46 @@ const Subs = (props) => {
 		[loading, hasMore]
 	);
 
+	if (status == STATUS_CLOSED) {
+		return <Placeholder icon={<Icon36Done />} header="Вещь успешно передана"></Placeholder>;
+	}
+	if (status == STATUS_ABORTED) {
+		return <Placeholder icon={<Icon36Cancel />} header="Передача вещи отменена" />;
+	}
 	if (subs.length == 0) {
 		return (
-			<Placeholder icon={<Icon56Users3Outline />} header="Откливнушихся нет">
+			<Placeholder icon={<Icon56Users3Outline />} header="Откливнувшихся нет">
 				Никто еще не захотел забрать
 			</Placeholder>
 		);
 	}
 
 	return props.mini ? (
-		<Group header={<Header aside={<Link onClick={props.openSubs}>Показать всех</Link>}>Откликнулись</Header>}>
-			<UsersStack onClick={props.openSubs} photos={photos} size="m">
-				{subs.length == 1
-					? subs[0].name
-					: subs.length == 2
-					? subs[0].name + ' и ' + subs[1].name
-					: subs.length == 3
-					? subs[0].name + ', ' + subs[1].name + ', ' + subs[2].name
-					: subs[0].name +
-					  ', ' +
-					  subs[1].name +
-					  ', ' +
-					  subs[2].name +
-					  'и еще ' +
-					  subs.length +
-					  ' человек откликнулись'}
-			</UsersStack>
+		<Group header={<Header aside={<Link onClick={openSubs}>Показать всех</Link>}>Откликнулись</Header>}>
+			{subs.length == 1 ? (
+				<Cell
+					multiline={true}
+					key={subs[0].vk_id}
+					before={<Avatar size={36} src={subs[0].photo_url} />}
+				>
+					<div>{subs[0].name + ' ' + subs[0].surname}</div>
+				</Cell>
+			) : (
+				<UsersStack onClick={openSubs} photos={photos} size="m">
+					{subs.length == 2
+						? subs[0].name + ' и ' + subs[1].name
+						: subs.length == 3
+						? subs[0].name + ', ' + subs[1].name + ', ' + subs[2].name
+						: subs[0].name +
+						  ', ' +
+						  subs[1].name +
+						  ', ' +
+						  subs[2].name +
+						  'и еще ' +
+						  subs.length +
+						  ' человек откликнулись'}
+				</UsersStack>
+			)}
 		</Group>
 	) : (
 		<div>
@@ -253,27 +275,16 @@ const Subs = (props) => {
 						Как отдать вещь?
 					</CellButton>
 					{showSubs(
-						dealer,
-						props.setPopout,
 						lastAdElementRef,
-						subs,
-						props.openUser,
 						(subscriber) => {
 							if (dealer) {
-								cancel_ad(
-									props.setPopout,
-									props.setSnackbar,
-									props.ad.ad_id,
-									subscriber,
-									setDealer,
-									true
-								);
+								cancel_ad(subscriber, true);
 								return;
 							}
-							close_ad(props.setPopout, props.setSnackbar, props.ad.ad_id, subscriber, setDealer);
+							close_ad(subscriber);
 						},
 						(subscriber) => {
-							cancel_ad(props.setPopout, props.setSnackbar, props.ad.ad_id, subscriber, setDealer, false);
+							cancel_ad(subscriber, false);
 						}
 					)}
 				</>
@@ -306,4 +317,18 @@ const Subs = (props) => {
 	);
 };
 
-export default Subs;
+const mapStateToProps = (state) => {
+	return {
+		AD: state.ad,
+		myID: state.vkui.myID,
+	};
+};
+
+const mapDispatchToProps = {
+	openPopout,
+	closePopout,
+	setDealer,
+	setPage,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Subs);

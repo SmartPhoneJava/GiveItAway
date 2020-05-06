@@ -17,7 +17,7 @@ import {
 
 import { connect } from 'react-redux';
 
-import { setPage } from './../../../../../store/router/actions';
+import { setPage, openPopout, openSnackbar, closeSnackbar } from './../../../../../store/router/actions';
 
 import useCommentsGet from './useCommentsGet';
 
@@ -165,113 +165,10 @@ const arr = [
 	},
 ];
 
-function showComments(
-	setPopout,
-	setSnackbar,
-	nots,
-	lastAdElementRef,
-	myID,
-	setText,
-	setEditableID,
-	setHide,
-	openUser,
-	mini,
-	openCommentaries,
-	deleteCommentByID,
-) {
-	if (nots.length == 0) {
-		return;
-	}
-	return (
-		<Group
-			style={{ marginBottom: mini ? '0px' : '52px' }}
-			header={
-				mini ? (
-					<Header aside={mini ? <Link onClick={openCommentaries}>Показать все</Link> : ''}>
-						{'Комментарии'}
-					</Header>
-				) : (
-					''
-				)
-			}
-		>
-			{mini ? (
-				<Comment onClick={openCommentaries} v={nots[0]} />
-			) : (
-				nots.map((v, index) => {
-					let inner = (
-						<Comment
-							onClick={() => {
-								if (v.author.vk_id != myID) {
-									openUser(v.author.vk_id);
-									return;
-								}
-
-								setPopout(
-									<ActionSheet onClose={() => setPopout(null)}>
-										<ActionSheetItem
-											autoclose
-											onClick={() => {
-												setText(v.text);
-												setEditableID(v.comment_id);
-											}}
-										>
-											Редактировать
-										</ActionSheetItem>
-										<ActionSheetItem
-											autoclose
-											mode="destructive"
-											onClick={() => {
-												setHide(true);
-												deleteComment(
-													setPopout,
-													setSnackbar,
-													v,
-													(vv) => {
-														deleteCommentByID(v.comment_id);
-													},
-													(e) => {},
-													() => {
-														setHide(false);
-													}
-												);
-											}}
-										>
-											Удалить
-										</ActionSheetItem>
-										{osname === IOS && (
-											<ActionSheetItem autoclose mode="cancel">
-												Отменить
-											</ActionSheetItem>
-										)}
-									</ActionSheet>
-								);
-							}}
-							v={v}
-						/>
-					);
-
-					if (nots.length === index + 1) {
-						return (
-							<div key={v.comment_id} ref={lastAdElementRef}>
-								{inner}
-							</div>
-						);
-					} else {
-						return <div key={v.comment_id}>{inner}</div>;
-					}
-				})
-			)}
-		</Group>
-	);
-}
-
 const NO_ID = -1;
 
-let i = 0;
-
 const CommentsI = (props) => {
-	const { AD, deleteCommentByID } = props;
+	const { AD, deleteCommentByID, myID, openPopout, openSnackbar, closeSnackbar } = props;
 
 	const nots = AD.comments || [];
 
@@ -281,24 +178,13 @@ const CommentsI = (props) => {
 	const [editableID, setEditableID] = useState(NO_ID);
 
 	const [pageNumber, setPageNumber] = useState(1);
-	let { inited, loading, tnots, error, hasMore, newPage } = useCommentsGet(
-		props.setPopout,
-		'',
+	let { inited, loading, error, hasMore, newPage } = useCommentsGet(
+		openPopout,
 		pageNumber,
 		10,
 		AD.ad_id,
 		props.maxAmount
 	);
-	// const [nots, setNots] = useState([]);
-	// useEffect(() => {
-	// 	console.log('hasMore', i, hasMore, tnots);
-	// 	i++;
-	// 	if (tnots.length != 0 && !hasMore && i < 80) {
-	// 		// setNots(tnots);
-	// 		console.log('i seeeet');
-	// 		setComments(tnots);
-	// 	}
-	// }, [nots]);
 
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
@@ -315,9 +201,93 @@ const CommentsI = (props) => {
 		[loading, hasMore]
 	);
 
-	useEffect(() => {
-		setHide(props.hide);
-	}, [props.hide]);
+	function showComments() {
+		if (nots.length == 0) {
+			return;
+		}
+		return (
+			<Group
+				style={{ marginBottom: props.mini ? '0px' : '52px' }}
+				header={
+					props.mini ? (
+						<Header aside={props.mini ? <Link onClick={openCommentaries}>Показать все</Link> : ''}>
+							{'Комментарии'}
+						</Header>
+					) : (
+						''
+					)
+				}
+			>
+				{props.mini ? (
+					<Comment onClick={openCommentaries} v={nots[0]} />
+				) : (
+					nots.map((v, index) => {
+						let inner = (
+							<Comment
+								onClick={() => {
+									if (v.author.vk_id != myID) {
+										props.openUser(v.author.vk_id);
+										return;
+									}
+
+									setPopout(
+										<ActionSheet onClose={() => setPopout(null)}>
+											<ActionSheetItem
+												autoclose
+												onClick={() => {
+													setText(v.text);
+													setEditableID(v.comment_id);
+												}}
+											>
+												Редактировать
+											</ActionSheetItem>
+											<ActionSheetItem
+												autoclose
+												mode="destructive"
+												onClick={() => {
+													setHide(true);
+													deleteComment(
+														openPopout,
+														openPopout,
+														v,
+														(vv) => {
+															deleteCommentByID(v.comment_id);
+														},
+														(e) => {},
+														() => {
+															setHide(false);
+														}
+													);
+												}}
+											>
+												Удалить
+											</ActionSheetItem>
+											{osname === IOS && (
+												<ActionSheetItem autoclose mode="cancel">
+													Отменить
+												</ActionSheetItem>
+											)}
+										</ActionSheet>
+									);
+								}}
+								v={v}
+							/>
+						);
+
+						if (nots.length === index + 1) {
+							return (
+								<div key={v.comment_id} ref={lastAdElementRef}>
+									{inner}
+								</div>
+							);
+						} else {
+							return <div key={v.comment_id}>{inner}</div>;
+						}
+					})
+				)}
+			</Group>
+		);
+	}
 
 	function sendComment() {
 		setHide(true);
@@ -326,12 +296,12 @@ const CommentsI = (props) => {
 			comment.text = text;
 			const obj = JSON.stringify({
 				comment_id: comment.comment_id,
-				author_id: props.myID,
+				author_id: myID,
 				text: text,
 			});
 			editComment(
-				props.setPopout,
-				props.setSnackbar,
+				openPopout,
+				openSnackbar,
 				comment.comment_id,
 				obj,
 				(v) => {
@@ -345,11 +315,11 @@ const CommentsI = (props) => {
 			);
 		} else {
 			if (text.length == 0) {
-				props.setSnackbar(
+				openSnackbar(
 					<Snackbar
 						duration={SNACKBAR_DURATION_DEFAULT}
 						onClose={() => {
-							props.setSnackbar(null);
+							closeSnackbar();
 							setHide(false);
 						}}
 						before={
@@ -369,8 +339,8 @@ const CommentsI = (props) => {
 				text: text,
 			});
 			postComment(
-				props.setPopout,
-				props.setSnackbar,
+				openPopout,
+				openSnackbar,
 				AD.ad_id,
 				obj,
 				(v) => {
@@ -403,22 +373,9 @@ const CommentsI = (props) => {
 					header="Комментариев нет"
 				></Placeholder>
 			) : null}
-			{showComments(
-				props.setPopout,
-				props.setSnackbar,
-				nots,
-				lastAdElementRef,
-				props.myID,
-				setText,
-				setEditableID,
-				setHide,
-				props.openUser,
-				props.mini,
-				props.openCommentaries,
-				deleteCommentByID,
-			)}
+			{showComments()}
 
-			{hide ? null : (
+			{props.mini || hide ? null : (
 				<div className="write">
 					<Input
 						style={{ paddingRight: '30px' }}
@@ -445,12 +402,16 @@ const CommentsI = (props) => {
 const mapStateToProps = (state) => {
 	return {
 		AD: state.ad,
+		myID: state.vkui.myID,
 	};
 };
 
 const mapDispatchToProps = {
 	setPage,
 	deleteCommentByID,
+	openPopout,
+	openSnackbar,
+	closeSnackbar,
 };
 
 const Comments = connect(mapStateToProps, mapDispatchToProps)(CommentsI);

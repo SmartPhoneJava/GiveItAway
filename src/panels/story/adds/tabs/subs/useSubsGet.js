@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { store } from './../../../../../index';
 
 import { ScreenSpinner } from '@vkontakte/vkui';
 
 import { Addr, BASE_AD } from '../../../../../store/addr';
-
-import { User } from '../../../../../store/user';
-
-import { CategoryNo } from '../../../../template/Categories';
+import { setSubs, addSub } from '../../../../../store/detailed_ad/actions';
+import { openPopout, closePopout } from '../../../../../store/router/actions';
 
 export default function useSubsGet(
 	setPopout,
@@ -21,11 +20,11 @@ export default function useSubsGet(
 	const [inited, setInited] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
-	const [subs, setSubs] = useState([]);
+
 	const [hasMore, setHasMore] = useState(false);
 
 	useEffect(() => {
-		setSubs([]);
+		store.dispatch(setSubs([]));
 		pageNumber = 1;
 	}, []);
 
@@ -34,7 +33,7 @@ export default function useSubsGet(
 			setHasMore(false);
 			return;
 		}
-		setPopout(<ScreenSpinner size="large" />);
+		store.dispatch(openPopout(<ScreenSpinner size="large" />));
 		setLoading(true);
 		setError(false);
 		setInited(false);
@@ -56,13 +55,14 @@ export default function useSubsGet(
 				console.log('sucess subs', res);
 				const newNots = res.data;
 
-				setSubs((prev) => {
-					const v = [...new Set([...prev, ...newNots])];
-					return v;
+				newNots.forEach((sub) => {
+					store.dispatch(addSub(sub));
 				});
+
 				setHasMore(newNots.length > 0);
 				setLoading(false);
-				setPopout(null);
+			
+				store.dispatch(closePopout());
 				setInited(true);
 				successCallback(newNots);
 			})
@@ -70,7 +70,7 @@ export default function useSubsGet(
 				console.log('fail subs', e);
 				if (axios.isCancel(e)) return;
 
-				setPopout(null);
+				store.dispatch(closePopout());
 				failCallback(e);
 				setInited(true);
 			});
@@ -80,7 +80,6 @@ export default function useSubsGet(
 	return {
 		inited,
 		newPage: pageNumber,
-		tsubs: subs,
 		loading,
 		error,
 		hasMore,

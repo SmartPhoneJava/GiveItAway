@@ -111,12 +111,13 @@ export const adReducer = (state = initialState, action) => {
 		}
 
 		case ADD_SUB: {
-			const subs = state.subs || [];
+			let subs = state.subs || [];
 			const sub = action.payload.sub;
+			subs = [...subs.filter((v) => v.vk_id != sub.vk_id), sub];
 
 			return {
 				...state,
-				subs: [...subs, sub],
+				subs,
 			};
 		}
 
@@ -149,7 +150,7 @@ export const adReducer = (state = initialState, action) => {
 		}
 
 		case SET_IS_DEALER: {
-			const isAuthor = action.payload.isDealer;
+			const isDealer = action.payload.isDealer;
 
 			return {
 				...state,
@@ -194,7 +195,7 @@ export const adReducer = (state = initialState, action) => {
 		}
 
 		case SET_DEALER: {
-			const cost = action.payload.dealer;
+			const dealer = action.payload.dealer;
 
 			return {
 				...state,

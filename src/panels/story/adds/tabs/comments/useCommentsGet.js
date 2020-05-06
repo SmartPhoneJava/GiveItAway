@@ -7,18 +7,16 @@ import { ScreenSpinner } from '@vkontakte/vkui';
 import { Addr, BASE_AD } from '../../../../../store/addr';
 import { setComments, addComment } from '../../../../../store/detailed_ad/actions';
 
-export default function useCommentsGet(setPopout, query, pageNumber, rowsPerPage, ad_id, maxAmount) {
+export default function useCommentsGet(setPopout, pageNumber, rowsPerPage, ad_id, maxAmount) {
 	const [inited, setInited] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
-	const [nots, setNots] = useState([]);
 	const [hasMore, setHasMore] = useState(false);
 
 	useEffect(() => {
-		setNots([]);
-		store.dispatch(setComments([]))
+		store.dispatch(setComments([]));
 		pageNumber = 1;
-	}, [query]);
+	}, []);
 
 	useEffect(() => {
 		if (maxAmount && maxAmount > 0 && maxAmount <= (pageNumber - 1) * rowsPerPage) {
@@ -47,17 +45,10 @@ export default function useCommentsGet(setPopout, query, pageNumber, rowsPerPage
 				console.log('sucess comments', res);
 				const newNots = res.data;
 
-				setNots((prev) => {
-					const v = [...new Set([...prev, ...newNots])];
-
-					return v;
+				newNots.forEach((comment) => {
+					store.dispatch(addComment(comment));
 				});
-				
-					newNots.forEach((comment) => {
-						store.dispatch(addComment(comment))
-						
-					});
-				
+
 				setHasMore(newNots.length > 0);
 				setLoading(false);
 				setPopout(null);
@@ -71,12 +62,11 @@ export default function useCommentsGet(setPopout, query, pageNumber, rowsPerPage
 				setInited(true);
 			});
 		return () => cancel();
-	}, [query, pageNumber]);
+	}, [pageNumber]);
 
 	return {
 		inited,
 		newPage: pageNumber,
-		tnots: nots,
 		loading,
 		error,
 		hasMore,

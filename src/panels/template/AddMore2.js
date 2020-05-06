@@ -25,6 +25,7 @@ import 'react-photoswipe/lib/photoswipe.css';
 import { PhotoSwipe, PhotoSwipeGallery } from 'react-photoswipe';
 
 import Icon56WriteOutline from '@vkontakte/icons/dist/56/write_outline';
+import Icon36Done from '@vkontakte/icons/dist/36/done';
 
 import { GetCategoryText, GetCategoryImageSmall } from './Categories';
 
@@ -38,6 +39,8 @@ import Icon24Delete from '@vkontakte/icons/dist/24/delete';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 
+import Icon24Write from '@vkontakte/icons/dist/24/write';
+import Icon24ShareExternal from '@vkontakte/icons/dist/24/share_external';
 import Icon24Settings from '@vkontakte/icons/dist/24/settings';
 import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 import Icon24Place from '@vkontakte/icons/dist/24/place';
@@ -97,6 +100,7 @@ import {
 	STATUS_CLOSED,
 	STATUS_ABORTED,
 } from '../../const/ads';
+import { shareInVK } from '../../services/VK';
 
 const AddMore2r = (props) => {
 	const { myID, dispatch } = props;
@@ -121,6 +125,7 @@ const AddMore2r = (props) => {
 		isSub,
 		status,
 		deal,
+		dealer,
 		pathes_to_photo,
 		photos,
 		header,
@@ -252,13 +257,13 @@ const AddMore2r = (props) => {
 							console.log('suuubs', s);
 							updateSubsInfo(s);
 							if (status != STATUS_OFFER) {
+								console.log('new status', status);
 								getDeal(
 									openSnackbar,
 									ad_id,
-									(deal) => {
-										updateDealInfo(s, deal);
-										setIsDealer(deal.subscriber_id == myID);
-										setDeal(deal);
+									(d) => {
+										console.log('get deal', d);
+										updateDealInfo(s, d);
 									},
 									(e) => {}
 								);
@@ -327,14 +332,13 @@ const AddMore2r = (props) => {
 		);
 	}
 
-	function updateDealInfo(subs, deal) {
-		setDeal(deal);
-		setIsDealer(deal.subscriber_id == myID);
-		setDealer(
-			subs.filter((v) => v.vk_id == deal.subscriber_id).length > 0
-				? subs.filter((v) => v.vk_id == deal.subscriber_id)[0]
-				: null
-		);
+	function updateDealInfo(s, d) {
+		setDeal(d);
+		setIsDealer(d.subscriber_id == myID);
+		const subDeal = s.filter((v) => v.vk_id == d.subscriber_id);
+		const newDealer = subDeal.length > 0 ? subDeal[0] : null;
+		console.log('really he is dealer', newDealer, subDeal, s);
+		setDealer(newDealer);
 	}
 
 	function showClosed() {
@@ -442,16 +446,16 @@ const AddMore2r = (props) => {
 				<div style={{ width: '100%', color: 'rgb(220,220,220)', fontSize: '13px', padding: '2px' }}>
 					<div style={{ display: 'flex' }}>
 						Ожидание подтверждения от
-						<div style={{ display: 'flex' }} onClick={() => props.openUser(getDealer().vk_id)}>
+						<div style={{ display: 'flex' }} onClick={() => props.openUser(dealer.vk_id)}>
 							<Avatar
 								style={{
 									marginLeft: '15px',
 									marginRight: '4px',
 								}}
 								size={16}
-								src={getDealer().photo_url}
+								src={dealer ? dealer.photo_url : ''}
 							/>
-							{getDealer().name + ' ' + getDealer().surname + '  '}
+							{dealer ? dealer.name + ' ' + dealer.surname + '  ' : ''}
 						</div>
 					</div>
 				</div>,
@@ -529,7 +533,7 @@ const AddMore2r = (props) => {
 			openPopout,
 			openSnackbar,
 			ad_id,
-			() => sub(c-1),
+			() => sub(c - 1),
 			(v) => {
 				changeIsSub(false, c);
 			},
@@ -543,7 +547,7 @@ const AddMore2r = (props) => {
 			openPopout,
 			openSnackbar,
 			ad_id,
-			() => unsub(c+1),
+			() => unsub(c + 1),
 			(v) => {
 				changeIsSub(true, c);
 			},
@@ -648,64 +652,8 @@ const AddMore2r = (props) => {
 
 			<div style={{ padding: '16px' }}>
 				<div style={{ display: 'block', alignItems: 'center' }}>
-					<div className="CellLeft__head">{header}</div>
 					{isAuthor ? (
 						<div style={{ display: 'block' }}>
-							<div style={{ display: 'flex' }}>
-								<CellButton
-									onClick={() => {
-										hidden
-											? adVisible(openPopout, openSnackbar, ad_id, () => {
-													setIsHidden(false);
-											  })
-											: adHide(openPopout, openSnackbar, ad_id, () => {
-													setIsHidden(true);
-											  });
-									}}
-									disabled={isFinished()}
-									before={hidden ? <Icon24Globe /> : <Icon24Hide />}
-								>
-									{hidden ? 'Сделать видимым' : 'Сделать невидимым'}
-								</CellButton>
-								<CellButton
-									mode="danger"
-									disabled={isFinished()}
-									before={<Icon24Delete />}
-									onClick={() => {
-										deleteAd(openPopout, ad_id, openSnackbar, props.refresh);
-									}}
-								>
-									Удалить
-								</CellButton>
-							</div>
-							{/* <PanelHeaderButton
-									mode="primary"
-									size="l"
-									onClick={() => {
-										setHide(true);
-										OpenActions(
-											props.setPopout,
-											props.setSnackbar,
-											props.refresh,
-											ad.ad_id,
-											() => {
-												props.onCloseClick();
-												setRequest('CLOSE');
-											},
-											status == 'chosen',
-											ad.hidden,
-											subs.length,
-											() => {
-												setHide(false);
-											}
-										);
-									}}
-									disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
-								>
-									<Avatar style={{ background: 'white' }} size={40}>
-										<Icon28SettingsOutline fill="var(--black)" />
-									</Avatar>
-								</PanelHeaderButton> */}
 							<Button disabled={isFinished()} mode="commerce" size="xl" onClick={openSubs}>
 								{status == STATUS_OFFER ? 'Отдать' : 'Изменить получателя'}
 							</Button>
@@ -715,17 +663,7 @@ const AddMore2r = (props) => {
 					)}
 				</div>
 			</div>
-			<Separator />
-			<div
-				style={{
-					display: 'flex',
-					paddingLeft: '16px',
-					margin: '0px',
-				}}
-			>
-				<Cell before={<Icon24Place />}>{region + ', ' + district}</Cell>
-			</div>
-			<Separator />
+
 			{isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED || isAuthor ? (
 				''
 			) : isSub ? (
@@ -775,10 +713,9 @@ const AddMore2r = (props) => {
 					</PanelHeaderButton>
 				</div>
 			)}
-			<div style={{ marginTop: '10px', paddingLeft: '16px', paddingRight: '16px' }}>
-				<div className="CellLeft__block">{text}</div>
-			</div>
-
+			<div className="CellLeft__head">{header}</div>
+			<div className="CellLeft__block">{text}</div>
+			<Separator />
 			<table>
 				<tbody>
 					<tr>
@@ -804,6 +741,17 @@ const AddMore2r = (props) => {
 					</tr>
 				</tbody>
 			</table>
+			<Separator />
+			<div
+				style={{
+					display: 'flex',
+					paddingLeft: '16px',
+					margin: '0px',
+				}}
+			>
+				<Cell before={<Icon24Place />}>{region + ', ' + district}</Cell>
+			</div>
+			<Separator />
 			<Group header={<Header>Автор</Header>}>
 				<Cell
 					onClick={() => props.openUser(author.vk_id)}
@@ -826,37 +774,74 @@ const AddMore2r = (props) => {
 					</div>
 				</Cell>
 			</Group>
-			{isAuthor && isFinished ? (
-				<Subs
-					setPopout={openPopout}
-					setSnackbar={openSnackbar}
-					openUser={props.openUser}
-					amount={2}
-					maxAmount={2}
-					openSubs={openSubs}
-					ad={AD}
-					mini={true}
-				/>
-			) : null}
+			{isAuthor && isFinished ? <Subs openUser={props.openUser} amount={2} maxAmount={2} mini={true} /> : null}
 
 			{feedback_type == 'comments' ? (
 				<>
-					<Comments
-						mini={true}
-						openCommentaries={openComments}
-						hide={true}
-						AD={AD}
-						amount={1}
-						maxAmount={1}
-						setPopout={openPopout}
-						setSnackbar={openSnackbar}
-						myID={myID}
-						openUser={props.openUser}
-					/>
+					<Comments mini={true} amount={1} maxAmount={1} openUser={props.openUser} />
 				</>
 			) : (
 				<Placeholder icon={<Icon56WriteOutline />} header="Комментарии закрыты"></Placeholder>
 			)}
+			<Group separator="show" header={<Header mode="secondary">Действия</Header>}>
+				<div style={{ display: 'block', alignItems: 'center' }}>
+					{isAuthor ? (
+						<div style={{ display: 'block' }}>
+							
+
+							<div style={{ display: 'flex' }}>
+								<CellButton disabled={isFinished()} before={<Icon24Write />} onClick={() => {}}>
+									Редактировать
+								</CellButton>
+								<CellButton
+									mode="danger"
+									disabled={isFinished()}
+									before={<Icon24Delete />}
+									onClick={() => {
+										deleteAd(openPopout, ad_id, openSnackbar, props.refresh);
+									}}
+								>
+									Удалить
+								</CellButton>
+							</div>
+							<div style={{ display: 'flex' }}>
+								<CellButton
+									onClick={() => {
+										hidden
+											? adVisible(openPopout, openSnackbar, ad_id, () => {
+													setIsHidden(false);
+											  })
+											: adHide(openPopout, openSnackbar, ad_id, () => {
+													setIsHidden(true);
+											  });
+									}}
+									disabled={isFinished()}
+									before={hidden ? <Icon24Globe /> : <Icon24Hide />}
+								>
+									{hidden ? 'Сделать видимым' : 'Сделать невидимым'}
+								</CellButton>
+								<CellButton
+									onClick={() => {
+										shareInVK(openSnackbar);
+									}}
+									before={<Icon24ShareExternal />}
+								>
+									Поделиться
+								</CellButton>
+							</div>
+						</div>
+					) : (
+						<CellButton
+							onClick={() => {
+								shareInVK(openSnackbar);
+							}}
+							before={<Icon24ShareExternal />}
+						>
+							Поделиться
+						</CellButton>
+					)}
+				</div>
+			</Group>
 		</div>
 	);
 };
