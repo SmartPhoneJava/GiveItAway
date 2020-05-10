@@ -39,7 +39,6 @@ export async function postComment(setPopout, setSnackbar, ad_id, comment, succes
 				() => {
 					postComment(setPopout, setSnackbar, ad_id, comment, successCallback, failCallback, end);
 				},
-				setSnackbar,
 				end
 			);
 			setPopout(null);
@@ -65,7 +64,7 @@ export async function deleteComment(setPopout, setSnackbar, comment, successCall
 			return response.data;
 		})
 		.then(function (response) {
-			success('Комментарий удален', null, setSnackbar, end);
+			success('Комментарий удален', null, end);
 			successCallback(response);
 			setPopout(null);
 			return response;
@@ -77,7 +76,6 @@ export async function deleteComment(setPopout, setSnackbar, comment, successCall
 				() => {
 					deleteComment(setPopout, setSnackbar, comment, successCallback, failCallback, end);
 				},
-				setSnackbar,
 				end
 			);
 			failCallback(error);
@@ -103,7 +101,7 @@ export async function editComment(setPopout, setSnackbar, id, comment, successCa
 		})
 		.then(function (response) {
 			successCallback(response);
-			success('Комментарий отредактирован', null, setSnackbar, end);
+			success('Комментарий отредактирован', null, end);
 			setPopout(null);
 			return response;
 		})
@@ -115,7 +113,6 @@ export async function editComment(setPopout, setSnackbar, id, comment, successCa
 				() => {
 					editComment(setPopout, setSnackbar, id, comment, successCallback, failCallback, end);
 				},
-				setSnackbar,
 				end
 			);
 			setPopout(null);

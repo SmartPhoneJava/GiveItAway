@@ -9,7 +9,6 @@ export function updateDealInfo() {
 	const myID = store.getState().vkui.myID;
 	const ad_id = store.getState().ad.ad_id;
 	getDeal(
-		(v) => store.dispatch(openSnackbar(v)),
 		ad_id,
 		(d) => {
 			if (cancel) {

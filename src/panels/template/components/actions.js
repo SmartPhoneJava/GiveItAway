@@ -1,5 +1,6 @@
 import React from 'react';
 import { ActionSheet, ActionSheetItem, usePlatform, IOS, Snackbar, Avatar } from '@vkontakte/vkui';
+import { connect } from 'react-redux';
 
 import { Draft } from './../../../store/draft';
 
@@ -9,17 +10,29 @@ import { getSubscribers } from './../../../requests';
 
 import { CancelClose, adVisible, adHide, deleteAd } from './../../../requests';
 import { SNACKBAR_DURATION_DEFAULT } from '../../../store/const';
+import { closePopout, openPopout, openSnackbar } from '../../../store/router/actions';
 
-
-function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClosing, hidden, failedOpen) {
+const OpenActions = (props) => {
 	const osname = usePlatform();
-	setPopout(
-		<ActionSheet onClose={() => setPopout(null)}>
+	const {
+		closePopout,
+		openPopout,
+		openSnackbar,
+		refresh,
+		ad_id,
+		onCloseClick,
+		isClosing,
+		hidden,
+		failedOpen,
+	} = props;
+
+	return (
+		<ActionSheet onClose={closePopout}>
 			{isClosing ? (
 				<ActionSheetItem
 					autoclose
 					onClick={() => {
-						CancelClose(setPopout, setSnackbar, ad_id);
+						CancelClose(ad_id);
 						Draft.dispatch({ type: 'set', new_state: 'CANCEL_CLOSE_REQUEST' });
 					}}
 				>
@@ -30,18 +43,16 @@ function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClo
 					autoclose
 					onClick={() => {
 						getSubscribers(
-							setPopout,
-							setSnackbar,
 							ad_id,
 							(subs) => {
 								onCloseClick();
 							},
 							(e) => {
-								setSnackbar(
+								openSnackbar(
 									<Snackbar
 										duration={SNACKBAR_DURATION_DEFAULT}
 										onClose={() => {
-											setSnackbar(null);
+											openSnackbar(null);
 											if (failedOpen) {
 												failedOpen();
 											}
@@ -68,7 +79,7 @@ function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClo
 				<ActionSheetItem
 					autoclose
 					onClick={() => {
-						adVisible(setPopout, setSnackbar, ad_id, () => {
+						adVisible(ad_id, () => {
 							Draft.dispatch({ type: 'set', new_state: 'SET_VISIBLE' });
 						});
 					}}
@@ -79,7 +90,7 @@ function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClo
 				<ActionSheetItem
 					autoclose
 					onClick={() => {
-						adHide(setPopout, setSnackbar, ad_id, () => {
+						adHide(ad_id, () => {
 							Draft.dispatch({ type: 'set', new_state: 'SET_HIDEN' });
 						});
 					}}
@@ -88,13 +99,7 @@ function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClo
 				</ActionSheetItem>
 			)}
 
-			<ActionSheetItem
-				autoclose
-				mode="destructive"
-				onClick={() => {
-					deleteAd(setPopout, ad_id, setSnackbar, refresh);
-				}}
-			>
+			<ActionSheetItem autoclose mode="destructive" onClick={() => deleteAd(ad_id, refresh)}>
 				Удалить
 			</ActionSheetItem>
 			{osname === IOS && (
@@ -104,6 +109,16 @@ function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClo
 			)}
 		</ActionSheet>
 	);
-}
+};
 
-export default OpenActions;
+const mapStateToProps = (state) => {
+	return {};
+};
+
+const mapDispatchToProps = {
+	closePopout,
+	openPopout,
+	openSnackbar,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(OpenActions);

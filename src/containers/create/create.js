@@ -11,7 +11,6 @@ import CreateAddRedux from './../../panels/story/create/components/CreateAddRedu
 import { CreateAd, EditAd } from '../../requests';
 import { CategoryNo } from '../../components/categories/Categories';
 
-import { NoRegion } from '../../components/location/const';
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { FORM_CREATE } from '../../components/categories/redux';
 import { setDetailedAd, setExtraInfo } from '../../store/detailed_ad/actions';
@@ -100,8 +99,6 @@ const createAd = (myUser, inputData, tgeodata, dispatch) => {
 			loadAd(ad, dispatch)
 			console.log("we loaded more")
 		},
-		openSnackbar,
-		openPopout,
 		() => {
 			clearForm(dispatch);
 		}

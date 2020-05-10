@@ -29,7 +29,7 @@ const Countries = (props) => {
 			})
 			.catch(error => {
 				console.log('VKWebAppCallAPIMethod:', error);
-				fail('Не удалось получить список стран. Попробуйте позже', null, openSnackbar);
+				fail('Не удалось получить список стран. Попробуйте позже');
 				props.goBack();
 			});
 

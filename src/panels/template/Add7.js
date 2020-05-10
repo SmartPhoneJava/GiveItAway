@@ -21,8 +21,10 @@ import { Draft } from '../../store/draft';
 
 import './Add7.css';
 import { GetCategoryText } from './Categories';
+import { openPopout } from '../../store/router/actions';
 
 const Add7 = (props) => {
+	const {openPopout} = props
 	const [ad, setAd] = useState(props.ad);
 	const [haveDeal, setHaveDeal] = useState(false);
 	const [isVisible, setIsVisible] = useState(true);
@@ -43,15 +45,24 @@ const Add7 = (props) => {
 	const image = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : '';
 
 	function openSettings() {
-		OpenActions(
-			props.setPopout,
-			props.setSnackbar,
-			props.refresh,
-			ad.ad_id,
-			props.onCloseClick,
-			haveDeal,
-			!isVisible
+		props.setPopout(
+			<OpenActions
+				refresh={props.refresh}
+				ad_id={ad.ad_id}
+				onCloseClick={props.onCloseClick}
+				failedOpen={!isVisible}
+				hidden={haveDeal}
+			/>
 		);
+		// OpenActions(
+		// 	props.setPopout,
+		// 	props.setSnackbar,
+		// 	props.refresh,
+		// 	ad.ad_id,
+		// 	props.onCloseClick,
+		// 	haveDeal,
+		// 	!isVisible
+		// );
 	}
 
 	function isAuthor() {

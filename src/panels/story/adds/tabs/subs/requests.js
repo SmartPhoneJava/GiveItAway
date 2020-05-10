@@ -23,7 +23,7 @@ export function subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallba
 		.then(function (response) {
 			setPopout(null);
 			successCallback(response);
-			success('Теперь вы будете получать уведомления, связанные с этим постом', clCancel, setSnackbar, end);
+			success('Теперь вы будете получать уведомления, связанные с этим постом', clCancel, end);
 			return response;
 		})
 		.catch(function (error) {
@@ -31,14 +31,13 @@ export function subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallba
 			console.log('loook, error', error, status);
 			failCallback(error);
 			if (error == 'Error: Request failed with status code 409') {
-				fail('недостаточно кармы. Откажитесь от другой вещи, чтобы получить эту!', null, setSnackbar, end);
+				fail('недостаточно кармы. Откажитесь от другой вещи, чтобы получить эту!', null, end);
 			} else {
 				fail(
 					'Нет соединения с сервером',
 					() => {
 						subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallback, failCallback, end);
 					},
-					setSnackbar,
 					end
 				);
 			}
@@ -63,7 +62,7 @@ export function unsubscribe(setPopout, setSnackbar, ad_id, clCancel, successCall
 		.then(function (response) {
 			setPopout(null);
 			successCallback(response);
-			success('Больше вы не будете получать связанные с этим постом уведомления', clCancel, setSnackbar, end);
+			success('Больше вы не будете получать связанные с этим постом уведомления', clCancel, end);
 			return response;
 		})
 		.catch(function (error) {

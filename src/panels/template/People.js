@@ -27,8 +27,6 @@ export const PeopleRBI = withModalRootContext((props) => {
 
 	useEffect(() => {
 		getSubscribers(
-			props.setPopout,
-			props.setSnackbar,
 			props.ad_id,
 			(s) => {
 				setSubs(s);
@@ -48,7 +46,7 @@ export const PeopleRBI = withModalRootContext((props) => {
 						value={v.vk_id}
 						onClick={(e) => {
 							const { value } = e.currentTarget;
-							Close(props.setPopout, props.setSnackbar, props.ad_id, value);
+							Close(props.ad_id, value);
 							props.back();
 							Draft.dispatch({ type: 'set', new_state: 'CLOSE' });
 						}}

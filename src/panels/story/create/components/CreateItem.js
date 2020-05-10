@@ -38,12 +38,13 @@ import { loadPhotos, MAX_FILE_SIZE } from '../../../../services/file';
 import { PHOTO_TEXT } from '../../../../const/create';
 
 import './createItem.css';
+import { closeSnackbar, setSnackbar } from '../../../../store/router/actions';
 
 const nameLabel = 'Название';
 const descriptionLabel = 'Описание';
 
 const CreateItem = (props) => {
-	const { AD, defaultInputData, setFormData } = props;
+	const { AD, defaultInputData, setFormData, setSnackbar, closeSnackbar } = props;
 	const inputData = props.inputData[CREATE_AD_ITEM] || defaultInputData;
 	const name = props.inputData[CREATE_AD_ITEM].name || "";
 	const description = props.inputData[CREATE_AD_ITEM].description || "";
@@ -80,15 +81,11 @@ const CreateItem = (props) => {
 
 	const { platform } = props;
 
-	function hideSnackbar() {
-		props.setSnackbar(null);
-	}
-
 	function handleWrongSize(file) {
 		setSnackbar(
 			<Snackbar
 				duration={SNACKBAR_DURATION_DEFAULT}
-				onClose={hideSnackbar}
+				onClose={closeSnackbar}
 				before={
 					<Avatar size={24} style={{ background: 'orange' }}>
 						<Icon24Favorite fill="#fff" width={14} height={14} />
@@ -105,7 +102,7 @@ const CreateItem = (props) => {
 		setSnackbar(
 			<Snackbar
 				duration={SNACKBAR_DURATION_DEFAULT}
-				onClose={hideSnackbar}
+				onClose={closeSnackbar}
 				before={
 					<Avatar size={24} style={{ background: 'orange' }}>
 						<Icon24Favorite fill="#fff" width={14} height={14} />
@@ -357,6 +354,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
 	setFormData,
+	closeSnackbar,
+	setSnackbar,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateItem);

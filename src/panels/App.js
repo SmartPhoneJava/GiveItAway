@@ -68,7 +68,7 @@ import AddMore2 from './template/AddMore2';
 
 import { GEO_TYPE_FILTERS, AdDefault, STATUS_OFFER } from './../const/ads';
 
-import { Auth, getToken, fail, getDeal } from '../requests';
+import { Auth, getToken, fail, getNotificationCounter } from '../requests';
 
 import Error from './placeholders/error';
 import NotHere from './placeholders/NotHere';
@@ -196,6 +196,8 @@ const App = (props) => {
 			const noteType = note.data.notification_type;
 			const noteAdId = note.data.payload.ad.ad_id;
 
+			console.log('noteAdId ', noteType, noteAdId, NT_STATUS);
+
 			if (AD.ad_id == noteAdId) {
 				switch (noteType) {
 					case NT_RESPOND: {
@@ -204,9 +206,10 @@ const App = (props) => {
 					}
 					case NT_STATUS: {
 						const noteValue = note.data.payload.ad.status;
+						console.log('noteValue ', noteValue);
 						setStatus(noteValue);
 						if (noteValue == STATUS_OFFER) {
-							updateDealInfo()
+							updateDealInfo();
 						}
 					}
 				}
@@ -240,6 +243,18 @@ const App = (props) => {
 			})
 		);
 	}, [AD.ad_id]);
+
+	useEffect(() => {
+		//....
+		getNotificationCounter(
+			(r) => {
+				console.log('some result happened', r);
+			},
+			(e) => {
+				console.log('some error happened', e);
+			}
+		);
+	}, []);
 
 	useEffect(() => {
 		openPopout(<ScreenSpinner size="large" />);
@@ -279,23 +294,17 @@ const App = (props) => {
 			VK.getuser((us) => {
 				Auth(
 					us,
-					openSnackbar,
-					openPopout,
 					(v) => {
 						setInited(true);
 						dispatch(addProfile(us.id));
-						getToken(
-							openSnackbar,
-							(v) => {
-								centrifuge.setToken(v.token);
-								centrifuge.connect();
-								turnOnNotifications(us.id);
-							},
-							(e) => {}
-						);
+						getToken((v) => {
+							centrifuge.setToken(v.token);
+							centrifuge.connect();
+							turnOnNotifications(us.id);
+						});
 					},
 					(e) => {
-						fail('Не удалось получить ваши данные', null, openSnackbar);
+						fail('Не удалось получить ваши данные');
 					}
 				);
 				return us;
@@ -326,7 +335,7 @@ const App = (props) => {
 	let createPanels = props.panelsHistory[STORY_CREATE];
 	let createActivePanel = props.activePanels[STORY_CREATE];
 	let choosen = props.activeAd;
-	
+
 	if (!inited) {
 		return <ScreenSpinner size="large" />;
 	}

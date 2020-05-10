@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Group, PanelHeaderButton, Avatar, Placeholder } from '@vkontakte/vkui';
+import { Search, Group, PanelHeaderButton, Avatar, Banner, Button } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
@@ -8,7 +8,6 @@ import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 import Add from './../../../../template/Add';
 import Add7 from './../../../../template/Add7';
 import Add6 from './../../../../template/Add6';
-import Add5 from './../../../../template/Add5';
 import Add4 from './../../../../template/Add4';
 import Add3 from './../../../../template/Add3';
 import Add2 from './../../../../template/Add2';
@@ -352,6 +351,36 @@ const AddsTab = (props) => {
 						</PanelHeaderButton>
 					) : null}
 				</div>
+
+				<Banner
+					mode="image"
+					size="m"
+					header="Хочу забрать"
+					subheader={
+						<span>
+							Привлекайте больше людей
+							<br />в Ваше сообщество
+						</span>
+					}
+					background={
+						<div
+							style={{
+								backgroundColor: '#5b9be6',
+								backgroundImage:
+									'url(https://sun9-31.userapi.com/PQ4UCzqE_jue9hAINefBMorYCdfGXvcuV5nSjA/eYugcFYzdW8.jpg)',
+								backgroundPosition: 'right bottom',
+								backgroundSize: '102%',
+								backgroundRepeat: 'no-repeat',
+							}}
+						/>
+					}
+					asideMode="dismiss"
+					actions={
+						<Button mode="overlay" size="l">
+							Подробнее
+						</Button>
+					}
+				/>
 				<Group>
 					{ads.length > 0 ? (
 						ads.map((ad, index) => {

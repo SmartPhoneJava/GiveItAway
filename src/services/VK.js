@@ -118,17 +118,17 @@ export const getuser = (success) => (dispatch) => {
 		});
 };
 
-export const shareInVK = (openSnackbar) => {
+export const shareInVK = () => {
 	const appID = store.getState().vkui.appID;
 	const adID = store.getState().ad.ad_id;
 	return bridge
 		.send('VKWebAppShare', { link: 'https://vk.com/app' + appID + '#' + adID })
 		.then((data) => {
-			success('Вы успешно поделились объявлением', null, openSnackbar);
+			success('Вы успешно поделились объявлением');
 			return data;
 		})
 		.catch((error) => {
-			fail('Не удалось поделиться объявлением', null, openSnackbar);
+			fail('Не удалось поделиться объявлением');
 			return error;
 		});
 };

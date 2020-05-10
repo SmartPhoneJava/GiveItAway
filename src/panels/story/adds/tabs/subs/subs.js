@@ -19,12 +19,14 @@ import {
 
 import Icon56Users3Outline from '@vkontakte/icons/dist/56/users_outline';
 
+import Icon24BrowserForward from '@vkontakte/icons/dist/24/browser_forward';
 import Icon24Shuffle from '@vkontakte/icons/dist/24/shuffle';
 import Icon24Help from '@vkontakte/icons/dist/24/help';
 import Icon24Message from '@vkontakte/icons/dist/24/message';
 import Icon24Gift from '@vkontakte/icons/dist/24/gift';
 import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';
 
+import Icon24User from '@vkontakte/icons/dist/24/user';
 import Icon36Done from '@vkontakte/icons/dist/36/done';
 import Icon36Cancel from '@vkontakte/icons/dist/36/cancel';
 
@@ -37,6 +39,25 @@ import { openPopout, closePopout, openSnackbar, setPage } from '../../../../../s
 import { setDealer } from '../../../../../store/detailed_ad/actions';
 import { PANEL_SUBS } from '../../../../../store/router/panelTypes';
 import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED } from '../../../../../const/ads';
+
+export const Given = (props) => {
+	const dealer = props.dealer;
+	return (
+		<Group header={<Header>Получатель</Header>}>
+			<Cell
+				onClick={() => {
+					props.openUser(dealer.vk_id);
+				}}
+				multiline={true}
+				key={dealer ? dealer.vk_id : ''}
+				before={dealer ? <Avatar size={36} src={dealer.photo_url} /> : <Icon24User />}
+				asideContent={dealer ? <Icon24BrowserForward /> : ''}
+			>
+				<div>{dealer ? dealer.name + ' ' + dealer.surname : 'Никто не выбран'}</div>
+			</Cell>
+		</Group>
+	);
+};
 
 const Subs = (props) => {
 	const osname = usePlatform();
@@ -104,7 +125,7 @@ const Subs = (props) => {
 				multiline={true}
 				description={dealer ? <>Ждём подтверждение получения вещи</> : ''}
 				key={dealer ? dealer.vk_id : ''}
-				before={<Avatar size={36} src={dealer ? dealer.photo_url : ''} />}
+				before={dealer ? <Avatar size={36} src={dealer.photo_url} /> : <Icon24User />}
 				asideContent={dealer ? <Icon24Dismiss /> : ''}
 			>
 				<div>{dealer ? dealer.name + ' ' + dealer.surname : 'Никто не выбран'}</div>
@@ -151,8 +172,6 @@ const Subs = (props) => {
 
 	function close_ad(subscriber) {
 		Close(
-			openPopout,
-			openSnackbar,
 			ad_id,
 			subscriber.vk_id,
 			(data) => {
@@ -167,8 +186,6 @@ const Subs = (props) => {
 
 	function cancel_ad(subscriber, need_close) {
 		CancelClose(
-			openPopout,
-			openSnackbar,
 			ad_id,
 			(data) => {
 				console.log('we are stopping', need_close);
@@ -195,7 +212,6 @@ const Subs = (props) => {
 		(s) => {
 			setPhotos([...s].map((v) => v.photo_url));
 			getDeal(
-				openSnackbar,
 				ad_id,
 				(data) => {
 					const d = s.filter((v) => v.vk_id == data.subscriber_id)[0];

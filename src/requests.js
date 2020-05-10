@@ -16,35 +16,41 @@ import { openPopout, closePopout, openSnackbar, closeSnackbar } from './store/ro
 
 let request_id = 0;
 
-export function success(text, cancelMe, setSnackbar, end) {
-	setSnackbar(
-		cancelMe ? (
+export function success(text, cancelMe, end) {
+	const close = () => {
+		store.dispatch(closePopout());
+		if (end) {
+			end();
+		}
+	};
+
+	const snack = (
+		<Snackbar
+			duration={SNACKBAR_DURATION_DEFAULT}
+			onClose={close}
+			action={cancelMe ? 'Отменить' : null}
+			onActionClick={cancelMe}
+			before={
+				<Avatar size={24} style={{ background: 'green' }}>
+					<Icon24DoneOutline fill="#fff" width={14} height={14} />
+				</Avatar>
+			}
+		>
+			{text}
+		</Snackbar>
+	);
+
+	store.dispatch(setSnackbar(snack));
+}
+
+export function sendSnack(text, setSnackbar) {
+	store.dispatch(
+		setSnackbar(
 			<Snackbar
+				style={{ zIndex: '120' }}
 				duration={SNACKBAR_DURATION_DEFAULT}
 				onClose={() => {
-					setSnackbar(null);
-					if (end) {
-						end();
-					}
-				}}
-				action="Отменить"
-				onActionClick={cancelMe}
-				before={
-					<Avatar size={24} style={{ background: 'green' }}>
-						<Icon24DoneOutline fill="#fff" width={14} height={14} />
-					</Avatar>
-				}
-			>
-				{text}
-			</Snackbar>
-		) : (
-			<Snackbar
-				duration={SNACKBAR_DURATION_DEFAULT}
-				onClose={() => {
-					setSnackbar(null);
-					if (end) {
-						end();
-					}
+					store.dispatch(closeSnackbar());
 				}}
 				before={
 					<Avatar size={24} style={{ background: 'green' }}>
@@ -58,29 +64,9 @@ export function success(text, cancelMe, setSnackbar, end) {
 	);
 }
 
-export function sendSnack(text, setSnackbar) {
-	setSnackbar(
-		<Snackbar
-			style={{ zIndex: '120' }}
-			duration={SNACKBAR_DURATION_DEFAULT}
-			onClose={() => {
-				setSnackbar(null);
-			}}
-			before={
-				<Avatar size={24} style={{ background: 'green' }}>
-					<Icon24DoneOutline fill="#fff" width={14} height={14} />
-				</Avatar>
-			}
-		>
-			{text}
-		</Snackbar>
-	);
-}
-
-export async function getToken(setSnackbar, successCallback, failCallBack) {
-	let err = false;
+export function getToken(successCallback, failCallBack) {
 	let cancel;
-	const deal = await axios({
+	axios({
 		method: 'get',
 		withCredentials: true,
 		url: Addr.getState() + BASE + 'ws_token',
@@ -92,18 +78,49 @@ export async function getToken(setSnackbar, successCallback, failCallBack) {
 			return response.data;
 		})
 		.then(function (response) {
-			successCallback(response);
+			if (successCallback) {
+				successCallback(response);
+			}
 			return response;
 		})
 		.catch(function (error) {
-			failCallBack(error);
+			if (failCallBack) {
+				failCallBack(error);
+			}
+		});
+}
+
+export async function getNotificationCounter(successCallback, failCallBack) {
+	let err = false;
+	let cancel;
+	const deal = await axios({
+		method: 'get',
+		withCredentials: true,
+		url: Addr.getState() + BASE + 'notifications_count',
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(function (response) {
+			console.log('response from getNotificationCounter:', response);
+
+			return response.data;
+		})
+		.then(function (response) {
+			if (successCallback) {
+				successCallback(response);
+			}
+			return response;
+		})
+		.catch(function (error) {
+			if (failCallBack) {
+				failCallBack(error);
+			}
 			err = true;
 		});
 	return { deal, err };
 }
 
-export async function adHide(setPopout, setSnackbar, ad_id, callback) {
-	store.dispatch(openPopout(<ScreenSpinner size="large" />))
+export async function adHide(ad_id, callback) {
+	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;
 
@@ -118,22 +135,22 @@ export async function adHide(setPopout, setSnackbar, ad_id, callback) {
 			return response.data;
 		})
 		.then(function (response) {
-			store.dispatch(closePopout())
-			success('Объявление скрыто', null, setSnackbar);
+			store.dispatch(closePopout());
+			success('Объявление скрыто');
 			callback(response);
 			return response;
 		})
 		.catch(function (error) {
 			err = true;
-			fail('Нет соединения с сервером', adHide(setPopout, setSnackbar, ad_id, callback), setSnackbar);
+			fail('Нет соединения с сервером', adHide(ad_id, callback));
 
-			store.dispatch(closePopout())
+			store.dispatch(closePopout());
 		});
 	return err;
 }
 
-export async function adVisible(setPopout, setSnackbar, ad_id, callback) {
-	setPopout(<ScreenSpinner size="large" />);
+export async function adVisible(ad_id, callback) {
+	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;
 
@@ -148,20 +165,20 @@ export async function adVisible(setPopout, setSnackbar, ad_id, callback) {
 			return response.data;
 		})
 		.then(function (response) {
-			setPopout(null);
-			success('Объявление открыто для просмотра', null, setSnackbar);
+			store.dispatch(closePopout());
+			success('Объявление открыто для просмотра');
 			callback(response);
 			return response;
 		})
 		.catch(function (error) {
 			err = true;
-			fail('Нет соединения с сервером', adVisible(setPopout, setSnackbar, ad_id, callback), setSnackbar);
-			setPopout(null);
+			fail('Нет соединения с сервером', adVisible(ad_id, callback));
+			store.dispatch(closePopout());
 		});
 	return err;
 }
 
-export async function getDeal(setSnackbar, ad_id, successCallback, failCallback) {
+export async function getDeal(ad_id, successCallback, failCallback) {
 	let err = false;
 	let cancel;
 	const deal = await axios({
@@ -216,12 +233,12 @@ export async function getCost(ad_id, successCallback, failCallback) {
 		});
 }
 
-export async function denyDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end, text) {
+export async function denyDeal(deal_id, successCallback, failCallback, end, text) {
 	console.log('denyDeall', deal_id);
 	let dtext = text || 'Ваш отказ принят!';
 	let err = false;
 	let cancel;
-	setPopout(<ScreenSpinner size="large" />);
+	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 
 	console.log('denyDeal', deal_id);
 
@@ -233,12 +250,12 @@ export async function denyDeal(setPopout, setSnackbar, deal_id, successCallback,
 	})
 		.then(function (response) {
 			console.log('response from denyDeal:', response);
-			success(dtext, null, setSnackbar, end);
+			success(dtext, null, end);
 			return response.data;
 		})
 		.then(function (response) {
 			successCallback(response);
-			setPopout(null);
+			store.dispatch(closePopout());
 			return response;
 		})
 		.catch(function (error) {
@@ -246,21 +263,20 @@ export async function denyDeal(setPopout, setSnackbar, deal_id, successCallback,
 			fail(
 				'Нет соединения с сервером',
 				() => {
-					denyDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end, text);
+					denyDeal(deal_id, successCallback, failCallback, end, text);
 				},
-				setSnackbar,
 				end
 			);
 			failCallback(error);
-			setPopout(null);
+			store.dispatch(closePopout());
 		});
 	return err;
 }
 
-export async function acceptDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end) {
+export async function acceptDeal(deal_id, successCallback, failCallback, end) {
 	let err = false;
 	let cancel;
-	setPopout(<ScreenSpinner size="large" />);
+	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 
 	await axios({
 		method: 'post',
@@ -270,12 +286,12 @@ export async function acceptDeal(setPopout, setSnackbar, deal_id, successCallbac
 	})
 		.then(function (response) {
 			console.log('response from acceptDeal:', response);
-			success('Автор благодарит вас за подтверждение!', null, setSnackbar, end);
+			success('Автор благодарит вас за подтверждение!', null, end);
 			return response.data;
 		})
 		.then(function (response) {
 			successCallback(response);
-			setPopout(null);
+			store.dispatch(closePopout());
 			return response;
 		})
 		.catch(function (error) {
@@ -283,39 +299,31 @@ export async function acceptDeal(setPopout, setSnackbar, deal_id, successCallbac
 			fail(
 				'Нет соединения с сервером',
 				() => {
-					acceptDeal(setPopout, setSnackbar, deal_id, successCallback, failCallback, end);
+					acceptDeal(deal_id, successCallback, failCallback, end);
 				},
-				setSnackbar,
 				end
 			);
 			failCallback(error);
-			setPopout(null);
+			store.dispatch(closePopout());
 		});
 	return err;
 }
 
-export async function CancelClose(setPopout, setSnackbar, ad_id, successCallback, failCallback, blockSnackbar) {
-	console.log('CancelClose 1', ad_id);
+export async function CancelClose(ad_id, successCallback, failCallback, blockSnackbar) {
 	getDeal(
-		setSnackbar,
 		ad_id,
 		(deal) => {
-			console.log('CancelClose 2', deal);
 			denyDeal(
-				setPopout,
-				setSnackbar,
 				deal.deal_id,
 				(v) => {
-					console.log('stoooop 2', deal);
 					if (!blockSnackbar) {
-						success('Запрос успешно отменен!', null, setSnackbar);
+						success('Запрос успешно отменен!');
 					}
 					if (successCallback) {
 						successCallback(v);
 					}
 				},
 				(e) => {
-					console.log('stoooop 3', e);
 					if (failCallback) {
 						failCallback(e);
 					}
@@ -330,8 +338,8 @@ export async function CancelClose(setPopout, setSnackbar, ad_id, successCallback
 	);
 }
 
-export function Close(setPopout, setSnackbar, ad_id, subscriber_id, successCallback, failCallback) {
-	setPopout(<ScreenSpinner size="large" />);
+export function Close(ad_id, subscriber_id, successCallback, failCallback) {
+	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;
 	axios({
@@ -342,15 +350,11 @@ export function Close(setPopout, setSnackbar, ad_id, subscriber_id, successCallb
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
-			setPopout(null);
+			store.dispatch(closePopout());
 			console.log('response from Close:', response);
-			success(
-				'Спасибо, что делаете других людей счастливыми :) Ждем подтверждения от второй стороны!',
-				() => {
-					CancelClose(setPopout, setSnackbar, ad_id);
-				},
-				setSnackbar
-			);
+			success('Спасибо, что делаете других людей счастливыми :) Ждем подтверждения от второй стороны!', () => {
+				CancelClose(ad_id);
+			});
 			return response.data;
 		})
 		.then(function (data) {
@@ -364,14 +368,14 @@ export function Close(setPopout, setSnackbar, ad_id, subscriber_id, successCallb
 			if (error) {
 				failCallback(error);
 			}
-			fail('Нет соединения с сервером', () => {}, setSnackbar);
-			setPopout(null);
+			fail('Нет соединения с сервером');
+			store.dispatch(closePopout());
 		});
 	return err;
 }
 
-export async function getSubscribers(setPopout, setSnackbar, ad_id, successCallback, failCallback) {
-	setPopout(<ScreenSpinner size="large" />);
+export async function getSubscribers(ad_id, successCallback, failCallback) {
+	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;
 	const subscribers = await axios({
@@ -390,21 +394,23 @@ export async function getSubscribers(setPopout, setSnackbar, ad_id, successCallb
 		})
 		.then(function (response) {
 			successCallback(response);
-			setPopout(null);
+			store.dispatch(closePopout());
 			return response;
 		})
 		.catch(function (error) {
 			if (err) {
-				fail('Нет соединения с сервером', () => {}, setSnackbar);
+				fail('Нет соединения с сервером');
 			}
-			failCallback(error);
-			setPopout(null);
+			if (failCallback) {
+				failCallback(error);
+			}
+			store.dispatch(closePopout());
 		});
 	return { subscribers, err };
 }
 
-export async function getDetails(setPopout, setSnackbar, ad_id, successCallback, failCallback, end) {
-	setPopout(<ScreenSpinner size="large" />);
+export async function getDetails(ad_id, successCallback, failCallback) {
+	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;
 	const data = await axios({
@@ -414,7 +420,7 @@ export async function getDetails(setPopout, setSnackbar, ad_id, successCallback,
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
-			setPopout(null);
+			store.dispatch(closePopout());
 			console.log('response from getDetails:', response);
 			return response.data;
 		})
@@ -429,14 +435,10 @@ export async function getDetails(setPopout, setSnackbar, ad_id, successCallback,
 			if (failCallback) {
 				failCallback(error);
 			}
-			fail(
-				'Нет соединения с сервером',
-				() => {
-					getDetails(setPopout, setSnackbar, ad_id);
-				},
-				setSnackbar
-			);
-			setPopout(null);
+			fail('Нет соединения с сервером', () => {
+				getDetails(ad_id);
+			});
+			store.dispatch(closePopout());
 		});
 
 	return { details: data, err };
@@ -485,8 +487,8 @@ export async function canWritePrivateMessage(id, appID, apiVersion, successCallb
 	request_id++;
 }
 
-export async function Auth(user, setSnackbar, setPopout, successCallback, failCallback) {
-	setPopout(<ScreenSpinner size="large" />);
+export async function Auth(user, successCallback, failCallback) {
+	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	console.log('secret:', window.location.href);
 	console.log('user:', user);
 	let cancel;
@@ -508,19 +510,19 @@ export async function Auth(user, setSnackbar, setPopout, successCallback, failCa
 		})
 		.then(function (data) {
 			successCallback(data);
-			setPopout(null);
+			store.dispatch(closePopout());
 			User.dispatch({ type: 'set', new_state: data });
 			return data;
 		})
 		.catch(function (error) {
-			setPopout(null);
+			store.dispatch(closePopout());
 			failCallback(error);
-			fail('Не удалось авторизоваться', null, setSnackbar);
+			fail('Не удалось авторизоваться');
 		});
 	return getUser;
 }
 
-export async function CreateImages(photos, id, goToAds, setSnackbar) {
+export async function CreateImages(photos, id, goToAds) {
 	let err = false;
 	let s = 0;
 	photos.forEach((photo, i) => {
@@ -538,17 +540,15 @@ export async function CreateImages(photos, id, goToAds, setSnackbar) {
 			.then(function (response) {
 				console.log('success uploaded', s, photos.length - 1);
 				s++;
-				if (s == photos.length - 1) {
+				if (s == photos.length) {
 					goToAds(
 						<Snackbar
 							duration={SNACKBAR_DURATION_DEFAULT}
 							onClose={() => {
-								setSnackbar(null);
+								store.dispatch(closePopout());
 							}}
 							action="Отменить"
-							onActionClick={() => {
-								deleteAd(setPopout, id, setSnackbar, refresh);
-							}}
+							onActionClick={() => deleteAd(id, refresh)}
 							before={
 								<Avatar size={24} style={{ background: 'green' }}>
 									<Icon24DoneOutline fill="#fff" width={14} height={14} />
@@ -573,10 +573,10 @@ export async function CreateImages(photos, id, goToAds, setSnackbar) {
 	}
 }
 
-export async function CreateAd(ad, obj, photos, openAd, loadAd, setSnackbar, setPopout, successcallback) {
-	setPopout(<ScreenSpinner size="large" />);
+export function CreateAd(ad, obj, photos, openAd, loadAd, successcallback) {
+	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let cancel;
-	await axios({
+	axios({
 		method: 'post',
 		url: Addr.getState() + BASE_AD + 'create',
 		withCredentials: true,
@@ -584,25 +584,20 @@ export async function CreateAd(ad, obj, photos, openAd, loadAd, setSnackbar, set
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(async function (response) {
-			setPopout(null);
+			store.dispatch(closePopout());
 
 			if (response.status != 201) {
 				throw new Error('Не тот код!');
 			}
 			ad.ad_id = response.data.ad_id;
 			openAd(ad);
-			await CreateImages(
-				photos,
-				response.data.ad_id,
-				(snackbar) => {
-					if (successcallback) {
-						successcallback();
-					}
-					setSnackbar(snackbar);
-					getDetails(setPopout, setSnackbar, response.data.ad_id, (e) => loadAd(e));
-				},
-				setSnackbar
-			);
+			await CreateImages(photos, response.data.ad_id, (snackbar) => {
+				if (successcallback) {
+					successcallback();
+				}
+				store.dispatch(setSnackbar(snackbar));
+				getDetails(response.data.ad_id, loadAd);
+			});
 			return response;
 		})
 		.then(function (response) {
@@ -610,9 +605,12 @@ export async function CreateAd(ad, obj, photos, openAd, loadAd, setSnackbar, set
 		})
 		.catch(function (error) {
 			console.log('Request failed', error);
-			setPopout(null);
-			fail('Нет соединения с сервером', () => createAd(setPopout), setSnackbar);
+			store.dispatch(closePopout());
+			fail('Нет соединения с сервером', () => createAd(ad, obj, photos, openAd, loadAd, successcallback));
 		});
+	return () => {
+		cancel();
+	};
 }
 
 export async function EditAd(ad, obj, openAd, successcallback) {
@@ -633,30 +631,21 @@ export async function EditAd(ad, obj, openAd, successcallback) {
 			if (successcallback) {
 				successcallback();
 			}
-			success('Изменения сохранены', null, (s) => {
-				store.dispatch(openSnackbar(s));
-			});
+			success('Изменения сохранены');
 			return response;
 		})
 		.catch(function (error) {
 			console.log('Request failed', error);
 			store.dispatch(closePopout());
-			fail(
-				'Нет соединения с сервером',
-				() => createAd(setPopout),
-				(s) => {
-					console.log('errrrrrrrr', s);
-					store.dispatch(openSnackbar(s));
-				}
-			);
+			fail('Нет соединения с сервером', () => EditAd(ad, obj, openAd, successcallback));
 		});
 	return () => {
 		cancel();
 	};
 }
 
-export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
-	setPopout(<ScreenSpinner size="large" />);
+export const deleteAd = (ad_id, refresh) => {
+	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let cancel;
 
 	axios({
@@ -666,27 +655,23 @@ export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
-			setPopout(null);
+			store.dispatch(closePopout());
 			if (response.status != 200) {
-				fail(
-					response.status + ' - ' + response.statusText,
-					() => deleteAd(setPopout, ad_id, setSnackbar, refresh),
-					setSnackbar
-				);
+				fail(response.status + ' - ' + response.statusText, () => deleteAd(ad_id, refresh));
 			} else {
 				refresh(ad_id);
-				success('Объявление удалено!', null, setSnackbar);
+				success('Объявление удалено!');
 			}
 			return response.data;
 		})
 		.catch(function (error) {
 			console.log('Request failed', error);
-			setPopout(null);
-			fail('Нет соединения с сервером', () => deleteAd(setPopout, ad_id, setSnackbar, refresh), setSnackbar);
+			store.dispatch(closePopout());
+			fail('Нет соединения с сервером', () => deleteAd(ad_id, refresh));
 		});
 };
 
-export function fail(err, repeat, setSnackbar, end) {
+export function fail(err, repeat, end) {
 	{
 		let open;
 		console.log('we wanna set snackbar', err);

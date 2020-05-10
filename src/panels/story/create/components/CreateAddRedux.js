@@ -16,23 +16,9 @@ import { canWritePrivateMessage } from '../../../../requests';
 import { FORM_LOCATION_CREATE } from '../../../../components/location/redux';
 import { SNACKBAR_DURATION_DEFAULT } from '../../../../store/const';
 import { EDIT_MODE, CREATE_AD_ITEM } from '../../../../store/create_post/types';
-import { FORM_CREATE } from '../../../../components/categories/redux';
 
 const CreateAddRedux = (props) => {
-	const {
-		openPopout,
-		openSnackbar,
-		closeSnackbar,
-		myUser,
-		appID,
-		apiVersion,
-		setFormData,
-		setPage,
-		clearForm,
-		snackbar,
-		inputData,
-		AD,
-	} = props;
+	const { openSnackbar, closeSnackbar, myUser, appID, apiVersion, setPage, snackbar, inputData, AD } = props;
 
 	const [pmOpen, setPmOpen] = useState(true);
 	useEffect(() => {

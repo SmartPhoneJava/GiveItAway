@@ -40,7 +40,7 @@ export async function getUser(setPopout, setSnackbar, user_id, successCallback, 
 		.catch(function (error) {
 			err = true;
 			failCallback(error);
-			fail('Нет соединения с сервером', null, openSnackbar);
+			fail('Нет соединения с сервером');
 			store.dispatch(closePopout())
 		});
 	return err;

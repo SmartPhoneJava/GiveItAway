@@ -39,13 +39,14 @@ import Icon24Delete from '@vkontakte/icons/dist/24/delete';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 
+import Icon24BrowserForward from '@vkontakte/icons/dist/24/browser_forward';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
 import Icon24ShareExternal from '@vkontakte/icons/dist/24/share_external';
 import Icon24Settings from '@vkontakte/icons/dist/24/settings';
 import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 import Icon24Place from '@vkontakte/icons/dist/24/place';
 
-import Subs from './../story/adds/tabs/subs/subs';
+import Subs, { Given } from './../story/adds/tabs/subs/subs';
 import { subscribe, unsubscribe } from './../story/adds/tabs/subs/requests';
 
 import { K } from './../story/profile/Profile';
@@ -243,22 +244,19 @@ const AddMore2r = (props) => {
 		// 	setImage('');
 		// 	return;
 		// }
-		console.log("herereeees")
+		console.log('herereeees');
 		const init = () => (dispatch) => {
 			const id = AD.ad_id;
-			updateDealInfo()
+			updateDealInfo();
 			getCost(
 				ad_id,
 				(data) => {
 					setCost(data.bid);
 					getSubscribers(
-						(e) => {},
-						openSnackbar,
 						id,
 						(s) => {
 							console.log('suuubs', s);
 							updateSubsInfo(s);
-							
 						},
 						(e) => {
 							// props.setCost(-data.bid);
@@ -281,8 +279,6 @@ const AddMore2r = (props) => {
 				(e) => {}
 			);
 			getDetails(
-				(s) => {},
-				openSnackbar,
 				id,
 				(details) => {
 					setExtraInfo(details);
@@ -354,8 +350,6 @@ const AddMore2r = (props) => {
 							mode="commerce"
 							onClick={() => {
 								acceptDeal(
-									openPopout,
-									openSnackbar,
 									deal.deal_id,
 									(v) => {
 										props.back();
@@ -377,8 +371,6 @@ const AddMore2r = (props) => {
 							onClick={() => {
 								setHide(true);
 								denyDeal(
-									openPopout,
-									openSnackbar,
 									deal.deal_id,
 									(v) => {
 										props.back();
@@ -536,7 +528,6 @@ const AddMore2r = (props) => {
 	}
 
 	function onEditClick() {
-	
 		setFormData(EDIT_MODE, {
 			mode: true,
 		});
@@ -748,6 +739,7 @@ const AddMore2r = (props) => {
 			<Separator />
 			<Group header={<Header>Автор</Header>}>
 				<Cell
+					asideContent={<Icon24BrowserForward />}
 					onClick={() => props.openUser(author.vk_id)}
 					before={<Avatar size={36} src={author.photo_url} />}
 					description={extra_field ? extra_field : ''}
@@ -768,6 +760,7 @@ const AddMore2r = (props) => {
 					</div>
 				</Cell>
 			</Group>
+			<Given openUser={props.openUser} dealer={dealer} />
 			{isAuthor && isFinished ? <Subs openUser={props.openUser} amount={2} maxAmount={2} mini={true} /> : null}
 
 			{feedback_type == 'comments' ? (
@@ -789,9 +782,7 @@ const AddMore2r = (props) => {
 									mode="danger"
 									disabled={isFinished()}
 									before={<Icon24Delete />}
-									onClick={() => {
-										deleteAd(openPopout, ad_id, openSnackbar, props.refresh);
-									}}
+									onClick={() => deleteAd(ad_id, props.refresh)}
 								>
 									Удалить
 								</CellButton>
@@ -800,35 +791,21 @@ const AddMore2r = (props) => {
 								<CellButton
 									onClick={() => {
 										hidden
-											? adVisible(openPopout, openSnackbar, ad_id, () => {
-													setIsHidden(false);
-											  })
-											: adHide(openPopout, openSnackbar, ad_id, () => {
-													setIsHidden(true);
-											  });
+											? adVisible(ad_id, () => setIsHidden(false))
+											: adHide(ad_id, () => setIsHidden(true));
 									}}
 									disabled={isFinished()}
 									before={hidden ? <Icon24Globe /> : <Icon24Hide />}
 								>
 									{hidden ? 'Сделать видимым' : 'Сделать невидимым'}
 								</CellButton>
-								<CellButton
-									onClick={() => {
-										shareInVK(openSnackbar);
-									}}
-									before={<Icon24ShareExternal />}
-								>
+								<CellButton onClick={shareInVK} before={<Icon24ShareExternal />}>
 									Поделиться
 								</CellButton>
 							</div>
 						</div>
 					) : (
-						<CellButton
-							onClick={() => {
-								shareInVK(openSnackbar);
-							}}
-							before={<Icon24ShareExternal />}
-						>
+						<CellButton onClick={shareInVK} before={<Icon24ShareExternal />}>
 							Поделиться
 						</CellButton>
 					)}
