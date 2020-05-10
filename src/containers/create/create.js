@@ -47,7 +47,7 @@ const getAd = (myUser, inputData, tgeodata) => {
 	const main = getMainInfo(inputData);
 	const item = getItemInfo(inputData);
 	const category = getCategoryInfo(inputData);
-	const ad_id = store.getState().ad ? store.getState().ad.ad_id : 0
+	const ad_id = store.getState().ad ? store.getState().ad.ad_id : 0;
 	return {
 		ad_id,
 		author_id: myUser.id,
@@ -59,8 +59,10 @@ const getAd = (myUser, inputData, tgeodata) => {
 		category: category.category,
 		region: location.country.title,
 		district: location.city.title,
-		long: geodata.long,
-		lat: geodata.lat,
+		geo_position: {
+			long: geodata.long,
+			lat: geodata.lat,
+		},
 	};
 };
 
@@ -96,8 +98,8 @@ const createAd = (myUser, inputData, tgeodata, dispatch) => {
 		photos,
 		(ad) => openAd(ad, dispatch),
 		(ad) => {
-			loadAd(ad, dispatch)
-			console.log("we loaded more")
+			loadAd(ad, dispatch);
+			console.log('we loaded more');
 		},
 		() => {
 			clearForm(dispatch);
