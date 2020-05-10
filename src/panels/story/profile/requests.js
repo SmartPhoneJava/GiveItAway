@@ -12,11 +12,13 @@ import Icon24Add from '@vkontakte/icons/dist/24/add';
 import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
+import { store } from '../../../index';
+import { openPopout, openSnackbar, closePopout } from '../../../store/router/actions';
 
 let request_id = 0;
 
 export async function getUser(setPopout, setSnackbar, user_id, successCallback, failCallback) {
-	setPopout(<ScreenSpinner size="large" />);
+	store.dispatch(openPopout(<ScreenSpinner size="large" />))
 	let err = false;
 	let cancel;
 
@@ -31,15 +33,15 @@ export async function getUser(setPopout, setSnackbar, user_id, successCallback, 
 			return response.data;
 		})
 		.then(function (response) {
-			setPopout(null);
+			store.dispatch(closePopout())
 			successCallback(response);
 			return response;
 		})
 		.catch(function (error) {
 			err = true;
 			failCallback(error);
-			fail('Нет соединения с сервером', null, setSnackbar);
-			setPopout(null);
+			fail('Нет соединения с сервером', null, openSnackbar);
+			store.dispatch(closePopout())
 		});
 	return err;
 }

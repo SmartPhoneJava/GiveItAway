@@ -12,7 +12,7 @@ import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
 import { AD_LOADING } from './const/ads';
 import { SNACKBAR_DURATION_DEFAULT } from './store/const';
 import { store } from '.';
-import { openPopout, closePopout, openSnackbar } from './store/router/actions';
+import { openPopout, closePopout, openSnackbar, closeSnackbar } from './store/router/actions';
 
 let request_id = 0;
 
@@ -103,7 +103,7 @@ export async function getToken(setSnackbar, successCallback, failCallBack) {
 }
 
 export async function adHide(setPopout, setSnackbar, ad_id, callback) {
-	setPopout(<ScreenSpinner size="large" />);
+	store.dispatch(openPopout(<ScreenSpinner size="large" />))
 	let err = false;
 	let cancel;
 
@@ -118,7 +118,7 @@ export async function adHide(setPopout, setSnackbar, ad_id, callback) {
 			return response.data;
 		})
 		.then(function (response) {
-			setPopout(null);
+			store.dispatch(closePopout())
 			success('Объявление скрыто', null, setSnackbar);
 			callback(response);
 			return response;
@@ -127,7 +127,7 @@ export async function adHide(setPopout, setSnackbar, ad_id, callback) {
 			err = true;
 			fail('Нет соединения с сервером', adHide(setPopout, setSnackbar, ad_id, callback), setSnackbar);
 
-			setPopout(null);
+			store.dispatch(closePopout())
 		});
 	return err;
 }
@@ -688,20 +688,22 @@ export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
 
 export function fail(err, repeat, setSnackbar, end) {
 	{
+		let open;
 		console.log('we wanna set snackbar', err);
-		repeat
-			? setSnackbar(
+		if (repeat) {
+			open = () =>
+				openSnackbar(
 					<Snackbar
 						duration={SNACKBAR_DURATION_DEFAULT}
 						onClose={() => {
-							setSnackbar(null);
+							closeSnackbar();
 							if (end) {
 								end();
 							}
 						}}
 						action="Повторить"
 						onActionClick={() => {
-							setSnackbar(null);
+							closeSnackbar();
 							repeat();
 						}}
 						before={
@@ -712,11 +714,13 @@ export function fail(err, repeat, setSnackbar, end) {
 					>
 						Произошла ошибка: {err}
 					</Snackbar>
-			  )
-			: setSnackbar(
+				);
+		} else {
+			open = () =>
+				openSnackbar(
 					<Snackbar
 						duration={SNACKBAR_DURATION_DEFAULT}
-						onClose={() => setSnackbar(null)}
+						onClose={closeSnackbar}
 						before={
 							<Avatar size={24} style={{ background: 'red' }}>
 								<Icon24Cancel fill="#fff" width={14} height={14} />
@@ -725,7 +729,9 @@ export function fail(err, repeat, setSnackbar, end) {
 					>
 						Произошла ошибка: {err}
 					</Snackbar>
-			  );
+				);
+		}
+		store.dispatch(open);
 	}
 }
 
