@@ -248,7 +248,9 @@ const App = (props) => {
 		//....
 		getNotificationCounter(
 			(r) => {
-				console.log('some result happened', r);
+				console.log("r.data.number", r.number)
+				notsCounterrr = r.number
+				setNotsCounterr(r.number)
 			},
 			(e) => {
 				console.log('some error happened', e);

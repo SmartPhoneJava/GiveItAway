@@ -40,12 +40,12 @@ export function success(text, cancelMe, end) {
 		</Snackbar>
 	);
 
-	store.dispatch(setSnackbar(snack));
+	store.dispatch(openSnackbar(snack));
 }
 
 export function sendSnack(text, setSnackbar) {
 	store.dispatch(
-		setSnackbar(
+		openSnackbar(
 			<Snackbar
 				style={{ zIndex: '120' }}
 				duration={SNACKBAR_DURATION_DEFAULT}
@@ -250,11 +250,11 @@ export async function denyDeal(deal_id, successCallback, failCallback, end, text
 	})
 		.then(function (response) {
 			console.log('response from denyDeal:', response);
-			success(dtext, null, end);
 			return response.data;
 		})
 		.then(function (response) {
 			successCallback(response);
+			success(dtext, null, end);
 			store.dispatch(closePopout());
 			return response;
 		})
@@ -273,12 +273,11 @@ export async function denyDeal(deal_id, successCallback, failCallback, end, text
 	return err;
 }
 
-export async function acceptDeal(deal_id, successCallback, failCallback, end) {
-	let err = false;
+export function acceptDeal(deal_id, successCallback, failCallback, end) {
 	let cancel;
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 
-	await axios({
+	axios({
 		method: 'post',
 		withCredentials: true,
 		url: Addr.getState() + BASE_DEAL + deal_id + '/fulfill',
@@ -286,16 +285,16 @@ export async function acceptDeal(deal_id, successCallback, failCallback, end) {
 	})
 		.then(function (response) {
 			console.log('response from acceptDeal:', response);
-			success('Автор благодарит вас за подтверждение!', null, end);
+			
 			return response.data;
 		})
 		.then(function (response) {
 			successCallback(response);
 			store.dispatch(closePopout());
+			success('Автор благодарит вас за подтверждение!', null, end);
 			return response;
 		})
 		.catch(function (error) {
-			err = true;
 			fail(
 				'Нет соединения с сервером',
 				() => {
@@ -306,7 +305,6 @@ export async function acceptDeal(deal_id, successCallback, failCallback, end) {
 			failCallback(error);
 			store.dispatch(closePopout());
 		});
-	return err;
 }
 
 export async function CancelClose(ad_id, successCallback, failCallback, blockSnackbar) {
@@ -595,7 +593,7 @@ export function CreateAd(ad, obj, photos, openAd, loadAd, successcallback) {
 				if (successcallback) {
 					successcallback();
 				}
-				store.dispatch(setSnackbar(snackbar));
+				store.dispatch(openSnackbar(snackbar));
 				getDetails(response.data.ad_id, loadAd);
 			});
 			return response;

@@ -252,7 +252,7 @@ function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackba
 											? 'Автор выбрал пользователя для передачи вещи'
 											: v.status == 'close'
 											? 'Вещь отдана'
-											: 'Объявление закрыто'
+											: 'Выбран получатель вещи'
 									}
 									header={v.payload.ad.header}
 									system={true}

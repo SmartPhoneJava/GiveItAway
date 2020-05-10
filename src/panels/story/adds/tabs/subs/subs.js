@@ -46,7 +46,9 @@ export const Given = (props) => {
 		<Group header={<Header>Получатель</Header>}>
 			<Cell
 				onClick={() => {
-					props.openUser(dealer.vk_id);
+					if (dealer) {
+						props.openUser(dealer.vk_id);
+					}
 				}}
 				multiline={true}
 				key={dealer ? dealer.vk_id : ''}

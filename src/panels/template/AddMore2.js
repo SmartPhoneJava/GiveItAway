@@ -100,7 +100,7 @@ import {
 	STATUS_ABORTED,
 } from '../../const/ads';
 import { shareInVK } from '../../services/VK';
-import { STORY_CREATE } from '../../store/router/storyTypes';
+import { STORY_CREATE, STORY_ADS } from '../../store/router/storyTypes';
 import { EDIT_MODE, CREATE_AD_MAIN, CREATE_AD_ITEM } from '../../store/create_post/types';
 import { setFormData } from '../../store/create_post/actions';
 import { defaultInputData } from '../../const/create';
@@ -352,10 +352,11 @@ const AddMore2r = (props) => {
 								acceptDeal(
 									deal.deal_id,
 									(v) => {
-										props.back();
+										setStory(STORY_ADS);
 									},
-									(e) => {},
-									() => {}
+									(e) => {
+										console.log('acceptDeal err', e);
+									}
 								);
 							}}
 							style
@@ -369,18 +370,15 @@ const AddMore2r = (props) => {
 							size="l"
 							mode="destructive"
 							onClick={() => {
-								setHide(true);
 								denyDeal(
 									deal.deal_id,
 									(v) => {
-										props.back();
+										setStory(STORY_ADS);
 									},
-									(e) => {},
-									() => {
-										setHide(false);
+									(e) => {
+										console.log('denyDeal error', e);
 									}
 								);
-								props.back();
 							}}
 							style={{ marginRight: 8 }}
 							before={<Icon24Cancel />}
