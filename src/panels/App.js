@@ -7,7 +7,6 @@ import {
 	Tabbar,
 	PanelHeaderBack,
 	TabbarItem,
-	PanelHeaderSimple,
 	ScreenSpinner,
 	ConfigProvider,
 } from '@vkontakte/vkui';
@@ -44,7 +43,7 @@ import {
 import * as VK from '../services/VK';
 import { setAppID, setPlatform } from '../store/vk/actions';
 
-import { setDetailedAd, addComment, addSub } from '../store/detailed_ad/actions';
+import { setDetailedAd, addComment, addSub, setStatus } from '../store/detailed_ad/actions';
 
 import CategoriesPanel from './../components/categories/panel';
 import Countries from './../components/location/countries';
@@ -63,13 +62,13 @@ import Icon28Add from '@vkontakte/icons/dist/28/add_outline';
 
 import { VkUser } from '../store/vkUser';
 
-import { handleNotifications, NT_COMMENT, NT_RESPOND } from './story/adds/tabs/notifications/notifications';
+import { handleNotifications, NT_COMMENT, NT_RESPOND, NT_STATUS } from './story/adds/tabs/notifications/notifications';
 
 import AddMore2 from './template/AddMore2';
 
-import { GEO_TYPE_FILTERS, AdDefault } from './../const/ads';
+import { GEO_TYPE_FILTERS, AdDefault, STATUS_OFFER } from './../const/ads';
 
-import { Auth, getToken, fail } from '../requests';
+import { Auth, getToken, fail, getDeal } from '../requests';
 
 import Error from './placeholders/error';
 import NotHere from './placeholders/NotHere';
@@ -85,8 +84,10 @@ import { inputArgs } from '../utils/window';
 import Centrifuge from 'centrifuge';
 import { FORM_CREATE, FORM_ADS } from '../components/categories/redux';
 import { setFormData } from '../store/create_post/actions';
-import { ADS_FILTERS } from '../store/create_post/types';
+import { ADS_FILTERS, EDIT_MODE, CREATE_AD_MAIN, CREATE_AD_ITEM } from '../store/create_post/types';
 import AdsModal from '../containers/ads/modal';
+import { defaultInputData } from '../components/create/default';
+import { updateDealInfo } from '../store/detailed_ad/update';
 
 const adsText = 'Объявления';
 const addText = 'Создать обьявление';
@@ -98,7 +99,7 @@ let centrifuge = new Centrifuge(addr);
 let notsCounterrr = 0;
 
 const App = (props) => {
-	const { colorScheme, myID } = props;
+	const { colorScheme, myUser, myID, inputData, AD } = props;
 	const {
 		activeStory,
 		goBack,
@@ -114,10 +115,12 @@ const App = (props) => {
 		popouts,
 		openPopout,
 		snackbars,
-		AD,
 		addComment,
 		addSub,
+		scrollPosition,
 	} = props;
+
+	const needEdit = inputData[EDIT_MODE] ? inputData[EDIT_MODE].mode : false;
 
 	const adPopout = popouts[STORY_ADS];
 	const createPopout = popouts[STORY_CREATE];
@@ -134,19 +137,32 @@ const App = (props) => {
 
 	const historyLen = panelsHistory ? (panelsHistory[STORY_ADS] ? panelsHistory[STORY_ADS].length : 0) : 0;
 
-	console.log('historyLen historyLen', historyLen, panelsHistory[STORY_ADS]);
 	function dropFilters() {
 		setFormData(ADS_FILTERS, null);
 	}
+
+	useEffect(() => {
+		window.scroll(0, scrollPosition[scrollPosition.length - 1]);
+	}, [scrollPosition]);
 
 	const onStoryChange = (e) => {
 		const isProfile = e.currentTarget.dataset.text == profileText;
 		const story = e.currentTarget.dataset.story;
 		if (story == STORY_CREATE) {
 			setStory(story);
+			setFormData(EDIT_MODE, null);
+			setFormData(FORM_LOCATION_CREATE, {
+				...inputData[FORM_LOCATION_CREATE],
+				country: myUser.country,
+				city: myUser.city,
+			});
+			setFormData(FORM_CREATE, null);
+			setFormData(CREATE_AD_MAIN, { ...defaultInputData });
+			setFormData(CREATE_AD_ITEM, { ...defaultInputData });
 		} else {
 			setStory(story, isProfile ? PANEL_USER : null);
 		}
+
 		addProfile(myID);
 		if (e.currentTarget.dataset.story == STORY_ADS) {
 			if (isProfile) {
@@ -175,13 +191,24 @@ const App = (props) => {
 
 		centrifuge.subscribe('user#' + id, (note) => {
 			notsCounterrr++;
+			console.log('note.data ', note);
 			setNotsCounterr(notsCounterrr);
 			const noteType = note.data.notification_type;
-			const noteValue = note.data.payload.author;
-			console.log('look noties', noteType, noteValue, note);
-			switch (noteType) {
-				case NT_RESPOND: {
-					addSub(noteValue);
+			const noteAdId = note.data.payload.ad.ad_id;
+
+			if (AD.ad_id == noteAdId) {
+				switch (noteType) {
+					case NT_RESPOND: {
+						const noteValue = note.data.payload.author;
+						addSub(noteValue);
+					}
+					case NT_STATUS: {
+						const noteValue = note.data.payload.ad.status;
+						setStatus(noteValue);
+						if (noteValue == STATUS_OFFER) {
+							updateDealInfo()
+						}
+					}
 				}
 			}
 
@@ -372,9 +399,9 @@ const App = (props) => {
 						{snackbars[PANEL_ADS]}
 					</Panel>
 					<Panel id={PANEL_ONE}>
-						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
+						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
 							{choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошбка'}
-						</PanelHeaderSimple>
+						</PanelHeader>
 						{choosen ? (
 							<AddMore2
 								refresh={(id) => {
@@ -393,42 +420,38 @@ const App = (props) => {
 						{snackbars[PANEL_ONE]}
 					</Panel>
 					<Panel id={PANEL_USER}>
-						<PanelHeaderSimple left={historyLen <= 1 ? null : <PanelHeaderBack onClick={goBack} />}>
+						<PanelHeader left={historyLen <= 1 ? null : <PanelHeaderBack onClick={goBack} />}>
 							<p className="panel-header"> {profileName} </p>
-						</PanelHeaderSimple>
+						</PanelHeader>
 						<Profile setProfileName={setProfileName} setSnackbar={openSnackbar} openAd={setReduxAd} />
 						{snackbars[PANEL_USER]}
 					</Panel>
 					<Panel id={PANEL_COMMENTS}>
-						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
+						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
 							{choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошбка'}
-						</PanelHeaderSimple>
+						</PanelHeader>
 						{choosen ? <Comments amount={5} maxAmount={-1} openUser={setProfile} /> : Error}
 						{snackbars[PANEL_COMMENTS]}
 					</Panel>
 					<Panel id={PANEL_SUBS}>
-						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
+						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
 							{choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошбка'}
-						</PanelHeaderSimple>
+						</PanelHeader>
 						{choosen ? <Subs openUser={setProfile} amount={5} maxAmount={-1} /> : Error}
 						{snackbars[PANEL_SUBS]}
 					</Panel>
 					<Panel id={PANEL_CATEGORIES}>
-						<PanelHeaderSimple left={<PanelHeaderBack onClick={backToAdsFilters} />}>
+						<PanelHeader left={<PanelHeaderBack onClick={backToAdsFilters} />}>
 							Выберите категорию
-						</PanelHeaderSimple>
+						</PanelHeader>
 						<CategoriesPanel goBack={backToAdsFilters} redux_form={ADS_FILTERS} />
 					</Panel>
 					<Panel id={PANEL_COUNTRIES}>
-						<PanelHeaderSimple left={<PanelHeaderBack onClick={backToGeoFilters} />}>
-							Выберите страну
-						</PanelHeaderSimple>
+						<PanelHeader left={<PanelHeaderBack onClick={backToGeoFilters} />}>Выберите страну</PanelHeader>
 						<Countries goBack={backToGeoFilters} redux_form={ADS_FILTERS} />
 					</Panel>
 					<Panel id={PANEL_CITIES}>
-						<PanelHeaderSimple left={<PanelHeaderBack onClick={backToGeoFilters} />}>
-							Выберите город
-						</PanelHeaderSimple>
+						<PanelHeader left={<PanelHeaderBack onClick={backToGeoFilters} />}>Выберите город</PanelHeader>
 						<Cities goBack={backToGeoFilters} redux_form={ADS_FILTERS} />
 					</Panel>
 				</View>
@@ -441,26 +464,23 @@ const App = (props) => {
 					history={createPanels}
 				>
 					<Panel id={PANEL_CREATE}>
-						<PanelHeader>{addText}</PanelHeader>
+						<PanelHeader left={historyLen <= 1 ? null : <PanelHeaderBack onClick={goBack} />}>
+							{needEdit ? 'Редактировать' : addText}
+						</PanelHeader>
+
 						<Create />
 						{snackbars[PANEL_CREATE]}
 					</Panel>
 					<Panel id={PANEL_CATEGORIES}>
-						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
-							Выберите категорию
-						</PanelHeaderSimple>
+						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>Выберите категорию</PanelHeader>
 						<CategoriesPanel redux_form={FORM_CREATE} goBack={goBack} />
 					</Panel>
 					<Panel id={PANEL_COUNTRIES}>
-						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
-							Выберите страну
-						</PanelHeaderSimple>
+						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>Выберите страну</PanelHeader>
 						<Countries redux_form={FORM_LOCATION_CREATE} goBack={goBack} />
 					</Panel>
 					<Panel id={PANEL_CITIES}>
-						<PanelHeaderSimple left={<PanelHeaderBack onClick={goBack} />}>
-							Выберите город
-						</PanelHeaderSimple>
+						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>Выберите город</PanelHeader>
 						<Cities redux_form={FORM_LOCATION_CREATE} goBack={goBack} />
 					</Panel>
 				</View>
@@ -481,13 +501,14 @@ const mapStateToProps = (state) => {
 
 		profileHistory: state.router.profileHistory,
 		activeProfile: state.router.activeProfile,
-		activePanels: state.router.activePanels,
 		snackbars: state.router.snackbars,
+		inputData: state.formData.forms,
 
 		AD: state.ad,
 
 		colorScheme: state.vkui.colorScheme,
 		myID: state.vkui.myID,
+		myUser: state.vkui.myUser,
 	};
 };
 

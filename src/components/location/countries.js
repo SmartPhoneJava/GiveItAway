@@ -10,7 +10,6 @@ let request_id = 0;
 
 const Countries = (props) => {
 	const [countries, setCountries] = useState([NoRegion]);
-	console.log('reddddd +', props.redux_form);
 
 	const { accessToken, apiVersion, openSnackbar } = props;
 	useEffect(() => {
@@ -22,11 +21,9 @@ const Countries = (props) => {
 				params: { v: apiVersion, access_token: accessToken },
 			})
 			.then(response => {
-				console.log('sucess VKWebAppCallAPIMethod', response.response.items);
 				return response.response.items;
 			})
 			.then((ctrs) => {
-				console.log('seeeet:', ctrs);
 				setCountries([NoRegion, ...ctrs]);
 				return ctrs;
 			})
@@ -38,7 +35,6 @@ const Countries = (props) => {
 
 		request_id++;
 	}, []);
-	console.log('ctrsctrs:', countries);
 	return (
 		<FormPanel
 			redux_form={props.redux_form}
@@ -46,11 +42,9 @@ const Countries = (props) => {
 			goBack={props.goBack}
 			field={'country'}
 			getText={(v) => {
-				console.log('ahahaha', v);
 				return v.title;
 			}}
 			filterFunc={(v) => {
-				console.log('ahahaha', v);
 				return v.title;
 			}}
 			none_value={NoRegion}

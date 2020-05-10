@@ -9,7 +9,7 @@ import {
 	PanelHeaderButton,
 	Placeholder,
 	Button,
-	osname,
+	usePlatform,
 	IOS,
 	Avatar,
 	Link,
@@ -17,17 +17,9 @@ import {
 
 import { connect } from 'react-redux';
 
-import { setPage, openPopout, openSnackbar, closeSnackbar } from './../../../../../store/router/actions';
+import { setPage, openPopout, openSnackbar, closeSnackbar, closePopout } from './../../../../../store/router/actions';
 
 import useCommentsGet from './useCommentsGet';
-
-import Man from './../../../../../img/man.jpeg';
-import Cat from './../../../../../img/cat.jpg';
-import Kitten from './../../../../../img/kitten.jpeg';
-import Jins from './../../../../../img/jins.jpg';
-import Tea from './../../../../../img/tea.jpg';
-import Playstein from './../../../../../img/playstein.jpg';
-import Bb from './../../../../../img/bb.jpg';
 
 import Icon56WriteOutline from '@vkontakte/icons/dist/56/write_outline';
 
@@ -42,133 +34,11 @@ import { SNACKBAR_DURATION_DEFAULT } from '../../../../../store/const';
 import { PANEL_COMMENTS } from '../../../../../store/router/panelTypes';
 import { deleteCommentByID } from '../../../../../store/detailed_ad/actions';
 
-const arr = [
-	{
-		comment_id: 1,
-		creation_date_time: '01.02.2006 15:04',
-		author: {
-			vk_id: 23232,
-			carma: 0,
-			name: 'Семен',
-			surname: 'Ефимов',
-			photo_url: Man,
-		},
-		text: 'будет ли здесь какой то текст?',
-	},
-	{
-		comment_id: 1,
-		creation_date_time: '01.02.2006 15:04',
-		author: {
-			vk_id: 23232,
-			carma: 0,
-			name: 'Семен',
-			surname: 'Ефимов',
-			photo_url: Man,
-		},
-		text: 'будет ли здесь какой то текст?',
-	},
-	{
-		comment_id: 1,
-		creation_date_time: '01.02.2006 15:04',
-		author: {
-			vk_id: 23232,
-			carma: 0,
-			name: 'Семен',
-			surname: 'Ефимов',
-			photo_url: Man,
-		},
-		text: 'будет ли здесь какой то текст?',
-	},
-	{
-		comment_id: 1,
-		creation_date_time: '01.02.2006 15:04',
-		author: {
-			vk_id: 23232,
-			carma: 0,
-			name: 'Семен',
-			surname: 'Ефимов',
-			photo_url: Man,
-		},
-		text: 'будет ли здесь какой то текст?',
-	},
-	{
-		comment_id: 1,
-		creation_date_time: '01.02.2006 15:04',
-		author: {
-			vk_id: 23232,
-			carma: 0,
-			name: 'Семен',
-			surname: 'Ефимов',
-			photo_url: Man,
-		},
-		text: 'будет ли здесь какой то текст?',
-	},
-	{
-		comment_id: 1,
-		creation_date_time: '01.02.2006 15:04',
-		author: {
-			vk_id: 23232,
-			carma: 0,
-			name: 'Семен',
-			surname: 'Ефимов',
-			photo_url: Man,
-		},
-		text: 'будет ли здесь какой то текст?',
-	},
-	{
-		comment_id: 1,
-		creation_date_time: '01.02.2006 15:04',
-		author: {
-			vk_id: 23232,
-			carma: 0,
-			name: 'Семен',
-			surname: 'Ефимов',
-			photo_url: Man,
-		},
-		text: 'будет ли здесь какой то текст?',
-	},
-	{
-		comment_id: 1,
-		creation_date_time: '01.02.2006 15:04',
-		author: {
-			vk_id: 23232,
-			carma: 0,
-			name: 'Семен',
-			surname: 'Ефимов',
-			photo_url: Man,
-		},
-		text: 'будет ли здесь какой то текст?',
-	},
-	{
-		comment_id: 1,
-		creation_date_time: '01.02.2006 15:04',
-		author: {
-			vk_id: 23232,
-			carma: 0,
-			name: 'Семен',
-			surname: 'Ефимов',
-			photo_url: Man,
-		},
-		text: 'будет ли здесь какой то текст?',
-	},
-	{
-		comment_id: 1,
-		creation_date_time: '01.02.2006 15:04',
-		author: {
-			vk_id: 23232,
-			carma: 0,
-			name: 'Семен',
-			surname: 'Ефимов',
-			photo_url: Man,
-		},
-		text: 'будет ли здесь какой то текст?',
-	},
-];
-
 const NO_ID = -1;
 
 const CommentsI = (props) => {
-	const { AD, deleteCommentByID, myID, openPopout, openSnackbar, closeSnackbar } = props;
+	const osname = usePlatform();
+	const { AD, deleteCommentByID, myID, openPopout, openSnackbar, closeSnackbar, closePopout } = props;
 
 	const nots = AD.comments || [];
 
@@ -201,6 +71,50 @@ const CommentsI = (props) => {
 		[loading, hasMore]
 	);
 
+	function onEditClick(v) {
+		setText(v.text);
+		setEditableID(v.comment_id);
+	}
+
+	function onDeleteClick(v) {
+		setHide(true);
+		deleteComment(
+			openPopout,
+			openPopout,
+			v,
+			(vv) => {
+				deleteCommentByID(v.comment_id);
+			},
+			(e) => {},
+			() => {
+				setHide(false);
+			}
+		);
+	}
+
+	function onUserClick(v) {
+		if (v.author.vk_id != myID) {
+			props.openUser(v.author.vk_id);
+			return;
+		}
+
+		openPopout(
+			<ActionSheet onClose={closePopout}>
+				<ActionSheetItem autoclose onClick={() => onEditClick(v)}>
+					Редактировать
+				</ActionSheetItem>
+				<ActionSheetItem autoclose mode="destructive" onClick={() => onDeleteClick(v)}>
+					Удалить
+				</ActionSheetItem>
+				{osname === IOS && (
+					<ActionSheetItem autoclose mode="cancel">
+						Отменить
+					</ActionSheetItem>
+				)}
+			</ActionSheet>
+		);
+	}
+
 	function showComments() {
 		if (nots.length == 0) {
 			return;
@@ -222,57 +136,7 @@ const CommentsI = (props) => {
 					<Comment onClick={openCommentaries} v={nots[0]} />
 				) : (
 					nots.map((v, index) => {
-						let inner = (
-							<Comment
-								onClick={() => {
-									if (v.author.vk_id != myID) {
-										props.openUser(v.author.vk_id);
-										return;
-									}
-
-									setPopout(
-										<ActionSheet onClose={() => setPopout(null)}>
-											<ActionSheetItem
-												autoclose
-												onClick={() => {
-													setText(v.text);
-													setEditableID(v.comment_id);
-												}}
-											>
-												Редактировать
-											</ActionSheetItem>
-											<ActionSheetItem
-												autoclose
-												mode="destructive"
-												onClick={() => {
-													setHide(true);
-													deleteComment(
-														openPopout,
-														openPopout,
-														v,
-														(vv) => {
-															deleteCommentByID(v.comment_id);
-														},
-														(e) => {},
-														() => {
-															setHide(false);
-														}
-													);
-												}}
-											>
-												Удалить
-											</ActionSheetItem>
-											{osname === IOS && (
-												<ActionSheetItem autoclose mode="cancel">
-													Отменить
-												</ActionSheetItem>
-											)}
-										</ActionSheet>
-									);
-								}}
-								v={v}
-							/>
-						);
+						let inner = <Comment onClick={() => onUserClick(v)} v={v} />;
 
 						if (nots.length === index + 1) {
 							return (
@@ -412,6 +276,7 @@ const mapDispatchToProps = {
 	openPopout,
 	openSnackbar,
 	closeSnackbar,
+	closePopout,
 };
 
 const Comments = connect(mapStateToProps, mapDispatchToProps)(CommentsI);

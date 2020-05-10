@@ -15,6 +15,8 @@ import Location from '../../../../components/location/label';
 import { canWritePrivateMessage } from '../../../../requests';
 import { FORM_LOCATION_CREATE } from '../../../../components/location/redux';
 import { SNACKBAR_DURATION_DEFAULT } from '../../../../store/const';
+import { EDIT_MODE, CREATE_AD_ITEM } from '../../../../store/create_post/types';
+import { FORM_CREATE } from '../../../../components/categories/redux';
 
 const CreateAddRedux = (props) => {
 	const {
@@ -26,7 +28,10 @@ const CreateAddRedux = (props) => {
 		apiVersion,
 		setFormData,
 		setPage,
+		clearForm,
 		snackbar,
+		inputData,
+		AD,
 	} = props;
 
 	const [pmOpen, setPmOpen] = useState(true);
@@ -43,19 +48,6 @@ const CreateAddRedux = (props) => {
 			},
 			(e) => {}
 		);
-
-		let stop = false;
-		if (props.inputData[FORM_LOCATION_CREATE]) {
-			stop = props.inputData[FORM_LOCATION_CREATE].stopMe;
-		}
-		if (!stop) {
-			setFormData(FORM_LOCATION_CREATE, {
-				...props.inputData[FORM_LOCATION_CREATE],
-				country: myUser.country,
-				city: myUser.city,
-				stopMe: true,
-			});
-		}
 		return () => (cleanupFunction = true);
 	}, []);
 
@@ -67,13 +59,14 @@ const CreateAddRedux = (props) => {
 	});
 
 	const [valid, setValid] = useState(false);
+	const needEdit = inputData[EDIT_MODE] ? inputData[EDIT_MODE].mode : false;
 
 	useEffect(() => {
-		const { v, header, text } = props.isValid(props.inputData);
+		const { v, header, text } = props.isValid(inputData);
 		setValid(v);
 		setErrorHeader(header);
 		setErrorText(text);
-	}, [props.inputData]);
+	}, [inputData]);
 
 	useEffect(() => {
 		let cleanupFunction = false;
@@ -108,8 +101,14 @@ const CreateAddRedux = (props) => {
 
 	function createAd() {
 		if (valid) {
-			openPopout(<ScreenSpinner size="large" />);
-			props.createAd(myUser, props.inputData, geodata);
+			props.createAd(myUser, inputData, geodata);
+		} else {
+			saveCancel();
+		}
+	}
+	function editAd() {
+		if (valid) {
+			props.editAd(myUser, inputData, geodata);
 		} else {
 			saveCancel();
 		}
@@ -126,7 +125,7 @@ const CreateAddRedux = (props) => {
 				/>
 			</Group>
 
-			<Group separator="hide" header={<Header>Мое местоположение</Header>}>
+			<Group separator="hide" header={<Header>Местоположение объявления</Header>}>
 				<Location
 					redux_form={FORM_LOCATION_CREATE}
 					openCountries={() => {
@@ -135,7 +134,7 @@ const CreateAddRedux = (props) => {
 					openCities={() => {
 						setPage(PANEL_CITIES);
 					}}
-					useMine={true}
+					// useMine={true}
 				/>
 			</Group>
 
@@ -151,9 +150,15 @@ const CreateAddRedux = (props) => {
 				</div>
 			)}
 			<Div style={{ display: 'flex' }}>
-				<Button onClick={createAd} mode={valid ? 'commerce' : 'secondary'} size="l" stretched>
-					Добавить
-				</Button>
+				{needEdit ? (
+					<Button onClick={editAd} mode={valid ? 'commerce' : 'secondary'} size="l" stretched>
+						Сохранить
+					</Button>
+				) : (
+					<Button onClick={createAd} mode={valid ? 'commerce' : 'secondary'} size="l" stretched>
+						Добавить
+					</Button>
+				)}
 			</Div>
 			{snackbar}
 		</div>

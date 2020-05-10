@@ -61,7 +61,6 @@ import {
 	deleteAd,
 	getSubscribers,
 	getDetails,
-	getDeal,
 	acceptDeal,
 	denyDeal,
 	getCost,
@@ -74,7 +73,7 @@ import './styles.css';
 import Comments from './../story/adds/tabs/comments/comments';
 
 import { time } from './../../utils/time';
-import { setDummy, openModal, setPage, setAd, openSnackbar, openPopout } from '../../store/router/actions';
+import { setDummy, openModal, setPage, setAd, openSnackbar, openPopout, setStory } from '../../store/router/actions';
 import { PANEL_IMAGE, PANEL_COMMENTS, PANEL_SUBS } from './../../store/router/panelTypes';
 import { MODAL_ADS_COST, MODAL_ADS_FROZEN } from '../../store/router/modalTypes';
 import {
@@ -101,6 +100,14 @@ import {
 	STATUS_ABORTED,
 } from '../../const/ads';
 import { shareInVK } from '../../services/VK';
+import { STORY_CREATE } from '../../store/router/storyTypes';
+import { EDIT_MODE, CREATE_AD_MAIN, CREATE_AD_ITEM } from '../../store/create_post/types';
+import { setFormData } from '../../store/create_post/actions';
+import { defaultInputData } from '../../const/create';
+import { FORM_CREATE } from '../../components/categories/redux';
+import { FORM_LOCATION_CREATE } from '../../components/location/redux';
+import { smoothScrollToTop } from '../../services/_functions';
+import { updateDealInfo } from '../../store/detailed_ad/update';
 
 const AddMore2r = (props) => {
 	const { myID, dispatch } = props;
@@ -116,9 +123,10 @@ const AddMore2r = (props) => {
 		setExtraInfo,
 		openSnackbar,
 		openPopout,
+		setStory,
+		setFormData,
 	} = props;
 	const { setPage, openModal, setDummy, AD } = props;
-	console.log('ADDDDDDDD', AD);
 	const {
 		isDealer,
 		isAuthor,
@@ -214,9 +222,7 @@ const AddMore2r = (props) => {
 			return;
 		}
 		if (isSubs) {
-			// props.setCost(cost);
 			if (backUser) {
-				console.log('backUser valid treu', cost);
 				let b = backUser;
 				b.frozen_carma += c;
 				setBackUser(b);
@@ -224,9 +230,7 @@ const AddMore2r = (props) => {
 			}
 			setCost(c + 1);
 		} else {
-			// props.setCost(-(cost - 1));
 			if (backUser) {
-				console.log('backUser valid fale', cost);
 				let b = backUser;
 				b.frozen_carma -= c - 1;
 				setBackUser(b);
@@ -234,7 +238,6 @@ const AddMore2r = (props) => {
 			}
 			setCost(c - 1);
 		}
-		console.log('isSubscriber', isSubs);
 		setIsSub(isSubs);
 	}
 
@@ -245,6 +248,7 @@ const AddMore2r = (props) => {
 		// }
 		const init = () => (dispatch) => {
 			const id = AD.ad_id;
+			updateDealInfo()
 			getCost(
 				ad_id,
 				(data) => {
@@ -256,23 +260,7 @@ const AddMore2r = (props) => {
 						(s) => {
 							console.log('suuubs', s);
 							updateSubsInfo(s);
-							if (status != STATUS_OFFER) {
-								console.log('new status', status);
-								getDeal(
-									openSnackbar,
-									ad_id,
-									(d) => {
-										console.log('get deal', d);
-										updateDealInfo(s, d);
-									},
-									(e) => {}
-								);
-							}
-							// if (is) {
-							// 	props.setCost(-data.bid);
-							// } else {
-							// 	props.setCost(data.bid - 1);
-							// }
+							
 						},
 						(e) => {
 							// props.setCost(-data.bid);
@@ -299,13 +287,8 @@ const AddMore2r = (props) => {
 				openSnackbar,
 				id,
 				(details) => {
-					console.log('looooook', details);
-					// setDetailedAd(details);
 					setExtraInfo(details);
 					setIsAuthor(details.author.vk_id == myID);
-					// dispatch(setIsHidden(false));
-
-					// saveInstance = details;
 				},
 				(e) => {}
 			);
@@ -330,15 +313,6 @@ const AddMore2r = (props) => {
 				{block}
 			</div>
 		);
-	}
-
-	function updateDealInfo(s, d) {
-		setDeal(d);
-		setIsDealer(d.subscriber_id == myID);
-		const subDeal = s.filter((v) => v.vk_id == d.subscriber_id);
-		const newDealer = subDeal.length > 0 ? subDeal[0] : null;
-		console.log('really he is dealer', newDealer, subDeal, s);
-		setDealer(newDealer);
 	}
 
 	function showClosed() {
@@ -561,6 +535,28 @@ const AddMore2r = (props) => {
 				<ScreenSpinner size="large" />
 			</Placeholder>
 		);
+	}
+
+	function onEditClick() {
+	
+		setFormData(EDIT_MODE, {
+			mode: true,
+		});
+
+		setFormData(FORM_LOCATION_CREATE, {
+			country: { id: 1, title: AD.region },
+			city: { id: 1, title: AD.district },
+		});
+		setFormData(CREATE_AD_ITEM, {
+			name: AD.header,
+			description: AD.text,
+			photosUrl: AD.pathes_to_photo,
+		});
+		setFormData(FORM_CREATE, {
+			category: AD.category,
+		});
+
+		setStory(STORY_CREATE, null, true);
 	}
 
 	// console.log("details info", isDealer, status, status == 'aborted' || isAuthor() ? (
@@ -787,10 +783,8 @@ const AddMore2r = (props) => {
 				<div style={{ display: 'block', alignItems: 'center' }}>
 					{isAuthor ? (
 						<div style={{ display: 'block' }}>
-							
-
 							<div style={{ display: 'flex' }}>
-								<CellButton disabled={isFinished()} before={<Icon24Write />} onClick={() => {}}>
+								<CellButton disabled={isFinished()} before={<Icon24Write />} onClick={onEditClick}>
 									Редактировать
 								</CellButton>
 								<CellButton
@@ -866,7 +860,6 @@ const mapDispatchToProps = (dispatch) => {
 				deleteAd,
 				getSubscribers,
 				getDetails,
-				getDeal,
 				acceptDeal,
 				denyDeal,
 				getCost,
@@ -881,6 +874,9 @@ const mapDispatchToProps = (dispatch) => {
 				setIsHidden,
 				setIsAuthor,
 				setExtraInfo,
+
+				setStory,
+				setFormData,
 
 				openPopout,
 				openSnackbar,

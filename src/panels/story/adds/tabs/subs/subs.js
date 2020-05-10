@@ -8,7 +8,7 @@ import {
 	UsersStack,
 	Placeholder,
 	Button,
-	osname,
+	usePlatform,
 	IOS,
 	Avatar,
 	CellButton,
@@ -39,7 +39,8 @@ import { PANEL_SUBS } from '../../../../../store/router/panelTypes';
 import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED } from '../../../../../const/ads';
 
 const Subs = (props) => {
-	const { openPopout, closePopout, setDealer, openUser, setPage, AD } = props;
+	const osname = usePlatform();
+	const { openPopout, openSnackbar, closePopout, setDealer, openUser, setPage, AD } = props;
 	const { dealer, subs, ad_id } = AD;
 	const status = AD.status || STATUS_OFFER;
 
@@ -97,6 +98,9 @@ const Subs = (props) => {
 	const given = (
 		<Group header={<Header>Получатель</Header>}>
 			<Cell
+				onClick={() => {
+					cancel_ad(dealer, false);
+				}}
 				multiline={true}
 				description={dealer ? <>Ждём подтверждение получения вещи</> : ''}
 				key={dealer ? dealer.vk_id : ''}
@@ -167,6 +171,7 @@ const Subs = (props) => {
 			openSnackbar,
 			ad_id,
 			(data) => {
+				console.log('we are stopping', need_close);
 				if (need_close) {
 					close_ad(subscriber);
 				} else {
@@ -193,9 +198,7 @@ const Subs = (props) => {
 				openSnackbar,
 				ad_id,
 				(data) => {
-					console.log('deal success', data);
 					const d = s.filter((v) => v.vk_id == data.subscriber_id)[0];
-					console.log('dealer success', dealer, data.subscriber_id);
 					setDealer(d);
 				},
 				(err) => {
@@ -239,6 +242,7 @@ const Subs = (props) => {
 		<Group header={<Header aside={<Link onClick={openSubs}>Показать всех</Link>}>Откликнулись</Header>}>
 			{subs.length == 1 ? (
 				<Cell
+					onClick={openSubs}
 					multiline={true}
 					key={subs[0].vk_id}
 					before={<Avatar size={36} src={subs[0].photo_url} />}
@@ -326,6 +330,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
 	openPopout,
+	openSnackbar,
 	closePopout,
 	setDealer,
 	setPage,

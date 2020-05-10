@@ -19,7 +19,7 @@ import 'react-photoswipe/lib/photoswipe.css';
 import { PhotoSwipe, PhotoSwipeGallery } from 'react-photoswipe';
 
 import { setFormData } from './../../../../store/create_post/actions';
-import { CREATE_AD_ITEM } from './../../../../store/create_post/types';
+import { CREATE_AD_ITEM, EDIT_MODE } from './../../../../store/create_post/types';
 
 import CategoriesLabel from './../../../../components/categories/label';
 import { FORM_CREATE } from './../../../../components/categories/redux';
@@ -35,26 +35,30 @@ import { connect } from 'react-redux';
 import { SNACKBAR_DURATION_DEFAULT } from '../../../../store/const';
 import { loadPhotos, MAX_FILE_SIZE } from '../../../../services/file';
 
+import { PHOTO_TEXT } from '../../../../const/create';
+
 import './createItem.css';
 
 const nameLabel = 'Название';
 const descriptionLabel = 'Описание';
 
-const PHOTO_TEXT = 'Не более трех фотографий (jpeg, png) размером 4мб';
-
 const CreateItem = (props) => {
-	const [inputData, setInputData] = useState(props.inputData[CREATE_AD_ITEM] || props.defaultInputData);
+	const { AD, defaultInputData, setFormData } = props;
+	const inputData = props.inputData[CREATE_AD_ITEM] || defaultInputData;
 
+	// const [inputData, setInputData] = useState(props.inputData[CREATE_AD_ITEM] || props.defaultInputData);
+	const needEdit = props.inputData[EDIT_MODE] ? props.inputData[EDIT_MODE].mode : false;
+	console.log('inputData inputData', needEdit, inputData);
 	const handleInput = (e) => {
 		let value = e.currentTarget.value;
-		props.setFormData(CREATE_AD_ITEM, {
+		setFormData(CREATE_AD_ITEM, {
 			...inputData,
 			[e.currentTarget.name]: value,
 		});
-		setInputData({
-			...inputData,
-			[e.currentTarget.name]: value,
-		});
+		// setInputData({
+		// 	...inputData,
+		// 	[e.currentTarget.name]: value,
+		// });
 	};
 
 	const [isOpen, setIsOpen] = useState(false);
@@ -118,22 +122,22 @@ const CreateItem = (props) => {
 			handleWrongType,
 			(value) => {
 				const photosUrl = [...inputData.photosUrl, value];
-				setInputData({
-					...inputData,
-					photosUrl,
-				});
-				props.setFormData(CREATE_AD_ITEM, {
+				// setInputData({
+				// 	...inputData,
+				// 	photosUrl,
+				// });
+				setFormData(CREATE_AD_ITEM, {
 					...inputData,
 					photosUrl,
 				});
 			},
 			() => {
 				const photoText = PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length + 1) + '/3';
-				setInputData({
-					...inputData,
-					photoText,
-				});
-				props.setFormData(CREATE_AD_ITEM, {
+				// setInputData({
+				// 	...inputData,
+				// 	photoText,
+				// });
+				setFormData(CREATE_AD_ITEM, {
 					...inputData,
 					photoText,
 				});
@@ -144,20 +148,17 @@ const CreateItem = (props) => {
 	function deletePhoto(i) {
 		const photoText = PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length - 1) + '/3';
 		const photosUrl = [...inputData.photosUrl.slice(0, i), ...inputData.photosUrl.slice(i + 1)];
-		setInputData({
+		// setInputData({
+		// 	...inputData,
+		// 	photoText,
+		// });
+		// setInputData({
+		// 	...inputData,
+		// 	photosUrl,
+		// });
+		setFormData(CREATE_AD_ITEM, {
 			...inputData,
 			photoText,
-		});
-		setInputData({
-			...inputData,
-			photosUrl,
-		});
-		props.setFormData(CREATE_AD_ITEM, {
-			...inputData,
-			photoText,
-		});
-		props.setFormData(CREATE_AD_ITEM, {
-			...inputData,
 			photosUrl,
 		});
 	}
@@ -172,29 +173,36 @@ const CreateItem = (props) => {
 		// }
 	}
 
-	const photoSwipeImgs = inputData.photosUrl.map((v) => {
-		let img = new Image();
-		img.src = v.src;
-		let width = img.width;
-		let hight = img.height;
-		return {
-			src: v.src,
-			msrc: v.src,
-			w: width,
-			h: hight,
-			thumbnail: v.src,
-		};
-	});
+	const photoSwipeImgs = inputData.photosUrl
+		? inputData.photosUrl.map((v) => {
+				let img = new Image();
+				const src = v.src ? v.src : v.PhotoUrl;
+				img.src = v.src;
+				let width = img.width;
+				let hight = img.height;
+				return {
+					src: v.src,
+					msrc: v.src,
+					w: width,
+					h: hight,
+					thumbnail: v.src,
+				};
+		  })
+		: [];
 
 	return (
 		<>
-			<PhotoSwipe
-				style={{ marginTop: '50px' }}
-				isOpen={isOpen}
-				items={photoSwipeImgs}
-				options={options}
-				onClose={handleClose}
-			/>
+			{!needEdit ? (
+				<PhotoSwipe
+					style={{ marginTop: '50px' }}
+					isOpen={isOpen}
+					items={photoSwipeImgs}
+					options={options}
+					onClose={handleClose}
+				/>
+			) : (
+				''
+			)}
 			<CardGrid>
 				<Card size="l">
 					<div
@@ -242,29 +250,38 @@ const CreateItem = (props) => {
 						textAlign: 'center',
 					}}
 				>
-					{inputData.photosUrl.length > 0 ? (
+					{inputData.photosUrl && inputData.photosUrl.length > 0 ? (
 						<>
-							<File
-								before={<Icon24Camera />}
-								disabled={inputData.photosUrl.length == 3}
-								mode={inputData.photosUrl.length == 3 ? 'secondary' : 'primary'}
-								onChange={loadPhoto}
-							>
-								Загрузить
-							</File>
-							<InfoRow
-								style={{
-									color: 'var(--text_secondary)',
-									marginTop: '6px',
-									paddingLeft: '6px',
-									paddingRight: '6px',
-								}}
-							>
-								{inputData.photoText}
-							</InfoRow>
+							{needEdit ? null : (
+								<>
+									<File
+										before={<Icon24Camera />}
+										disabled={inputData.photosUrl.length == 3}
+										mode={inputData.photosUrl.length == 3 ? 'secondary' : 'primary'}
+										onChange={loadPhoto}
+									>
+										Загрузить
+									</File>
+									<InfoRow
+										style={{
+											color: 'var(--text_secondary)',
+											marginTop: '6px',
+											paddingLeft: '6px',
+											paddingRight: '6px',
+										}}
+									>
+										{inputData.photoText}
+									</InfoRow>
+								</>
+							)}
+
 							<HorizontalScroll>
 								<div style={{ display: 'flex', marginLeft: '10px', marginRight: '10px' }}>
 									{inputData.photosUrl.map((img, i) => {
+										if (needEdit) {
+											img.src = img.PhotoUrl;
+											img.id = img.AdPhotoId;
+										}
 										return (
 											<div key={img.id} style={{ padding: '4px' }}>
 												<div className="create-photo-panel">
@@ -273,9 +290,14 @@ const CreateItem = (props) => {
 														src={img.src}
 														className="create-photo"
 													/>
-													<div onClick={() => deletePhoto(i)} className="create-photo-delete">
-														<Icon24Cancel />
-													</div>
+													{needEdit ? null : (
+														<div
+															onClick={() => deletePhoto(i)}
+															className="create-photo-delete"
+														>
+															<Icon24Cancel />
+														</div>
+													)}
 												</div>
 											</div>
 										);
@@ -290,8 +312,10 @@ const CreateItem = (props) => {
 							action={
 								<File
 									top="Снимки вещей"
-									disabled={inputData.photosUrl.length == 3}
-									mode={inputData.photosUrl.length == 3 ? 'secondary' : 'primary'}
+									disabled={inputData.photosUrl && inputData.photosUrl.length == 3}
+									mode={
+										inputData.photosUrl && inputData.photosUrl.length == 3 ? 'secondary' : 'primary'
+									}
 									onChange={loadPhoto}
 								>
 									Загрузить
@@ -311,6 +335,8 @@ const mapStateToProps = (state) => {
 	return {
 		platform: state.vkui.platform,
 		inputData: state.formData.forms,
+
+		AD: state.ad,
 	};
 };
 

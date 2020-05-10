@@ -45,7 +45,6 @@ const FormPanel = (props) => {
 		if (props.clear) {
 			props.setFormData(redux_form, {
 				...defaultInputData,
-				stopMe: true,
 				[field]: cat,
 			});
 		} else {

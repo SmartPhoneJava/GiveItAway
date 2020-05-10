@@ -11,8 +11,71 @@ import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
 import { AD_LOADING } from './const/ads';
 import { SNACKBAR_DURATION_DEFAULT } from './store/const';
+import { store } from '.';
+import { openPopout, closePopout, openSnackbar } from './store/router/actions';
 
 let request_id = 0;
+
+export function success(text, cancelMe, setSnackbar, end) {
+	setSnackbar(
+		cancelMe ? (
+			<Snackbar
+				duration={SNACKBAR_DURATION_DEFAULT}
+				onClose={() => {
+					setSnackbar(null);
+					if (end) {
+						end();
+					}
+				}}
+				action="Отменить"
+				onActionClick={cancelMe}
+				before={
+					<Avatar size={24} style={{ background: 'green' }}>
+						<Icon24DoneOutline fill="#fff" width={14} height={14} />
+					</Avatar>
+				}
+			>
+				{text}
+			</Snackbar>
+		) : (
+			<Snackbar
+				duration={SNACKBAR_DURATION_DEFAULT}
+				onClose={() => {
+					setSnackbar(null);
+					if (end) {
+						end();
+					}
+				}}
+				before={
+					<Avatar size={24} style={{ background: 'green' }}>
+						<Icon24DoneOutline fill="#fff" width={14} height={14} />
+					</Avatar>
+				}
+			>
+				{text}
+			</Snackbar>
+		)
+	);
+}
+
+export function sendSnack(text, setSnackbar) {
+	setSnackbar(
+		<Snackbar
+			style={{ zIndex: '120' }}
+			duration={SNACKBAR_DURATION_DEFAULT}
+			onClose={() => {
+				setSnackbar(null);
+			}}
+			before={
+				<Avatar size={24} style={{ background: 'green' }}>
+					<Icon24DoneOutline fill="#fff" width={14} height={14} />
+				</Avatar>
+			}
+		>
+			{text}
+		</Snackbar>
+	);
+}
 
 export async function getToken(setSnackbar, successCallback, failCallBack) {
 	let err = false;
@@ -56,7 +119,7 @@ export async function adHide(setPopout, setSnackbar, ad_id, callback) {
 		})
 		.then(function (response) {
 			setPopout(null);
-			sucessNoCancel('Объявление скрыто', setSnackbar);
+			success('Объявление скрыто', null, setSnackbar);
 			callback(response);
 			return response;
 		})
@@ -86,7 +149,7 @@ export async function adVisible(setPopout, setSnackbar, ad_id, callback) {
 		})
 		.then(function (response) {
 			setPopout(null);
-			sucessNoCancel('Объявление открыто для просмотра', setSnackbar);
+			success('Объявление открыто для просмотра', null, setSnackbar);
 			callback(response);
 			return response;
 		})
@@ -171,7 +234,7 @@ export async function denyDeal(setPopout, setSnackbar, deal_id, successCallback,
 	})
 		.then(function (response) {
 			console.log('response from denyDeal:', response);
-			sucessNoCancel(dtext, setSnackbar, end);
+			success(dtext, null, setSnackbar, end);
 			return response.data;
 		})
 		.then(function (response) {
@@ -208,7 +271,7 @@ export async function acceptDeal(setPopout, setSnackbar, deal_id, successCallbac
 	})
 		.then(function (response) {
 			console.log('response from acceptDeal:', response);
-			sucessNoCancel('Автор благодарит вас за подтверждение!', setSnackbar, end);
+			success('Автор благодарит вас за подтверждение!', null, setSnackbar, end);
 			return response.data;
 		})
 		.then(function (response) {
@@ -233,28 +296,39 @@ export async function acceptDeal(setPopout, setSnackbar, deal_id, successCallbac
 }
 
 export async function CancelClose(setPopout, setSnackbar, ad_id, successCallback, failCallback, blockSnackbar) {
-	getDeal(setSnackbar, ad_id, async (deal) => {
-		await denyDeal(
-			setPopout,
-			setSnackbar,
-			deal.deal_id,
-			(v) => {
-				if (!blockSnackbar) {
-					sucessNoCancel('Запрос успешно отменен!', setSnackbar);
-				}
-				if (successCallback) {
-					successCallback(v);
-				}
-			},
-			(e) => {
-				if (failCallback) {
-					failCallback(e);
-				}
-			},
-			null,
-			'Предложение о передаче вещи отменено'
-		);
-	});
+	console.log('CancelClose 1', ad_id);
+	getDeal(
+		setSnackbar,
+		ad_id,
+		(deal) => {
+			console.log('CancelClose 2', deal);
+			denyDeal(
+				setPopout,
+				setSnackbar,
+				deal.deal_id,
+				(v) => {
+					console.log('stoooop 2', deal);
+					if (!blockSnackbar) {
+						success('Запрос успешно отменен!', null, setSnackbar);
+					}
+					if (successCallback) {
+						successCallback(v);
+					}
+				},
+				(e) => {
+					console.log('stoooop 3', e);
+					if (failCallback) {
+						failCallback(e);
+					}
+				},
+				null,
+				'Предложение о передаче вещи отменено'
+			);
+		},
+		(err) => {
+			console.log('CancelClose 3', err);
+		}
+	);
 }
 
 export function Close(setPopout, setSnackbar, ad_id, subscriber_id, successCallback, failCallback) {
@@ -542,6 +616,46 @@ export async function CreateAd(ad, obj, photos, openAd, loadAd, setSnackbar, set
 		});
 }
 
+export async function EditAd(ad, obj, openAd, successcallback) {
+	store.dispatch(openPopout(<ScreenSpinner size="large" />));
+	let cancel;
+
+	await axios({
+		method: 'put',
+		url: Addr.getState() + BASE_AD + ad.ad_id + '/edit',
+		withCredentials: true,
+		data: obj,
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(async function (response) {
+			store.dispatch(closePopout());
+
+			openAd(ad);
+			if (successcallback) {
+				successcallback();
+			}
+			success('Изменения сохранены', null, (s) => {
+				store.dispatch(openSnackbar(s));
+			});
+			return response;
+		})
+		.catch(function (error) {
+			console.log('Request failed', error);
+			store.dispatch(closePopout());
+			fail(
+				'Нет соединения с сервером',
+				() => createAd(setPopout),
+				(s) => {
+					console.log('errrrrrrrr', s);
+					store.dispatch(openSnackbar(s));
+				}
+			);
+		});
+	return () => {
+		cancel();
+	};
+}
+
 export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
 	setPopout(<ScreenSpinner size="large" />);
 	let cancel;
@@ -562,21 +676,7 @@ export const deleteAd = (setPopout, ad_id, setSnackbar, refresh) => {
 				);
 			} else {
 				refresh(ad_id);
-				setSnackbar(
-					<Snackbar
-						duration={SNACKBAR_DURATION_DEFAULT}
-						onClose={() => {
-							setSnackbar(null);
-						}}
-						before={
-							<Avatar size={24} style={{ background: 'green' }}>
-								<Icon24DoneOutline fill="#fff" width={14} height={14} />
-							</Avatar>
-						}
-					>
-						Объявление удалено!
-					</Snackbar>
-				);
+				success('Объявление удалено!', null, setSnackbar);
 			}
 			return response.data;
 		})
@@ -630,84 +730,5 @@ export function fail(err, repeat, setSnackbar, end) {
 	}
 }
 
-export function success(text, cancelMe, setSnackbar, end) {
-	setSnackbar(
-		cancelMe ? (
-			<Snackbar
-				duration={SNACKBAR_DURATION_DEFAULT}
-				onClose={() => {
-					setSnackbar(null);
-					if (end) {
-						end();
-					}
-				}}
-				action="Отменить"
-				onActionClick={cancelMe}
-				before={
-					<Avatar size={24} style={{ background: 'green' }}>
-						<Icon24DoneOutline fill="#fff" width={14} height={14} />
-					</Avatar>
-				}
-			>
-				{text}
-			</Snackbar>
-		) : (
-			<Snackbar
-				duration={SNACKBAR_DURATION_DEFAULT}
-				onClose={() => {
-					setSnackbar(null);
-					if (end) {
-						end();
-					}
-				}}
-				before={
-					<Avatar size={24} style={{ background: 'green' }}>
-						<Icon24DoneOutline fill="#fff" width={14} height={14} />
-					</Avatar>
-				}
-			>
-				{text}
-			</Snackbar>
-		)
-	);
-}
-
-export function sucessNoCancel(text, setSnackbar, end) {
-	setSnackbar(
-		<Snackbar
-			duration={SNACKBAR_DURATION_DEFAULT}
-			onClose={() => {
-				setSnackbar(null);
-				if (end) {
-					end();
-				}
-			}}
-			before={
-				<Avatar size={24} style={{ background: 'green' }}>
-					<Icon24DoneOutline fill="#fff" width={14} height={14} />
-				</Avatar>
-			}
-		>
-			{text}
-		</Snackbar>
-	);
-}
-
-export function sendSnack(text, setSnackbar) {
-	setSnackbar(
-		<Snackbar
-			style={{ zIndex: '120' }}
-			duration={SNACKBAR_DURATION_DEFAULT}
-			onClose={() => {
-				setSnackbar(null);
-			}}
-			before={
-				<Avatar size={24} style={{ background: 'green' }}>
-					<Icon24DoneOutline fill="#fff" width={14} height={14} />
-				</Avatar>
-			}
-		>
-			{text}
-		</Snackbar>
-	);
-}
+// 745
+// 600

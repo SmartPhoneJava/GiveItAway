@@ -190,8 +190,6 @@ const Profile = (props) => {
 		);
 	}
 
-	console.log('we want update', profileID);
-
 	function getUserVK() {
 		return 'https://vk.com/id' + profileID;
 	}

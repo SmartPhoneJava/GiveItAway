@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { PanelHeaderSimple, Link, Avatar, Button, Cell } from '@vkontakte/vkui';
+import { Link, Avatar, Cell } from '@vkontakte/vkui';
 
 import './comment.css';
 
-import {time} from "./../../../../../utils/time"
+import { time } from './../../../../../utils/time';
 
 function shortText(str, newLength) {
 	if (str.length > newLength) {
@@ -53,7 +53,9 @@ const Comment = (props) => {
 			multiline="true"
 			description={
 				<div style={{ display: 'flex', marginTop: '2px' }}>
-					<div style={{ marginRight: '4px', color:"var(--text_secondary)" }}>{time(props.v.creation_date_time)} </div>
+					<div style={{ marginRight: '4px', color: 'var(--text_secondary)' }}>
+						{time(props.v.creation_date_time)}{' '}
+					</div>
 				</div>
 			}
 			before={getImage(props)}
@@ -61,7 +63,7 @@ const Comment = (props) => {
 			<div className="block">
 				<div style={{ display: 'block' }}>
 					{getAuthorHref(props)}
-					<div style={{color:"var(--text_subhead)"}}>{props.v.text} </div>
+					<div style={{ color: 'var(--text_subhead)' }}>{props.v.text} </div>
 				</div>
 			</div>
 		</Cell>

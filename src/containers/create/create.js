@@ -8,7 +8,7 @@ import { CREATE_AD_MAIN, CREATE_AD_ITEM } from '../../store/create_post/types';
 
 import CreateAddRedux from './../../panels/story/create/components/CreateAddRedux';
 
-import { CreateAd } from '../../requests';
+import { CreateAd, EditAd } from '../../requests';
 import { CategoryNo } from '../../components/categories/Categories';
 
 import { NoRegion } from '../../components/location/const';
@@ -16,26 +16,12 @@ import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { FORM_CREATE } from '../../components/categories/redux';
 import { setDetailedAd, setExtraInfo } from '../../store/detailed_ad/actions';
 import { STORY_ADS } from '../../store/router/storyTypes';
-
-const PHOTO_TEXT = 'Не более трех фотографий (jpeg, png) размером 4мб';
-
-let defaultInputData = {
-	photoText: PHOTO_TEXT,
-	name: '',
-	description: '',
-	photosUrl: [],
-	ls: true,
-	comments: true,
-	type: 'choice',
-	category: CategoryNo,
-	city: NoRegion,
-	country: NoRegion,
-};
+import { store } from '../..';
+import { defaultInputData } from '../../components/create/default';
 
 const clearForm = (dispatch) => {
 	console.log('clicked clearForm');
-	dispatch(setFormData(FORM_LOCATION_CREATE, { ...defaultInputData }));
-	dispatch(setFormData(FORM_CREATE, { ...defaultInputData }));
+	dispatch(setFormData(FORM_CREATE, null));
 	dispatch(setFormData(CREATE_AD_MAIN, { ...defaultInputData }));
 	dispatch(setFormData(CREATE_AD_ITEM, { ...defaultInputData }));
 };
@@ -62,7 +48,10 @@ const getAd = (myUser, inputData, tgeodata) => {
 	const main = getMainInfo(inputData);
 	const item = getItemInfo(inputData);
 	const category = getCategoryInfo(inputData);
+	const ad_id = store.getState().ad ? store.getState().ad.ad_id : 0
+	console.log("store.getState().ad ", ad_id)
 	return {
+		ad_id,
 		author_id: myUser.id,
 		header: item.name,
 		text: item.description,
@@ -92,6 +81,7 @@ const openCities = () => {
 const openAd = (ad, dispatch) => {
 	dispatch(setStory(STORY_ADS));
 	dispatch(setAd(ad));
+	dispatch(setExtraInfo(ad));
 };
 const loadAd = (ad, dispatch) => {
 	dispatch(setExtraInfo(ad));
@@ -101,7 +91,6 @@ const createAd = (myUser, inputData, tgeodata, dispatch) => {
 	const ad = getAd(myUser, inputData, tgeodata);
 	const obj = JSON.stringify(ad);
 	const photos = getItemInfo(inputData).photosUrl;
-	console.log('objection', getItemInfo(inputData).photosUrl);
 
 	CreateAd(
 		ad,
@@ -111,6 +100,20 @@ const createAd = (myUser, inputData, tgeodata, dispatch) => {
 		(ad) => loadAd(ad, dispatch),
 		openSnackbar,
 		openPopout,
+		() => {
+			clearForm(dispatch);
+		}
+	);
+};
+
+const editAd = (myUser, inputData, tgeodata, dispatch) => {
+	const ad = getAd(myUser, inputData, tgeodata);
+	const obj = JSON.stringify(ad);
+
+	EditAd(
+		ad,
+		obj,
+		(ad) => openAd(ad, dispatch),
 		() => {
 			clearForm(dispatch);
 		}
@@ -226,6 +229,7 @@ const mapStateToProps = (state) => {
 		myUser: state.vkui.myUser,
 		appID: state.vkui.appID,
 		apiVersion: state.vkui.apiVersion,
+		AD: state.ad,
 
 		snackbar: state.router.snackbars[state.router.activeStory],
 
@@ -242,6 +246,10 @@ const mapDispatchToProps = (dispatch) => {
 		openPopout: (p) => dispatch(openPopout(p)),
 		closeSnackbar: () => dispatch(closeSnackbar()),
 		createAd: (myUser, inputData, tgeodata) => createAd(myUser, inputData, tgeodata, dispatch),
+		editAd: (myUser, inputData, tgeodata) => editAd(myUser, inputData, tgeodata, dispatch),
+		clearForm: () => {
+			clearForm(dispatch);
+		},
 	};
 };
 

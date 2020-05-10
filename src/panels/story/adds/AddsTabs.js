@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
-	PanelHeaderSimple,
+	PanelHeader,
 	List,
 	Counter,
 	Cell,
@@ -62,7 +62,7 @@ const AddsTabs = (props) => {
 
 	return (
 		<React.Fragment>
-			<PanelHeaderSimple left={<PanelHeaderButton />} separator={false}>
+			<PanelHeader left={<PanelHeaderButton />} separator={false}>
 				<Tabs>
 					<TabsItem
 						onClick={onTabAdsClick}
@@ -90,7 +90,7 @@ const AddsTabs = (props) => {
 						</TabbarItem>
 					</TabsItem>
 				</Tabs>
-			</PanelHeaderSimple>
+			</PanelHeader>
 			<PanelHeaderContext
 				opened={contextOpened}
 				onClose={() => {

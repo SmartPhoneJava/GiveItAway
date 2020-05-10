@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActionSheet, ActionSheetItem, osname, IOS, Snackbar, Avatar } from '@vkontakte/vkui';
+import { ActionSheet, ActionSheetItem, usePlatform, IOS, Snackbar, Avatar } from '@vkontakte/vkui';
 
 import { Draft } from './../../../store/draft';
 
@@ -10,7 +10,9 @@ import { getSubscribers } from './../../../requests';
 import { CancelClose, adVisible, adHide, deleteAd } from './../../../requests';
 import { SNACKBAR_DURATION_DEFAULT } from '../../../store/const';
 
+
 function OpenActions(setPopout, setSnackbar, refresh, ad_id, onCloseClick, isClosing, hidden, failedOpen) {
+	const osname = usePlatform();
 	setPopout(
 		<ActionSheet onClose={() => setPopout(null)}>
 			{isClosing ? (

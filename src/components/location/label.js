@@ -1,38 +1,58 @@
 import React, { useState, useEffect } from 'react';
 import { setFormData } from './../../store/create_post/actions';
-import { FORM_LOCATION_CREATE } from './../../components/location/redux';
 import { SelectMimicry, FormLayout } from '@vkontakte/vkui';
 import { connect } from 'react-redux';
+import { EDIT_MODE } from '../../store/create_post/types';
 
 const Location = (props) => {
 	const [applied, setApplied] = useState(false);
+	const isEdited = props.inputData[EDIT_MODE] ? props.inputData[EDIT_MODE].mode : false;
 	const { redux_form } = props;
+
+	// const eCountry =
+	// 	props.inputData[redux_form] && props.inputData[redux_form].country
+	// 		? props.inputData[redux_form].country.title
+	// 		: '';
+	// const eCity =
+	// 	props.inputData[redux_form] && props.inputData[redux_form].city ? props.inputData[redux_form].city.title : '';
+
+	// const myCountry = props.myUse && props.myUser.country ? props.myUser.country.title : '';
+	// const myCity = props.myUse && props.myUser.city ? props.myUser.city.title : '';
+
 	const country =
-		props.inputData[redux_form] && props.inputData[redux_form].country
+		props.inputData[redux_form] && props.inputData[redux_form].country && props.inputData[redux_form].country.title
 			? props.inputData[redux_form].country.title
-			: props.useMine && props.myUser.country
-			? props.myUser.country.title
 			: 'Не определена';
 	const city =
-		props.inputData[redux_form] && props.inputData[redux_form].city
+		props.inputData[redux_form] && props.inputData[redux_form].city && props.inputData[redux_form].city.title
 			? props.inputData[redux_form].city.title
-			: props.useMine && props.myUser.city
-			? props.myUser.city.title
 			: 'Не определен';
-	// useEffect(() => {
-	// 	console.log("hi here ", applied)
-	// 	if (applied) {
-	// 		return;
+
+	// if (isEdited) {
+	// 	if (eCountry.length > 0) {
+	// 		country = eCountry;
 	// 	}
-	// 	if (props.useMine) {
-	// 		props.setFormData(FORM_LOCATION_CREATE, {
-	// 			...props.inputData[FORM_LOCATION_CREATE],
-	// 			country: props.myUser.country,
-	// 			city: props.myUser.city,
-	// 		});
-	// 		setApplied(true);
+	// 	if (eCity.length > 0) {
+	// 		city = eCity;
 	// 	}
-	// }, []);
+	// } else if (props.useMine) {
+	// 	if (myCountry.length > 0) {
+	// 		country = myCountry;
+	// 	}
+	// 	if (myCity.length > 0) {
+	// 		city = myCity;
+	// 	}
+	// } else {
+	// 	if (eCountry.length > 0) {
+	// 		country = eCountry;
+	// 	}
+	// 	if (eCity.length > 0) {
+	// 		city = eCity;
+	// 	}
+	// }
+	console.log('city and country', city, country);
+
+	console.log('loooook at it', redux_form, props.inputData[redux_form], 'please stop');
 
 	const width = document.body.clientWidth;
 

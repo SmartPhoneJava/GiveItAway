@@ -18,6 +18,7 @@ import {
 } from './actionTypes';
 
 import * as VK from '../../services/VK';
+import { smoothScrollToTop } from '../../services/_functions';
 import { STORY_ADS, STORY_CREATE } from './storyTypes';
 import { PANEL_ADS, PANEL_CREATE, PANEL_USER, PANEL_ONE } from './panelTypes';
 import { AdDefault, TAB_ADS } from '../../const/ads';
@@ -71,6 +72,7 @@ export const routerReducer = (state = initialState, action) => {
 	switch (action.type) {
 		case SET_PAGE: {
 			window.history.pushState(null, null);
+			smoothScrollToTop();
 
 			let panel = action.payload.panel;
 
@@ -130,6 +132,7 @@ export const routerReducer = (state = initialState, action) => {
 
 		case SET_PROFILE: {
 			window.history.pushState(null, null);
+			smoothScrollToTop();
 
 			let panel = action.payload.panel;
 			let profile = action.payload.profile;
@@ -177,6 +180,7 @@ export const routerReducer = (state = initialState, action) => {
 
 		case SET_AD: {
 			window.history.pushState(null, null);
+			smoothScrollToTop();
 
 			let panel = action.payload.panel;
 			let ad = action.payload.ad;
@@ -211,23 +215,32 @@ export const routerReducer = (state = initialState, action) => {
 
 		case SET_STORY: {
 			window.history.pushState(null, null);
-
-			VK.swipeBackOff();
+			smoothScrollToTop()
 
 			let story = action.payload.story;
+			let save_to_history = action.payload.save_to_history;
 			let panel = action.payload.panel || initialState.activePanels[story];
 
-			console.log('looook', panel);
+			let storiesHistory = state.storiesHistory || [];
+			if (save_to_history) {
+				storiesHistory = [...storiesHistory, state.activeStory];
+			} else {
+				VK.swipeBackOff();
+			}
+			console.log('looook', panel, save_to_history);
+
+			const newState = save_to_history ? state : initialState;
 
 			return {
-				...initialState,
+				...newState,
 				activeStory: story,
+				storiesHistory,
 				activePanels: {
-					...initialState.activePanels,
+					...newState.activePanels,
 					[story]: panel,
 				},
 				panelsHistory: {
-					...initialState.panelsHistory,
+					...newState.panelsHistory,
 					[story]: [panel],
 				},
 				scrollPosition: [window.pageYOffset],
@@ -328,6 +341,9 @@ export const routerReducer = (state = initialState, action) => {
 				store.dispatch(backToPrevAd());
 			}
 
+			const scrollPosition = state.scrollPosition || [];
+			scrollPosition.pop();
+
 			return {
 				...state,
 
@@ -347,6 +363,7 @@ export const routerReducer = (state = initialState, action) => {
 
 				profileHistory: Profiles,
 				adHistory: Ads,
+				scrollPosition,
 			};
 		}
 

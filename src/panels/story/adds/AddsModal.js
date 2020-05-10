@@ -170,7 +170,7 @@ const AddsModal = (props) => {
 							redux_form={ADS_FILTERS}
 							openCountries={openCountries}
 							openCities={openCities}
-							useMine={false}
+							// useMine={false}
 						/>
 					) : (
 						<FormLayout>
