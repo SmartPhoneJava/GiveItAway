@@ -122,7 +122,6 @@ export const routerReducer = (state = initialState, action) => {
 				Profile = profile;
 			}
 			Profiles = Profile ? [...Profiles, Profile] : Profiles;
-			console.log('set activeProfile', profile);
 			return {
 				...state,
 				activeProfile: profile,
@@ -254,6 +253,7 @@ export const routerReducer = (state = initialState, action) => {
 			let Popout = state.popouts[Story];
 
 			let Dummies = state.dummies[Story] || [];
+			console.log("Dummies", Dummies)
 			// если были открытые заглушки
 			if (Dummies.length > 0) {
 				Dummies.pop();
@@ -338,7 +338,8 @@ export const routerReducer = (state = initialState, action) => {
 			if (state.activePanel == PANEL_ONE) {
 				Ads.pop();
 				Ad = Ads[Ads.length - 1];
-				store.dispatch(backToPrevAd());
+				console.log("backToPrevAd")
+				// store.dispatch(backToPrevAd());
 			}
 
 			const scrollPosition = state.scrollPosition || [];

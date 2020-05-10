@@ -5,7 +5,7 @@ export const DELETE_COMMENT = 'DELETE_COMMENT';
 export const EDIT_COMMENT = 'EDIT_COMMENT';
 
 export const SET_EXTRA_INFO = 'SET_EXTRA_INFO';
-export const GO_BACK = 'GO_BACK';
+export const AD_BACK = 'AD_BACK';
 export const CLEAR = 'CLEAR';
 
 export const SET_SUBS = 'SET_SUBS';

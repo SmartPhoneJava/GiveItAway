@@ -9,7 +9,6 @@ const CategoriesLabel = (props) => {
 	const { redux_form, inputData } = props;
 	const category = inputData[redux_form] && inputData[redux_form].category ? inputData[redux_form].category : CategoryNo;
 
-	console.log("set next category", redux_form, inputData[redux_form] )
 	return (
 		<div
 			style={{

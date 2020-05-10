@@ -50,9 +50,6 @@ const Location = (props) => {
 	// 		city = eCity;
 	// 	}
 	// }
-	console.log('city and country', city, country);
-
-	console.log('loooook at it', redux_form, props.inputData[redux_form], 'please stop');
 
 	const width = document.body.clientWidth;
 

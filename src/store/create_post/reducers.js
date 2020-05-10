@@ -1,7 +1,15 @@
 import {SET_FORM_DATA} from './actionTypes';
+import { CREATE_AD_ITEM } from './types';
 
 const initialState = {
-    forms: []
+    forms: {
+        CREATE_AD_ITEM: {
+            name:"",
+            description: "",
+            photoText: "",
+            photosUrl: [],
+        }
+    }
 };
 
 export const formDataReducer = (state = initialState, action) => {

@@ -45,10 +45,12 @@ const descriptionLabel = 'Описание';
 const CreateItem = (props) => {
 	const { AD, defaultInputData, setFormData } = props;
 	const inputData = props.inputData[CREATE_AD_ITEM] || defaultInputData;
+	const name = props.inputData[CREATE_AD_ITEM].name || "";
+	const description = props.inputData[CREATE_AD_ITEM].description || "";
+	const photosUrl = props.inputData[CREATE_AD_ITEM].photosUrl || "";
 
 	// const [inputData, setInputData] = useState(props.inputData[CREATE_AD_ITEM] || props.defaultInputData);
 	const needEdit = props.inputData[EDIT_MODE] ? props.inputData[EDIT_MODE].mode : false;
-	console.log('inputData inputData', needEdit, inputData);
 	const handleInput = (e) => {
 		let value = e.currentTarget.value;
 		setFormData(CREATE_AD_ITEM, {
@@ -121,26 +123,39 @@ const CreateItem = (props) => {
 			handleWrongSize,
 			handleWrongType,
 			(value) => {
-				const photosUrl = [...inputData.photosUrl, value];
-				// setInputData({
+				let photosUrl;
+				if (!inputData.photosUrl) {
+					photosUrl = [value];
+				} else {
+					photosUrl = [...inputData.photosUrl, value];
+				} // setInputData({
 				// 	...inputData,
 				// 	photosUrl,
 				// });
+				console.log("PHOTO_TEXT", PHOTO_TEXT)
+				const photoText = "" + PHOTO_TEXT + '. Загружено ' + photosUrl.length + '/3';
 				setFormData(CREATE_AD_ITEM, {
 					...inputData,
 					photosUrl,
+					photoText,
 				});
+				
 			},
 			() => {
-				const photoText = PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length + 1) + '/3';
-				// setInputData({
+				// let photoText;
+				// if (!inputData.photosUrl) {
+				// 	photoText = PHOTO_TEXT + '. Загружено 0/3';
+				// } else {
+				// 	photoText = PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length + 1) + '/3';
+				// }
+				// // setInputData({
+				// // 	...inputData,
+				// // 	photoText,
+				// // });
+				// setFormData(CREATE_AD_ITEM, {
 				// 	...inputData,
 				// 	photoText,
 				// });
-				setFormData(CREATE_AD_ITEM, {
-					...inputData,
-					photoText,
-				});
 			}
 		);
 	};
@@ -224,7 +239,7 @@ const CreateItem = (props) => {
 								name="name"
 								size="50"
 								placeholder="футбольный мяч"
-								value={inputData.name}
+								value={name}
 								onChange={handleInput}
 							/>
 						</FormLayout>
@@ -235,7 +250,7 @@ const CreateItem = (props) => {
 								top={descriptionLabel}
 								name="description"
 								placeholder="Количество, состояние, габариты, дата покупки, особенности и т.д."
-								value={inputData.description}
+								value={description}
 								onChange={handleInput}
 							/>
 						</FormLayout>

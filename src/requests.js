@@ -176,7 +176,6 @@ export async function getDeal(setSnackbar, ad_id, successCallback, failCallback)
 		})
 		.then(function (response) {
 			if (successCallback) {
-				console.log('action');
 				successCallback(response);
 			}
 			return response;

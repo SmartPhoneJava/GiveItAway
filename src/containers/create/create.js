@@ -49,7 +49,6 @@ const getAd = (myUser, inputData, tgeodata) => {
 	const item = getItemInfo(inputData);
 	const category = getCategoryInfo(inputData);
 	const ad_id = store.getState().ad ? store.getState().ad.ad_id : 0
-	console.log("store.getState().ad ", ad_id)
 	return {
 		ad_id,
 		author_id: myUser.id,
@@ -97,7 +96,10 @@ const createAd = (myUser, inputData, tgeodata, dispatch) => {
 		obj,
 		photos,
 		(ad) => openAd(ad, dispatch),
-		(ad) => loadAd(ad, dispatch),
+		(ad) => {
+			loadAd(ad, dispatch)
+			console.log("we loaded more")
+		},
 		openSnackbar,
 		openPopout,
 		() => {
@@ -166,7 +168,7 @@ const isValid = (inputData) => {
 				text: 'Краткость сестра таланта!(максимум: 1000 символов)',
 			};
 		}
-		if (photosUrl.length == 0) {
+		if (!photosUrl || photosUrl.length == 0) {
 			return {
 				v: false,
 				header: 'Не загружено ни одной фотографии',

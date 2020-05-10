@@ -19,6 +19,7 @@ import {
 	SET_DEALER,
 	SET_EXTRA_INFO,
 	GO_BACK,
+	AD_BACK,
 } from './actionTypes';
 
 const initialState = {
@@ -284,12 +285,13 @@ export const adReducer = (state = initialState, action) => {
 			};
 		}
 
-		case GO_BACK: {
+		case AD_BACK: {
 			const history = state.history || [];
 			let newState = state;
 			if (history.length > 0) {
 				newState = history[history.length - 1];
 			}
+			console.log("reducers AD_BACK")
 			history.pop();
 			newState.history = history;
 

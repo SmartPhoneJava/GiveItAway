@@ -82,7 +82,6 @@ import {
 	setSubs,
 	setIsDealer,
 	setDeal,
-	setDetailedAd,
 	setPhotos,
 	setIsHidden,
 	setExtraInfo,
@@ -183,8 +182,6 @@ const AddMore2r = (props) => {
 		setIsOpen(true);
 	};
 
-	console.log('props.myID', myID);
-
 	const [backUser, setBackUser] = useState();
 
 	function isNotValid() {
@@ -246,6 +243,7 @@ const AddMore2r = (props) => {
 		// 	setImage('');
 		// 	return;
 		// }
+		console.log("herereeees")
 		const init = () => (dispatch) => {
 			const id = AD.ad_id;
 			updateDealInfo()

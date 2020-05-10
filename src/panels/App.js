@@ -326,8 +326,7 @@ const App = (props) => {
 	let createPanels = props.panelsHistory[STORY_CREATE];
 	let createActivePanel = props.activePanels[STORY_CREATE];
 	let choosen = props.activeAd;
-	console.log('activeProfile', props.activeProfile, props.profileHistory);
-
+	
 	if (!inited) {
 		return <ScreenSpinner size="large" />;
 	}
