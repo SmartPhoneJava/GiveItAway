@@ -21,6 +21,7 @@ import {
 	GO_BACK,
 	AD_BACK,
 } from './actionTypes';
+import { TYPE_CHOICE } from '../../const/ads';
 
 const initialState = {
 	ad_id: -1,
@@ -29,7 +30,14 @@ const initialState = {
 	anonymous: false,
 	text: 'Неизвестно',
 	creation_date: 'Неизвестно',
-	feedback_type: 'ls',
+
+	ad_type: TYPE_CHOICE,
+	ls_enabled: true,
+	comments_enabled: true,
+	extra_enabled: true,
+	comments_count: 0,
+	subscribers_num: 0,
+
 	category: 'animals',
 	extra_field: '',
 	views_count: 0,
@@ -253,6 +261,14 @@ export const adReducer = (state = initialState, action) => {
 			const extra_field = ad.extra_field || state.extra_field;
 			const views_count = ad.views_count || state.views_count;
 
+			const ad_type = ad.ad_type || state.ad_type;
+			const ls_enabled = ad.ls_enabled || state.ls_enabled;
+			const comments_enabled = ad.comments_enabled || state.comments_enabled;
+			const extra_enabled = ad.extra_enabled || state.extra_enabled;
+			const comments_count = ad.comments_count || state.comments_count;
+			const subscribers_num = ad.subscribers_num || state.subscribers_num;
+			const isSub = ad.is_subscriber || state.is_subscriber;
+
 			const region = ad.region || state.region;
 			const district = ad.district || state.district;
 			const pathes_to_photo = ad.pathes_to_photo || state.pathes_to_photo;
@@ -282,6 +298,13 @@ export const adReducer = (state = initialState, action) => {
 				region,
 				district,
 				history,
+				ad_type,
+				ls_enabled,
+				comments_enabled,
+				extra_enabled,
+				comments_count,
+				subscribers_num,
+				isSub,
 			};
 		}
 

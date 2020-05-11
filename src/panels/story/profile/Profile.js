@@ -1,5 +1,16 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Avatar, Link, Button, Cell, Header, Group, Placeholder, HorizontalScroll, Separator } from '@vkontakte/vkui';
+import {
+	Avatar,
+	Link,
+	Button,
+	Cell,
+	Header,
+	Group,
+	Placeholder,
+	HorizontalScroll,
+	Separator,
+	Banner,
+} from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
@@ -105,14 +116,14 @@ const Profile = (props) => {
 			profileID,
 			(v) => {
 				if (cleanupFunction) {
-					return
+					return;
 				}
 				setBackUser(v);
 				props.setProfileName(v.name + ' ' + v.surname);
 			},
 			(e) => {
 				if (cleanupFunction) {
-					return
+					return;
 				}
 				setFailed(true);
 			}
@@ -124,7 +135,7 @@ const Profile = (props) => {
 			props.apiVersion,
 			(r) => {
 				if (cleanupFunction) {
-					return
+					return;
 				}
 				setVkUser(r);
 			},
@@ -325,92 +336,128 @@ const Profile = (props) => {
 						</Placeholder>
 					)}
 				</Group>
-				<Separator style={{ marginBottom: '10px' }} />
-				<div className="infographics-main">
-					<div className="infographics-column">
-						<div>Вещей</div>
-						<RadialChart
-							data={
-								backuser.total_given_ads + backuser.total_received_ads == 0
-									? [
-											{ angle: 1, color: '#00CCFF' },
-											{
-												angle: 1,
-												color: '#FFCC33',
-											},
-									  ]
-									: [
-											{ angle: backuser.total_given_ads, color: '#00CCFF' },
-											{
-												angle: backuser.total_received_ads,
-												color: '#FFCC33',
-											},
-									  ]
-							}
-							showLabels={true}
-							radius={40}
-							innerRadius={30}
-							width={width / 2}
-							height={100}
-							labelsAboveChildren={false}
-							labelsRadiusMultiplier={2}
-							colorType="literal"
-						/>
+				<Group header={<Header mode="secondary">Статистика</Header>}>
+					<div className="infographics-main">
+						<div className="infographics-column">
+							<div>Вещей</div>
+							<RadialChart
+								data={
+									backuser.total_given_ads + backuser.total_received_ads == 0
+										? [
+												{ angle: 1, color: '#00CCFF' },
+												{
+													angle: 1,
+													color: '#FFCC33',
+												},
+										  ]
+										: [
+												{ angle: backuser.total_given_ads, color: '#00CCFF' },
+												{
+													angle: backuser.total_received_ads,
+													color: '#FFCC33',
+												},
+										  ]
+								}
+								showLabels={true}
+								radius={40}
+								innerRadius={30}
+								width={width / 2}
+								height={100}
+								labelsAboveChildren={false}
+								labelsRadiusMultiplier={2}
+								colorType="literal"
+							/>
 
-						<div style={{ display: 'flex', justifyContent: 'center' }}>
-							<Avatar style={{ background: '#00CCFF', marginRight: '3px' }} size={14}></Avatar>
-							<>Отдано</>
+							<div style={{ display: 'flex', justifyContent: 'center' }}>
+								<Avatar style={{ background: '#00CCFF', marginRight: '3px' }} size={14}></Avatar>
+								<>Отдано</>
+							</div>
+							<div style={{ display: 'flex', paddingLeft: '15px', justifyContent: 'center' }}>
+								<Avatar style={{ background: '#FFCC33', marginRight: '3px' }} size={14}></Avatar>
+								<>Получено</>
+							</div>
 						</div>
-						<div style={{ display: 'flex', paddingLeft: '15px', justifyContent: 'center' }}>
-							<Avatar style={{ background: '#FFCC33', marginRight: '3px' }} size={14}></Avatar>
-							<>Получено</>
+						<div className="infographics-column">
+							Обменов
+							<RadialChart
+								data={
+									backuser.total_given_ads +
+										backuser.total_received_ads +
+										backuser.total_aborted_ads ==
+									0
+										? [
+												{
+													angle: 1,
+													color: '#00CC66',
+												},
+												{
+													angle: 1,
+													color: '#FF9933',
+												},
+										  ]
+										: [
+												{
+													angle: backuser.total_given_ads + backuser.total_received_ads,
+													color: '#00CC66',
+												},
+												{
+													angle: backuser.total_aborted_ads,
+													color: '#FF9933',
+												},
+										  ]
+								}
+								colorType="literal"
+								showLabels={true}
+								radius={40}
+								innerRadius={30}
+								width={width / 2}
+								height={100}
+								labelsAboveChildren={false}
+								labelsRadiusMultiplier={2}
+							/>
+							<div style={{ display: 'flex', paddingLeft: '18px', justifyContent: 'center' }}>
+								<Avatar style={{ background: '#00CC66', marginRight: '3px' }} size={14}></Avatar>
+								<>Проведено</>
+							</div>
+							<div style={{ display: 'flex', justifyContent: 'center' }}>
+								<Avatar style={{ background: '#FF9933', marginRight: '3px' }} size={14}></Avatar>
+								<>Сорвано</>
+							</div>
 						</div>
 					</div>
-					<div className="infographics-column">
-						Обменов
-						<RadialChart
-							data={
-								backuser.total_given_ads + backuser.total_received_ads + backuser.total_aborted_ads == 0
-									? [
-											{
-												angle: 1,
-												color: '#00CC66',
-											},
-											{
-												angle: 1,
-												color: '#FF9933',
-											},
-									  ]
-									: [
-											{
-												angle: backuser.total_given_ads + backuser.total_received_ads,
-												color: '#00CC66',
-											},
-											{
-												angle: backuser.total_aborted_ads,
-												color: '#FF9933',
-											},
-									  ]
+				</Group>
+				{profileID == props.myID ? (
+					<div style={{ marginTop: '20px' }}>
+						<Banner
+							mode="image"
+							size="m"
+							header="Помогите нам стать лучше"
+							subheader={
+								<span>
+									Присылайте свои идеи для <br /> развития проекта
+								</span>
 							}
-							colorType="literal"
-							showLabels={true}
-							radius={40}
-							innerRadius={30}
-							width={width / 2}
-							height={100}
-							labelsAboveChildren={false}
-							labelsRadiusMultiplier={2}
+							background={
+								<div
+									style={{
+										backgroundColor: '#5b9be6',
+										backgroundImage:
+											'url(https://sun9-31.userapi.com/PQ4UCzqE_jue9hAINefBMorYCdfGXvcuV5nSjA/eYugcFYzdW8.jpg)',
+										backgroundPosition: 'right bottom',
+										backgroundSize: '102%',
+										backgroundRepeat: 'no-repeat',
+									}}
+								/>
+							}
+							asideMode="expand"
+							actions={
+								<Button mode="overlay" size="l">
+									Подробнее
+								</Button>
+							}
 						/>
-						<div style={{ display: 'flex', paddingLeft: '18px', justifyContent: 'center' }}>
-							<Avatar style={{ background: '#00CC66', marginRight: '3px' }} size={14}></Avatar>
-							<>Проведено</>
-						</div>
-						<div style={{ display: 'flex', justifyContent: 'center' }}>
-							<Avatar style={{ background: '#FF9933', marginRight: '3px' }} size={14}></Avatar>
-							<>Сорвано</>
-						</div>
 					</div>
-				</div>
+				) : null}
 			</>
 		);
 	}

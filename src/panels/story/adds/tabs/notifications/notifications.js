@@ -347,8 +347,8 @@ function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackba
 											  '.'
 											: ''
 									}
-									text={v.payload ? v.payload.comment.text : ""}
-									header={v.payload ? v.payload.ad.header: ""}
+									text={v.payload ? v.payload.comment.text : ''}
+									header={v.payload ? v.payload.ad.header : ''}
 									system={false}
 									openUser={openUser}
 									ad={v.payload.ad}
@@ -479,7 +479,7 @@ const Notifications = (props) => {
 				''
 			)}
 			{arrRead.length > 0 ? (
-				<Group header={<Header mode="primary">Прочитанные</Header>}>
+				<Group header={<Header mode="primary"> {arrNotRead.length > 0 ? 'Прочитанные' : ''} </Header>}>
 					{getNotifications(arrRead, lastAdElementRef, props.openUser, props.openAd, props.setSnackbar)}
 				</Group>
 			) : (

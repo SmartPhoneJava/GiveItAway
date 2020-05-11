@@ -98,6 +98,8 @@ import {
 	STATUS_CHOSEN,
 	STATUS_CLOSED,
 	STATUS_ABORTED,
+	TYPE_CHOICE,
+	TYPE_AUCTION,
 } from '../../const/ads';
 import { shareInVK } from '../../services/VK';
 import { STORY_CREATE, STORY_ADS } from '../../store/router/storyTypes';
@@ -146,7 +148,10 @@ const AddMore2r = (props) => {
 		views_count,
 		creation_date,
 		author,
-		feedback_type,
+		ad_type,
+		ls_enabled,
+		comments_enabled,
+		extra_enabled,
 		extra_field,
 		cost,
 		hidden,
@@ -244,7 +249,6 @@ const AddMore2r = (props) => {
 		// 	setImage('');
 		// 	return;
 		// }
-		console.log('herereeees');
 		const init = () => (dispatch) => {
 			const id = AD.ad_id;
 			updateDealInfo();
@@ -256,7 +260,7 @@ const AddMore2r = (props) => {
 						id,
 						(s) => {
 							console.log('suuubs', s);
-							updateSubsInfo(s);
+							setSubs(s);
 						},
 						(e) => {
 							// props.setCost(-data.bid);
@@ -485,11 +489,6 @@ const AddMore2r = (props) => {
 		// );
 	}, [AD]);
 
-	function updateSubsInfo(s) {
-		setSubs(s);
-		setIsSub(s.filter((v) => v.vk_id == myID).length > 0);
-	}
-
 	function unsub(c) {
 		unsubscribe(
 			openPopout,
@@ -541,6 +540,12 @@ const AddMore2r = (props) => {
 		});
 		setFormData(FORM_CREATE, {
 			category: AD.category,
+		});
+
+		setFormData(CREATE_AD_MAIN, {
+			type: AD.ad_type,
+			ls_enabled: AD.ls_enabled,
+			comments_enabled: AD.comments_enabled,
 		});
 
 		setStory(STORY_CREATE, null, true);
@@ -702,6 +707,11 @@ const AddMore2r = (props) => {
 			<table>
 				<tbody>
 					<tr>
+						<td className="first">Тип</td>
+						<td>{ad_type == TYPE_CHOICE ? 'Сделка' : ad_type == TYPE_AUCTION ? 'Аукцион' : 'Лотерея'}</td>
+						<td>тут знак вопроса</td>
+					</tr>
+					<tr>
 						<td className="first">Категория</td>
 						<td>{GetCategoryText(category)}</td>
 					</tr>
@@ -744,7 +754,7 @@ const AddMore2r = (props) => {
 				>
 					<div style={{ display: 'flex' }}>
 						{author.name + ' ' + author.surname}{' '}
-						{feedback_type == 'ls' ? (
+						{ls_enabled ? (
 							<Link
 								style={{ marginLeft: '15px' }}
 								href={'https://vk.com/im?sel=' + author.vk_id}
@@ -761,7 +771,7 @@ const AddMore2r = (props) => {
 			<Given openUser={props.openUser} dealer={dealer} />
 			{isAuthor && isFinished ? <Subs openUser={props.openUser} amount={2} maxAmount={2} mini={true} /> : null}
 
-			{feedback_type == 'comments' ? (
+			{comments_enabled ? (
 				<>
 					<Comments mini={true} amount={1} maxAmount={1} openUser={props.openUser} />
 				</>

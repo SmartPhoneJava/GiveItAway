@@ -17,6 +17,10 @@ export const COLOR_DEFAULT = 'rgba(0,0,0,0.6)';
 export const COLOR_DONE = 'rgba(0,75,0,0.8)';
 export const COLOR_CANCEL = 'rgba(75,0,0,0.8)';
 
+export const TYPE_CHOICE = 'choice';
+export const TYPE_RANDOM = 'random';
+export const TYPE_AUCTION = 'auction';
+
 export const STATUS_OFFER = 'offer';
 export const STATUS_CHOSEN = 'chosen';
 export const STATUS_CLOSED = 'closed';
@@ -29,7 +33,12 @@ export const AD_LOADING = {
 	anonymous: false,
 	text: 'Загрузка',
 	creation_date: 'Загрузка',
-	feedback_type: 'Загрузка',
+	ad_type: TYPE_CHOICE,
+	ls_enabled: true,
+	comments_enabled: true,
+	extra_enabled: true,
+	comments_count: 0,
+	subscribers_num: 0,
 	category: 'animals',
 	extra_field: '',
 	views_count: '0',
@@ -50,7 +59,12 @@ export const AdDefault = {
 	anonymous: false,
 	text: 'Описание',
 	creation_date: '13.12.2012',
-	feedback_type: 'ls',
+	ad_type: TYPE_CHOICE,
+	ls_enabled: true,
+	comments_enabled: true,
+	extra_enabled: true,
+	comments_count: 0,
+	subscribers_num: 0,
 	category: 'animals',
 	extra_field: '',
 	views_count: '87',

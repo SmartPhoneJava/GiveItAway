@@ -53,9 +53,11 @@ const getAd = (myUser, inputData, tgeodata) => {
 		author_id: myUser.id,
 		header: item.name,
 		text: item.description,
-		feedback_type: 'comments',
+		ls_enabled: main.ls_enabled,
+		comments_enabled: main.comments_enabled,
+		ad_type: main.type,
 		// feedback_type: (main.ls ? ' ls' : '') + (main.comments ? ' comments' : ''),
-		extra_field: main ? main.type : 'choice',
+		// extra_field: main ? main.type : 'choice',
 		category: category.category,
 		region: location.country.title,
 		district: location.city.title,
@@ -173,6 +175,17 @@ const isValid = (inputData) => {
 				header: 'Не загружено ни одной фотографии',
 				text: 'Загрузите от 1 до 3 фотографий предмета!',
 			};
+		}
+		const mainInfo = getMainInfo(inputData);
+		if (mainInfo) {
+			const { ls_enabled, comments_enabled } = itemInfo;
+			if (!ls_enabled && !comments_enabled) {
+				return {
+					v: false,
+					header: 'Обратная связь',
+					text: 'Разрешите доступ к ЛС или включите комментарии',
+				};
+			}
 		}
 	} else {
 		return {

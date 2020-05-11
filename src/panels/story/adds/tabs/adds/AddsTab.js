@@ -352,35 +352,6 @@ const AddsTab = (props) => {
 					) : null}
 				</div>
 
-				<Banner
-					mode="image"
-					size="m"
-					header="Хочу забрать"
-					subheader={
-						<span>
-							Привлекайте больше людей
-							<br />в Ваше сообщество
-						</span>
-					}
-					background={
-						<div
-							style={{
-								backgroundColor: '#5b9be6',
-								backgroundImage:
-									'url(https://sun9-31.userapi.com/PQ4UCzqE_jue9hAINefBMorYCdfGXvcuV5nSjA/eYugcFYzdW8.jpg)',
-								backgroundPosition: 'right bottom',
-								backgroundSize: '102%',
-								backgroundRepeat: 'no-repeat',
-							}}
-						/>
-					}
-					asideMode="dismiss"
-					actions={
-						<Button mode="overlay" size="l">
-							Подробнее
-						</Button>
-					}
-				/>
 				<Group>
 					{ads.length > 0 ? (
 						ads.map((ad, index) => {

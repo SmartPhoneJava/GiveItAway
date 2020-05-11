@@ -50,10 +50,11 @@ const ChooseFeedback = (props) => {
 			<Cell
 				before={<Icon24Message fill="var(--header_tab_inactive_text)" />}
 				multiline
+				disabled={!props.pmOpen}
 				asideContent={
 					<Switch
-						checked={inputData.ls}
-						name="ls"
+						checked={inputData.ls_enabled}
+						name="ls_enabled"
 						onChange={(e) => {
 							if (props.pmOpen) {
 								handleChecked(e);
@@ -70,7 +71,7 @@ const ChooseFeedback = (props) => {
 			<Cell
 				before={<Icon24Comment fill="var(--header_tab_inactive_text)" />}
 				multiline
-				asideContent={<Switch name="comments" checked={inputData.comments} onChange={handleChecked} />}
+				asideContent={<Switch name="comments_enabled" checked={inputData.comments_enabled} onChange={handleChecked} />}
 				description="Пользователи могут оставлять коментарии в обьявлении"
 			>
 				Комментарии
