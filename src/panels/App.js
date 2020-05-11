@@ -62,11 +62,18 @@ import Icon28Add from '@vkontakte/icons/dist/28/add_outline';
 
 import { VkUser } from '../store/vkUser';
 
-import { handleNotifications, NT_COMMENT, NT_RESPOND, NT_STATUS } from './story/adds/tabs/notifications/notifications';
+import {
+	handleNotifications,
+	NT_COMMENT,
+	NT_RESPOND,
+	NT_STATUS,
+	NT_AD_STATUS,
+	NT_CLOSE,
+} from './story/adds/tabs/notifications/notifications';
 
 import AddMore2 from './template/AddMore2';
 
-import { GEO_TYPE_FILTERS, AdDefault, STATUS_OFFER } from './../const/ads';
+import { GEO_TYPE_FILTERS, AdDefault, STATUS_OFFER, STATUS_CHOSEN } from './../const/ads';
 
 import { Auth, getToken, fail, getNotificationCounter } from '../requests';
 
@@ -107,6 +114,7 @@ const App = (props) => {
 		setAd,
 		setStory,
 		setProfile,
+		setStatus,
 		openModal,
 		addProfile,
 		setFormData,
@@ -197,7 +205,7 @@ const App = (props) => {
 			const noteType = note.data.notification_type;
 			const noteAdId = note.data.payload.ad.ad_id;
 
-			const ad = store.getState().ad
+			const ad = store.getState().ad;
 
 			console.log('noteAdId ', noteType, noteAdId, ad, NT_STATUS);
 
@@ -205,16 +213,8 @@ const App = (props) => {
 				switch (noteType) {
 					case NT_RESPOND: {
 						const noteValue = note.data.payload.author;
-						console.log("we add new value")
+						console.log('we add new value');
 						addSub(noteValue);
-					}
-					case NT_STATUS: {
-						const noteValue = note.data.payload.ad.status;
-						console.log('noteValue ', noteValue);
-						setStatus(noteValue);
-						if (noteValue == STATUS_OFFER) {
-							updateDealInfo();
-						}
 					}
 				}
 			}
@@ -241,6 +241,21 @@ const App = (props) => {
 				switch (noteType) {
 					case NT_COMMENT: {
 						addComment(noteValue);
+						break;
+					}
+					case NT_CLOSE: {
+						setStatus(STATUS_CHOSEN);
+						updateDealInfo();
+						break;
+					}
+					case NT_AD_STATUS: {
+						const noteValue = note.data.payload.new_status;
+						console.log('noteValue ', noteValue);
+						setStatus(noteValue);
+						if (noteValue == STATUS_CHOSEN) {
+							updateDealInfo();
+						}
+						break;
 					}
 				}
 				console.log('centrifugu notenote', note);
@@ -252,9 +267,9 @@ const App = (props) => {
 		//....
 		getNotificationCounter(
 			(r) => {
-				console.log("r.data.number", r.number)
-				notsCounterrr = r.number
-				setNotsCounterr(r.number)
+				console.log('r.data.number', r.number);
+				notsCounterrr = r.number;
+				setNotsCounterr(r.number);
 			},
 			(e) => {
 				console.log('some error happened', e);
@@ -543,6 +558,7 @@ function mapDispatchToProps(dispatch) {
 				openPopout,
 				addComment,
 				addSub,
+				setStatus,
 			},
 			dispatch
 		),

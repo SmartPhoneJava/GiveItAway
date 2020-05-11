@@ -215,6 +215,7 @@ export async function getCost(ad_id, successCallback, failCallback) {
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
+			console.log('response response:', response);
 			return response.data;
 		})
 		.then(function (response) {

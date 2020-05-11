@@ -61,7 +61,6 @@ import {
 	getDetails,
 	acceptDeal,
 	denyDeal,
-	getCost,
 } from './../../requests';
 
 import './addsTab.css';
@@ -211,6 +210,7 @@ const AddMore2r = (props) => {
 	}, [photoIndex, pathes_to_photo]);
 
 	function changeIsSub(isSubs, c) {
+		console.log("changeIsSub", isSubs)
 		if (isNotValid()) {
 			return;
 		}
@@ -237,7 +237,7 @@ const AddMore2r = (props) => {
 	useEffect(() => {
 		const init = () => () => {
 			const id = AD.ad_id;
-			clearAds();
+			
 			updateDealInfo();
 			updateCost();
 			updateSubs();
@@ -808,7 +808,6 @@ const mapDispatchToProps = (dispatch) => {
 				getDetails,
 				acceptDeal,
 				denyDeal,
-				getCost,
 
 				setCost,
 				setIsSub,
@@ -835,4 +834,4 @@ const AddMore2 = connect(mapStateToProps, mapDispatchToProps)(AddMore2r);
 
 export default AddMore2;
 
-// 857 -> 936
+// 857 -> 936 -> 838

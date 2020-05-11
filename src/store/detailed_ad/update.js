@@ -5,24 +5,18 @@ import { openSnackbar } from '../router/actions';
 import { getUser } from '../../panels/story/profile/requests';
 
 export function updateDealInfo() {
-	let cancel = false;
 	const myID = store.getState().vkui.myID;
 	const ad_id = store.getState().ad.ad_id;
 	getDeal(
 		ad_id,
 		(d) => {
-			if (cancel) {
-				return;
-			}
+			console.log('we seee', d, myID);
 			store.dispatch(setDeal(d));
 
 			store.dispatch(setIsDealer(d.subscriber_id == myID));
 			getUser(
 				d.subscriber_id,
 				(user) => {
-					if (cancel) {
-						return;
-					}
 					store.dispatch(setDealer(user));
 				},
 				(e) => {
@@ -37,10 +31,6 @@ export function updateDealInfo() {
 			store.dispatch(setDealer(null));
 		}
 	);
-
-	return () => {
-		cancel = true;
-	};
 }
 
 const SUBS_AMOUNT = 10;
@@ -65,8 +55,13 @@ export function updateCost() {
 	const ad_id = store.getState().ad.ad_id;
 	getCost(
 		ad_id,
-		(data) => setCost(data.bid),
-		(e) => setCost(0)
+		(data) => {
+			console.log('set cost', data.bid);
+			store.dispatch(setCost(data.bid));
+		},
+		(e) => {
+			store.dispatch(setCost(0));
+		}
 	);
 
 	return () => {

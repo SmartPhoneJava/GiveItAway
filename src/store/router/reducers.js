@@ -214,7 +214,7 @@ export const routerReducer = (state = initialState, action) => {
 
 		case SET_STORY: {
 			window.history.pushState(null, null);
-			smoothScrollToTop()
+			smoothScrollToTop();
 
 			let story = action.payload.story;
 			let save_to_history = action.payload.save_to_history;
@@ -253,7 +253,7 @@ export const routerReducer = (state = initialState, action) => {
 			let Popout = state.popouts[Story];
 
 			let Dummies = state.dummies[Story] || [];
-			console.log("Dummies", Dummies)
+			console.log('Dummies', Dummies);
 			// если были открытые заглушки
 			if (Dummies.length > 0) {
 				Dummies.pop();
@@ -338,7 +338,7 @@ export const routerReducer = (state = initialState, action) => {
 			if (state.activePanel == PANEL_ONE) {
 				Ads.pop();
 				Ad = Ads[Ads.length - 1];
-				console.log("backToPrevAd")
+				console.log('backToPrevAd');
 				// store.dispatch(backToPrevAd());
 			}
 
@@ -432,10 +432,7 @@ export const routerReducer = (state = initialState, action) => {
 			const Panel = state.activePanels[Story];
 			return {
 				...state,
-				snackbars: {
-					...state.snackbars,
-					[Panel]: null,
-				},
+				snackbars: {},
 			};
 		}
 

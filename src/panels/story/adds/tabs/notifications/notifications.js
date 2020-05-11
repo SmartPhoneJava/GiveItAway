@@ -33,6 +33,8 @@ export const NT_DELETED = 'deleted'; // приходит подписчикам
 export const NT_COMMENT = 'new_comment'; // приходит всем
 export const NT_COMMENT_DELETED = 'delete_comment'; // приходит всем
 
+export const NT_AD_STATUS = 'status_changed'; 
+
 export function handleNotifications(note, setSnackbar) {
 	switch (note.data.notification_type) {
 		case NT_STATISTICS:
