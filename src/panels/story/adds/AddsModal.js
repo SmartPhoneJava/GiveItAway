@@ -51,8 +51,19 @@ const AddsModal = (props) => {
 	const applyTimeSort = () => props.applyTimeSort(inputData);
 	const setRadius = (r) => props.setRadius(inputData, r);
 	const applyGeoSort = () => props.applyGeoSort(inputData);
-	const setGeoFilters = () => props.setGeoFilters(inputData);
-	const setGeoNear = () => props.setGeoNear(inputData);
+
+	const setGeoFilters = () => {
+		props.setGeoFilters(inputData);
+		if (props.updateModalHeight) {
+			props.updateModalHeight();
+		}
+	};
+	const setGeoNear = () => {
+		props.setGeoNear(inputData);
+		if (props.updateModalHeight) {
+			props.updateModalHeight();
+		}
+	};
 
 	const geoType = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geotype : null) || GEO_TYPE_FILTERS;
 	const radius = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].radius : null) || 0;
@@ -79,7 +90,7 @@ const AddsModal = (props) => {
 			}
 			return country.title;
 		}
-		return 'Поиск по радиусу временно недоступен';
+		return 'В радиусе ' + radius + ' км';
 	}
 
 	function getCost() {
@@ -141,6 +152,7 @@ const AddsModal = (props) => {
 			<ModalPage
 				id={MODAL_ADS_GEO}
 				onClose={closeModal}
+				dynamicContentHeight
 				header={<ModalHeader isBack={true} name="Где искать?" back={closeModal} />}
 			>
 				<Radio
@@ -198,9 +210,9 @@ const AddsModal = (props) => {
 						>
 							<div style={{ textAlign: 'center' }}>Отменить</div>
 						</CellButton> */}
-						<CellButton mode="primary" onClick={closeModal}>
+						{/* <CellButton mode="primary" onClick={closeModal}>
 							Сохранить
-						</CellButton>
+						</CellButton> */}
 					</div>
 				</div>
 			</ModalPage>

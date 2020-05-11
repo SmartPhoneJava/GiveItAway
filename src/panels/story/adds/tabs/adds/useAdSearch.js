@@ -7,9 +7,9 @@ import { Addr, BASE_AD } from './../../../../../store/addr';
 
 import { User } from './AddsTab/../../../../../../store/user';
 
-import { store } from "./../../../../../index"
+import { store } from './../../../../../index';
 import { openPopout, closePopout } from '../../../../../store/router/actions';
-import { MODE_WANTED, MODE_ALL } from '../../../../../const/ads';
+import { MODE_WANTED, MODE_ALL, GEO_TYPE_NEAR } from '../../../../../const/ads';
 import { CategoryNo } from '../../../../../components/categories/Categories';
 
 export default function useAdSearch(
@@ -24,6 +24,8 @@ export default function useAdSearch(
 	country,
 	sort,
 	geodata,
+	geoType,
+	radius,
 	refreshMe
 ) {
 	const [inited, setInited] = useState(false);
@@ -35,7 +37,7 @@ export default function useAdSearch(
 	useEffect(() => {
 		setAds([]);
 		pageNumber = 1;
-	}, [category, mode, query, city, country, sort, geodata, refreshMe]);
+	}, [category, mode, query, city, country, sort, geodata, geoType, radius, refreshMe]);
 
 	useEffect(() => {
 		console.log('deleteID', deleteID);
@@ -50,8 +52,8 @@ export default function useAdSearch(
 
 	useEffect(() => {
 		let cleanupFunction = false;
-		store.dispatch(openPopout(<ScreenSpinner size="large" />))
-		
+		store.dispatch(openPopout(<ScreenSpinner size="large" />));
+
 		setLoading(true);
 		setError(false);
 		setInited(false);
@@ -75,13 +77,16 @@ export default function useAdSearch(
 			params.long = geodata.long;
 		}
 
-		if (city && city.id != -1) {
-			params.district = city.title;
-		}
+		if (geoType == GEO_TYPE_NEAR) {
+			params.radius = radius;
+		} else {
+			if (city && city.id != -1) {
+				params.district = city.title;
+			}
 
-		console.log('before check', geodata);
-		if (country && country.id != -1) {
-			params.region = country.title;
+			if (country && country.id != -1) {
+				params.region = country.title;
+			}
 		}
 
 		let url = BASE_AD + 'find';
@@ -91,8 +96,6 @@ export default function useAdSearch(
 			url = BASE_AD + 'wanted';
 		}
 
-		console.log('use cleanupFunction ', cleanupFunction);
-
 		axios({
 			method: 'GET',
 			url: Addr.getState() + url,
@@ -101,18 +104,16 @@ export default function useAdSearch(
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
 		})
 			.then((res) => {
-				console.log('look cleanupFunction ', cleanupFunction);
-				console.log('useAdsearch', res);
 				const newAds = res.data;
 				if (cleanupFunction || !isMounted) {
-					return
+					return;
 				}
 				setAds((prev) => {
 					return [...new Set([...prev, ...newAds])];
 				});
 				setHasMore(newAds.length > 0);
 				setLoading(false);
-				store.dispatch(closePopout())
+				store.dispatch(closePopout());
 				setInited(true);
 			})
 			.catch((e) => {
@@ -121,14 +122,14 @@ export default function useAdSearch(
 				if (('' + e).indexOf('404') == -1) {
 					setError(true);
 				}
-				store.dispatch(closePopout())
+				store.dispatch(closePopout());
 				setInited(true);
 			});
 		return () => {
-			cancel()
-			cleanupFunction = true
-		}
-	}, [category, mode, query, pageNumber, city, country, sort, geodata]);
+			cancel();
+			cleanupFunction = true;
+		};
+	}, [category, mode, query, pageNumber, city, country, sort, geodata, geoType, radius, refreshMe]);
 
 	return { inited, newPage: pageNumber, ads, loading, error, hasMore };
 }

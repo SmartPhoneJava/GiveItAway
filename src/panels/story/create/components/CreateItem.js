@@ -38,13 +38,13 @@ import { loadPhotos, MAX_FILE_SIZE } from '../../../../services/file';
 import { PHOTO_TEXT } from '../../../../const/create';
 
 import './createItem.css';
-import { closeSnackbar, setSnackbar } from '../../../../store/router/actions';
+import { closeSnackbar, openSnackbar } from '../../../../store/router/actions';
 
 const nameLabel = 'Название';
 const descriptionLabel = 'Описание';
 
 const CreateItem = (props) => {
-	const { AD, defaultInputData, setFormData, setSnackbar, closeSnackbar } = props;
+	const { AD, defaultInputData, setFormData, openSnackbar, closeSnackbar } = props;
 	const inputData = props.inputData[CREATE_AD_ITEM] || defaultInputData;
 	const name = props.inputData[CREATE_AD_ITEM].name || "";
 	const description = props.inputData[CREATE_AD_ITEM].description || "";
@@ -82,7 +82,7 @@ const CreateItem = (props) => {
 	const { platform } = props;
 
 	function handleWrongSize(file) {
-		setSnackbar(
+		openSnackbar(
 			<Snackbar
 				duration={SNACKBAR_DURATION_DEFAULT}
 				onClose={closeSnackbar}
@@ -99,7 +99,7 @@ const CreateItem = (props) => {
 	}
 
 	function handleWrongType(file) {
-		setSnackbar(
+		openSnackbar(
 			<Snackbar
 				duration={SNACKBAR_DURATION_DEFAULT}
 				onClose={closeSnackbar}
@@ -355,7 +355,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
 	setFormData,
 	closeSnackbar,
-	setSnackbar,
+	openSnackbar,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateItem);

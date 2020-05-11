@@ -264,6 +264,8 @@ const AddsTab = (props) => {
 		country,
 		sort,
 		geodata,
+		geoType,
+		radius,
 		refreshMe
 	);
 
@@ -349,8 +351,6 @@ const AddsTab = (props) => {
 
 				<PullToRefresh
 					onRefresh={() => {
-						console.log("refreshMe")
-						setPageNumber(1);
 						setRefreshMe((prev) => prev + 1);
 					}}
 					isFetching={loading}
