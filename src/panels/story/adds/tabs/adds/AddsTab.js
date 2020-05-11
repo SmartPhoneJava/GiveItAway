@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Group, PanelHeaderButton, Avatar, Banner, Button } from '@vkontakte/vkui';
+import { Search, Group, PanelHeaderButton, Avatar, Banner, List, PullToRefresh } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
@@ -232,6 +232,7 @@ const AddsTab = (props) => {
 	const sort = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].sort : null) || SORT_TIME;
 	const mode = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].mode : null) || MODE_ALL;
 
+	const [refreshMe, setRefreshMe] = useState(1);
 	const [pageNumber, setPageNumber] = useState(1);
 
 	const [filtersOn, setFiltersOn] = useState(false);
@@ -262,7 +263,8 @@ const AddsTab = (props) => {
 		city,
 		country,
 		sort,
-		geodata
+		geodata,
+		refreshMe
 	);
 
 	const observer = useRef();
@@ -345,72 +347,83 @@ const AddsTab = (props) => {
 					) : null}
 				</div>
 
-				<Group>
-					{ads.length > 0 ? (
-						ads.map((ad, index) => {
-							if (!width || width < 500) {
-								if (ads.length === index + 1) {
-									return (
-										<div key={ad.ad_id} ref={lastAdElementRef}>
-											{Ad(ad)}
-										</div>
-									);
-								}
-								return <div key={ad.ad_id}>{Ad(ad)}</div>;
-							}
-							if (index % 2) {
-								const prev = ads[index - 1];
-								const first = (
-									<div className="one-block" key={prev.ad_id}>
-										{Ad(prev)}
-									</div>
-								);
+				<PullToRefresh
+					onRefresh={() => {
+						console.log("refreshMe")
+						setPageNumber(1);
+						setRefreshMe((prev) => prev + 1);
+					}}
+					isFetching={loading}
+				>
+					<Group>
+						<List>
+							{ads.length > 0 ? (
+								ads.map((ad, index) => {
+									if (!width || width < 500) {
+										if (ads.length === index + 1) {
+											return (
+												<div key={ad.ad_id} ref={lastAdElementRef}>
+													{Ad(ad)}
+												</div>
+											);
+										}
+										return <div key={ad.ad_id}>{Ad(ad)}</div>;
+									}
+									if (index % 2) {
+										const prev = ads[index - 1];
+										const first = (
+											<div className="one-block" key={prev.ad_id}>
+												{Ad(prev)}
+											</div>
+										);
 
-								let second = (
-									<div className="one-block" key={ad.ad_id}>
-										{Ad(ad)}
-									</div>
-								);
+										let second = (
+											<div className="one-block" key={ad.ad_id}>
+												{Ad(ad)}
+											</div>
+										);
 
-								if (ads.length === index + 1) {
-									second = (
-										<div className="one-block" key={ad.ad_id} ref={lastAdElementRef}>
-											{Ad(ad)}
-										</div>
-									);
-								}
-								return (
-									<div className="flex-blocks">
-										{first} {second}
-									</div>
-								);
-							}
-							if (index % 2 == 0 && ads.length - 1 == index) {
-								return (
-									<div key={ad.ad_id} ref={lastAdElementRef}>
-										{Ad(ad)}
-									</div>
-								);
-							}
-						})
-					) : error ? (
-						<Error />
-					) : // addsArrDD.map((ad) => {
-					// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
-					// })
-					// addsArrDD.map(ad => {
-					// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
-					// })
-					!inited ? (
-						''
-					) : mode == MODE_ALL ? (
-						<AdNotFound dropFilters={props.dropFilters} />
-					) : mode == MODE_GIVEN ? (
-						<AdNoGiven setAllMode={setAllMode} />
-					) : (
-						<AdNoWanted setAllMode={setAllMode} />
-					)}
-				</Group>
+										if (ads.length === index + 1) {
+											second = (
+												<div className="one-block" key={ad.ad_id} ref={lastAdElementRef}>
+													{Ad(ad)}
+												</div>
+											);
+										}
+										return (
+											<div className="flex-blocks">
+												{first} {second}
+											</div>
+										);
+									}
+									if (index % 2 == 0 && ads.length - 1 == index) {
+										return (
+											<div key={ad.ad_id} ref={lastAdElementRef}>
+												{Ad(ad)}
+											</div>
+										);
+									}
+								})
+							) : error ? (
+								<Error />
+							) : // addsArrDD.map((ad) => {
+							// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
+							// })
+							// addsArrDD.map(ad => {
+							// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
+							// })
+							!inited ? (
+								''
+							) : mode == MODE_ALL ? (
+								<AdNotFound dropFilters={props.dropFilters} />
+							) : mode == MODE_GIVEN ? (
+								<AdNoGiven setAllMode={setAllMode} />
+							) : (
+								<AdNoWanted setAllMode={setAllMode} />
+							)}
+						</List>
+					</Group>
+				</PullToRefresh>
 			</div>
 		</>
 	);

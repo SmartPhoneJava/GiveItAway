@@ -23,7 +23,8 @@ export default function useAdSearch(
 	city,
 	country,
 	sort,
-	geodata
+	geodata,
+	refreshMe
 ) {
 	const [inited, setInited] = useState(false);
 	const [loading, setLoading] = useState(true);
@@ -34,7 +35,7 @@ export default function useAdSearch(
 	useEffect(() => {
 		setAds([]);
 		pageNumber = 1;
-	}, [category, mode, query, city, country, sort, geodata]);
+	}, [category, mode, query, city, country, sort, geodata, refreshMe]);
 
 	useEffect(() => {
 		console.log('deleteID', deleteID);
