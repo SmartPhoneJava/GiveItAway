@@ -39,6 +39,7 @@ import { openPopout, closePopout, openSnackbar, setPage } from '../../../../../s
 import { setDealer } from '../../../../../store/detailed_ad/actions';
 import { PANEL_SUBS } from '../../../../../store/router/panelTypes';
 import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED } from '../../../../../const/ads';
+import { updateDealInfo } from '../../../../../store/detailed_ad/update';
 
 export const Given = (props) => {
 	const dealer = props.dealer;
@@ -206,23 +207,13 @@ const Subs = (props) => {
 	}
 
 	let { inited, loading, error, hasMore, newPage } = useSubsGet(
-		openPopout,
 		pageNumber,
 		props.amount,
 		ad_id,
 		props.maxAmount,
 		(s) => {
 			setPhotos([...s].map((v) => v.photo_url));
-			getDeal(
-				ad_id,
-				(data) => {
-					const d = s.filter((v) => v.vk_id == data.subscriber_id)[0];
-					setDealer(d);
-				},
-				(err) => {
-					console.log('deal fail', err);
-				}
-			);
+			updateDealInfo()
 		},
 		(e) => {}
 	);

@@ -1,38 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Avatar, PanelHeaderButton, Link, Button, InfoRow, CellButton, Separator } from '@vkontakte/vkui';
-
-import { AdDefault } from './AddMore2';
-
-import Icon24CommentOutline from '@vkontakte/icons/dist/24/comment_outline';
-import Icon24Chats from '@vkontakte/icons/dist/24/chats';
-import Icon16Place from '@vkontakte/icons/dist/16/place';
-
-import Icon24ShareOutline from '@vkontakte/icons/dist/24/share_outline';
-import Icon24LikeOutline from '@vkontakte/icons/dist/24/like_outline';
-
-import Icon24Phone from '@vkontakte/icons/dist/24/phone';
-import Icon24Mention from '@vkontakte/icons/dist/24/mention';
-import Icon24Info from '@vkontakte/icons/dist/24/info';
-
-import Icon24Hide from '@vkontakte/icons/dist/24/hide';
-
-import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
+import React from 'react';
 
 import Icon20ArticleBoxOutline from '@vkontakte/icons/dist/20/article_box_outline';
 
-import Icon12Lock from '@vkontakte/icons/dist/12/lock';
 import Icon16CheckCircle from '@vkontakte/icons/dist/16/check_circle';
 import Icon16Clear from '@vkontakte/icons/dist/16/clear';
 
-import OpenActions from './components/actions';
-
-import { time } from './../../utils/time';
 import { shortText } from './../../utils/short_text';
-
-import { Draft } from './../../store/draft';
 
 import './addsTab.css';
 import './Add7.css';
+import { STATUS_ABORTED, STATUS_CLOSED, STATUS_CHOSEN } from '../../const/ads';
 
 export function AdLight(ad, image, openAd) {
 	return (
@@ -51,7 +28,7 @@ export function AdLight(ad, image, openAd) {
 				</div>
 			</div>
 
-			{ad.status == 'aborted' ? (
+			{ad.status == STATUS_ABORTED ? (
 				<div className="light-failed">
 					<div className="on-img-text">
 						<Icon16Clear style={{ marginRight: '5px' }} />
@@ -61,7 +38,7 @@ export function AdLight(ad, image, openAd) {
 			) : (
 				''
 			)}
-			{ad.status == 'closed' ? (
+			{ad.status == STATUS_CLOSED ? (
 				<div className="light-success">
 					<div className="on-img-text">
 						<Icon16CheckCircle style={{ marginRight: '5px' }} />
@@ -71,7 +48,7 @@ export function AdLight(ad, image, openAd) {
 			) : (
 				''
 			)}
-			{ad.status == 'chosen' ? (
+			{ad.status == STATUS_CHOSEN ? (
 				<div className="light-deal">
 					<div
 						style={{
@@ -92,254 +69,4 @@ export function AdLight(ad, image, openAd) {
 	);
 }
 
-const Add6 = (props) => {
-	const [ad, setAd] = useState(props.ad);
-	const [haveDeal, setHaveDeal] = useState(false);
-	const [isVisible, setIsVisible] = useState(true);
-
-	async function init() {
-		setHaveDeal(props.ad.status == 'chosen');
-		setIsVisible(!props.ad.hidden);
-	}
-
-	useEffect(() => {
-		Draft.subscribe(init);
-	}, []);
-
-	useEffect(() => {
-		init();
-	}, [props.ad]);
-
-	function getFeedback(pm, comments) {
-		if (pm) {
-			return (
-				<Icon24Chats
-					onClick={() => {
-						props.openAd();
-					}}
-					fill="var(--grey)"
-				/>
-			);
-		}
-		if (comments) {
-			return (
-				<Icon24CommentOutline
-					onClick={() => {
-						props.openAd();
-					}}
-					fill="var(--grey)"
-				/>
-			);
-		}
-		return (
-			<Icon24Info
-				onClick={() => {
-					props.openAd();
-				}}
-				fill="var(--grey)"
-			/>
-		);
-	}
-
-	const image = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : '';
-
-	function openSettings() {
-		props.chooseAdd(ad);
-		OpenActions(
-			props.setPopout,
-			props.setSnackbar,
-			props.refresh,
-			ad.ad_id,
-			props.onCloseClick,
-			haveDeal,
-			!isVisible
-		);
-	}
-
-	function isAuthor() {
-		return props.myID == ad.author.vk_id;
-	}
-
-	function controllButton() {
-		return (ad.status == 'offer' || ad.status == 'chosen') && isAuthor() ? (
-			// <PanelHeaderButton
-			// 	mode="primary"
-			// 	size="m"
-			// 	className="button"
-			// 	onClick={openSettings}
-			// 	disabled={ad.status !== 'offer' && ad.status !== 'chosen'}
-			// >
-			// 	<Icon24MoreVertical />
-			// </PanelHeaderButton>
-			<Icon24MoreVertical
-				onClick={openSettings}
-				style={{ marginLeft: 'auto', marginTop: '15px', marginRight: '10px' }}
-			/>
-		) : (
-			''
-		);
-	}
-
-	function authorPanel(openAd) {
-		return (
-			<div
-				style={{
-					display: 'flex',
-					paddingBottom: '10px',
-					alignItems: 'center',
-				}}
-			>
-				{!ad.anonymous ? (
-					<Avatar
-						onClick={() => {
-							props.openUser(ad.author.vk_id);
-						}}
-						style={{
-							marginRight: '5px',
-						}}
-						size={36}
-						src={ad.author.photo_url}
-					/>
-				) : (
-					''
-				)}
-
-				<div
-					onClick={openAd}
-					style={{
-						display: 'block',
-					}}
-				>
-					<div>{!ad.anonymous ? ad.author.name + ' ' + ad.author.surname : ''}</div>
-				</div>
-			</div>
-		);
-	}
-
-	function commonActions() {
-		return <></>;
-		return (
-			<div style={{ marginLeft: 'auto' }}>
-				<PanelHeaderButton mode="secondary" className="button" size="m" disabled={ad.status !== 'offer'}>
-					{getFeedback(ad.feedback_type == 'ls', ad.feedback_type == 'comments')}
-				</PanelHeaderButton>
-				<PanelHeaderButton mode="secondary" className="button" size="m">
-					<Icon24ShareOutline fill="var(--grey)" />
-				</PanelHeaderButton>
-				{isAuthor() ? (
-					''
-				) : (
-					<PanelHeaderButton mode="secondary" className="button" size="m">
-						<Icon24LikeOutline fill="var(--grey)" />
-					</PanelHeaderButton>
-				)}
-			</div>
-		);
-	}
-
-	if (!ad) {
-		return <></>;
-	}
-	return (
-		<div className="outter">
-			<div
-				className={
-					ad.status == 'aborted'
-						? 'tile tile-failed'
-						: ad.status == 'closed'
-						? 'tile tile-success'
-						: ad.status == 'chosen'
-						? 'tile tile-chosen'
-						: ad.status == 'offer'
-						? 'tile'
-						: 'tile'
-				}
-			>
-				<div className="main">
-					<div onClick={props.openAd} className="main-left">
-						<img src={image} className="tiled" />
-						<div className="city">
-							<div
-								style={{ display: 'flex', color: 'rgb(200,200,200)', fontSize: '12px', padding: '2px' }}
-							>
-								<Icon16Place /> {ad.district}
-							</div>
-						</div>
-
-						{ad.status == 'aborted' ? (
-							<div className="failed">
-								<div className="on-img-text">
-									<Icon16Clear style={{ marginRight: '5px' }} />
-									Отменено
-								</div>
-							</div>
-						) : (
-							''
-						)}
-						{ad.status == 'closed' ? (
-							<div className="success">
-								<div className="on-img-text">
-									<Icon16CheckCircle style={{ marginRight: '5px' }} />
-									Вещь отдана
-								</div>
-							</div>
-						) : (
-							''
-						)}
-						{ad.status == 'chosen' && isAuthor() && haveDeal ? (
-							<div className="deal">
-								<div style={{ color: 'rgb(220,220,220)', fontSize: '12px', padding: '2px' }}>
-									Ожидание ответа
-								</div>
-							</div>
-						) : (
-							''
-						)}
-						{!isVisible ? (
-							isAuthor() && haveDeal ? (
-								<div className="hidden2">
-									<div style={{ display: 'flex', color: 'white', fontSize: '12px', padding: '2px' }}>
-										<Icon12Lock />
-										Видно только вам
-									</div>
-								</div>
-							) : (
-								<div className="hidden">
-									<div className="on-img-text">
-										<Icon12Lock />
-										Видно только вам
-									</div>
-								</div>
-							)
-						) : (
-							''
-						)}
-					</div>
-					<div onClick={props.openAd} style={{ padding: '10px' }}>
-						{authorPanel(props.openAd)}
-						<InfoRow> {shortText(ad.header, 300)} </InfoRow>
-					</div>
-					{controllButton()}
-				</div>
-				<div
-					onClick={props.openAd}
-					style={{
-						textAlign: 'center',
-						color: 'grey',
-						width: '120px',
-						marginBottom: '4px',
-						marginTop: '4px',
-					}}
-				>
-					{time(ad.creation_date)}
-				</div>
-				<Separator />
-				<div style={{ display: 'flex' }}>{commonActions()}</div>
-			</div>
-		</div>
-	);
-};
-
-export default Add6;
-
-// 329
+// 329 -> 71

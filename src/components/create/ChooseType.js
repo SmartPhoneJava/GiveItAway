@@ -32,7 +32,7 @@ const ChooseType = (props) => {
 				value={TYPE_CHOICE}
 				onChange={handleChecked}
 				description="Вы самостоятельно выбираете человека, которому отдадите вещь"
-				checked={inputData.type == 'choice'}
+				checked={inputData.type == TYPE_CHOICE}
 			>
 				Сделка
 			</Radio>
@@ -42,7 +42,7 @@ const ChooseType = (props) => {
 				value={TYPE_RANDOM}
 				onChange={handleChecked}
 				description="Получатель определяется случайным образом из списка откликнувшихся"
-				checked={inputData.type == 'random'}
+				checked={inputData.type == TYPE_RANDOM}
 			>
 				Лотерея
 			</Radio>
@@ -52,7 +52,7 @@ const ChooseType = (props) => {
 				value={TYPE_AUCTION}
 				onChange={handleChecked}
 				description="Ваша вещь достанется тому, кто предложит больше всего Кармы"
-				checked={inputData.type == 'auction'}
+				checked={inputData.type == TYPE_AUCTION}
 			>
 				Аукцион
 			</Radio>

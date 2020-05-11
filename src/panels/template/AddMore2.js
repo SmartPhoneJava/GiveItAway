@@ -25,9 +25,8 @@ import 'react-photoswipe/lib/photoswipe.css';
 import { PhotoSwipe, PhotoSwipeGallery } from 'react-photoswipe';
 
 import Icon56WriteOutline from '@vkontakte/icons/dist/56/write_outline';
-import Icon36Done from '@vkontakte/icons/dist/36/done';
 
-import { GetCategoryText, GetCategoryImageSmall } from './Categories';
+import { GetCategoryText } from '../../components/categories/Categories';
 
 import Icon24Hide from '@vkontakte/icons/dist/24/hide';
 import Icon24Globe from '@vkontakte/icons/dist/24/globe';
@@ -42,8 +41,6 @@ import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon24BrowserForward from '@vkontakte/icons/dist/24/browser_forward';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
 import Icon24ShareExternal from '@vkontakte/icons/dist/24/share_external';
-import Icon24Settings from '@vkontakte/icons/dist/24/settings';
-import Icon28SettingsOutline from '@vkontakte/icons/dist/28/settings_outline';
 import Icon24Place from '@vkontakte/icons/dist/24/place';
 
 import Subs, { Given } from './../story/adds/tabs/subs/subs';
@@ -54,7 +51,6 @@ import { K } from './../story/profile/Profile';
 import Icon24Coins from '@vkontakte/icons/dist/24/coins';
 import Icon24Help from '@vkontakte/icons/dist/24/help';
 import Icon24MarketOutline from '@vkontakte/icons/dist/24/market_outline';
-import Icon24Market from '@vkontakte/icons/dist/24/market';
 
 import {
 	adVisible,
@@ -68,7 +64,6 @@ import {
 } from './../../requests';
 
 import './addsTab.css';
-
 import './styles.css';
 
 import Comments from './../story/adds/tabs/comments/comments';
@@ -80,13 +75,11 @@ import { MODAL_ADS_COST, MODAL_ADS_FROZEN } from '../../store/router/modalTypes'
 import {
 	setCost,
 	setIsSub,
-	setSubs,
-	setIsDealer,
-	setDeal,
 	setPhotos,
 	setIsHidden,
 	setExtraInfo,
 	setIsAuthor,
+	clearAds,
 } from '../../store/detailed_ad/actions';
 import {
 	AdDefault,
@@ -105,20 +98,15 @@ import { shareInVK } from '../../services/VK';
 import { STORY_CREATE, STORY_ADS } from '../../store/router/storyTypes';
 import { EDIT_MODE, CREATE_AD_MAIN, CREATE_AD_ITEM } from '../../store/create_post/types';
 import { setFormData } from '../../store/create_post/actions';
-import { defaultInputData } from '../../const/create';
 import { FORM_CREATE } from '../../components/categories/redux';
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
-import { smoothScrollToTop } from '../../services/_functions';
-import { updateDealInfo } from '../../store/detailed_ad/update';
+import { updateDealInfo, updateCost, updateSubs } from '../../store/detailed_ad/update';
 
 const AddMore2r = (props) => {
 	const { myID, dispatch } = props;
 	const {
 		setCost,
 		setIsSub,
-		setSubs,
-		setIsDealer,
-		setDeal,
 		setIsAuthor,
 		setPhotos,
 		setIsHidden,
@@ -127,6 +115,7 @@ const AddMore2r = (props) => {
 		openPopout,
 		setStory,
 		setFormData,
+		clearAds,
 	} = props;
 	const { setPage, openModal, setDummy, AD } = props;
 	const {
@@ -245,36 +234,13 @@ const AddMore2r = (props) => {
 	}
 
 	useEffect(() => {
-		// if (isNotValid(props.ad)) {
-		// 	setImage('');
-		// 	return;
-		// }
-		const init = () => (dispatch) => {
+		const init = () => () => {
 			const id = AD.ad_id;
+			clearAds()
 			updateDealInfo();
-			getCost(
-				ad_id,
-				(data) => {
-					setCost(data.bid);
-					getSubscribers(
-						id,
-						(s) => {
-							console.log('suuubs', s);
-							setSubs(s);
-						},
-						(e) => {
-							// props.setCost(-data.bid);
-						}
-					);
-				},
-				(e) => {
-					console.log('some err', e);
-				}
-			);
-
+			updateCost()
+			updateSubs()
 			getUser(
-				openPopout,
-				openSnackbar,
 				myID,
 				(v) => {
 					props.setbackUser(v);
@@ -288,7 +254,9 @@ const AddMore2r = (props) => {
 					setExtraInfo(details);
 					setIsAuthor(details.author.vk_id == myID);
 				},
-				(e) => {}
+				(e) => {
+					setIsAuthor(false);
+				}
 			);
 		};
 		dispatch(init());
@@ -551,10 +519,6 @@ const AddMore2r = (props) => {
 		setStory(STORY_CREATE, null, true);
 	}
 
-	// console.log("details info", isDealer, status, status == 'aborted' || isAuthor() ? (
-	// 	''
-	// ) : isSub )
-
 	return (
 		<div>
 			<div onClick={() => {}}>
@@ -725,7 +689,7 @@ const AddMore2r = (props) => {
 							<td>{subs.length > 0 ? subs.length : '0'}</td>
 						</tr>
 					) : (
-						''
+						null
 					)}
 
 					<tr>
@@ -849,9 +813,6 @@ const mapDispatchToProps = (dispatch) => {
 
 				setCost,
 				setIsSub,
-				setSubs,
-				setIsDealer,
-				setDeal,
 
 				setPhotos,
 				setIsHidden,
@@ -863,6 +824,8 @@ const mapDispatchToProps = (dispatch) => {
 
 				openPopout,
 				openSnackbar,
+
+				clearAds,
 			},
 			dispatch
 		),

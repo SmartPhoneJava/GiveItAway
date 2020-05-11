@@ -9,7 +9,6 @@ import { setSubs, addSub } from '../../../../../store/detailed_ad/actions';
 import { openPopout, closePopout } from '../../../../../store/router/actions';
 
 export default function useSubsGet(
-	setPopout,
 	pageNumber,
 	rowsPerPage,
 	ad_id,
@@ -67,7 +66,7 @@ export default function useSubsGet(
 				successCallback(newNots);
 			})
 			.catch((e) => {
-				console.log('fail subs', e);
+				console.log('ERROR useSubsGet:', e);
 				if (axios.isCancel(e)) return;
 
 				store.dispatch(closePopout());

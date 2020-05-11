@@ -1,16 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import {
-	Avatar,
-	Link,
-	Button,
-	Cell,
-	Header,
-	Group,
-	Placeholder,
-	HorizontalScroll,
-	Separator,
-	Banner,
-} from '@vkontakte/vkui';
+import { Avatar, Link, Button, Cell, Header, Group, Placeholder, HorizontalScroll, Banner } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
@@ -27,7 +16,7 @@ import Icon56DoNotDisturbOutline from '@vkontakte/icons/dist/56/do_not_disturb_o
 
 import Error from './../../placeholders/error';
 
-import { old, time, fromSeconds } from './../../../utils/time';
+import { old, fromSeconds } from './../../../utils/time';
 
 import './profile.css';
 import { setFormData } from '../../../store/create_post/actions';
@@ -111,8 +100,6 @@ const Profile = (props) => {
 	useEffect(() => {
 		let cleanupFunction = false;
 		getUser(
-			openPopout,
-			openSnackbar,
 			profileID,
 			(v) => {
 				if (cleanupFunction) {
@@ -468,8 +455,6 @@ const Profile = (props) => {
 				<Error
 					action={() => {
 						getUser(
-							openPopout,
-							openSnackbar,
 							profileID,
 							(v) => {
 								setBackUser(v);

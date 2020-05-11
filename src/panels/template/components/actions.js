@@ -67,7 +67,8 @@ const OpenActions = (props) => {
 										ваше объявление.
 									</Snackbar>
 								);
-							}
+							},
+							1
 						);
 					}}
 				>

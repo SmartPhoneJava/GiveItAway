@@ -21,6 +21,7 @@ import { sendSnack } from './../../../../../requests';
 
 import './notification.css';
 import Notification from './Notification';
+import { STATUS_CHOSEN, STATUS_ABORTED } from '../../../../../const/ads';
 
 export const NT_CLOSE = 'ad_close'; // приходит выбранному автором пользователю
 export const NT_RESPOND = 'respond'; // приходит автору
@@ -84,7 +85,7 @@ const arr = [
 			},
 			ad: {
 				ad_id: 3201,
-				status: 'chosen',
+				status: STATUS_CHOSEN,
 				header: 'Отдам котенка',
 				pathes_to_photo: [
 					{ AdPhotoId: 1, PhotoUrl: Cat },
@@ -129,7 +130,7 @@ const arr = [
 		payload: {
 			ad: {
 				ad_id: 3201,
-				status: 'chosen',
+				status: STATUS_CHOSEN,
 				header: 'Меняю вещи',
 				pathes_to_photo: [
 					{ AdPhotoId: 1, PhotoUrl: Jins },
@@ -147,7 +148,7 @@ const arr = [
 		payload: {
 			ad: {
 				ad_id: 3201,
-				status: 'chosen',
+				status: STATUS_CHOSEN,
 				header: 'Ловите штукатурку',
 				pathes_to_photo: [
 					{ AdPhotoId: 1, PhotoUrl: Bb },
@@ -165,7 +166,7 @@ const arr = [
 		payload: {
 			ad: {
 				ad_id: 3201,
-				status: 'aborted',
+				status: STATUS_ABORTED,
 				header: 'Заберите продукты: бананы и морковку',
 				pathes_to_photo: [
 					{ AdPhotoId: 1, PhotoUrl: Tea },
@@ -248,7 +249,7 @@ function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackba
 									date={v.creation_date_time}
 									author=""
 									text={
-										v.status == 'chosen'
+										v.status == STATUS_CHOSEN
 											? 'Автор выбрал пользователя для передачи вещи'
 											: v.status == 'close'
 											? 'Вещь отдана'

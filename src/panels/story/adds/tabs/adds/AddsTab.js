@@ -5,19 +5,12 @@ import { connect } from 'react-redux';
 
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 
-import Add from './../../../../template/Add';
 import Add7 from './../../../../template/Add7';
-import Add6 from './../../../../template/Add6';
-import Add4 from './../../../../template/Add4';
-import Add3 from './../../../../template/Add3';
-import Add2 from './../../../../template/Add2';
-import Add0 from './../../../../template/Add0';
 
 import useAdSearch from './useAdSearch';
 
 import './addsTab.css';
 
-import { NoRegion } from './../../../../template/Location';
 import { CategoryNo } from './../../../../template/Categories';
 
 import Error from './../../../../placeholders/error';
@@ -38,6 +31,7 @@ import { openSnackbar, openPopout, closePopout } from '../../../../../store/rout
 import AdNoWanted from '../../../../placeholders/adNoWanted';
 import { setFormData } from '../../../../../store/create_post/actions';
 import AdNoGiven from '../../../../placeholders/adNoGiven';
+import { NoRegion } from '../../../../../components/location/const';
 
 const addsArrDD = [
 	{
@@ -243,12 +237,12 @@ const AddsTab = (props) => {
 
 	const [filtersOn, setFiltersOn] = useState(false);
 	useEffect(() => {
-		if (country == NoRegion && city == NoRegion && category == CategoryNo) {
+		if (country == NoRegion && city == NoRegion && category == CategoryNo && radius == 0) {
 			setFiltersOn(false);
 			return;
 		}
 		setFiltersOn(true);
-	}, [country, city, category]);
+	}, [country, city, category, radius]);
 
 	const [isMounted, setIsMounted] = useState(true);
 	useEffect(() => {

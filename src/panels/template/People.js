@@ -32,7 +32,8 @@ export const PeopleRBI = withModalRootContext((props) => {
 				setSubs(s);
 				props.updateModalHeight();
 			},
-			(e) => {}
+			(e) => {},
+			10
 		);
 	}, [props.ad_id]);
 

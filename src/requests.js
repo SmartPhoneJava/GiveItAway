@@ -207,7 +207,6 @@ export async function getDeal(ad_id, successCallback, failCallback) {
 }
 
 export async function getCost(ad_id, successCallback, failCallback) {
-	let err = false;
 	let cancel;
 	axios({
 		method: 'get',
@@ -216,7 +215,6 @@ export async function getCost(ad_id, successCallback, failCallback) {
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
-			console.log('response from getCost:', response);
 			return response.data;
 		})
 		.then(function (response) {
@@ -226,7 +224,7 @@ export async function getCost(ad_id, successCallback, failCallback) {
 			return response;
 		})
 		.catch(function (error) {
-			err = true;
+			console.log('ERROR getCost:', error);
 			if (failCallback) {
 				failCallback(error);
 			}
@@ -285,7 +283,7 @@ export function acceptDeal(deal_id, successCallback, failCallback, end) {
 	})
 		.then(function (response) {
 			console.log('response from acceptDeal:', response);
-			
+
 			return response.data;
 		})
 		.then(function (response) {
@@ -372,14 +370,14 @@ export function Close(ad_id, subscriber_id, successCallback, failCallback) {
 	return err;
 }
 
-export async function getSubscribers(ad_id, successCallback, failCallback) {
+export async function getSubscribers(ad_id, successCallback, failCallback, count) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;
 	const subscribers = await axios({
 		method: 'get',
 		withCredentials: true,
-		params: { page: 1, rows_per_page: 1000 }, // todo поправить
+		params: { page: 1, rows_per_page: count },
 		url: Addr.getState() + BASE_AD + ad_id + '/subscribers',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})

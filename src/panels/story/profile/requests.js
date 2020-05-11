@@ -17,7 +17,7 @@ import { openPopout, openSnackbar, closePopout } from '../../../store/router/act
 
 let request_id = 0;
 
-export async function getUser(setPopout, setSnackbar, user_id, successCallback, failCallback) {
+export async function getUser(user_id, successCallback, failCallback) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />))
 	let err = false;
 	let cancel;
@@ -38,6 +38,7 @@ export async function getUser(setPopout, setSnackbar, user_id, successCallback, 
 			return response;
 		})
 		.catch(function (error) {
+			console.log('ERROR getUser:', error);
 			err = true;
 			failCallback(error);
 			fail('Нет соединения с сервером');

@@ -20,17 +20,16 @@ import { time } from '../../utils/time';
 import { Draft } from '../../store/draft';
 
 import './Add7.css';
-import { GetCategoryText } from './Categories';
-import { openPopout } from '../../store/router/actions';
+import { GetCategoryText } from '../../components/categories/Categories';
+import { STATUS_ABORTED, STATUS_CLOSED, STATUS_CHOSEN, STATUS_OFFER } from '../../const/ads';
 
 const Add7 = (props) => {
-	const {openPopout} = props
 	const [ad, setAd] = useState(props.ad);
 	const [haveDeal, setHaveDeal] = useState(false);
 	const [isVisible, setIsVisible] = useState(true);
 
 	async function init() {
-		setHaveDeal(props.ad.status == 'chosen');
+		setHaveDeal(props.ad.status == STATUS_CHOSEN);
 		setIsVisible(!props.ad.hidden);
 	}
 
@@ -54,15 +53,6 @@ const Add7 = (props) => {
 				hidden={haveDeal}
 			/>
 		);
-		// OpenActions(
-		// 	props.setPopout,
-		// 	props.setSnackbar,
-		// 	props.refresh,
-		// 	ad.ad_id,
-		// 	props.onCloseClick,
-		// 	haveDeal,
-		// 	!isVisible
-		// );
 	}
 
 	function isAuthor() {
@@ -70,7 +60,7 @@ const Add7 = (props) => {
 	}
 
 	function controllButton() {
-		return (ad.status == 'offer' || ad.status == 'chosen') && isAuthor() ? (
+		return (ad.status == STATUS_OFFER || ad.status == STATUS_CHOSEN) && isAuthor() ? (
 			<Icon24MoreVertical onClick={openSettings} style={{ marginLeft: 'auto', marginBottom: 'auto' }} />
 		) : (
 			''
@@ -115,7 +105,7 @@ const Add7 = (props) => {
 						<Icon16Place /> {ad.district}
 					</div>
 
-					{ad.status == 'aborted' ? (
+					{ad.status == STATUS_ABORTED ? (
 						<div className="failed">
 							<div className="on-img-text">
 								<Icon16Clear style={{ marginRight: '5px' }} />
@@ -125,7 +115,7 @@ const Add7 = (props) => {
 					) : (
 						''
 					)}
-					{ad.status == 'closed' ? (
+					{ad.status == STATUS_CLOSED ? (
 						<div className="success">
 							<div className="on-img-text">
 								<Icon16CheckCircle style={{ marginRight: '5px' }} />
@@ -135,7 +125,7 @@ const Add7 = (props) => {
 					) : (
 						''
 					)}
-					{ad.status == 'chosen' && isAuthor() && haveDeal ? (
+					{ad.status == STATUS_CHOSEN && isAuthor() && haveDeal ? (
 						<div className="deal">
 							<div style={{ color: 'rgb(220,220,220)', fontSize: '12px', padding: '2px' }}>
 								Ожидание ответа

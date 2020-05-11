@@ -18,7 +18,7 @@ import { GEO_TYPE_FILTERS, GEO_TYPE_NEAR, SORT_TIME, SORT_GEO } from './../../co
 function applyTimeSort(inputData, dispatch) {
 	dispatch(
 		setFormData(ADS_FILTERS, {
-			...inputData,
+			...inputData[ADS_FILTERS],
 			sort: SORT_TIME,
 		})
 	);
@@ -28,14 +28,14 @@ function applyTimeSort(inputData, dispatch) {
 function applyGeoSort(inputData, dispatch) {
 	dispatch(
 		setFormData(ADS_FILTERS, {
-			...inputData,
+			...inputData[ADS_FILTERS],
 			sort: SORT_GEO,
 		})
 	);
 	bridge.send('VKWebAppGetGeodata').then((value) => {
 		dispatch(
 			setFormData(ADS_FILTERS, {
-				...inputData,
+				...inputData[ADS_FILTERS],
 				sort: SORT_GEO,
 				geodata: value,
 			})
@@ -48,7 +48,7 @@ function applyGeoSort(inputData, dispatch) {
 function setRadius(inputData, radius, dispatch) {
 	dispatch(
 		setFormData(ADS_FILTERS, {
-			...inputData,
+			...inputData[ADS_FILTERS],
 			radius,
 		})
 	);
@@ -80,7 +80,7 @@ function openGeoSearch(dispatch) {
 function setGeoFilters(inputData, dispatch) {
 	dispatch(
 		setFormData(ADS_FILTERS, {
-			...inputData,
+			...inputData[ADS_FILTERS],
 			geotype: GEO_TYPE_FILTERS,
 		})
 	);
@@ -89,7 +89,7 @@ function setGeoFilters(inputData, dispatch) {
 function setGeoNear(inputData, dispatch) {
 	dispatch(
 		setFormData(ADS_FILTERS, {
-			...inputData,
+			...inputData[ADS_FILTERS],
 			geotype: GEO_TYPE_NEAR,
 		})
 	);

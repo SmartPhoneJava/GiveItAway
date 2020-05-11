@@ -1,6 +1,6 @@
-import { setDeal, setIsDealer, setDealer } from './actions';
+import { setDeal, setIsDealer, setDealer, setSubs, setCost } from './actions';
 import { store } from '../..';
-import { getDeal } from '../../requests';
+import { getDeal, getSubscribers, getCost } from '../../requests';
 import { openSnackbar } from '../router/actions';
 import { getUser } from '../../panels/story/profile/requests';
 
@@ -15,30 +15,58 @@ export function updateDealInfo() {
 				return;
 			}
 			store.dispatch(setDeal(d));
-	
+
 			store.dispatch(setIsDealer(d.subscriber_id == myID));
-			getUser(null, null, d.subscriber_id, (user)=>{
-				if (cancel) {
-					return;
+			getUser(
+				d.subscriber_id,
+				(user) => {
+					if (cancel) {
+						return;
+					}
+					store.dispatch(setDealer(user));
+				},
+				(e) => {
+					store.dispatch(setDealer(null));
 				}
-				console.log("!!! deal", d)
-				console.log("!!! setIsDealer", d.subscriber_id == myID)
-				console.log("!!! user", user)
-				// setDeal(d);
-	
-				// setIsDealer(d.subscriber_id == myID);
-				// const subDeal = s.filter((v) => v.vk_id == d.subscriber_id);
-				// const newDealer = subDeal.length > 0 ? subDeal[0] : null;
-				// console.log("!!! newDealer", newDealer)
-				store.dispatch(setDealer(user));
-			}, (e)=>{
-				console.log("some error happened")
-			})
-		
+			);
 		},
 		(e) => {
-			console.log('error updateDealInfo', e);
+			console.log('ERROR updateDealInfo:', e);
+			store.dispatch(setDeal(null));
+			store.dispatch(setIsDealer(false));
+			store.dispatch(setDealer(null));
 		}
+	);
+
+	return () => {
+		cancel = true;
+	};
+}
+
+const SUBS_AMOUNT = 10;
+
+export function updateSubs() {
+	let cancel = false;
+	const ad_id = store.getState().ad.ad_id;
+	getSubscribers(
+		ad_id,
+		(s) => store.dispatch(setSubs(s)),
+		(e) => store.dispatch(setSubs(null)),
+		SUBS_AMOUNT
+	);
+
+	return () => {
+		cancel = true;
+	};
+}
+
+export function updateCost() {
+	let cancel = false;
+	const ad_id = store.getState().ad.ad_id;
+	getCost(
+		ad_id,
+		(data) => setCost(data.bid),
+		(e) => setCost(0)
 	);
 
 	return () => {

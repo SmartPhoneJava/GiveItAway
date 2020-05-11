@@ -48,25 +48,11 @@ const AddsModal = (props) => {
 	const { closeModal, inputData } = props;
 	const { openGeoSearch, openCountries, openCities, openCategories, openCarma } = props;
 
-	const applyTimeSort = () => {
-		props.applyTimeSort(inputData);
-	};
-
-	const setRadius = (r) => {
-		props.setRadius(inputData, r);
-	};
-
-	const applyGeoSort = () => {
-		props.applyGeoSort(inputData);
-	};
-
-	const setGeoFilters = () => {
-		props.setGeoFilters(inputData);
-	};
-
-	const setGeoNear = () => {
-		props.setGeoNear(inputData);
-	};
+	const applyTimeSort = () => props.applyTimeSort(inputData);
+	const setRadius = (r) => props.setRadius(inputData, r);
+	const applyGeoSort = () => props.applyGeoSort(inputData);
+	const setGeoFilters = () => props.setGeoFilters(inputData);
+	const setGeoNear = () => props.setGeoNear(inputData);
 
 	const geoType = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geotype : null) || GEO_TYPE_FILTERS;
 	const radius = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].radius : null) || 0;
@@ -78,8 +64,6 @@ const AddsModal = (props) => {
 
 	const cost = props.ad.cost || 0;
 	const isSubscriber = props.ad.isSub || 0;
-
-	console.log('looook at cost', props.ad);
 
 	function isRadiusValid() {
 		return radius >= 0.5 && radius <= 100;
@@ -129,10 +113,22 @@ const AddsModal = (props) => {
 				</Group>
 
 				<Group separator="show" header={<Header mode="secondary">Отсортировать по</Header>}>
-					<Radio checked={sort == SORT_TIME} key="1" value={SORT_TIME} name="sort" onChange={applyTimeSort}>
+					<Radio
+						checked={sort == SORT_TIME}
+						key={SORT_TIME}
+						value={SORT_TIME}
+						name="sort"
+						onChange={applyTimeSort}
+					>
 						По времени
 					</Radio>
-					<Radio checked={sort == SORT_GEO} key="2" value={SORT_GEO} name="sort" onChange={applyGeoSort}>
+					<Radio
+						checked={sort == SORT_GEO}
+						key={SORT_GEO}
+						value={SORT_GEO}
+						name="sort"
+						onChange={applyGeoSort}
+					>
 						По близости
 					</Radio>
 				</Group>
@@ -150,16 +146,16 @@ const AddsModal = (props) => {
 				<Radio
 					name="radio"
 					value={GEO_TYPE_FILTERS}
-					defaultChecked={geoType == GEO_TYPE_FILTERS}
-					onClick={setGeoFilters}
+					checked={geoType == GEO_TYPE_FILTERS}
+					onChange={setGeoFilters}
 				>
 					В указанных стране и городе
 				</Radio>
 				<Radio
 					name="radio"
-					defaultChecked={geoType == GEO_TYPE_NEAR}
+					checked={geoType == GEO_TYPE_NEAR}
 					value={GEO_TYPE_NEAR}
-					onClick={setGeoNear}
+					onChange={setGeoNear}
 					description="Необходимо предоставить доступ к GPS"
 				>
 					Недалеко от меня
