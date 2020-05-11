@@ -51,7 +51,7 @@ export function updateSubs() {
 	getSubscribers(
 		ad_id,
 		(s) => store.dispatch(setSubs(s)),
-		(e) => store.dispatch(setSubs(null)),
+		(e) => store.dispatch(setSubs([])),
 		SUBS_AMOUNT
 	);
 

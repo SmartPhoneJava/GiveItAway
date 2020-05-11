@@ -30,6 +30,7 @@ import { GetCategoryText } from '../../components/categories/Categories';
 
 import Icon24Hide from '@vkontakte/icons/dist/24/hide';
 import Icon24Globe from '@vkontakte/icons/dist/24/globe';
+import Icon24Fullscreen from '@vkontakte/icons/dist/24/fullscreen';
 
 import Icon24VideoFill from '@vkontakte/icons/dist/24/video_fill';
 
@@ -129,7 +130,7 @@ const AddMore2r = (props) => {
 		photos,
 		header,
 		ad_id,
-		subs,
+		subscribers_num,
 		district,
 		region,
 		text,
@@ -236,10 +237,10 @@ const AddMore2r = (props) => {
 	useEffect(() => {
 		const init = () => () => {
 			const id = AD.ad_id;
-			clearAds()
+			clearAds();
 			updateDealInfo();
-			updateCost()
-			updateSubs()
+			updateCost();
+			updateSubs();
 			getUser(
 				myID,
 				(v) => {
@@ -542,7 +543,7 @@ const AddMore2r = (props) => {
 						size="m"
 					>
 						<Avatar style={{ background: 'rgba(0,0,0,0.7)' }} size={32}>
-							<Icon24VideoFill fill="var(--white)" />
+							<Icon24Fullscreen fill="var(--white)" />
 						</Avatar>
 					</PanelHeaderButton>
 				</div>
@@ -685,12 +686,10 @@ const AddMore2r = (props) => {
 					</tr>
 					{!isFinished() ? (
 						<tr>
-							<td className="first">Отклинулось</td>
-							<td>{subs.length > 0 ? subs.length : '0'}</td>
+							<td className="first">Откликнулось</td>
+							<td>{subscribers_num}</td>
 						</tr>
-					) : (
-						null
-					)}
+					) : null}
 
 					<tr>
 						<td className="first">Размещено</td>
@@ -732,7 +731,7 @@ const AddMore2r = (props) => {
 					</div>
 				</Cell>
 			</Group>
-			<Given openUser={props.openUser} dealer={dealer} />
+			<Given openSubs={openSubs} isAuthor={isAuthor} openUser={props.openUser} dealer={dealer} />
 			{isAuthor && isFinished ? <Subs openUser={props.openUser} amount={2} maxAmount={2} mini={true} /> : null}
 
 			{comments_enabled ? (

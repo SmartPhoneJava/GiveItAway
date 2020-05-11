@@ -43,10 +43,30 @@ import { updateDealInfo } from '../../../../../store/detailed_ad/update';
 
 export const Given = (props) => {
 	const dealer = props.dealer;
+	const isAuthor = props.isAuthor;
+	const openSubs = props.openSubs;
 	return (
-		<Group header={<Header>Получатель</Header>}>
+		<Group
+			header={
+				<Header
+					aside={
+						isAuthor ? (
+							dealer ? (
+								<Link onClick={openSubs}>Изменить</Link>
+							) : (
+								<Link onClick={openSubs}>Выбрать</Link>
+							)
+						) : null
+					}
+				>
+					Получатель
+				</Header>
+			}
+		>
 			<Cell
 				onClick={() => {
+					if (isAuthor) {
+					}
 					if (dealer) {
 						props.openUser(dealer.vk_id);
 					}
@@ -65,7 +85,7 @@ export const Given = (props) => {
 const Subs = (props) => {
 	const osname = usePlatform();
 	const { openPopout, openSnackbar, closePopout, setDealer, openUser, setPage, AD } = props;
-	const { dealer, subs, ad_id } = AD;
+	const { dealer, subs, ad_id, subscribers_num } = AD;
 	const status = AD.status || STATUS_OFFER;
 
 	console.log('look at dealer', status, AD);
@@ -142,7 +162,7 @@ const Subs = (props) => {
 				{given}
 
 				<Group header={<Header mode="secondary">Откликнулись</Header>}>
-					<CellButton onClick={() => close(subs[getRandomInt(subs.length)])} before={<Icon24Shuffle />}>
+					<CellButton onClick={() => close(subs[getRandomInt(subscribers_num)])} before={<Icon24Shuffle />}>
 						Случайный выбор
 					</CellButton>
 					{subs.length > 0 ? (
@@ -213,7 +233,7 @@ const Subs = (props) => {
 		props.maxAmount,
 		(s) => {
 			setPhotos([...s].map((v) => v.photo_url));
-			updateDealInfo()
+			updateDealInfo();
 		},
 		(e) => {}
 	);
@@ -270,7 +290,7 @@ const Subs = (props) => {
 						  ', ' +
 						  subs[2].name +
 						  'и еще ' +
-						  subs.length +
+						  (subscribers_num - 3) +
 						  ' человек откликнулись'}
 				</UsersStack>
 			)}

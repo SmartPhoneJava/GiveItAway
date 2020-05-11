@@ -7,12 +7,10 @@ import { Addr, BASE_AD } from './../../../../../store/addr';
 
 import { User } from './AddsTab/../../../../../../store/user';
 
-import { CategoryNo } from './../../../../template/Categories';
-
 import { store } from "./../../../../../index"
-import { STORY_ADS } from '../../../../../store/router/storyTypes';
 import { openPopout, closePopout } from '../../../../../store/router/actions';
 import { MODE_WANTED, MODE_ALL } from '../../../../../const/ads';
+import { CategoryNo } from '../../../../../components/categories/Categories';
 
 export default function useAdSearch(
 	isMounted,

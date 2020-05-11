@@ -88,6 +88,7 @@ import { ADS_FILTERS, EDIT_MODE, CREATE_AD_MAIN, CREATE_AD_ITEM } from '../store
 import AdsModal from '../containers/ads/modal';
 import { defaultInputData } from '../components/create/default';
 import { updateDealInfo } from '../store/detailed_ad/update';
+import { store } from '..';
 
 const adsText = 'Объявления';
 const addText = 'Создать обьявление';
@@ -196,12 +197,15 @@ const App = (props) => {
 			const noteType = note.data.notification_type;
 			const noteAdId = note.data.payload.ad.ad_id;
 
-			console.log('noteAdId ', noteType, noteAdId, NT_STATUS);
+			const ad = store.getState().ad
 
-			if (AD.ad_id == noteAdId) {
+			console.log('noteAdId ', noteType, noteAdId, ad, NT_STATUS);
+
+			if (ad.ad_id == noteAdId) {
 				switch (noteType) {
 					case NT_RESPOND: {
 						const noteValue = note.data.payload.author;
+						console.log("we add new value")
 						addSub(noteValue);
 					}
 					case NT_STATUS: {

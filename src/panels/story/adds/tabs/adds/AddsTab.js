@@ -11,8 +11,6 @@ import useAdSearch from './useAdSearch';
 
 import './addsTab.css';
 
-import { CategoryNo } from './../../../../template/Categories';
-
 import Error from './../../../../placeholders/error';
 import AdNotFound from './../../../../placeholders/adNotFound';
 
@@ -32,6 +30,7 @@ import AdNoWanted from '../../../../placeholders/adNoWanted';
 import { setFormData } from '../../../../../store/create_post/actions';
 import AdNoGiven from '../../../../placeholders/adNoGiven';
 import { NoRegion } from '../../../../../components/location/const';
+import { CategoryNo } from '../../../../../components/categories/Categories';
 
 const addsArrDD = [
 	{

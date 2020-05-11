@@ -4,8 +4,6 @@ import { withModalRootContext } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
-import { Draft } from './../../store/draft';
-
 import { getSubscribers, Close } from './../../requests';
 
 export const PeopleList = (subs) => {
@@ -49,7 +47,6 @@ export const PeopleRBI = withModalRootContext((props) => {
 							const { value } = e.currentTarget;
 							Close(props.ad_id, value);
 							props.back();
-							Draft.dispatch({ type: 'set', new_state: 'CLOSE' });
 						}}
 					>
 						<Cell key={v.vk_id} before={<Avatar size={36} src={v.photo_url} />}>

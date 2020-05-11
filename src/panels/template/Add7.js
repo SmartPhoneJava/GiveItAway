@@ -17,29 +17,22 @@ import OpenActions from './components/actions';
 
 import { time } from '../../utils/time';
 
-import { Draft } from '../../store/draft';
-
 import './Add7.css';
 import { GetCategoryText } from '../../components/categories/Categories';
 import { STATUS_ABORTED, STATUS_CLOSED, STATUS_CHOSEN, STATUS_OFFER } from '../../const/ads';
 
 const Add7 = (props) => {
 	const [ad, setAd] = useState(props.ad);
-	const [haveDeal, setHaveDeal] = useState(false);
-	const [isVisible, setIsVisible] = useState(true);
-
-	async function init() {
-		setHaveDeal(props.ad.status == STATUS_CHOSEN);
-		setIsVisible(!props.ad.hidden);
-	}
+	const [status, setStatus] = useState(props.ad.status);
+	const [isVisible, setIsVisible] = useState(!props.ad.hidden);
 
 	useEffect(() => {
-		Draft.subscribe(init);
-	}, []);
+		props.ad.hidden = !isVisible;
+	}, [isVisible]);
 
 	useEffect(() => {
-		init();
-	}, [props.ad]);
+		props.ad.status = status;
+	}, [status]);
 
 	const image = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : '';
 
@@ -47,24 +40,23 @@ const Add7 = (props) => {
 		props.setPopout(
 			<OpenActions
 				refresh={props.refresh}
-				ad_id={ad.ad_id}
+				ad={props.ad}
 				onCloseClick={props.onCloseClick}
-				failedOpen={!isVisible}
-				hidden={haveDeal}
+				setIsVisible={setIsVisible}
+				setStatus={setStatus}
 			/>
 		);
 	}
 
 	function isAuthor() {
-		return props.myID == ad.author.vk_id;
+		return props.myID == props.ad.author.vk_id;
 	}
 
 	function controllButton() {
-		return (ad.status == STATUS_OFFER || ad.status == STATUS_CHOSEN) && isAuthor() ? (
+		const par = (ad.status == STATUS_OFFER || ad.status == STATUS_CHOSEN) && isAuthor();
+		return par ? (
 			<Icon24MoreVertical onClick={openSettings} style={{ marginLeft: 'auto', marginBottom: 'auto' }} />
-		) : (
-			''
-		);
+		) : null;
 	}
 
 	function metroPanel() {
@@ -125,7 +117,7 @@ const Add7 = (props) => {
 					) : (
 						''
 					)}
-					{ad.status == STATUS_CHOSEN && isAuthor() && haveDeal ? (
+					{ad.status == STATUS_CHOSEN && isAuthor() && ad.status == STATUS_CHOSEN ? (
 						<div className="deal">
 							<div style={{ color: 'rgb(220,220,220)', fontSize: '12px', padding: '2px' }}>
 								Ожидание ответа
@@ -135,7 +127,7 @@ const Add7 = (props) => {
 						''
 					)}
 					{!isVisible ? (
-						isAuthor() && haveDeal ? (
+						isAuthor() && ad.hidden ? (
 							<div className="hidden2 on-img-text">
 								<Icon12Lock />
 								Видно только вам

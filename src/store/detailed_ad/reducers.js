@@ -18,7 +18,6 @@ import {
 	CLEAR,
 	SET_DEALER,
 	SET_EXTRA_INFO,
-	GO_BACK,
 	AD_BACK,
 } from './actionTypes';
 import { TYPE_CHOICE } from '../../const/ads';
@@ -84,9 +83,11 @@ export const adReducer = (state = initialState, action) => {
 			const comment = action.payload.comment;
 			comments = [...comments.filter((v) => v.comment_id != comment.comment_id), comment];
 
+			const comments_count = state.comments_count > comments.length ? state.comments_count : comments.length;
 			return {
 				...state,
 				comments,
+				comments_count,
 			};
 		}
 
@@ -123,10 +124,12 @@ export const adReducer = (state = initialState, action) => {
 			let subs = state.subs || [];
 			const sub = action.payload.sub;
 			subs = [...subs.filter((v) => v.vk_id != sub.vk_id), sub];
+			const subscribers_num = state.subscribers_num > subs.length ? state.subscribers_num : subs.length;
 
 			return {
 				...state,
 				subs,
+				subscribers_num,
 			};
 		}
 
@@ -314,7 +317,7 @@ export const adReducer = (state = initialState, action) => {
 			if (history.length > 0) {
 				newState = history[history.length - 1];
 			}
-			console.log("reducers AD_BACK")
+			console.log('reducers AD_BACK');
 			history.pop();
 			newState.history = history;
 
