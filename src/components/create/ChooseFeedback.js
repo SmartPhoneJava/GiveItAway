@@ -39,6 +39,7 @@ const ChooseFeedback = (props) => {
 			...inputData,
 			[e.currentTarget.name]: e.currentTarget.checked,
 		});
+		console.log("debuuug", e.currentTarget.name, e.currentTarget.checked )
 		props.setFormData(CREATE_AD_MAIN, {
 			...inputData,
 			[e.currentTarget.name]: e.currentTarget.checked,

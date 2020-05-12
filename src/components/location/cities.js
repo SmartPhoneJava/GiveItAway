@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import bridge from '@vkontakte/vk-bridge';
 import FormPanel from './../template/formPanel';
 import { DefaultInputData, NoRegion } from './const';

@@ -1,12 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import bridge from '@vkontakte/vk-bridge';
-import { Button, Group, Header, Div, FormStatus, Separator, ScreenSpinner, Snackbar, Avatar } from '@vkontakte/vkui';
+import React, { useState, useEffect, useRef } from 'react';
+import { YMaps, Map, YMapsApi, Placemark } from 'react-yandex-maps';
+import {
+	Button,
+	Group,
+	Header,
+	Div,
+	FormStatus,
+	Separator,
+	ScreenSpinner,
+	Snackbar,
+	Avatar,
+	PanelHeaderButton,
+} from '@vkontakte/vkui';
+import { ReactDadata } from 'react-dadata';
 
 import CreateItem from './CreateItem';
 import ChooseFeedback from './../../../../components/create/ChooseFeedback';
 import ChooseType from './../../../../components/create/ChooseType';
 
 import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
+import Icon24Place from '@vkontakte/icons/dist/24/place';
 
 import { PANEL_CITIES, PANEL_CATEGORIES, PANEL_COUNTRIES } from './../../../../store/router/panelTypes';
 
@@ -15,10 +28,50 @@ import Location from '../../../../components/location/label';
 import { canWritePrivateMessage } from '../../../../requests';
 import { FORM_LOCATION_CREATE } from '../../../../components/location/redux';
 import { SNACKBAR_DURATION_DEFAULT } from '../../../../store/const';
-import { EDIT_MODE, CREATE_AD_ITEM } from '../../../../store/create_post/types';
+import { EDIT_MODE, CREATE_AD_ITEM, GEO_DATA } from '../../../../store/create_post/types';
+import { getGeodata } from '../../../../services/VK';
+import { getAdress, getMetro } from '../../../../services/geodata';
+import { NoRegion } from '../../../../components/location/const';
 
 const CreateAddRedux = (props) => {
-	const { openSnackbar, closeSnackbar, myUser, appID, apiVersion, setPage, snackbar, inputData, AD } = props;
+	const {
+		openSnackbar,
+		closeSnackbar,
+		setGeoDataString,
+		setGeoData,
+		setFormData,
+		myUser,
+		appID,
+		apiVersion,
+		setPage,
+		snackbar,
+		inputData,
+		AD,
+	} = props;
+	const geodata =
+		inputData && inputData[GEO_DATA] && inputData[GEO_DATA].geodata && inputData[GEO_DATA].geodata.lat
+			? inputData[GEO_DATA].geodata
+			: { lat: 55.75, long: 37.57 };
+
+	const [geodata_string, set_geodata_string] = useState(
+		inputData && inputData[GEO_DATA] && inputData[GEO_DATA].geodata_string
+			? inputData[GEO_DATA].geodata_string
+			: inputData[FORM_LOCATION_CREATE] &&
+			  inputData[FORM_LOCATION_CREATE].city &&
+			  inputData[FORM_LOCATION_CREATE].city.title
+			? inputData[FORM_LOCATION_CREATE].city.title
+			: 'Мой адрес'
+	);
+	// const geodata_string =
+	// 	inputData && inputData[GEO_DATA] && inputData[GEO_DATA].geodata_string
+	// 		? inputData[GEO_DATA].geodata_string
+	// 		: inputData[FORM_LOCATION_CREATE] &&
+	// 		  inputData[FORM_LOCATION_CREATE].city &&
+	// 		  inputData[FORM_LOCATION_CREATE].city.title
+	// 		? inputData[FORM_LOCATION_CREATE].city.title
+	// 		: 'Мой адрес';
+
+	console.log('geodata geodata', geodata, geodata_string);
 
 	const [pmOpen, setPmOpen] = useState(true);
 	useEffect(() => {
@@ -39,10 +92,10 @@ const CreateAddRedux = (props) => {
 
 	const [errorHeader, setErrorHeader] = useState('');
 	const [errorText, setErrorText] = useState('');
-	const [geodata, setGeodata] = useState({
-		long: -1,
-		lat: -1,
-	});
+	// const [geodata, setGeodata] = useState({
+	// 	long: -1,
+	// 	lat: -1,
+	// });
 
 	const [valid, setValid] = useState(false);
 	const needEdit = inputData[EDIT_MODE] ? inputData[EDIT_MODE].mode : false;
@@ -54,20 +107,52 @@ const CreateAddRedux = (props) => {
 		setErrorText(text);
 	}, [inputData]);
 
+	const ON_REFRESH_CLICK = 'ON_REFRESH_CLICK';
+	const ON_SUGGESTION_CLICK = 'ON_SUGGESTION_CLICK';
+	const NO_CLICK = 'NO_CLICK';
+
+	const [mapState, setMapState] = useState({ center: [2.75, 2.57], zoom: 9 });
+	const [place, setPlace] = useState([2.75, 2.57]);
+	const [dadataB, setDadataB] = useState(ON_REFRESH_CLICK);
+	const dadata = useRef();
+
 	useEffect(() => {
-		let cleanupFunction = false;
-		bridge
-			.send('VKWebAppGetGeodata')
-			.then((value) => {
-				if (!cleanupFunction) {
-					setGeodata(value);
-				}
-			})
-			.catch((error) => {
-				console.log('VKWebAppGetGeodata error', error);
-			});
-		return () => (cleanupFunction = true);
-	}, []);
+		if (dadataB == NO_CLICK) {
+			return;
+		} else if (dadataB == ON_SUGGESTION_CLICK) {
+			setTimeout(() => {
+				setDadataB(NO_CLICK);
+			}, 1000);
+			return;
+		}
+		console.log('сбой ', dadataB);
+		getGeodata(
+			(data) => {
+				console.log('go deeper', data);
+				const center = [data.lat, data.long];
+				setMapState({ ...mapState, center });
+				setPlace(center);
+				getAdress(
+					data,
+					(data_string) => {
+						set_geodata_string(data_string);
+						// dadata.current.address = 'sssss';
+						console.log('go deeper 2', data_string);
+						setDadataB(NO_CLICK);
+						// getMetro((l) => {
+						// 	console.log('go deeper 3', l);
+						// });
+					},
+					(e) => {
+						setDadataB(NO_CLICK);
+					}
+				);
+			},
+			(e) => {
+				setDadataB(NO_CLICK);
+			}
+		);
+	}, [dadataB]);
 
 	function saveCancel() {
 		openSnackbar(
@@ -87,18 +172,57 @@ const CreateAddRedux = (props) => {
 
 	function createAd() {
 		if (valid) {
-			props.createAd(myUser, inputData, geodata);
+			props.createAd(myUser, inputData);
 		} else {
 			saveCancel();
 		}
 	}
 	function editAd() {
 		if (valid) {
-			props.editAd(myUser, inputData, geodata);
+			props.editAd(myUser, inputData);
 		} else {
 			saveCancel();
 		}
 	}
+
+	function findMetro(ymaps) {
+		console.log('cliick', geodata_string);
+		ymaps
+			.geocode(geodata_string)
+			.then((result) => {
+				const lom = result.geoObjects.get(0).geometry.getCoordinates();
+
+				const center = [lom[0], lom[1]];
+				setGeoData({ lat: lom[0], long: lom[1] });
+				setPlace(center);
+				setMapState({ center, zoom: 9 });
+			})
+			.catch((e) => {
+				console.log('hey hey hey errr', result.geoObjects.get(0).geometry.getCoordinates());
+			});
+		ymaps
+			.geocode([geodata.lat, geodata.long], {
+				/**
+				 * Опции запроса
+				 * @see https://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/geocode.xml
+				 */
+				// Ищем только станции метро.
+				kind: 'metro',
+				// Запрашиваем не более 20 результатов.
+				results: 20,
+				apikey: '7f6269fb-0f48-4182-bd23-13b3cb155a06',
+			})
+			.then(function (res) {
+				const coords = res.geoObjects[0];
+				console.log('reeees findMetro', coords, res);
+			})
+			.catch((e) => {
+				console.log('error findMetro', e);
+			});
+	}
+
+	const width = document.body.clientWidth - 40;
+
 	return (
 		<div>
 			<Group separator="hide" header={<Header mode="secondary">Опишите выставляемые предметы</Header>}>
@@ -111,17 +235,75 @@ const CreateAddRedux = (props) => {
 				/>
 			</Group>
 
-			<Group separator="hide" header={<Header>Местоположение объявления</Header>}>
+			{/* <Group separator="hide" header={<Header>Местоположение объявления</Header>}>
 				<Location
 					redux_form={FORM_LOCATION_CREATE}
-					openCountries={() => {
-						setPage(PANEL_COUNTRIES);
-					}}
-					openCities={() => {
-						setPage(PANEL_CITIES);
-					}}
-					// useMine={true}
+					openCountries={() => setPage(PANEL_COUNTRIES)}
+					openCities={() => setPage(PANEL_CITIES)}
 				/>
+			</Group> */}
+
+			<Group separator="hide" header={<Header>Местоположение объявления</Header>}>
+				{dadataB == NO_CLICK ? (
+					<>
+						<div style={{ paddingRight: '15px' }}>
+							<div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+								<PanelHeaderButton
+									style={{ padding: '0px', margin: '0px' }}
+									onClick={() => {
+										setDadataB(ON_REFRESH_CLICK);
+									}}
+								>
+									<Icon24Place fill="var(--accent)" />
+								</PanelHeaderButton>
+								<div style={{ flex: 1 }}>
+									<ReactDadata
+										ref={dadata}
+										token={'efb37d1dc6b04c11116d3ab7ef9482fa13e0b664'}
+										query={geodata_string}
+										address={'sssss'}
+										onChange={(e) => {
+											console.log('geoDataString', e);
+											setGeoDataString(e.value);
+											set_geodata_string(e.value);
+											setDadataB(ON_SUGGESTION_CLICK);
+											const city_title = e.data.city
+												? e.data.city
+												: e.data.region
+												? e.data.region
+												: NoRegion.title;
+											setFormData(FORM_LOCATION_CREATE, {
+												...inputData[FORM_LOCATION_CREATE],
+												country: { id: 1, title: e.data.country },
+												city: { id: 1, title: city_title },
+											});
+											// if (!e.data.geo_lat) {
+											// 	getMetro(e.data.postal_code);
+											// }
+											// setMapState({ ...mapState, center: [e.geo_lat, e.geo_long] });
+										}}
+										autocomplete={geodata_string}
+										placeholder={'Введите адрес'}
+									/>
+								</div>
+							</div>
+							<div style={{ paddingLeft: '15px' }}>
+								<YMaps query={{ apikey: '7f6269fb-0f48-4182-bd23-13b3cb155a06' }}>
+									<Map
+										width={width}
+										state={mapState}
+										modules={['geocode']}
+										onLoad={(ymaps) => findMetro(ymaps)}
+									>
+										<Placemark geometry={place} />
+									</Map>
+								</YMaps>
+							</div>
+						</div>
+					</>
+				) : (
+					<ScreenSpinner />
+				)}
 			</Group>
 
 			<ChooseFeedback setSnackbar={openSnackbar} pmOpen={pmOpen} />

@@ -3,8 +3,8 @@ import { connect } from 'react-redux';
 import { setPage, openPopout, openSnackbar, closeSnackbar, setStory, setAd } from '../../store/router/actions';
 import { PANEL_CATEGORIES, PANEL_CITIES, PANEL_COUNTRIES } from '../../store/router/panelTypes';
 
-import { setFormData } from '../../store/create_post/actions';
-import { CREATE_AD_MAIN, CREATE_AD_ITEM } from '../../store/create_post/types';
+import { setFormData, setGeoDataString, setGeoData } from '../../store/create_post/actions';
+import { CREATE_AD_MAIN, CREATE_AD_ITEM, GEO_DATA } from '../../store/create_post/types';
 
 import CreateAddRedux from './../../panels/story/create/components/CreateAddRedux';
 
@@ -41,13 +41,14 @@ const getLocationInfo = (inputData) => {
 	return inputData[FORM_LOCATION_CREATE];
 };
 
-const getAd = (myUser, inputData, tgeodata) => {
+const getAd = (myUser, inputData) => {
 	const location = getLocationInfo(inputData);
-	const geodata = tgeodata || { long: -1, lat: -1 };
 	const main = getMainInfo(inputData);
 	const item = getItemInfo(inputData);
 	const category = getCategoryInfo(inputData);
 	const ad_id = store.getState().ad ? store.getState().ad.ad_id : 0;
+	const geodata = inputData[GEO_DATA].geodata
+	const geodata_string = inputData[GEO_DATA].geodata_string
 	return {
 		ad_id,
 		author_id: myUser.id,
@@ -57,7 +58,7 @@ const getAd = (myUser, inputData, tgeodata) => {
 		comments_enabled: main.comments_enabled,
 		ad_type: main.type,
 		// feedback_type: (main.ls ? ' ls' : '') + (main.comments ? ' comments' : ''),
-		// extra_field: main ? main.type : 'choice',
+		extra_field: geodata_string,
 		category: category.category,
 		region: location.country.title,
 		district: location.city.title,
@@ -89,28 +90,29 @@ const loadAd = (ad, dispatch) => {
 	dispatch(setExtraInfo(ad));
 };
 
-const createAd = (myUser, inputData, tgeodata, dispatch) => {
-	const ad = getAd(myUser, inputData, tgeodata);
+const createAd = (myUser, inputData, dispatch) => {
+	const ad = getAd(myUser, inputData);
 	const obj = JSON.stringify(ad);
 	const photos = getItemInfo(inputData).photosUrl;
-
-	CreateAd(
-		ad,
-		obj,
-		photos,
-		(ad) => openAd(ad, dispatch),
-		(ad) => {
-			loadAd(ad, dispatch);
-			console.log('we loaded more');
-		},
-		() => {
-			clearForm(dispatch);
-		}
-	);
+	console.log("hahahahhaha, what are you waiting?", ad)
+	// CreateAd(
+	// 	ad,
+	// 	obj,
+	// 	photos,
+	// 	(ad) => openAd(ad, dispatch),
+	// 	(ad) => {
+	// 		loadAd(ad, dispatch);
+	// 		console.log('we loaded more');
+	// 	},
+	// 	() => {
+	// 		clearForm(dispatch);
+	// 	}
+	// );
 };
 
-const editAd = (myUser, inputData, tgeodata, dispatch) => {
-	const ad = getAd(myUser, inputData, tgeodata);
+const editAd = (myUser, inputData, dispatch) => {
+	const tgeodata = inputData[GEO_DATA].geodata
+	const ad = getAd(myUser, inputData);
 	const obj = JSON.stringify(ad);
 
 	EditAd(
@@ -254,13 +256,15 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
 	return {
+		setGeoData:(s)=>dispatch(setGeoData(s)),
+		setGeoDataString:(s)=> dispatch(setGeoDataString(s)),
 		setFormData: (p, s) => dispatch(setFormData(p, s)),
 		setPage: (p) => dispatch(setPage(p)),
 		openSnackbar: (p) => dispatch(openSnackbar(p)),
 		openPopout: (p) => dispatch(openPopout(p)),
 		closeSnackbar: () => dispatch(closeSnackbar()),
-		createAd: (myUser, inputData, tgeodata) => createAd(myUser, inputData, tgeodata, dispatch),
-		editAd: (myUser, inputData, tgeodata) => editAd(myUser, inputData, tgeodata, dispatch),
+		createAd: (myUser, inputData) => createAd(myUser, inputData, dispatch),
+		editAd: (myUser, inputData) => editAd(myUser, inputData, dispatch),
 		clearForm: () => {
 			clearForm(dispatch);
 		},

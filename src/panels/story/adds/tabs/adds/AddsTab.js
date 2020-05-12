@@ -325,8 +325,6 @@ const AddsTab = (props) => {
 			>
 				<div style={{ display: 'flex', background: 'var(--background_content)' }}>
 					<Search
-						disabled
-						placeholder="Поиск недоступен"
 						value={search}
 						onChange={handleSearch}
 						icon={<Icon24Filter />}
@@ -391,7 +389,7 @@ const AddsTab = (props) => {
 											);
 										}
 										return (
-											<div className="flex-blocks">
+											<div key={ad.ad_id} className="flex-blocks">
 												{first} {second}
 											</div>
 										);

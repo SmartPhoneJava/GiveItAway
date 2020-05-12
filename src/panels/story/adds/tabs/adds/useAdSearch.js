@@ -64,6 +64,7 @@ export default function useAdSearch(
 			page: pageNumber,
 			category: category,
 			sort_by: sort,
+			query,
 		};
 		if (category == '' || category == CategoryNo) {
 			params = {

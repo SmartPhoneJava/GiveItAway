@@ -4,6 +4,8 @@ import { store } from '../index';
 
 import { setColorScheme, setAccessToken, setMyID, setMyUser } from '../store/vk/actions';
 import { success, fail } from '../requests';
+import { setFormData, setGeoData } from '../store/create_post/actions';
+import { GEO_DATA } from '../store/create_post/types';
 
 export const initApp = () => (dispatch) => {
 	const bridgeCallback = (e) => {
@@ -131,4 +133,25 @@ export const shareInVK = () => {
 			fail('Не удалось поделиться объявлением');
 			return error;
 		});
+};
+
+export const getGeodata = (successCallback, failCallback) => {
+	let cleanupFunction = false;
+	bridge
+		.send('VKWebAppGetGeodata')
+		.then((geodata) => {
+			if (successCallback) {
+				successCallback(geodata)
+			}
+			if (!cleanupFunction) {
+				store.dispatch(setGeoData(geodata));
+			}
+		})
+		.catch((error) => {
+			console.log('VKWebAppGetGeodata error', error);
+			if (failCallback) {
+				failCallback(error)
+			}
+		});
+	return () => (cleanupFunction = true);
 };
