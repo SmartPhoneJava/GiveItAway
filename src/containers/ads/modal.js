@@ -14,6 +14,7 @@ import { setFormData } from '../../store/create_post/actions';
 import AddsModal from './../../panels/story/adds/AddsModal';
 
 import { GEO_TYPE_FILTERS, GEO_TYPE_NEAR, SORT_TIME, SORT_GEO } from './../../const/ads';
+import { getGeodata } from '../../services/VK';
 
 function applyTimeSort(inputData, dispatch) {
 	dispatch(
@@ -111,9 +112,15 @@ const mapDispatchToProps = (dispatch) => {
 		closeAllModals: () => dispatch(closeAllModals()),
 		setRadius: (inputData, radius) => setRadius(inputData, radius, dispatch),
 		applyTimeSort: (inputData) => applyTimeSort(inputData, dispatch),
-		applyGeoSort: (inputData) => applyGeoSort(inputData, dispatch),
+		applyGeoSort: (inputData) => {
+			applyGeoSort(inputData, dispatch)
+			getGeodata()
+		},
 		setGeoFilters: (inputData) => setGeoFilters(inputData, dispatch),
-		setGeoNear: (inputData) => setGeoNear(inputData, dispatch),
+		setGeoNear: (inputData) => {
+			setGeoNear(inputData, dispatch)
+			getGeodata()
+		},
 		openGeoSearch: () => openGeoSearch(dispatch),
 		openCountries: () => openCountries(dispatch),
 		openCities: () => openCities(dispatch),

@@ -24,7 +24,7 @@ import Tea from './../../../../../img/tea.jpg';
 import Playstein from './../../../../../img/playstein.jpg';
 import Bb from './../../../../../img/bb.jpg';
 import { SORT_TIME, GEO_TYPE_FILTERS, MODE_ALL, MODE_GIVEN } from '../../../../../const/ads';
-import { ADS_FILTERS } from '../../../../../store/create_post/types';
+import { ADS_FILTERS, GEO_DATA } from '../../../../../store/create_post/types';
 import { openSnackbar, openPopout, closePopout } from '../../../../../store/router/actions';
 import AdNoWanted from '../../../../placeholders/adNoWanted';
 import { setFormData } from '../../../../../store/create_post/actions';
@@ -203,7 +203,7 @@ const addsArrDD = [
 
 let i = 0;
 
-const SEARCH_WAIT = 500;
+const SEARCH_WAIT = 650;
 
 const AddsTab = (props) => {
 	const [search, setSearch] = useState('');
@@ -225,7 +225,7 @@ const AddsTab = (props) => {
 
 	const geoType = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geotype : null) || GEO_TYPE_FILTERS;
 	const radius = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].radius : null) || 0;
-	const geodata = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geodata : null) || null;
+	const geodata = (inputData[GEO_DATA] ? inputData[GEO_DATA].geodata : null) || null;
 	const country = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].country : null) || NoRegion;
 	const city = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].city : null) || NoRegion;
 	const category = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].category : null) || CategoryNo;

@@ -22,6 +22,7 @@ import {
 	PANEL_CATEGORIES,
 	PANEL_CITIES,
 	PANEL_COUNTRIES,
+	PANEL_MAP,
 } from './../store/router/panelTypes';
 
 import { MODAL_ADS_FILTERS, MODAL_ADS_GEO, MODAL_ADS_SUBS } from './../store/router/modalTypes';
@@ -96,6 +97,7 @@ import AdsModal from '../containers/ads/modal';
 import { defaultInputData } from '../components/create/default';
 import { updateDealInfo } from '../store/detailed_ad/update';
 import { store } from '..';
+import AdMap from '../containers/location/map';
 
 const adsText = 'Объявления';
 const addText = 'Создать обьявление';
@@ -482,6 +484,9 @@ const App = (props) => {
 					<Panel id={PANEL_CITIES}>
 						<PanelHeader left={<PanelHeaderBack onClick={backToGeoFilters} />}>Выберите город</PanelHeader>
 						<Cities goBack={backToGeoFilters} redux_form={ADS_FILTERS} />
+					</Panel>
+					<Panel id={PANEL_MAP}>
+						<AdMap />
 					</Panel>
 				</View>
 

@@ -95,19 +95,19 @@ const createAd = (myUser, inputData, dispatch) => {
 	const obj = JSON.stringify(ad);
 	const photos = getItemInfo(inputData).photosUrl;
 	console.log("hahahahhaha, what are you waiting?", ad)
-	// CreateAd(
-	// 	ad,
-	// 	obj,
-	// 	photos,
-	// 	(ad) => openAd(ad, dispatch),
-	// 	(ad) => {
-	// 		loadAd(ad, dispatch);
-	// 		console.log('we loaded more');
-	// 	},
-	// 	() => {
-	// 		clearForm(dispatch);
-	// 	}
-	// );
+	CreateAd(
+		ad,
+		obj,
+		photos,
+		(ad) => openAd(ad, dispatch),
+		(ad) => {
+			loadAd(ad, dispatch);
+			console.log('we loaded more');
+		},
+		() => {
+			clearForm(dispatch);
+		}
+	);
 };
 
 const editAd = (myUser, inputData, dispatch) => {

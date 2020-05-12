@@ -37,7 +37,7 @@ export default function useAdSearch(
 	useEffect(() => {
 		setAds([]);
 		pageNumber = 1;
-	}, [category, mode, query, city, country, sort, geodata, geoType, radius, refreshMe]);
+	}, [category, mode, query, city, country, sort, geodata, radius, refreshMe]);
 
 	useEffect(() => {
 		console.log('deleteID', deleteID);
@@ -62,17 +62,16 @@ export default function useAdSearch(
 		let params = {
 			rows_per_page: rowsPerPage,
 			page: pageNumber,
-			category: category,
 			sort_by: sort,
-			query,
 		};
-		if (category == '' || category == CategoryNo) {
-			params = {
-				rows_per_page: rowsPerPage,
-				page: pageNumber,
-			};
+		if (query != '') {
+			params.query = query;
+		}
+		if (category != CategoryNo) {
+			params.category = params.category;
 		}
 
+		console.log("i seeet geodata", geodata)
 		if (geodata) {
 			params.lat = geodata.lat;
 			params.long = geodata.long;
@@ -130,7 +129,7 @@ export default function useAdSearch(
 			cancel();
 			cleanupFunction = true;
 		};
-	}, [category, mode, query, pageNumber, city, country, sort, geodata, geoType, radius, refreshMe]);
+	}, [category, mode, query, pageNumber, city, country, sort, geodata, radius, refreshMe]);
 
 	return { inited, newPage: pageNumber, ads, loading, error, hasMore };
 }

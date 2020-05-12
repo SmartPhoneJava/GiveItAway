@@ -114,7 +114,6 @@ const CreateAddRedux = (props) => {
 	const [mapState, setMapState] = useState({ center: [2.75, 2.57], zoom: 9 });
 	const [place, setPlace] = useState([2.75, 2.57]);
 	const [dadataB, setDadataB] = useState(ON_REFRESH_CLICK);
-	const dadata = useRef();
 
 	useEffect(() => {
 		if (dadataB == NO_CLICK) {
@@ -136,7 +135,7 @@ const CreateAddRedux = (props) => {
 					data,
 					(data_string) => {
 						set_geodata_string(data_string);
-						// dadata.current.address = 'sssss';
+
 						console.log('go deeper 2', data_string);
 						setDadataB(NO_CLICK);
 						// getMetro((l) => {
@@ -258,10 +257,8 @@ const CreateAddRedux = (props) => {
 								</PanelHeaderButton>
 								<div style={{ flex: 1 }}>
 									<ReactDadata
-										ref={dadata}
 										token={'efb37d1dc6b04c11116d3ab7ef9482fa13e0b664'}
 										query={geodata_string}
-										address={'sssss'}
 										onChange={(e) => {
 											console.log('geoDataString', e);
 											setGeoDataString(e.value);
