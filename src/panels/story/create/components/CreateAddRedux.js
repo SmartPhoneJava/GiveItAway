@@ -227,7 +227,6 @@ const CreateAddRedux = (props) => {
 			<Group separator="hide" header={<Header mode="secondary">Опишите выставляемые предметы</Header>}>
 				<CreateItem
 					defaultInputData={props.defaultInputData}
-					setSnackbar={openSnackbar}
 					openCategories={() => {
 						setPage(PANEL_CATEGORIES);
 					}}
@@ -304,7 +303,7 @@ const CreateAddRedux = (props) => {
 				)}
 			</Group>
 
-			<ChooseFeedback setSnackbar={openSnackbar} pmOpen={pmOpen} />
+			<ChooseFeedback pmOpen={pmOpen} />
 			<ChooseType />
 			{valid ? (
 				''

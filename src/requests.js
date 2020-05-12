@@ -542,7 +542,7 @@ export async function CreateImages(photos, id, goToAds) {
 						<Snackbar
 							duration={SNACKBAR_DURATION_DEFAULT}
 							onClose={() => {
-								store.dispatch(closePopout());
+								store.dispatch(closeSnackbar());
 							}}
 							action="Отменить"
 							onActionClick={() => deleteAd(id, refresh)}
@@ -674,43 +674,47 @@ export function fail(err, repeat, end) {
 		console.log('we wanna set snackbar', err);
 		if (repeat) {
 			open = () =>
-				openSnackbar(
-					<Snackbar
-						duration={SNACKBAR_DURATION_DEFAULT}
-						onClose={() => {
-							closeSnackbar();
-							if (end) {
-								end();
+				store.dispatch(
+					openSnackbar(
+						<Snackbar
+							duration={SNACKBAR_DURATION_DEFAULT}
+							onClose={() => {
+								store.dispatch(closeSnackbar());
+								if (end) {
+									end();
+								}
+							}}
+							action="Повторить"
+							onActionClick={() => {
+								store.dispatch(closeSnackbar());
+								repeat();
+							}}
+							before={
+								<Avatar size={24} style={{ background: 'red' }}>
+									<Icon24Cancel fill="#fff" width={14} height={14} />
+								</Avatar>
 							}
-						}}
-						action="Повторить"
-						onActionClick={() => {
-							closeSnackbar();
-							repeat();
-						}}
-						before={
-							<Avatar size={24} style={{ background: 'red' }}>
-								<Icon24Cancel fill="#fff" width={14} height={14} />
-							</Avatar>
-						}
-					>
-						Произошла ошибка: {err}
-					</Snackbar>
+						>
+							Произошла ошибка: {err}
+						</Snackbar>
+					)
 				);
 		} else {
 			open = () =>
-				openSnackbar(
-					<Snackbar
-						duration={SNACKBAR_DURATION_DEFAULT}
-						onClose={closeSnackbar}
-						before={
-							<Avatar size={24} style={{ background: 'red' }}>
-								<Icon24Cancel fill="#fff" width={14} height={14} />
-							</Avatar>
-						}
-					>
-						Произошла ошибка: {err}
-					</Snackbar>
+				store.dispatch(
+					openSnackbar(
+						<Snackbar
+							duration={SNACKBAR_DURATION_DEFAULT}
+							onClose={() => store.dispatch(closeSnackbar())}
+							before={
+								<Avatar size={24} style={{ background: 'red' }}>
+									<Icon24Cancel fill="#fff" width={14} height={14} />
+								</Avatar>
+							}
+						>
+							Произошла ошибка: {err}
+						</Snackbar>
+					)
 				);
 		}
 		store.dispatch(open);

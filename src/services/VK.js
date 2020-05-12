@@ -121,6 +121,7 @@ export const getuser = (success) => (dispatch) => {
 };
 
 export const shareInVK = () => {
+	console.log("share in vk")
 	const appID = store.getState().vkui.appID;
 	const adID = store.getState().ad.ad_id;
 	return bridge

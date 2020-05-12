@@ -301,7 +301,6 @@ const AddsTab = (props) => {
 				openAd={() => props.openAd(ad)}
 				ad={ad}
 				setPopout={openPopout}
-				setSnackbar={openSnackbar}
 				refresh={props.refresh}
 				myID={props.myID}
 				onCloseClick={props.onCloseClick}

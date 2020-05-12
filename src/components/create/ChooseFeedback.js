@@ -14,15 +14,17 @@ import Icon24Note from '@vkontakte/icons/dist/24/note';
 import { CREATE_AD_MAIN } from './../../store/create_post/types';
 
 import { defaultInputData } from './default';
+import { closeSnackbar, openSnackbar } from '../../store/router/actions';
 
 const ChooseFeedback = (props) => {
 	const [inputData, setInputData] = useState(props.inputData[CREATE_AD_MAIN] || defaultInputData);
 
+	const { closeSnackbar, openSnackbar } = props;
 	function warningClosedProfile() {
-		props.setSnackbar(
+		openSnackbar(
 			<Snackbar
 				duration={SNACKBAR_DURATION_DEFAULT}
-				onClose={() => props.setSnackbar(null)}
+				onClose={closeSnackbar}
 				before={
 					<Avatar size={24} style={{ background: 'orange' }}>
 						<Icon24Favorite fill="#fff" width={14} height={14} />
@@ -39,7 +41,7 @@ const ChooseFeedback = (props) => {
 			...inputData,
 			[e.currentTarget.name]: e.currentTarget.checked,
 		});
-		console.log("debuuug", e.currentTarget.name, e.currentTarget.checked )
+		console.log('debuuug', e.currentTarget.name, e.currentTarget.checked);
 		props.setFormData(CREATE_AD_MAIN, {
 			...inputData,
 			[e.currentTarget.name]: e.currentTarget.checked,
@@ -72,7 +74,9 @@ const ChooseFeedback = (props) => {
 			<Cell
 				before={<Icon24Comment fill="var(--header_tab_inactive_text)" />}
 				multiline
-				asideContent={<Switch name="comments_enabled" checked={inputData.comments_enabled} onChange={handleChecked} />}
+				asideContent={
+					<Switch name="comments_enabled" checked={inputData.comments_enabled} onChange={handleChecked} />
+				}
 				description="Пользователи могут оставлять коментарии в обьявлении"
 			>
 				Комментарии
@@ -89,6 +93,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
 	setFormData,
+	closeSnackbar,
+	openSnackbar,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ChooseFeedback);
