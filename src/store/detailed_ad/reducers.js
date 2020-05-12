@@ -21,6 +21,7 @@ import {
 	AD_BACK,
 } from './actionTypes';
 import { TYPE_CHOICE } from '../../const/ads';
+import { shortText } from '../../utils/short_text';
 
 const initialState = {
 	ad_id: -1,
@@ -50,6 +51,7 @@ const initialState = {
 		surname: 'Неизвестно',
 		photo_url: '',
 	},
+	geo_position: { lat: 1, long: 1 },
 
 	comments: [],
 	subs: [],
@@ -263,6 +265,9 @@ export const adReducer = (state = initialState, action) => {
 			const category = ad.category || state.category;
 			const extra_field = ad.extra_field || state.extra_field;
 			const views_count = ad.views_count || state.views_count;
+			let geo_position = ad.geo_position || state.geo_position;
+			geo_position.lat.toFixed(3) 
+			geo_position.long.toFixed(3) 
 
 			const ad_type = ad.ad_type || state.ad_type;
 			const ls_enabled = ad.ls_enabled || state.ls_enabled;
@@ -308,6 +313,7 @@ export const adReducer = (state = initialState, action) => {
 				comments_count,
 				subscribers_num,
 				isSub,
+				geo_position,
 			};
 		}
 

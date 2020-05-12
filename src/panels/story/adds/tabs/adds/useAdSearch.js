@@ -65,13 +65,12 @@ export default function useAdSearch(
 			sort_by: sort,
 		};
 		if (query != '') {
-			params.query = query;
+			params.query = '' + query;
 		}
 		if (category != CategoryNo) {
 			params.category = params.category;
 		}
 
-		console.log("i seeet geodata", geodata)
 		if (geodata) {
 			params.lat = geodata.lat;
 			params.long = geodata.long;

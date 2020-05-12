@@ -19,7 +19,7 @@ import {
 
 import Icon56Users3Outline from '@vkontakte/icons/dist/56/users_outline';
 
-import Icon24BrowserForward from '@vkontakte/icons/dist/24/browser_forward';
+import Icon24Chevron from '@vkontakte/icons/dist/24/chevron';
 import Icon24Shuffle from '@vkontakte/icons/dist/24/shuffle';
 import Icon24Help from '@vkontakte/icons/dist/24/help';
 import Icon24Message from '@vkontakte/icons/dist/24/message';
@@ -74,7 +74,7 @@ export const Given = (props) => {
 				multiline={true}
 				key={dealer ? dealer.vk_id : ''}
 				before={dealer ? <Avatar size={36} src={dealer.photo_url} /> : <Icon24User />}
-				asideContent={dealer ? <Icon24BrowserForward /> : ''}
+				asideContent={dealer ? <Icon24Chevron /> : ''}
 			>
 				<div>{dealer ? dealer.name + ' ' + dealer.surname : 'Никто не выбран'}</div>
 			</Cell>
@@ -87,8 +87,6 @@ const Subs = (props) => {
 	const { openPopout, openSnackbar, closePopout, setDealer, openUser, setPage, AD } = props;
 	const { dealer, subs, ad_id, subscribers_num } = AD;
 	const status = AD.status || STATUS_OFFER;
-
-	console.log('look at dealer', status, AD);
 
 	const [photos, setPhotos] = useState([]);
 	const [openFAQ, setOpenFAQ] = useState(false);

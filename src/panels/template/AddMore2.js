@@ -39,7 +39,7 @@ import Icon24Delete from '@vkontakte/icons/dist/24/delete';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 
-import Icon24BrowserForward from '@vkontakte/icons/dist/24/browser_forward';
+import Icon24Chevron from '@vkontakte/icons/dist/24/chevron';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
 import Icon24ShareExternal from '@vkontakte/icons/dist/24/share_external';
 import Icon24Place from '@vkontakte/icons/dist/24/place';
@@ -53,15 +53,7 @@ import Icon24Coins from '@vkontakte/icons/dist/24/coins';
 import Icon24Help from '@vkontakte/icons/dist/24/help';
 import Icon24MarketOutline from '@vkontakte/icons/dist/24/market_outline';
 
-import {
-	adVisible,
-	adHide,
-	deleteAd,
-	getSubscribers,
-	getDetails,
-	acceptDeal,
-	denyDeal,
-} from './../../requests';
+import { adVisible, adHide, deleteAd, getSubscribers, getDetails, acceptDeal, denyDeal } from './../../requests';
 
 import './addsTab.css';
 import './styles.css';
@@ -70,7 +62,7 @@ import Comments from './../story/adds/tabs/comments/comments';
 
 import { time } from './../../utils/time';
 import { setDummy, openModal, setPage, setAd, openSnackbar, openPopout, setStory } from '../../store/router/actions';
-import { PANEL_IMAGE, PANEL_COMMENTS, PANEL_SUBS } from './../../store/router/panelTypes';
+import { PANEL_IMAGE, PANEL_COMMENTS, PANEL_SUBS, PANEL_MAP } from './../../store/router/panelTypes';
 import { MODAL_ADS_COST, MODAL_ADS_FROZEN } from '../../store/router/modalTypes';
 import {
 	setCost,
@@ -153,8 +145,6 @@ const AddMore2r = (props) => {
 		setIsOpen(false);
 	};
 
-	console.log('ADADADADAD', AD);
-
 	const [photoIndex, setPhotoIndex] = useState(0);
 	const [image, setImage] = useState('');
 
@@ -210,7 +200,7 @@ const AddMore2r = (props) => {
 	}, [photoIndex, pathes_to_photo]);
 
 	function changeIsSub(isSubs, c) {
-		console.log("changeIsSub", isSubs)
+		console.log('changeIsSub', isSubs);
 		if (isNotValid()) {
 			return;
 		}
@@ -237,7 +227,7 @@ const AddMore2r = (props) => {
 	useEffect(() => {
 		const init = () => () => {
 			const id = AD.ad_id;
-			
+
 			updateDealInfo();
 			updateCost();
 			updateSubs();
@@ -673,8 +663,14 @@ const AddMore2r = (props) => {
 				<tbody>
 					<tr>
 						<td className="first">Тип</td>
-						<td>{ad_type == TYPE_CHOICE ? 'Сделка' : ad_type == TYPE_AUCTION ? 'Аукцион' : 'Лотерея'}</td>
-						<td>тут знак вопроса</td>
+						<td>
+							<div style={{ display: 'flex', alignItems: 'center' }}>
+								{ad_type == TYPE_CHOICE ? 'Сделка' : ad_type == TYPE_AUCTION ? 'Аукцион' : 'Лотерея'}
+								<PanelHeaderButton onClick={() => {}}>
+									<Icon24Help fill="var(--text_subhead)" />
+								</PanelHeaderButton>
+							</div>
+						</td>
 					</tr>
 					<tr>
 						<td className="first">Категория</td>
@@ -699,18 +695,18 @@ const AddMore2r = (props) => {
 			</table>
 			<Separator />
 			<div
-				style={{
-					display: 'flex',
-					paddingLeft: '16px',
-					margin: '0px',
+				onClick={() => {
+					setPage(PANEL_MAP);
 				}}
 			>
-				<Cell before={<Icon24Place />}>{region + ', ' + district}</Cell>
+				<Cell asideContent={<Icon24Chevron />} before={<Icon24Place />}>
+					{region + ', ' + district}
+				</Cell>
 			</div>
 			<Separator />
 			<Group header={<Header>Автор</Header>}>
 				<Cell
-					asideContent={<Icon24BrowserForward />}
+					asideContent={<Icon24Chevron />}
 					onClick={() => props.openUser(author.vk_id)}
 					before={<Avatar size={36} src={author.photo_url} />}
 					description={extra_field ? extra_field : ''}
@@ -735,9 +731,7 @@ const AddMore2r = (props) => {
 			{isAuthor && isFinished ? <Subs openUser={props.openUser} amount={2} maxAmount={2} mini={true} /> : null}
 
 			{comments_enabled ? (
-				<>
-					<Comments mini={true} amount={1} maxAmount={1} openUser={props.openUser} />
-				</>
+				<Comments mini={true} amount={1} maxAmount={1} openUser={props.openUser} />
 			) : (
 				<Placeholder icon={<Icon56WriteOutline />} header="Комментарии закрыты"></Placeholder>
 			)}

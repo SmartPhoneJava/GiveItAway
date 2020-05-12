@@ -253,7 +253,6 @@ export const routerReducer = (state = initialState, action) => {
 			let Popout = state.popouts[Story];
 
 			let Dummies = state.dummies[Story] || [];
-			console.log('Dummies', Dummies);
 			// если были открытые заглушки
 			if (Dummies.length > 0) {
 				Dummies.pop();

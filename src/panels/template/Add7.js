@@ -60,13 +60,12 @@ const Add7 = (props) => {
 	}
 
 	function metroPanel() {
-		return (
-			<InfoRow onClick={props.openAd} className="atext" style={{ marginTop: '2px' }}>
-				<div style={{ display: 'flex' }}>
-					<Avatar style={{ marginRight: '5px' }} size={16} src={MetroImage30} /> Аэропорт
-				</div>
-			</InfoRow>
-		);
+		return null;
+		// <InfoRow onClick={props.openAd} className="atext" style={{ marginTop: '2px' }}>
+		// 	<div style={{ display: 'flex' }}>
+		// 		<Avatar style={{ marginRight: '5px' }} size={16} src={MetroImage30} /> Аэропорт
+		// 	</div>
+		// </InfoRow>
 	}
 
 	function authorPanel() {
@@ -127,7 +126,7 @@ const Add7 = (props) => {
 						''
 					)}
 					{!isVisible ? (
-						isAuthor() && ad.hidden ? (
+						isAuthor() && ad.status == STATUS_CHOSEN ? (
 							<div className="hidden2 on-img-text">
 								<Icon12Lock />
 								Видно только вам

@@ -486,7 +486,8 @@ const App = (props) => {
 						<Cities goBack={backToGeoFilters} redux_form={ADS_FILTERS} />
 					</Panel>
 					<Panel id={PANEL_MAP}>
-						<AdMap />
+						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>Местоположение</PanelHeader>
+						<AdMap max={true} />
 					</Panel>
 				</View>
 

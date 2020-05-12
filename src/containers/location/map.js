@@ -2,11 +2,13 @@ import { connect } from 'react-redux';
 
 import { setGeoDataString, setGeoData } from '../../store/create_post/actions';
 
-import AdMap from './../../components/location/map';
+import AdMap, { ON_REFRESH_CLICK } from './../../components/location/map';
 
 const mapStateToProps = (state) => {
 	return {
 		inputData: state.formData.forms,
+		AD: state.ad,
+		dadataB: ON_REFRESH_CLICK,
 	};
 };
 

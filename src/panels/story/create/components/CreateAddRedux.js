@@ -257,6 +257,7 @@ const CreateAddRedux = (props) => {
 								</PanelHeaderButton>
 								<div style={{ flex: 1 }}>
 									<ReactDadata
+										disabled={needEdit}
 										token={'efb37d1dc6b04c11116d3ab7ef9482fa13e0b664'}
 										query={geodata_string}
 										onChange={(e) => {

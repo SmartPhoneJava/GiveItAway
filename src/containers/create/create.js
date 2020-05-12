@@ -83,7 +83,6 @@ const openCities = () => {
 
 const openAd = (ad, dispatch) => {
 	dispatch(setStory(STORY_ADS));
-	dispatch(setAd(ad));
 	dispatch(setExtraInfo(ad));
 };
 const loadAd = (ad, dispatch) => {
@@ -180,7 +179,7 @@ const isValid = (inputData) => {
 		}
 		const mainInfo = getMainInfo(inputData);
 		if (mainInfo) {
-			const { ls_enabled, comments_enabled } = itemInfo;
+			const { ls_enabled, comments_enabled } = mainInfo;
 			if (!ls_enabled && !comments_enabled) {
 				return {
 					v: false,
