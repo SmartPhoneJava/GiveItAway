@@ -335,14 +335,14 @@ export async function CancelClose(ad_id, successCallback, failCallback, blockSna
 	);
 }
 
-export function Close(ad_id, subscriber_id, successCallback, failCallback) {
+export function Close(ad_id, ad_type, subscriber_id, successCallback, failCallback) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;
 	axios({
 		method: 'put',
 		withCredentials: true,
-		params: { subscriber_id: subscriber_id, type: 'choice' },
+		params: { subscriber_id, type: ad_type },
 		url: Addr.getState() + BASE_AD + ad_id + '/make_deal',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})

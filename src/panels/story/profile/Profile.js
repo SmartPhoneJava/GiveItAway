@@ -413,7 +413,7 @@ const Profile = (props) => {
 						</div>
 					</div>
 				</Group>
-				{profileID == props.myID ? (
+				{/* {profileID == props.myID ? (
 					<div style={{ marginTop: '20px' }}>
 						<Banner
 							mode="image"
@@ -444,7 +444,7 @@ const Profile = (props) => {
 							}
 						/>
 					</div>
-				) : null}
+				) : null} */}
 			</>
 		);
 	}

@@ -22,10 +22,11 @@ export const PeopleList = (subs) => {
 
 export const PeopleRBI = withModalRootContext((props) => {
 	const [subs, setSubs] = useState([]);
+	const { ad_id, ad_type } = props.ad;
 
 	useEffect(() => {
 		getSubscribers(
-			props.ad_id,
+			ad_id,
 			(s) => {
 				setSubs(s);
 				props.updateModalHeight();
@@ -33,7 +34,7 @@ export const PeopleRBI = withModalRootContext((props) => {
 			(e) => {},
 			10
 		);
-	}, [props.ad_id]);
+	}, [ad_id]);
 
 	return (
 		<>
@@ -45,7 +46,7 @@ export const PeopleRBI = withModalRootContext((props) => {
 						value={v.vk_id}
 						onClick={(e) => {
 							const { value } = e.currentTarget;
-							Close(props.ad_id, value);
+							Close(ad_id, ad_type, value);
 							props.back();
 						}}
 					>

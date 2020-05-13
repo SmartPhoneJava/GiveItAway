@@ -337,9 +337,9 @@ const App = (props) => {
 
 	function setReduxAd(ad) {
 		console.log('you ask to do this', ad);
-
-		setDetailedAd(ad);
 		setAd(ad);
+		setDetailedAd(ad);
+		
 	}
 
 	function backToAdsFilters() {

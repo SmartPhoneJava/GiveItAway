@@ -53,7 +53,17 @@ import Icon24Coins from '@vkontakte/icons/dist/24/coins';
 import Icon24Help from '@vkontakte/icons/dist/24/help';
 import Icon24MarketOutline from '@vkontakte/icons/dist/24/market_outline';
 
-import { adVisible, adHide, deleteAd, getSubscribers, getDetails, acceptDeal, denyDeal } from './../../requests';
+import {
+	adVisible,
+	adHide,
+	deleteAd,
+	getSubscribers,
+	getDetails,
+	acceptDeal,
+	denyDeal,
+	Close,
+	fail,
+} from './../../requests';
 
 import './addsTab.css';
 import './styles.css';
@@ -402,7 +412,25 @@ const AddMore2r = (props) => {
 	}
 
 	const openSubs = () => {
-		setPage(PANEL_SUBS);
+		if (ad_type == TYPE_CHOICE) {
+			setPage(PANEL_SUBS);
+		} else {
+			if (subscribers_num == 0) {
+				fail('Никто еще не откликнулся на ваше объявление');
+			} else {
+				Close(
+					ad_id,
+					ad_type,
+					0,
+					(e) => {
+						console.log('success close ad');
+					},
+					(e) => {
+						console.log('failed close ad', e);
+					}
+				);
+			}
+		}
 	};
 
 	const openComments = () => {
@@ -666,9 +694,9 @@ const AddMore2r = (props) => {
 						<td>
 							<div style={{ display: 'flex', alignItems: 'center' }}>
 								{ad_type == TYPE_CHOICE ? 'Сделка' : ad_type == TYPE_AUCTION ? 'Аукцион' : 'Лотерея'}
-								<PanelHeaderButton onClick={() => {}}>
+								{/* <PanelHeaderButton onClick={() => {}}>
 									<Icon24Help fill="var(--text_subhead)" />
-								</PanelHeaderButton>
+								</PanelHeaderButton> */}
 							</div>
 						</td>
 					</tr>

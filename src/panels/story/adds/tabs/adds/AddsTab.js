@@ -346,12 +346,12 @@ const AddsTab = (props) => {
 					) : null}
 				</div>
 
-				<PullToRefresh
+				{/* <PullToRefresh
 					onRefresh={() => {
 						setRefreshMe((prev) => prev + 1);
 					}}
 					isFetching={loading}
-				>
+				> */}
 					<Group>
 						<List>
 							{ads.length > 0 ? (
@@ -420,7 +420,7 @@ const AddsTab = (props) => {
 							)}
 						</List>
 					</Group>
-				</PullToRefresh>
+				{/* </PullToRefresh> */}
 			</div>
 		</>
 	);

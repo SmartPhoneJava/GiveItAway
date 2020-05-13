@@ -35,7 +35,7 @@ import useSubsGet from './useSubsGet';
 import { getDeal, Close, CancelClose } from './../../../../../requests';
 
 import Icon44SmileOutline from '@vkontakte/icons/dist/44/smile_outline';
-import { openPopout, closePopout, openSnackbar, setPage } from '../../../../../store/router/actions';
+import { openPopout, closePopout, setPage } from '../../../../../store/router/actions';
 import { setDealer } from '../../../../../store/detailed_ad/actions';
 import { PANEL_SUBS } from '../../../../../store/router/panelTypes';
 import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED } from '../../../../../const/ads';
@@ -84,8 +84,8 @@ export const Given = (props) => {
 
 const Subs = (props) => {
 	const osname = usePlatform();
-	const { openPopout, openSnackbar, closePopout, setDealer, openUser, setPage, AD } = props;
-	const { dealer, subs, ad_id, subscribers_num } = AD;
+	const { openPopout, closePopout, setDealer, openUser, setPage, AD } = props;
+	const { dealer, subs, ad_id, ad_type, subscribers_num } = AD;
 	const status = AD.status || STATUS_OFFER;
 
 	const [photos, setPhotos] = useState([]);
@@ -194,6 +194,7 @@ const Subs = (props) => {
 	function close_ad(subscriber) {
 		Close(
 			ad_id,
+			ad_type,
 			subscriber.vk_id,
 			(data) => {
 				console.log('what i have done?', data);
@@ -357,7 +358,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
 	openPopout,
-	openSnackbar,
 	closePopout,
 	setDealer,
 	setPage,
