@@ -44,7 +44,7 @@ import {
 import * as VK from '../services/VK';
 import { setAppID, setPlatform } from '../store/vk/actions';
 
-import { setDetailedAd, addComment, addSub, setStatus } from '../store/detailed_ad/actions';
+import { addComment, addSub, setStatus, setExtraInfo } from '../store/detailed_ad/actions';
 
 import CategoriesPanel from './../components/categories/panel';
 import Countries from './../components/location/countries';
@@ -337,9 +337,8 @@ const App = (props) => {
 
 	function setReduxAd(ad) {
 		console.log('you ask to do this', ad);
+		store.dispatch(setExtraInfo(ad));
 		setAd(ad);
-		setDetailedAd(ad);
-		
 	}
 
 	function backToAdsFilters() {
@@ -560,7 +559,6 @@ function mapDispatchToProps(dispatch) {
 				addProfile,
 				setFormData,
 				openSnackbar,
-				setDetailedAd,
 				openPopout,
 				addComment,
 				addSub,

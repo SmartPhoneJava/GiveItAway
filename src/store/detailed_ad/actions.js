@@ -12,7 +12,6 @@ import {
 	SET_IS_HIDDEN,
 	SET_STATUS,
 	SET_EXTRA_INFO,
-
 	SET_DEAL,
 	SET_COST,
 	SET_AD,
@@ -20,6 +19,8 @@ import {
 	CLEAR,
 	SET_DEALER,
 	AD_BACK,
+	SET_IMAGE,
+	SET_PHOTO_INDEX,
 } from './actionTypes';
 
 export const setComments = (comments) => ({
@@ -67,14 +68,14 @@ export const addSub = (sub) => ({
 export const deleteSub = (sub) => ({
 	type: DEL_SUB,
 	payload: {
-		sub
+		sub,
 	},
 });
 
 export const setIsAuthor = (isAuthor) => ({
 	type: SET_IS_AUTHOR,
 	payload: {
-		isAuthor
+		isAuthor,
 	},
 });
 
@@ -135,17 +136,19 @@ export const clearAds = () => ({
 	type: CLEAR,
 });
 
-export const setDetailedAd = (ad) => ({
-	type: SET_AD,
+export const setID = (ad_id) => ({
+	type: SET_AD_ID,
 	payload: {
-		ad,
+		ad_id,
 	},
 });
 
-export const setExtraInfo = (ad) => ({
+
+export const setExtraInfo = (ad, myID) => ({
 	type: SET_EXTRA_INFO,
 	payload: {
 		ad,
+		myID,
 	},
 });
 
@@ -153,6 +156,13 @@ export const setPhotos = (photos) => ({
 	type: SET_SWIPE_IMAGES,
 	payload: {
 		photos,
+	},
+});
+
+export const setPhotoIndex = (photoIndex) => ({
+	type: SET_PHOTO_INDEX,
+	payload: {
+		photoIndex,
 	},
 });
 

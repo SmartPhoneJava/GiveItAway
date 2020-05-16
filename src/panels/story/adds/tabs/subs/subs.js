@@ -32,7 +32,7 @@ import Icon36Cancel from '@vkontakte/icons/dist/36/cancel';
 
 import useSubsGet from './useSubsGet';
 
-import { getDeal, Close, CancelClose } from './../../../../../requests';
+import { Close, CancelClose } from './../../../../../requests';
 
 import Icon44SmileOutline from '@vkontakte/icons/dist/44/smile_outline';
 import { openPopout, closePopout, setPage } from '../../../../../store/router/actions';
@@ -226,6 +226,7 @@ const Subs = (props) => {
 	}
 
 	let { inited, loading, error, hasMore, newPage } = useSubsGet(
+		props.mini,
 		pageNumber,
 		props.amount,
 		ad_id,

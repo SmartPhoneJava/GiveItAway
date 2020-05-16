@@ -4,7 +4,7 @@ import { getDeal, getSubscribers, getCost } from '../../requests';
 import { openSnackbar } from '../router/actions';
 import { getUser } from '../../panels/story/profile/requests';
 
-export function updateDealInfo() {
+export async function updateDealInfo() {
 	const myID = store.getState().vkui.myID;
 	const ad_id = store.getState().ad.ad_id;
 	getDeal(
@@ -35,7 +35,7 @@ export function updateDealInfo() {
 
 const SUBS_AMOUNT = 10;
 
-export function updateSubs() {
+export async function updateSubs() {
 	let cancel = false;
 	const ad_id = store.getState().ad.ad_id;
 	getSubscribers(
@@ -50,7 +50,7 @@ export function updateSubs() {
 	};
 }
 
-export function updateCost() {
+export async function updateCost() {
 	let cancel = false;
 	const ad_id = store.getState().ad.ad_id;
 	getCost(

@@ -19,7 +19,7 @@ import {
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import { getUser } from './../../panels/story/profile/requests';
+import { DIRECTION_FORWARD } from './../../store/router/directionTypes';
 
 import 'react-photoswipe/lib/photoswipe.css';
 import { PhotoSwipe, PhotoSwipeGallery } from 'react-photoswipe';
@@ -82,6 +82,7 @@ import {
 	setExtraInfo,
 	setIsAuthor,
 	clearAds,
+	setPhotoIndex,
 } from '../../store/detailed_ad/actions';
 import {
 	AdDefault,
@@ -118,8 +119,9 @@ const AddMore2r = (props) => {
 		setStory,
 		setFormData,
 		clearAds,
+		setPhotoIndex,
 	} = props;
-	const { setPage, openModal, setDummy, AD } = props;
+	const { setPage, openModal, setDummy, direction, AD } = props;
 	const {
 		isDealer,
 		isAuthor,
@@ -146,6 +148,8 @@ const AddMore2r = (props) => {
 		extra_field,
 		cost,
 		hidden,
+		image,
+		photoIndex,
 	} = AD;
 
 	const [isOpen, setIsOpen] = useState(false);
@@ -155,8 +159,8 @@ const AddMore2r = (props) => {
 		setIsOpen(false);
 	};
 
-	const [photoIndex, setPhotoIndex] = useState(0);
-	const [image, setImage] = useState('');
+	// const [photoIndex, setPhotoIndex] = useState(0);
+	// const [image, setImage] = useState('');
 
 	const openImage = (imgs) => {
 		bridge
@@ -177,18 +181,12 @@ const AddMore2r = (props) => {
 		setIsOpen(true);
 	};
 
-	const [backUser, setBackUser] = useState();
-
 	function isNotValid() {
 		return AD == null || AD.ad_id == AD_LOADING.ad_id || AD.ad_id == AdDefault.ad_id;
 	}
 
-	function getImage() {
-		return AD.pathes_to_photo && AD.pathes_to_photo.length > 0 ? AD.pathes_to_photo[photoIndex].PhotoUrl : '';
-	}
-
 	useEffect(() => {
-		if (isNotValid()) {
+		if (isNotValid() || (photos && photos.length != 0)) {
 			return;
 		}
 		const photoSwipeImgs = pathes_to_photo.map((v) => {
@@ -206,8 +204,7 @@ const AddMore2r = (props) => {
 			};
 		});
 		setPhotos(photoSwipeImgs);
-		setImage(getImage());
-	}, [photoIndex, pathes_to_photo]);
+	}, [pathes_to_photo]);
 
 	function changeIsSub(isSubs, c) {
 		console.log('changeIsSub', isSubs);
@@ -215,20 +212,8 @@ const AddMore2r = (props) => {
 			return;
 		}
 		if (isSubs) {
-			if (backUser) {
-				let b = backUser;
-				b.frozen_carma += c;
-				setBackUser(b);
-				props.setbackUser(b);
-			}
 			setCost(c + 1);
 		} else {
-			if (backUser) {
-				let b = backUser;
-				b.frozen_carma -= c - 1;
-				setBackUser(b);
-				props.setbackUser(b);
-			}
 			setCost(c - 1);
 		}
 		setIsSub(isSubs);
@@ -241,26 +226,19 @@ const AddMore2r = (props) => {
 			updateDealInfo();
 			updateCost();
 			updateSubs();
-			getUser(
-				myID,
-				(v) => {
-					props.setbackUser(v);
-					setBackUser(v);
-				},
-				(e) => {}
-			);
 			getDetails(
 				id,
 				(details) => {
-					setExtraInfo(details);
-					setIsAuthor(details.author.vk_id == myID);
+					setExtraInfo(details, myID);
 				},
 				(e) => {
 					setIsAuthor(false);
 				}
 			);
 		};
-		dispatch(init());
+		if (direction == DIRECTION_FORWARD) {
+			dispatch(init());
+		}
 	}, []);
 
 	function statusWrapper(block, color) {
@@ -451,29 +429,12 @@ const AddMore2r = (props) => {
 	};
 
 	const [imgs, setImgs] = useState([]);
-	// const [photoSwipeImgs, setPhotoSwipeImgs] = useState([]);
 
 	useEffect(() => {
 		if (isNotValid(AD)) {
 			return;
 		}
 		setImgs(pathes_to_photo.map((v) => v.PhotoUrl));
-		// setPhotoSwipeImgs(
-		// 	ad.pathes_to_photo.map((v) => {
-		// 		let img = new Image();
-		// 		img.src = v.PhotoUrl;
-		// 		let width = img.width;
-		// 		let hight = img.height;
-		// 		return {
-		// 			src: v.PhotoUrl,
-		// 			msrc: v.PhotoUrl,
-		// 			w: width,
-		// 			h: hight,
-		// 			title: ad.header,
-		// 			thumbnail: v.PhotoUrl,
-		// 		};
-		// 	})
-		// );
 	}, [AD]);
 
 	function unsub(c) {
@@ -811,6 +772,7 @@ const AddMore2r = (props) => {
 const mapStateToProps = (state) => {
 	return {
 		AD: state.ad,
+		direction: state.router.direction,
 		myID: state.vkui.myID,
 	};
 };
@@ -846,6 +808,7 @@ const mapDispatchToProps = (dispatch) => {
 				openSnackbar,
 
 				clearAds,
+				setPhotoIndex,
 			},
 			dispatch
 		),

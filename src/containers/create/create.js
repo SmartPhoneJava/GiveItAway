@@ -13,7 +13,7 @@ import { CategoryNo } from '../../components/categories/Categories';
 
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { FORM_CREATE } from '../../components/categories/redux';
-import { setDetailedAd, setExtraInfo } from '../../store/detailed_ad/actions';
+import { setExtraInfo } from '../../store/detailed_ad/actions';
 import { STORY_ADS } from '../../store/router/storyTypes';
 import { store } from '../..';
 import { defaultInputData } from '../../components/create/default';
@@ -47,8 +47,8 @@ const getAd = (myUser, inputData) => {
 	const item = getItemInfo(inputData);
 	const category = getCategoryInfo(inputData);
 	const ad_id = store.getState().ad ? store.getState().ad.ad_id : 0;
-	const geodata = inputData[GEO_DATA].geodata
-	const geodata_string = inputData[GEO_DATA].geodata_string
+	const geodata = inputData[GEO_DATA].geodata;
+	const geodata_string = inputData[GEO_DATA].geodata_string;
 	return {
 		ad_id,
 		author_id: myUser.id,
@@ -82,18 +82,19 @@ const openCities = () => {
 };
 
 const openAd = (ad, dispatch) => {
+	// dispatch(setPage(PANEL_ONE))
 	dispatch(setStory(STORY_ADS));
-	dispatch(setExtraInfo(ad));
+	dispatch(setExtraInfo(ad, store.getState().vkui.myID));
 };
 const loadAd = (ad, dispatch) => {
-	dispatch(setExtraInfo(ad));
+	dispatch(setExtraInfo(ad, store.getState().vkui.myID));
 };
 
 const createAd = (myUser, inputData, dispatch) => {
 	const ad = getAd(myUser, inputData);
 	const obj = JSON.stringify(ad);
 	const photos = getItemInfo(inputData).photosUrl;
-	console.log("hahahahhaha, what are you waiting?", ad)
+	console.log('hahahahhaha, what are you waiting?', ad);
 	CreateAd(
 		ad,
 		obj,
@@ -110,7 +111,7 @@ const createAd = (myUser, inputData, dispatch) => {
 };
 
 const editAd = (myUser, inputData, dispatch) => {
-	const tgeodata = inputData[GEO_DATA].geodata
+	const tgeodata = inputData[GEO_DATA].geodata;
 	const ad = getAd(myUser, inputData);
 	const obj = JSON.stringify(ad);
 
@@ -255,8 +256,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
 	return {
-		setGeoData:(s)=>dispatch(setGeoData(s)),
-		setGeoDataString:(s)=> dispatch(setGeoDataString(s)),
+		setGeoData: (s) => dispatch(setGeoData(s)),
+		setGeoDataString: (s) => dispatch(setGeoDataString(s)),
 		setFormData: (p, s) => dispatch(setFormData(p, s)),
 		setPage: (p) => dispatch(setPage(p)),
 		openSnackbar: (p) => dispatch(openSnackbar(p)),

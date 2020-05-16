@@ -49,7 +49,7 @@ const CommentsI = (props) => {
 
 	const [pageNumber, setPageNumber] = useState(1);
 	let { inited, loading, error, hasMore, newPage } = useCommentsGet(
-		openPopout,
+		props.mini,
 		pageNumber,
 		10,
 		AD.ad_id,
@@ -79,8 +79,6 @@ const CommentsI = (props) => {
 	function onDeleteClick(v) {
 		setHide(true);
 		deleteComment(
-			openPopout,
-			openPopout,
 			v,
 			(vv) => {
 				deleteCommentByID(v.comment_id);
@@ -164,8 +162,6 @@ const CommentsI = (props) => {
 				text: text,
 			});
 			editComment(
-				openPopout,
-				openSnackbar,
 				comment.comment_id,
 				obj,
 				(v) => {
@@ -203,8 +199,6 @@ const CommentsI = (props) => {
 				text: text,
 			});
 			postComment(
-				openPopout,
-				openSnackbar,
 				AD.ad_id,
 				obj,
 				(v) => {

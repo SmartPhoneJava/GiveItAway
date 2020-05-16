@@ -13,12 +13,14 @@ import {
 	SET_STATUS,
 	SET_DEAL,
 	SET_COST,
-	SET_AD,
 	SET_SWIPE_IMAGES,
 	CLEAR,
 	SET_DEALER,
 	SET_EXTRA_INFO,
 	AD_BACK,
+	SET_IMAGE,
+	SET_PHOTO_INDEX,
+	SET_AD_ID,
 } from './actionTypes';
 import { TYPE_CHOICE } from '../../const/ads';
 import { shortText } from '../../utils/short_text';
@@ -55,7 +57,11 @@ const initialState = {
 
 	comments: [],
 	subs: [],
+
 	photos: [],
+	image: '',
+	photoIndex: 0,
+
 	deal: null,
 
 	isAuthor: false,
@@ -216,46 +222,17 @@ export const adReducer = (state = initialState, action) => {
 				dealer,
 			};
 		}
-
-		case SET_AD: {
-			const ad = action.payload.ad;
-			const ad_id = ad.ad_id || state.ad_id;
-			const status = ad.status || state.status;
-			const header = ad.header || state.header;
-			const text = ad.text || state.text;
-			const creation_date = ad.creation_date || state.creation_date;
-			const feedback_type = ad.feedback_type || state.feedback_type;
-			const category = ad.category || state.category;
-			const extra_field = ad.extra_field || state.extra_field;
-			const views_count = ad.views_count || state.views_count;
-
-			const region = ad.region || state.region;
-			const district = ad.district || state.district;
-			const pathes_to_photo = ad.pathes_to_photo || state.pathes_to_photo;
-			const hidden = ad.hidden || state.hidden;
-			const author = ad.author || state.author;
-
+		case SET_AD_ID: {
+			const ad_id = action.payload.ad_Id;
 			return {
-				...state,
+				...initialState,
 				ad_id,
-				status,
-				header,
-				text,
-				creation_date,
-				feedback_type,
-				category,
-				extra_field,
-				views_count,
-				pathes_to_photo,
-				author,
-				hidden,
-				region,
-				district,
 			};
 		}
 
 		case SET_EXTRA_INFO: {
 			const ad = action.payload.ad;
+			console.log('extra set', ad);
 			const ad_id = ad.ad_id || state.ad_id;
 			const status = ad.status || state.status;
 			const header = ad.header || state.header;
@@ -266,8 +243,8 @@ export const adReducer = (state = initialState, action) => {
 			const extra_field = ad.extra_field || state.extra_field;
 			const views_count = ad.views_count || state.views_count;
 			let geo_position = ad.geo_position || state.geo_position;
-			geo_position.lat.toFixed(3) 
-			geo_position.long.toFixed(3) 
+			geo_position.lat.toFixed(5);
+			geo_position.long.toFixed(5);
 
 			const ad_type = ad.ad_type || state.ad_type;
 			const ls_enabled = ad.ls_enabled || state.ls_enabled;
@@ -282,6 +259,9 @@ export const adReducer = (state = initialState, action) => {
 			const pathes_to_photo = ad.pathes_to_photo || state.pathes_to_photo;
 			const hidden = ad.hidden || state.hidden;
 			const author = ad.author || state.author;
+			const isAuthor = author.vk_id == action.payload.myID;
+
+			const image = (pathes_to_photo.length > 0 ? pathes_to_photo[0].PhotoUrl : null) || '';
 
 			let history = state.history || [];
 			const Ad_id = state.ad_id || 0;
@@ -290,7 +270,7 @@ export const adReducer = (state = initialState, action) => {
 			}
 
 			return {
-				...state,
+				...initialState,
 				ad_id,
 				status,
 				header,
@@ -314,6 +294,8 @@ export const adReducer = (state = initialState, action) => {
 				subscribers_num,
 				isSub,
 				geo_position,
+				image,
+				isAuthor,
 			};
 		}
 
@@ -344,6 +326,21 @@ export const adReducer = (state = initialState, action) => {
 			return {
 				...state,
 				photos,
+			};
+		}
+
+		case SET_PHOTO_INDEX: {
+			const photoIndex = action.payload.photoIndex;
+			const Photos = state.pathes_to_photo;
+			const image = (photoIndex < Photos.length ? Photos[photoIndex].PhotoUrl : null) || '';
+			console.log('seeet photoIndex', Photos, photoIndex, image);
+			if (image == '') {
+				return state;
+			}
+			return {
+				...state,
+				photoIndex,
+				image,
 			};
 		}
 

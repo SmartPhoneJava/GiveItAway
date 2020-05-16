@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { YMaps, Map, Circle, Placemark } from 'react-yandex-maps';
-import { ScreenSpinner, Snackbar, Avatar } from '@vkontakte/vkui';
+import { ScreenSpinner, Snackbar, Avatar, Placeholder } from '@vkontakte/vkui';
 
 import { GEO_DATA } from '../../store/create_post/types';
 import { getGeodata } from '../../services/VK';
@@ -26,36 +26,50 @@ const AdMap = (props) => {
 	const [loaded, setLoaded] = useState(false);
 
 	const width = document.body.clientWidth - 40;
-	const height = document.body.clientHeight - 150;
+	const height = document.body.clientHeight - 110;
+
+	if (max && geodata.lat == 1 && geodata.long == 1) {
+		return <Placeholder>Положение на карте не указано</Placeholder>;
+	}
 
 	return (
-		<div style={{ alignItems: 'center', justifyContent: 'center' }}>
-			{!loaded ? <ScreenSpinner size="large" /> : null}
-			<YMaps>
-				<Map
-					width={width}
-					height={max ? height : null}
-					state={mapState}
-					onLoad={() => {
-						setLoaded(true);
-					}}
-				>
-					{max ? (
-						<Circle
-							geometry={[center, 200]}
-							options={{
-								draggable: false,
-								fillColor: '#DB709377',
-								strokeColor: '#990066',
-								strokeOpacity: 0.5,
-								strokeWidth: 1,
-							}}
-						/>
-					) : (
-						<Placemark geometry={place} />
-					)}
-				</Map>
-			</YMaps>
+		<div style={{ display: 'flex' }}>
+			<div
+				style={{
+					alignItems: 'center',
+					justifyContent: 'center',
+					flex: 1,
+					marginLeft: 'auto',
+					marginRight: 'auto',
+				}}
+			>
+				{!loaded ? <ScreenSpinner size="large" /> : null}
+				<YMaps>
+					<Map
+						width={max ? height + 40 : null}
+						height={max ? height : null}
+						state={mapState}
+						onLoad={() => {
+							setLoaded(true);
+						}}
+					>
+						{max ? (
+							<Circle
+								geometry={[center, 200]}
+								options={{
+									draggable: false,
+									fillColor: '#DB709377',
+									strokeColor: '#990066',
+									strokeOpacity: 0.5,
+									strokeWidth: 1,
+								}}
+							/>
+						) : (
+							<Placemark geometry={place} />
+						)}
+					</Map>
+				</YMaps>
+			</div>
 		</div>
 	);
 };

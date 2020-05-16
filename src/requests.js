@@ -407,7 +407,7 @@ export async function getSubscribers(ad_id, successCallback, failCallback, count
 }
 
 export async function getDetails(ad_id, successCallback, failCallback) {
-	store.dispatch(openPopout(<ScreenSpinner size="large" />));
+	// store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;
 	const data = await axios({
@@ -417,7 +417,7 @@ export async function getDetails(ad_id, successCallback, failCallback) {
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
-			store.dispatch(closePopout());
+			// store.dispatch(closePopout());
 			console.log('response from getDetails:', response);
 			return response.data;
 		})
@@ -435,7 +435,7 @@ export async function getDetails(ad_id, successCallback, failCallback) {
 			fail('Нет соединения с сервером', () => {
 				getDetails(ad_id);
 			});
-			store.dispatch(closePopout());
+			// store.dispatch(closePopout());
 		});
 
 	return { details: data, err };
@@ -605,9 +605,7 @@ export function CreateAd(ad, obj, photos, openAd, loadAd, successcallback) {
 			store.dispatch(closePopout());
 			fail('Нет соединения с сервером', () => createAd(ad, obj, photos, openAd, loadAd, successcallback));
 		});
-	return () => {
-		cancel();
-	};
+	return;
 }
 
 export async function EditAd(ad, obj, openAd, successcallback) {
@@ -636,9 +634,7 @@ export async function EditAd(ad, obj, openAd, successcallback) {
 			store.dispatch(closePopout());
 			fail('Нет соединения с сервером', () => EditAd(ad, obj, openAd, successcallback));
 		});
-	return () => {
-		cancel();
-	};
+	return;
 }
 
 export const deleteAd = (ad_id, refresh) => {

@@ -6,11 +6,14 @@ import axios from 'axios';
 import { Addr, BASE_AD, BASE_COMMENT } from './../../../../../store/addr';
 
 import { fail, success } from './../../../../../requests';
+import { store } from '../../../../..';
+import { openPopout, closePopout, openSnackbar } from '../../../../../store/router/actions';
 
 let request_id = 0;
 
-export async function postComment(setPopout, setSnackbar, ad_id, comment, successCallback, failCallback, end) {
-	setPopout(<ScreenSpinner size="large" />);
+export async function postComment(ad_id, comment, successCallback, failCallback, end) {
+	store.dispatch(openPopout(<ScreenSpinner size="large" />));
+
 	let err = false;
 	let cancel;
 
@@ -25,9 +28,8 @@ export async function postComment(setPopout, setSnackbar, ad_id, comment, succes
 			return response.data;
 		})
 		.then(function (response) {
-			setPopout(null);
+			store.dispatch(closePopout());
 			successCallback(response);
-			// success('Комментарий отправлен', null, setSnackbar, end);
 			end();
 			return response;
 		})
@@ -37,17 +39,17 @@ export async function postComment(setPopout, setSnackbar, ad_id, comment, succes
 			fail(
 				'Комментарий не отправлен',
 				() => {
-					postComment(setPopout, setSnackbar, ad_id, comment, successCallback, failCallback, end);
+					postComment(ad_id, comment, successCallback, failCallback, end);
 				},
 				end
 			);
-			setPopout(null);
+			store.dispatch(closePopout());
 		});
 	return err;
 }
 
-export async function deleteComment(setPopout, setSnackbar, comment, successCallback, failCallback, end) {
-	setPopout(<ScreenSpinner size="large" />);
+export async function deleteComment(comment, successCallback, failCallback, end) {
+	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;
 
@@ -66,7 +68,7 @@ export async function deleteComment(setPopout, setSnackbar, comment, successCall
 		.then(function (response) {
 			success('Комментарий удален', null, end);
 			successCallback(response);
-			setPopout(null);
+			store.dispatch(closePopout());
 			return response;
 		})
 		.catch(function (error) {
@@ -74,18 +76,18 @@ export async function deleteComment(setPopout, setSnackbar, comment, successCall
 			fail(
 				'Комментарий не удален',
 				() => {
-					deleteComment(setPopout, setSnackbar, comment, successCallback, failCallback, end);
+					deleteComment(comment, successCallback, failCallback, end);
 				},
 				end
 			);
 			failCallback(error);
-			setPopout(null);
+			store.dispatch(closePopout());
 		});
 	return err;
 }
 
-export async function editComment(setPopout, setSnackbar, id, comment, successCallback, failCallback, end) {
-	setPopout(<ScreenSpinner size="large" />);
+export async function editComment(id, comment, successCallback, failCallback, end) {
+	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;
 
@@ -102,7 +104,7 @@ export async function editComment(setPopout, setSnackbar, id, comment, successCa
 		.then(function (response) {
 			successCallback(response);
 			success('Комментарий отредактирован', null, end);
-			setPopout(null);
+			store.dispatch(closePopout());
 			return response;
 		})
 		.catch(function (error) {
@@ -111,11 +113,11 @@ export async function editComment(setPopout, setSnackbar, id, comment, successCa
 			fail(
 				'Комментарий не отредактирован',
 				() => {
-					editComment(setPopout, setSnackbar, id, comment, successCallback, failCallback, end);
+					editComment(id, comment, successCallback, failCallback, end);
 				},
 				end
 			);
-			setPopout(null);
+			store.dispatch(closePopout());
 		});
 	return err;
 }

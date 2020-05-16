@@ -9,6 +9,7 @@ import { setSubs, addSub } from '../../../../../store/detailed_ad/actions';
 import { openPopout, closePopout } from '../../../../../store/router/actions';
 
 export default function useSubsGet(
+	ignorePopout,
 	pageNumber,
 	rowsPerPage,
 	ad_id,
@@ -32,7 +33,9 @@ export default function useSubsGet(
 			setHasMore(false);
 			return;
 		}
-		store.dispatch(openPopout(<ScreenSpinner size="large" />));
+		if (!ignorePopout) {
+			store.dispatch(openPopout(<ScreenSpinner size="large" />));
+		}
 		setLoading(true);
 		setError(false);
 		setInited(false);
@@ -60,8 +63,10 @@ export default function useSubsGet(
 
 				setHasMore(newNots.length > 0);
 				setLoading(false);
-			
-				store.dispatch(closePopout());
+
+				if (!ignorePopout) {
+					store.dispatch(closePopout());
+				}
 				setInited(true);
 				successCallback(newNots);
 			})
@@ -69,7 +74,9 @@ export default function useSubsGet(
 				console.log('ERROR useSubsGet:', e);
 				if (axios.isCancel(e)) return;
 
-				store.dispatch(closePopout());
+				if (!ignorePopout) {
+					store.dispatch(closePopout());
+				}
 				failCallback(e);
 				setInited(true);
 			});

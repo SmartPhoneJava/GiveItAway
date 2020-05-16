@@ -10,8 +10,8 @@ import Bb from './../img/bb.jpg';
 export const GEO_TYPE_FILTERS = 'filters';
 export const GEO_TYPE_NEAR = 'near';
 
-export const SORT_TIME = 'SORT_TIME';
-export const SORT_GEO = 'SORT_GEO';
+export const SORT_TIME = 'time';
+export const SORT_GEO = 'geo';
 
 export const COLOR_DEFAULT = 'rgba(0,0,0,0.6)';
 export const COLOR_DONE = 'rgba(0,75,0,0.8)';

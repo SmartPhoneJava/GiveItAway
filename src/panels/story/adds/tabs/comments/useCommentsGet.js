@@ -6,8 +6,9 @@ import { ScreenSpinner } from '@vkontakte/vkui';
 
 import { Addr, BASE_AD } from '../../../../../store/addr';
 import { setComments, addComment } from '../../../../../store/detailed_ad/actions';
+import { openPopout, closePopout } from '../../../../../store/router/actions';
 
-export default function useCommentsGet(setPopout, pageNumber, rowsPerPage, ad_id, maxAmount) {
+export default function useCommentsGet(ignorePopout, pageNumber, rowsPerPage, ad_id, maxAmount) {
 	const [inited, setInited] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
@@ -23,7 +24,9 @@ export default function useCommentsGet(setPopout, pageNumber, rowsPerPage, ad_id
 			setHasMore(false);
 			return;
 		}
-		setPopout(<ScreenSpinner size="large" />);
+		if (!ignorePopout) {
+			store.dispatch(openPopout(<ScreenSpinner size="large" />));
+		}
 		setLoading(true);
 		setError(false);
 		setInited(false);
@@ -42,7 +45,6 @@ export default function useCommentsGet(setPopout, pageNumber, rowsPerPage, ad_id
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
 		})
 			.then((res) => {
-				console.log('sucess comments', res);
 				const newNots = res.data;
 
 				newNots.forEach((comment) => {
@@ -51,14 +53,18 @@ export default function useCommentsGet(setPopout, pageNumber, rowsPerPage, ad_id
 
 				setHasMore(newNots.length > 0);
 				setLoading(false);
-				setPopout(null);
+				if (!ignorePopout) {
+					store.dispatch(closePopout());
+				}
 				setInited(true);
 			})
 			.catch((e) => {
 				console.log('fail comments', e);
 				if (axios.isCancel(e)) return;
 
-				setPopout(null);
+				if (!ignorePopout) {
+					store.dispatch(closePopout());
+				}
 				setInited(true);
 			});
 		return () => cancel();

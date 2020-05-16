@@ -1,4 +1,3 @@
-
 export const SET_COMMENTS = 'SET_COMMENTS';
 export const ADD_COMMENT = 'ADD_COMMENT';
 export const DELETE_COMMENT = 'DELETE_COMMENT';
@@ -23,5 +22,7 @@ export const SET_DEALER = 'SET_DEALER';
 
 export const SET_COST = 'SET_COST';
 
-export const SET_AD = 'SET_AD';
+export const SET_AD_ID = 'SET_AD_ID';
+
 export const SET_SWIPE_IMAGES = 'SET_SWIPE_IMAGES';
+export const SET_PHOTO_INDEX = 'SET_PHOTO_INDEX';
