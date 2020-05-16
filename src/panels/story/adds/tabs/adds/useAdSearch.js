@@ -37,7 +37,7 @@ export default function useAdSearch(
 	useEffect(() => {
 		setAds([]);
 		pageNumber = 1;
-	}, [category, mode, query, city, country, sort, geodata, radius, refreshMe]);
+	}, [category, mode, query, city, country, sort, geodata, geoType, radius, refreshMe]);
 
 	useEffect(() => {
 		console.log('deleteID', deleteID);
@@ -77,7 +77,7 @@ export default function useAdSearch(
 		}
 
 		if (geoType == GEO_TYPE_NEAR) {
-			params.radius = radius;
+			params.radius = radius || 0.5;
 		} else {
 			if (city && city.id != -1) {
 				params.district = city.title;
@@ -128,7 +128,7 @@ export default function useAdSearch(
 			cancel();
 			cleanupFunction = true;
 		};
-	}, [category, mode, query, pageNumber, city, country, sort, geodata, radius, refreshMe]);
+	}, [category, mode, query, pageNumber, city, country, sort, geoType, geodata, radius, refreshMe]);
 
 	return { inited, newPage: pageNumber, ads, loading, error, hasMore };
 }
