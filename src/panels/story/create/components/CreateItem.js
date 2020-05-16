@@ -38,17 +38,17 @@ import { loadPhotos, MAX_FILE_SIZE } from '../../../../services/file';
 import { PHOTO_TEXT } from '../../../../const/create';
 
 import './createItem.css';
-import { closeSnackbar, openSnackbar } from '../../../../store/router/actions';
+import { closeSnackbar, openSnackbar, setDummy } from '../../../../store/router/actions';
 
 const nameLabel = 'Название';
 const descriptionLabel = 'Описание';
 
 const CreateItem = (props) => {
-	const { AD, defaultInputData, setFormData, openSnackbar, closeSnackbar } = props;
+	const { AD, defaultInputData, setFormData, openSnackbar, closeSnackbar, setDummy } = props;
 	const inputData = props.inputData[CREATE_AD_ITEM] || defaultInputData;
-	const name = props.inputData[CREATE_AD_ITEM].name || "";
-	const description = props.inputData[CREATE_AD_ITEM].description || "";
-	const photosUrl = props.inputData[CREATE_AD_ITEM].photosUrl || "";
+	const name = props.inputData[CREATE_AD_ITEM].name || '';
+	const description = props.inputData[CREATE_AD_ITEM].description || '';
+	const photosUrl = props.inputData[CREATE_AD_ITEM].photosUrl || '';
 
 	// const [inputData, setInputData] = useState(props.inputData[CREATE_AD_ITEM] || props.defaultInputData);
 	const needEdit = props.inputData[EDIT_MODE] ? props.inputData[EDIT_MODE].mode : false;
@@ -77,6 +77,7 @@ const CreateItem = (props) => {
 			index: i,
 		});
 		setIsOpen(true);
+		setDummy('imager');
 	};
 
 	const { platform } = props;
@@ -129,14 +130,13 @@ const CreateItem = (props) => {
 				// 	...inputData,
 				// 	photosUrl,
 				// });
-				console.log("PHOTO_TEXT", PHOTO_TEXT)
-				const photoText = "" + PHOTO_TEXT + '. Загружено ' + photosUrl.length + '/3';
+				console.log('PHOTO_TEXT', PHOTO_TEXT);
+				const photoText = '' + PHOTO_TEXT + '. Загружено ' + photosUrl.length + '/3';
 				setFormData(CREATE_AD_ITEM, {
 					...inputData,
 					photosUrl,
 					photoText,
 				});
-				
 			},
 			() => {
 				// let photoText;
@@ -356,6 +356,7 @@ const mapDispatchToProps = {
 	setFormData,
 	closeSnackbar,
 	openSnackbar,
+	setDummy,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateItem);

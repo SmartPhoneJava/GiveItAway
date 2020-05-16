@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 
 import { setPage, openPopout, openSnackbar, closeSnackbar, setStory, setAd } from '../../store/router/actions';
-import { PANEL_CATEGORIES, PANEL_CITIES, PANEL_COUNTRIES } from '../../store/router/panelTypes';
+import { PANEL_CATEGORIES, PANEL_CITIES, PANEL_COUNTRIES, PANEL_ONE } from '../../store/router/panelTypes';
 
 import { setFormData, setGeoDataString, setGeoData } from '../../store/create_post/actions';
 import { CREATE_AD_MAIN, CREATE_AD_ITEM, GEO_DATA } from '../../store/create_post/types';
@@ -82,8 +82,8 @@ const openCities = () => {
 };
 
 const openAd = (ad, dispatch) => {
-	// dispatch(setPage(PANEL_ONE))
-	dispatch(setStory(STORY_ADS));
+	dispatch(setStory(STORY_ADS, PANEL_ONE));
+
 	dispatch(setExtraInfo(ad, store.getState().vkui.myID));
 };
 const loadAd = (ad, dispatch) => {
@@ -94,7 +94,6 @@ const createAd = (myUser, inputData, dispatch) => {
 	const ad = getAd(myUser, inputData);
 	const obj = JSON.stringify(ad);
 	const photos = getItemInfo(inputData).photosUrl;
-	console.log('hahahahhaha, what are you waiting?', ad);
 	CreateAd(
 		ad,
 		obj,

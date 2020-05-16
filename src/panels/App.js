@@ -338,7 +338,7 @@ const App = (props) => {
 	function setReduxAd(ad) {
 		console.log('you ask to do this', ad);
 		store.dispatch(setExtraInfo(ad));
-		setAd(ad);
+		store.dispatch(setAd(ad))
 	}
 
 	function backToAdsFilters() {
