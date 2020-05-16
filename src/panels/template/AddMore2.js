@@ -159,9 +159,6 @@ const AddMore2r = (props) => {
 		setIsOpen(false);
 	};
 
-	// const [photoIndex, setPhotoIndex] = useState(0);
-	// const [image, setImage] = useState('');
-
 	const openImage = (imgs) => {
 		bridge
 			.send('VKWebAppShowImages', {

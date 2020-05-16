@@ -138,8 +138,6 @@ const App = (props) => {
 
 	const [inited, setInited] = useState(false);
 
-	const [backUser, setbackUser] = useState(null);
-
 	const [profileName, setProfileName] = useState('Профиль');
 
 	const [notsCounterr, setNotsCounterr] = useState(notsCounterr);
@@ -338,7 +336,7 @@ const App = (props) => {
 	function setReduxAd(ad) {
 		console.log('you ask to do this', ad);
 		store.dispatch(setExtraInfo(ad));
-		store.dispatch(setAd(ad))
+		store.dispatch(setAd(ad));
 	}
 
 	function backToAdsFilters() {
@@ -411,7 +409,7 @@ const App = (props) => {
 					activePanel={adActivePanel}
 					onSwipeBack={goBack}
 					history={adPanels}
-					modal={<AdsModal backUser={backUser} />}
+					modal={<AdsModal />}
 					header={false}
 				>
 					<Panel id={PANEL_ADS} separator={false}>
@@ -435,14 +433,15 @@ const App = (props) => {
 						{choosen ? (
 							<AddMore2
 								refresh={(id) => {
-									goBack();
+									console.log('here we go');
+
+									setStory(STORY_ADS, PANEL_ADS);
 									SetDeleteID(id);
 									scroll();
 								}}
 								back={goBack}
 								openUser={setProfile}
 								VkUser={VkUser}
-								setbackUser={setbackUser}
 							/>
 						) : (
 							Error
