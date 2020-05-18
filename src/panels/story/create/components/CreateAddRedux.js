@@ -7,11 +7,14 @@ import {
 	Div,
 	FormStatus,
 	Separator,
+	Link,
 	Spinner,
 	Snackbar,
 	Avatar,
 	PanelHeaderButton,
 	Cell,
+	FormLayout,
+	Checkbox,
 } from '@vkontakte/vkui';
 import { ReactDadata } from 'react-dadata';
 
@@ -325,6 +328,11 @@ const CreateAddRedux = (props) => {
 
 			<ChooseFeedback pmOpen={pmOpen} />
 			<ChooseType />
+			{/* <FormLayout>
+				<Checkbox>
+					Я прочитал и согласен c <Link onClick={openSubs}>пользовательским соглашением</Link>
+				</Checkbox>
+			</FormLayout> */}
 			{valid ? (
 				''
 			) : (
@@ -334,6 +342,7 @@ const CreateAddRedux = (props) => {
 					</FormStatus>
 				</div>
 			)}
+			
 			<Div style={{ display: 'flex' }}>
 				{needEdit ? (
 					<Button onClick={editAd} mode={valid ? 'commerce' : 'secondary'} size="l" stretched>
