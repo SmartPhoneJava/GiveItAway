@@ -71,10 +71,9 @@ const Add7 = (props) => {
 	function authorPanel() {
 		return (
 			<InfoRow
-				onClick={props.openAd}
-				// onClick={() => {
-				// 	props.openUser(ad.author.vk_id);
-				// }}
+			// onClick={() => {
+			// 	props.openUser(ad.author.vk_id);
+			// }}
 			>
 				<div className="aauthor">
 					<Avatar style={{ marginRight: '5px' }} size={20} src={ad.author.photo_url} />{' '}
@@ -149,16 +148,12 @@ const Add7 = (props) => {
 
 						{controllButton()}
 					</div>
-					<InfoRow onClick={props.openAd} className="atext">
-						{' '}
-						{GetCategoryText(ad.category)}{' '}
-					</InfoRow>
-					<InfoRow onClick={props.openAd} className="atext">
-						{' '}
-						{time(ad.creation_date, 300)}{' '}
-					</InfoRow>
-					{metroPanel()}
-					{authorPanel()}
+					<div onClick={props.openAd}>
+						<InfoRow className="atext"> {GetCategoryText(ad.category)} </InfoRow>
+						<InfoRow className="atext"> {time(ad.creation_date, 300)} </InfoRow>
+						{metroPanel()}
+						{authorPanel()}
+					</div>
 				</div>
 			</div>
 		</div>
@@ -167,4 +162,4 @@ const Add7 = (props) => {
 
 export default Add7;
 
-// 342
+// 342 -> 165

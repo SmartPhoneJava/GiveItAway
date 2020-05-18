@@ -82,7 +82,12 @@ const openCities = () => {
 };
 
 const openAd = (ad, dispatch) => {
-	dispatch(setStory(STORY_ADS, PANEL_ONE));
+	// ? не обьединять эту функцию в одну, оно специально
+	// ? вызывается так. Первая функция ставит историю и панель,
+	// ? вторая простая ставит панель. Благодаря этому работает
+	// ? кнопка назад
+	dispatch(setStory(STORY_ADS));
+	dispatch(setPage(PANEL_ONE));
 
 	dispatch(setExtraInfo(ad, store.getState().vkui.myID));
 };

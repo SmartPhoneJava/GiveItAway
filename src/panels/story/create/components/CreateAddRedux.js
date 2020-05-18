@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { YMaps, Map, YMapsApi, Placemark } from 'react-yandex-maps';
+import { YMaps, Map, YMapsApi, Placemark, FullscreenControl } from 'react-yandex-maps';
 import {
 	Button,
 	Group,
@@ -7,10 +7,11 @@ import {
 	Div,
 	FormStatus,
 	Separator,
-	ScreenSpinner,
+	Spinner,
 	Snackbar,
 	Avatar,
 	PanelHeaderButton,
+	Cell,
 } from '@vkontakte/vkui';
 import { ReactDadata } from 'react-dadata';
 
@@ -48,11 +49,11 @@ const CreateAddRedux = (props) => {
 		inputData,
 		AD,
 	} = props;
+
 	const geodata =
 		inputData && inputData[GEO_DATA] && inputData[GEO_DATA].geodata && inputData[GEO_DATA].geodata.lat
 			? inputData[GEO_DATA].geodata
 			: { lat: 55.75, long: 37.57 };
-
 	const [geodata_string, set_geodata_string] = useState(
 		inputData && inputData[GEO_DATA] && inputData[GEO_DATA].geodata_string
 			? inputData[GEO_DATA].geodata_string
@@ -62,14 +63,6 @@ const CreateAddRedux = (props) => {
 			? inputData[FORM_LOCATION_CREATE].city.title
 			: 'Мой адрес'
 	);
-	// const geodata_string =
-	// 	inputData && inputData[GEO_DATA] && inputData[GEO_DATA].geodata_string
-	// 		? inputData[GEO_DATA].geodata_string
-	// 		: inputData[FORM_LOCATION_CREATE] &&
-	// 		  inputData[FORM_LOCATION_CREATE].city &&
-	// 		  inputData[FORM_LOCATION_CREATE].city.title
-	// 		? inputData[FORM_LOCATION_CREATE].city.title
-	// 		: 'Мой адрес';
 
 	console.log('geodata geodata', geodata, geodata_string);
 
@@ -111,9 +104,10 @@ const CreateAddRedux = (props) => {
 	const ON_SUGGESTION_CLICK = 'ON_SUGGESTION_CLICK';
 	const NO_CLICK = 'NO_CLICK';
 
-	const [mapState, setMapState] = useState({ center: [2.75, 2.57], zoom: 9 });
+	const [mapState, setMapState] = useState({ center: [2.75, 2.57], zoom: 9, controls: [] });
 	const [place, setPlace] = useState([2.75, 2.57]);
-	const [dadataB, setDadataB] = useState(ON_REFRESH_CLICK);
+	const [dadataB, setDadataB] = useState(NO_CLICK);
+	const [needRefreshL, setNeedRefreshL] = useState(false);
 
 	useEffect(() => {
 		if (dadataB == NO_CLICK) {
@@ -124,7 +118,6 @@ const CreateAddRedux = (props) => {
 			}, 1000);
 			return;
 		}
-		console.log('сбой ', dadataB);
 		getGeodata(
 			(data) => {
 				console.log('go deeper', data);
@@ -135,6 +128,10 @@ const CreateAddRedux = (props) => {
 					data,
 					(data_string) => {
 						set_geodata_string(data_string);
+						setNeedRefreshL(true);
+						setInterval(() => {
+							setNeedRefreshL(false), 50;
+						});
 
 						console.log('go deeper 2', data_string);
 						setDadataB(NO_CLICK);
@@ -184,14 +181,15 @@ const CreateAddRedux = (props) => {
 		}
 	}
 
-	function findMetro(ymaps) {
-		console.log('cliick', geodata_string);
+	function findMetro(ymaps, geoString) {
+		const geo_string = geoString || geodata_string;
 		ymaps
-			.geocode(geodata_string)
+			.geocode(geo_string)
 			.then((result) => {
 				const lom = result.geoObjects.get(0).geometry.getCoordinates();
 
 				const center = [lom[0], lom[1]];
+				console.log('looooook at center', center);
 				setGeoData({ lat: lom[0], long: lom[1] });
 				setPlace(center);
 				setMapState({ center, zoom: 9 });
@@ -199,28 +197,29 @@ const CreateAddRedux = (props) => {
 			.catch((e) => {
 				console.log('hey hey hey errr', result.geoObjects.get(0).geometry.getCoordinates());
 			});
-		ymaps
-			.geocode([geodata.lat, geodata.long], {
-				/**
-				 * Опции запроса
-				 * @see https://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/geocode.xml
-				 */
-				// Ищем только станции метро.
-				kind: 'metro',
-				// Запрашиваем не более 20 результатов.
-				results: 20,
-				apikey: '7f6269fb-0f48-4182-bd23-13b3cb155a06',
-			})
-			.then(function (res) {
-				const coords = res.geoObjects[0];
-				console.log('reeees findMetro', coords, res);
-			})
-			.catch((e) => {
-				console.log('error findMetro', e);
-			});
+		// ymaps
+		// 	.geocode([geodata.lat, geodata.long], {
+		// 		/**
+		// 		 * Опции запроса
+		// 		 * @see https://api.yandex.ru/maps/doc/jsapi/2.1/ref/reference/geocode.xml
+		// 		 */
+		// 		// Ищем только станции метро.
+		// 		kind: 'metro',
+		// 		// Запрашиваем не более 20 результатов.
+		// 		results: 20,
+		// 		apikey: '7f6269fb-0f48-4182-bd23-13b3cb155a06',
+		// 	})
+		// 	.then(function (res) {
+		// 		const coords = res.geoObjects[0];
+		// 		console.log('reeees findMetro', coords, res);
+		// 	})
+		// 	.catch((e) => {
+		// 		console.log('error findMetro', e);
+		// 	});
 	}
 
-	const width = document.body.clientWidth - 40;
+	const [width, setWidth] = useState(document.body.clientWidth - 40);
+	const [ymapsL, setYmapsL] = useState({});
 
 	return (
 		<div>
@@ -241,20 +240,31 @@ const CreateAddRedux = (props) => {
 				/>
 			</Group> */}
 
-			<Group separator="hide" header={<Header>Местоположение объявления</Header>}>
-				{dadataB == NO_CLICK ? (
-					<>
-						<div style={{ paddingRight: '15px' }}>
-							<div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-								<PanelHeaderButton
-									style={{ padding: '0px', margin: '0px' }}
-									onClick={() => {
-										setDadataB(ON_REFRESH_CLICK);
-									}}
-								>
-									<Icon24Place fill="var(--accent)" />
-								</PanelHeaderButton>
-								<div style={{ flex: 1 }}>
+			<Group
+				separator="hide"
+				header={
+					<Cell
+						multiline={true}
+						description="Кликни по полю ввода, чтобы указать свое местоположение или по иконке, чтобы определить его автоматически"
+					>
+						<div style={{ fontWeight: 600 }}>Местоположение объявления</div>
+					</Cell>
+				}
+			>
+				<>
+					<div style={{ paddingRight: '15px' }}>
+						<div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+							<PanelHeaderButton
+								style={{ padding: '0px', margin: '0px' }}
+								onClick={() => {
+									setDadataB(ON_REFRESH_CLICK);
+								}}
+							>
+								<Icon24Place fill="var(--accent)" />
+							</PanelHeaderButton>
+
+							<div style={{ flex: 1 }}>
+								{needRefreshL ? null : (
 									<ReactDadata
 										disabled={needEdit}
 										token={'efb37d1dc6b04c11116d3ab7ef9482fa13e0b664'}
@@ -264,6 +274,7 @@ const CreateAddRedux = (props) => {
 											setGeoDataString(e.value);
 											set_geodata_string(e.value);
 											setDadataB(ON_SUGGESTION_CLICK);
+
 											const city_title = e.data.city
 												? e.data.city
 												: e.data.region
@@ -274,6 +285,8 @@ const CreateAddRedux = (props) => {
 												country: { id: 1, title: e.data.country },
 												city: { id: 1, title: city_title },
 											});
+											findMetro(ymapsL, e.value);
+
 											// if (!e.data.geo_lat) {
 											// 	getMetro(e.data.postal_code);
 											// }
@@ -282,25 +295,32 @@ const CreateAddRedux = (props) => {
 										autocomplete={geodata_string}
 										placeholder={'Введите адрес'}
 									/>
-								</div>
+								)}
 							</div>
-							<div style={{ paddingLeft: '15px' }}>
-								<YMaps query={{ apikey: '7f6269fb-0f48-4182-bd23-13b3cb155a06' }}>
-									<Map
-										width={width}
-										state={mapState}
-										modules={['geocode']}
-										onLoad={(ymaps) => findMetro(ymaps)}
-									>
-										<Placemark geometry={place} />
-									</Map>
-								</YMaps>
-							</div>
+
+							{dadataB == NO_CLICK ? null : <Spinner size="small" />}
 						</div>
-					</>
-				) : (
-					<ScreenSpinner />
-				)}
+
+						<div style={{ paddingLeft: '15px' }}>
+							{/* {needRefreshM ? null : ( */}
+							<YMaps query={{ apikey: '7f6269fb-0f48-4182-bd23-13b3cb155a06' }}>
+								<Map
+									width={width}
+									state={mapState}
+									modules={['geocode']}
+									onLoad={(ymaps) => {
+										setYmapsL(ymaps);
+										findMetro(ymaps);
+									}}
+								>
+									<Placemark geometry={place} />
+									<FullscreenControl options={{ float: 'left' }} />
+								</Map>
+							</YMaps>
+							{/* )} */}
+						</div>
+					</div>
+				</>
 			</Group>
 
 			<ChooseFeedback pmOpen={pmOpen} />

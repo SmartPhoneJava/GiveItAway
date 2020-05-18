@@ -14,12 +14,10 @@ import {
 	SET_EXTRA_INFO,
 	SET_DEAL,
 	SET_COST,
-	SET_AD,
 	SET_SWIPE_IMAGES,
 	CLEAR,
 	SET_DEALER,
 	AD_BACK,
-	SET_IMAGE,
 	SET_PHOTO_INDEX,
 } from './actionTypes';
 
@@ -135,14 +133,6 @@ export const backToPrevAd = () => ({
 export const clearAds = () => ({
 	type: CLEAR,
 });
-
-export const setID = (ad_id) => ({
-	type: SET_AD_ID,
-	payload: {
-		ad_id,
-	},
-});
-
 
 export const setExtraInfo = (ad, myID) => ({
 	type: SET_EXTRA_INFO,

@@ -28,6 +28,7 @@ import Icon56WriteOutline from '@vkontakte/icons/dist/56/write_outline';
 
 import { GetCategoryText } from '../../components/categories/Categories';
 
+import Icon24Report from '@vkontakte/icons/dist/24/report';
 import Icon24Hide from '@vkontakte/icons/dist/24/hide';
 import Icon24Globe from '@vkontakte/icons/dist/24/globe';
 import Icon24Fullscreen from '@vkontakte/icons/dist/24/fullscreen';
@@ -71,8 +72,8 @@ import './styles.css';
 import Comments from './../story/adds/tabs/comments/comments';
 
 import { time } from './../../utils/time';
-import { setDummy, openModal, setPage, setAd, openSnackbar, openPopout, setStory } from '../../store/router/actions';
-import { PANEL_IMAGE, PANEL_COMMENTS, PANEL_SUBS, PANEL_MAP } from './../../store/router/panelTypes';
+import { setDummy, openModal, setPage, openSnackbar, openPopout, setStory } from '../../store/router/actions';
+import { PANEL_COMMENTS, PANEL_SUBS, PANEL_MAP } from './../../store/router/panelTypes';
 import { MODAL_ADS_COST, MODAL_ADS_FROZEN } from '../../store/router/modalTypes';
 import {
 	setCost,
@@ -756,9 +757,14 @@ const AddMore2r = (props) => {
 							</div>
 						</div>
 					) : (
-						<CellButton onClick={shareInVK} before={<Icon24ShareExternal />}>
-							Поделиться
-						</CellButton>
+						<div style={{ display: 'flex' }}>
+							<CellButton onClick={shareInVK} before={<Icon24ShareExternal />}>
+								Поделиться
+							</CellButton>
+							<CellButton onClick={() => {}} before={<Icon24Report />}>
+								Пожаловаться
+							</CellButton>
+						</div>
 					)}
 				</div>
 			</Group>

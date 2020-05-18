@@ -3,8 +3,6 @@ import { YMaps, Map, Circle, Placemark } from 'react-yandex-maps';
 import { ScreenSpinner, Snackbar, Avatar, Placeholder } from '@vkontakte/vkui';
 
 import { GEO_DATA } from '../../store/create_post/types';
-import { getGeodata } from '../../services/VK';
-import { getAdress, getMetro } from '../../services/geodata';
 
 export const ON_REFRESH_CLICK = 'ON_REFRESH_CLICK';
 export const ON_SUGGESTION_CLICK = 'ON_SUGGESTION_CLICK';
@@ -21,7 +19,7 @@ const AdMap = (props) => {
 	console.log('gleodata', geodata);
 
 	const center = [geodata.lat, geodata.long];
-	const [mapState, setMapState] = useState({ center: center, zoom: 15 });
+	const [mapState, setMapState] = useState({ center: center, zoom: 15});
 	const [place, setPlace] = useState(center);
 	const [loaded, setLoaded] = useState(false);
 

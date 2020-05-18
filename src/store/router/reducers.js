@@ -70,6 +70,7 @@ const initialState = {
 export const routerReducer = (state = initialState, action) => {
 	switch (action.type) {
 		case SET_PAGE: {
+			
 			window.history.pushState(null, null);
 			smoothScrollToTop();
 
@@ -182,6 +183,7 @@ export const routerReducer = (state = initialState, action) => {
 		case SET_AD: {
 			window.history.pushState(null, null);
 			smoothScrollToTop();
+			console.log("SET_AD called", action.payload.panel, action.payload.num)
 
 			let panel = action.payload.panel;
 			let ad = action.payload.ad;

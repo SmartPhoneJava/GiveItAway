@@ -153,6 +153,7 @@ export const getGeodata = (successCallback, failCallback) => {
 			if (failCallback) {
 				failCallback(error)
 			}
+			fail("Не удалось получить местоположение. Проверьте, включен ли GPS")
 		});
 	return () => (cleanupFunction = true);
 };

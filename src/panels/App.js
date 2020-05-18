@@ -336,7 +336,7 @@ const App = (props) => {
 	function setReduxAd(ad) {
 		console.log('you ask to do this', ad);
 		store.dispatch(setExtraInfo(ad));
-		store.dispatch(setAd(ad));
+		setAd(ad, 7);
 	}
 
 	function backToAdsFilters() {
@@ -428,7 +428,8 @@ const App = (props) => {
 					</Panel>
 					<Panel id={PANEL_ONE}>
 						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
-							{choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошбка'}
+							<p className="panel-header">Объявление</p>
+							{/* {choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошибка'} */}
 						</PanelHeader>
 						{choosen ? (
 							<AddMore2
@@ -457,14 +458,16 @@ const App = (props) => {
 					</Panel>
 					<Panel id={PANEL_COMMENTS}>
 						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
-							{choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошбка'}
+							<p className="panel-header">Комментарии</p>
+							{/* {choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошибка'} */}
 						</PanelHeader>
 						{choosen ? <Comments amount={5} maxAmount={-1} openUser={setProfile} /> : Error}
 						{snackbars[PANEL_COMMENTS]}
 					</Panel>
 					<Panel id={PANEL_SUBS}>
 						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
-							{choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошбка'}
+							<p className="panel-header">Отликнувшиеся</p>
+							{/* {choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошибка'} */}
 						</PanelHeader>
 						{choosen ? <Subs openUser={setProfile} amount={5} maxAmount={-1} /> : Error}
 						{snackbars[PANEL_SUBS]}

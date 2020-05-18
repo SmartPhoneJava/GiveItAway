@@ -18,9 +18,7 @@ import {
 	SET_DEALER,
 	SET_EXTRA_INFO,
 	AD_BACK,
-	SET_IMAGE,
 	SET_PHOTO_INDEX,
-	SET_AD_ID,
 } from './actionTypes';
 import { TYPE_CHOICE } from '../../const/ads';
 import { shortText } from '../../utils/short_text';
@@ -220,13 +218,6 @@ export const adReducer = (state = initialState, action) => {
 			return {
 				...state,
 				dealer,
-			};
-		}
-		case SET_AD_ID: {
-			const ad_id = action.payload.ad_Id;
-			return {
-				...initialState,
-				ad_id,
 			};
 		}
 
