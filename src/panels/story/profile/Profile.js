@@ -20,7 +20,7 @@ import { old, fromSeconds } from './../../../utils/time';
 
 import './profile.css';
 import { setFormData } from '../../../store/create_post/actions';
-import { setStory, openPopout, openSnackbar } from '../../../store/router/actions';
+import { setStory, openPopout } from '../../../store/router/actions';
 import { STORY_ADS, STORY_CREATE } from '../../../store/router/storyTypes';
 import { ADS_FILTERS } from '../../../store/create_post/types';
 import { MODE_WANTED } from '../../../const/ads';
@@ -44,7 +44,7 @@ function getAuthorHref(backuser) {
 export const K = 'Ҝ';
 
 const Profile = (props) => {
-	const { setFormData, setStory, openPopout, openSnackbar, popouts, story, activePanels } = props;
+	const { setFormData, setStory, openPopout, popouts, story, activePanels } = props;
 	const profileID = props.activeProfile || -1;
 
 	const popout = popouts ? popouts[story] : null;
@@ -98,6 +98,9 @@ const Profile = (props) => {
 	);
 
 	useEffect(() => {
+		if (profileID == -1) {
+			return
+		}
 		let cleanupFunction = false;
 		getUser(
 			profileID,
@@ -206,10 +209,11 @@ const Profile = (props) => {
 
 	function openFreeze() {
 		if (profileID == props.myID) {
-			setStory(STORY_ADS);
 			setFormData(ADS_FILTERS, {
+				...props.inputData[ADS_FILTERS],
 				mode: MODE_WANTED,
 			});
+			setStory(STORY_ADS);
 		}
 	}
 
@@ -489,7 +493,6 @@ const mapDispatchToProps = {
 	setFormData,
 	setStory,
 	openPopout,
-	openSnackbar,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);

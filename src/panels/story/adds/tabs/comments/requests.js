@@ -7,7 +7,7 @@ import { Addr, BASE_AD, BASE_COMMENT } from './../../../../../store/addr';
 
 import { fail, success } from './../../../../../requests';
 import { store } from '../../../../..';
-import { openPopout, closePopout, openSnackbar } from '../../../../../store/router/actions';
+import { openPopout, closePopout } from '../../../../../store/router/actions';
 
 let request_id = 0;
 

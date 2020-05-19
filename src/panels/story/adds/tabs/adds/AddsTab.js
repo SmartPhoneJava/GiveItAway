@@ -30,7 +30,7 @@ import {
 	MODE_WANTED,
 } from '../../../../../const/ads';
 import { ADS_FILTERS, GEO_DATA } from '../../../../../store/create_post/types';
-import { openSnackbar, openPopout, closePopout } from '../../../../../store/router/actions';
+import { openPopout, closePopout } from '../../../../../store/router/actions';
 import AdNoWanted from '../../../../placeholders/adNoWanted';
 import { setFormData } from '../../../../../store/create_post/actions';
 import AdNoGiven from '../../../../placeholders/adNoGiven';
@@ -57,7 +57,7 @@ const AddsTab = (props) => {
 		return () => (cleanupFunction = true);
 	}, [search]);
 
-	const { inputData, openPopout, openSnackbar, closePopout, setFormData } = props;
+	const { inputData, openPopout, closePopout, setFormData } = props;
 
 	const geoType = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geotype : null) || GEO_TYPE_FILTERS;
 	const radius = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].radius : null) || 0;
@@ -197,8 +197,10 @@ const AddsTab = (props) => {
 				console.log('fail', e);
 				if (axios.isCancel(e)) return;
 				if (('' + e).indexOf('404') == -1) {
+					console.log("real err", e)
 					setError(true);
 				} else {
+					console.log("non real err", e)
 					setError404(true)
 				}
 				closePopout();
@@ -398,7 +400,6 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-	openSnackbar,
 	openPopout,
 	closePopout,
 	setFormData,

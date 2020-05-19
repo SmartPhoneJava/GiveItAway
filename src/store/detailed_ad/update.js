@@ -1,7 +1,6 @@
 import { setDeal, setIsDealer, setDealer, setSubs, setCost } from './actions';
 import { store } from '../..';
 import { getDeal, getSubscribers, getCost } from '../../requests';
-import { openSnackbar } from '../router/actions';
 import { getUser } from '../../panels/story/profile/requests';
 
 export async function updateDealInfo() {

@@ -188,7 +188,6 @@ img.light-tiled {
 	line-height: 20px;
 	color: var(--header_text_secondary);
 
-	position: absolute;
 	bottom: 0;
 }
 

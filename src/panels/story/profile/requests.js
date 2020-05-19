@@ -13,7 +13,7 @@ import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
 import { store } from '../../../index';
-import { openPopout, openSnackbar, closePopout } from '../../../store/router/actions';
+import { openPopout, closePopout } from '../../../store/router/actions';
 
 let request_id = 0;
 

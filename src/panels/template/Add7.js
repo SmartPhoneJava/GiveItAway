@@ -76,8 +76,12 @@ const Add7 = (props) => {
 			// }}
 			>
 				<div className="aauthor">
-					<Avatar style={{ marginRight: '5px' }} size={20} src={ad.author.photo_url} />{' '}
-					{!ad.anonymous ? ad.author.name + ' ' + ad.author.surname : ''}
+					<div style={{ marginRight: '5px', minWidth:"20px" }}>
+						<Avatar size={20} src={ad.author.photo_url} />
+					</div>
+					<div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+						{!ad.anonymous ? ad.author.name + ' ' + ad.author.surname : ''}
+					</div>
 				</div>
 			</InfoRow>
 		);

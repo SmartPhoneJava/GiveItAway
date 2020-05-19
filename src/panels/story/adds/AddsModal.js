@@ -222,7 +222,7 @@ const AddsModal = (props) => {
 				header={<ModalHeader name="Выберите человека" back={closeModal} />}
 				dynamicContentHeight
 			>
-				<PeopleRB setPopout={props.openPopout} setSnackbar={props.openSnackbar} back={closeModal} />
+				<PeopleRB back={closeModal} />
 			</ModalPage>
 			<ModalPage
 				onClose={closeModal}

@@ -3,7 +3,6 @@ import bridge from '@vkontakte/vk-bridge';
 import FormPanel from './../template/formPanel';
 import { DefaultInputData, NoRegion } from './const';
 import { connect } from 'react-redux';
-import { openSnackbar } from '../../store/router/actions';
 import { fail } from '../../requests';
 
 let request_id = 0;
@@ -11,7 +10,7 @@ let request_id = 0;
 const Countries = (props) => {
 	const [countries, setCountries] = useState([NoRegion]);
 
-	const { accessToken, apiVersion, openSnackbar } = props;
+	const { accessToken, apiVersion } = props;
 	useEffect(() => {
 		
 		bridge
@@ -62,9 +61,7 @@ const mapStateToProps = (state) => {
 	};
 };
 
-const mapDispatchToProps = {
-	openSnackbar,
-};
+const mapDispatchToProps = {};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Countries);
 

@@ -18,7 +18,7 @@ let request_id = 0;
 
 export function success(text, cancelMe, end) {
 	const close = () => {
-		store.dispatch(closePopout());
+		store.dispatch(closeSnackbar());
 		if (end) {
 			end();
 		}
