@@ -12,26 +12,34 @@ const Countries = (props) => {
 
 	const { accessToken, apiVersion } = props;
 	useEffect(() => {
-		
+		let cancelFunc = false;
 		bridge
 			.sendPromise('VKWebAppCallAPIMethod', {
 				method: 'database.getCountries',
 				request_id: 'api' + request_id,
 				params: { v: apiVersion, access_token: accessToken },
 			})
-			.then(response => {
+			.then((response) => {
 				return response.response.items;
 			})
 			.then((ctrs) => {
+				if (cancelFunc) {
+					return;
+				}
 				setCountries([NoRegion, ...ctrs]);
 				return ctrs;
 			})
-			.catch(error => {
+			.catch((error) => {
+				if (cancelFunc) {
+					return;
+				}
 				console.log('VKWebAppCallAPIMethod:', error);
 				fail('Не удалось получить список стран. Попробуйте позже');
 				props.goBack();
 			});
-
+		return () => {
+			cancelFunc = true;
+		};
 		request_id++;
 	}, []);
 	return (

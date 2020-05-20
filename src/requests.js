@@ -141,10 +141,9 @@ export async function adHide(ad_id, callback) {
 			return response;
 		})
 		.catch(function (error) {
+			store.dispatch(closePopout());
 			err = true;
 			fail('Нет соединения с сервером', adHide(ad_id, callback));
-
-			store.dispatch(closePopout());
 		});
 	return err;
 }
@@ -171,9 +170,9 @@ export async function adVisible(ad_id, callback) {
 			return response;
 		})
 		.catch(function (error) {
+			store.dispatch(closePopout());
 			err = true;
 			fail('Нет соединения с сервером', adVisible(ad_id, callback));
-			store.dispatch(closePopout());
 		});
 	return err;
 }

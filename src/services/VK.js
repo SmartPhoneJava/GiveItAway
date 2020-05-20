@@ -131,7 +131,6 @@ export const shareInVK = () => {
 			return data;
 		})
 		.catch((error) => {
-			fail('Не удалось поделиться объявлением');
 			return error;
 		});
 };

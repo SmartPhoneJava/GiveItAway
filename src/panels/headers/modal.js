@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import bridge from '@vkontakte/vk-bridge';
+import React from 'react';
 import { ModalPageHeader, PanelHeaderButton, IS_PLATFORM_ANDROID, IS_PLATFORM_IOS } from '@vkontakte/vkui';
 
 import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';

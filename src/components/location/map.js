@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { YMaps, Map, Circle, Placemark } from 'react-yandex-maps';
-import { ScreenSpinner, Snackbar, Avatar, Placeholder } from '@vkontakte/vkui';
+import { ScreenSpinner, Placeholder } from '@vkontakte/vkui';
 
 import { GEO_DATA } from '../../store/create_post/types';
 

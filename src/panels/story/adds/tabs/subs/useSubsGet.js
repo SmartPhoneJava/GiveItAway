@@ -29,6 +29,7 @@ export default function useSubsGet(
 	}, []);
 
 	useEffect(() => {
+		let cancelFunc = false
 		if (maxAmount && maxAmount > 0 && maxAmount <= (pageNumber - 1) * rowsPerPage) {
 			setHasMore(false);
 			return;

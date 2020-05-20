@@ -111,16 +111,23 @@ const CreateAddRedux = (props) => {
 	const [needRefreshL, setNeedRefreshL] = useState(false);
 
 	useEffect(() => {
+		let cancelFunc = false;
 		if (dadataB == NO_CLICK) {
 			return;
 		} else if (dadataB == ON_SUGGESTION_CLICK) {
 			setTimeout(() => {
+				if (cancelFunc) {
+					return;
+				}
 				setDadataB(NO_CLICK);
 			}, 1000);
 			return;
 		}
 		getGeodata(
 			(data) => {
+				if (cancelFunc) {
+					return;
+				}
 				console.log('go deeper', data);
 				const center = [data.lat, data.long];
 				setMapState({ ...mapState, center });
@@ -128,11 +135,17 @@ const CreateAddRedux = (props) => {
 				getAdress(
 					data,
 					(data_string) => {
+						if (cancelFunc) {
+							return;
+						}
 						set_geodata_string(data_string);
 						setNeedRefreshL(true);
 						setInterval(() => {
-							setNeedRefreshL(false), 50;
-						});
+							if (cancelFunc) {
+								return;
+							}
+							setNeedRefreshL(false);
+						}, 50);
 
 						console.log('go deeper 2', data_string);
 						setDadataB(NO_CLICK);
@@ -141,14 +154,23 @@ const CreateAddRedux = (props) => {
 						// });
 					},
 					(e) => {
+						if (cancelFunc) {
+							return;
+						}
 						setDadataB(NO_CLICK);
 					}
 				);
 			},
 			(e) => {
+				if (cancelFunc) {
+					return;
+				}
 				setDadataB(NO_CLICK);
 			}
 		);
+		return () => {
+			cancelFunc = true;
+		};
 	}, [dadataB]);
 
 	function saveCancel() {
@@ -340,7 +362,7 @@ const CreateAddRedux = (props) => {
 					</FormStatus>
 				</div>
 			)}
-			
+
 			<Div style={{ display: 'flex' }}>
 				{needEdit ? (
 					<Button onClick={editAd} mode={valid ? 'commerce' : 'secondary'} size="l" stretched>

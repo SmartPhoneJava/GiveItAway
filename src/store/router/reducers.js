@@ -256,12 +256,14 @@ export const routerReducer = (state = initialState, action) => {
 		case GO_BACK: {
 			let Panel = state.activePanel;
 			let Story = state.activeStory;
+			onsole.log("GO_BACK Info", Story, Panel)
 
 			let Popout = state.popouts[Story];
 
 			let Dummies = state.dummies[Story] || [];
 			// если были открытые заглушки
 			if (Dummies.length > 0) {
+				onsole.log("GO_BACK DUMMY")
 				Dummies.pop();
 				return {
 					...state,
@@ -276,6 +278,7 @@ export const routerReducer = (state = initialState, action) => {
 
 			// если были открытые попауты
 			if (Popout) {
+				console.log("GO_BACK Popout")
 				return {
 					...state,
 					direction: DIRECTION_BACK,
@@ -290,6 +293,7 @@ export const routerReducer = (state = initialState, action) => {
 
 			// если были открытые модальные окна
 			if (Modals.length > 0) {
+				console.log("GO_BACK Modals". Modals)
 				Modals.pop();
 				let activeModal = null;
 				if (Modals.length > 0) {
@@ -309,6 +313,8 @@ export const routerReducer = (state = initialState, action) => {
 					},
 				};
 			}
+
+			console.log("GO_BACK ELSE")
 
 			let Panels = state.panelsHistory[Story] || [Story];
 			let Stories = state.storiesHistory;

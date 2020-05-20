@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import {
 	PanelHeader,
 	List,
-	Counter,
 	Cell,
 	PanelHeaderButton,
 	PanelHeaderContext,
 	TabsItem,
 	Tabs,
 	TabbarItem,
-	Avatar,
 } from '@vkontakte/vkui';
 
 import Icon28Notifications from '@vkontakte/icons/dist/28/notifications';
@@ -29,11 +27,11 @@ import AddsTab from './tabs/adds/AddsTab';
 import { setFormData } from '../../../store/create_post/actions';
 import { ADS_FILTERS } from '../../../store/create_post/types';
 import { TAB_ADS, TAB_NOTIFICATIONS, MODE_ALL, MODE_WANTED, MODE_GIVEN } from '../../../const/ads';
-import { setTab, openPopout, openModal, openSnackbar } from '../../../store/router/actions';
+import { setTab, openModal } from '../../../store/router/actions';
 import { MODAL_ADS_FILTERS, MODAL_ADS_SUBS } from '../../../store/router/modalTypes';
 
 const AddsTabs = (props) => {
-	const { setFormData, setTab, openPopout, openSnackbar, openModal, inputData, activeTabs, activeStory } = props;
+	const { setFormData, setTab, openModal, inputData, activeTabs, activeStory } = props;
 	const mode = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].mode : null) || MODE_ALL;
 	const activeTab = activeTabs[activeStory] || TAB_ADS;
 	const [contextOpened, setContextOpened] = useState(false);
@@ -126,14 +124,12 @@ const AddsTabs = (props) => {
 			</PanelHeaderContext>
 			{activeTab === TAB_NOTIFICATIONS ? (
 				<Notifications
-					setSnackbar={openSnackbar}
 					zeroNots={props.zeroNots}
 					openUser={props.openUser}
 					openAd={props.openAd}
 					goToAds={() => {
 						setTab(TAB_ADS);
 					}}
-					setPopout={openPopout}
 				/>
 			) : (
 				<AddsTab
@@ -165,9 +161,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
 	setFormData,
 	setTab,
-	openPopout,
 	openModal,
-	openSnackbar,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddsTabs);

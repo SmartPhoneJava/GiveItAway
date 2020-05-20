@@ -17,6 +17,7 @@ const Cities = (props) => {
 	const { accessToken, apiVersion } = props;
 
 	useEffect(() => {
+		let cancelFunc = false
 		let country_id = inputData.country ? inputData.country.id : null || NoRegion.id;
 		if (country_id == NoRegion.id) {
 			country_id = 1;
@@ -32,6 +33,9 @@ const Cities = (props) => {
 				return response.response.items;
 			})
 			.then((ctrs) => {
+				if (cancelFunc) {
+					return
+				}
 				setCities([NoRegion, ...ctrs]);
 				return ctrs;
 			})
@@ -39,6 +43,9 @@ const Cities = (props) => {
 				console.log('VKWebAppCallAPIMethod:', error);
 			});
 
+		return () => {
+			cancelFunc = true
+		}
 		request_id++;
 	}, [inputData.country]);
 	return (

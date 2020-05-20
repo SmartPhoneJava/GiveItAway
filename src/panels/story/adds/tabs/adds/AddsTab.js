@@ -144,7 +144,7 @@ const AddsTab = (props) => {
 		console.log('category category', category);
 
 		let cancel;
-		let rowsPerPage = 5;
+		let rowsPerPage = 7;
 		let query = searchR;
 		let params = {
 			rows_per_page: rowsPerPage,
@@ -325,7 +325,7 @@ const AddsTab = (props) => {
 						{rads.length > 0 ? (
 							rads.map((ad, index) => {
 								if (!width || width < 500) {
-									if (rads.length === index + 1) {
+									if (ads.length === index + 1) {
 										return (
 											<div key={ad.ad_id} ref={lastAdElementRef}>
 												{Ad(ad)}

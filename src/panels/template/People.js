@@ -25,15 +25,22 @@ export const PeopleRBI = withModalRootContext((props) => {
 	const { ad_id, ad_type } = props.ad;
 
 	useEffect(() => {
+		let cancelFunc = false;
 		getSubscribers(
 			ad_id,
 			(s) => {
+				if (cancelFunc) {
+					return;
+				}
 				setSubs(s);
 				props.updateModalHeight();
 			},
 			(e) => {},
 			10
 		);
+		return () => {
+			cancelFunc = true;
+		};
 	}, [ad_id]);
 
 	return (

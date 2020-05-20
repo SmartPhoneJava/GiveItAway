@@ -266,13 +266,9 @@ const mapDispatchToProps = (dispatch) => {
 		setFormData: (p, s) => dispatch(setFormData(p, s)),
 		setPage: (p) => dispatch(setPage(p)),
 		openSnackbar: (p) => dispatch(openSnackbar(p)),
-		openPopout: (p) => dispatch(openPopout(p)),
 		closeSnackbar: () => dispatch(closeSnackbar()),
 		createAd: (myUser, inputData) => createAd(myUser, inputData, dispatch),
 		editAd: (myUser, inputData) => editAd(myUser, inputData, dispatch),
-		clearForm: () => {
-			clearForm(dispatch);
-		},
 	};
 };
 
