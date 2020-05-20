@@ -107,7 +107,7 @@ const AddsTab = (props) => {
 	}, [category, mode, searchR, city, country, sort, geodata, geoType, radius, refreshMe]);
 
 	useEffect(() => {
-		console.log('loading is', loading);
+		console.log('loading is', loading, ads);
 		if (rads.length == 0) {
 			setRads(ads);
 		} else if (!loading || error404) {
@@ -118,6 +118,7 @@ const AddsTab = (props) => {
 	}, [loading, error404]);
 
 	useEffect(() => {
+		console.log("props.deleteID", props.deleteID)
 		if (props.deleteID > 0) {
 			setRads((rads) =>
 				rads.filter((x) => {
@@ -335,7 +336,9 @@ const AddsTab = (props) => {
 									return <div key={ad.ad_id}>{Ad(ad)}</div>;
 								}
 								if (index % 2) {
-									const prev = ads[index - 1];
+									console.log("index is", index)
+									const prev = rads[index - 1];
+									console.log("prev is", prev)
 									const first = (
 										<div className="one-block" key={prev.ad_id}>
 											{Ad(prev)}

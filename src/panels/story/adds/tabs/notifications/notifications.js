@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Header, Group, Placeholder, Button, Snackbar } from '@vkontakte/vkui';
-
+import { Header, Group, Placeholder, Button } from '@vkontakte/vkui';
+import { connect } from 'react-redux';
 import useNotificationsGet from './useNotificationsGet';
 
 import Man from './../../../../../img/man.jpeg';
@@ -23,6 +23,7 @@ import { sendSnack } from './../../../../../requests';
 import './notification.css';
 import Notification from './Notification';
 import { STATUS_CHOSEN, STATUS_ABORTED } from '../../../../../const/ads';
+import { openSnackbar, openPopout } from '../../../../../store/router/actions';
 
 export const NT_CLOSE = 'ad_close'; // приходит выбранному автором пользователю
 export const NT_RESPOND = 'respond'; // приходит автору
@@ -34,7 +35,7 @@ export const NT_DELETED = 'deleted'; // приходит подписчикам
 export const NT_COMMENT = 'new_comment'; // приходит всем
 export const NT_COMMENT_DELETED = 'delete_comment'; // приходит всем
 
-export const NT_AD_STATUS = 'status_changed'; 
+export const NT_AD_STATUS = 'status_changed';
 
 export function handleNotifications(note, setSnackbar) {
 	switch (note.data.notification_type) {
@@ -404,7 +405,7 @@ const Notifications = (props) => {
 	const [search, setSearch] = useState('');
 	const [pageNumber, setPageNumber] = useState(1);
 	let { inited, loading, nots, error, hasMore, newPage } = useNotificationsGet(
-		props.setPopout,
+		props.openPopout,
 		search,
 		pageNumber,
 		5
@@ -509,4 +510,13 @@ const Notifications = (props) => {
 	);
 };
 
-export default Notifications;
+const mapStateToProps = (state) => {
+	return {};
+};
+
+const mapDispatchToProps = {
+	openSnackbar,
+	openPopout,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Notifications);
