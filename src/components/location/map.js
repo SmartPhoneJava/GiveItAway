@@ -19,7 +19,7 @@ const AdMap = (props) => {
 	console.log('gleodata', geodata);
 
 	const center = [geodata.lat, geodata.long];
-	const [mapState, setMapState] = useState({ center: center, zoom: 15});
+	const [mapState, setMapState] = useState({ center: center, zoom: 15 });
 	const [place, setPlace] = useState(center);
 	const [loaded, setLoaded] = useState(false);
 
@@ -31,43 +31,43 @@ const AdMap = (props) => {
 	}
 
 	return (
-		<div style={{ display: 'flex' }}>
-			<div
-				style={{
-					alignItems: 'center',
-					justifyContent: 'center',
-					flex: 1,
-					marginLeft: 'auto',
-					marginRight: 'auto',
-				}}
-			>
-				{!loaded ? <ScreenSpinner size="large" /> : null}
-				<YMaps>
-					<Map
-						width={max ? height + 40 : null}
-						height={max ? height : null}
-						state={mapState}
-						onLoad={() => {
-							setLoaded(true);
-						}}
-					>
-						{max ? (
-							<Circle
-								geometry={[center, 200]}
-								options={{
-									draggable: false,
-									fillColor: '#DB709377',
-									strokeColor: '#990066',
-									strokeOpacity: 0.5,
-									strokeWidth: 1,
-								}}
-							/>
-						) : (
-							<Placemark geometry={place} />
-						)}
-					</Map>
-				</YMaps>
-			</div>
+		<div
+			style={{
+				display: 'block',
+				textAlign: 'center',
+				alignItems: 'center',
+				justifyContent: 'center',
+				flex: 1,
+				marginLeft: 'auto',
+				marginRight: 'auto',
+			}}
+		>
+			{!loaded ? <ScreenSpinner size="large" /> : null}
+			<YMaps>
+				<Map
+					width={max ? width + 40 : null}
+					height={max ? height : null}
+					state={mapState}
+					onLoad={() => {
+						setLoaded(true);
+					}}
+				>
+					{max ? (
+						<Circle
+							geometry={[center, 200]}
+							options={{
+								draggable: false,
+								fillColor: '#DB709377',
+								strokeColor: '#990066',
+								strokeOpacity: 0.5,
+								strokeWidth: 1,
+							}}
+						/>
+					) : (
+						<Placemark geometry={place} />
+					)}
+				</Map>
+			</YMaps>
 		</div>
 	);
 };

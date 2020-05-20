@@ -96,7 +96,7 @@ const Add7 = (props) => {
 				<div onClick={props.openAd} className="amain-left">
 					<img src={image} className="atiled" />
 					<div className="acity">
-						<Icon16Place /> {ad.district}
+						<Icon16Place /> {ad.district ? ad.district : ad.region}
 					</div>
 
 					{ad.status == STATUS_ABORTED ? (

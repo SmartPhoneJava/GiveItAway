@@ -687,7 +687,7 @@ const AddMore2r = (props) => {
 				}}
 			>
 				<Cell asideContent={<Icon24Chevron />} before={<Icon24Place />}>
-					{region + ', ' + district}
+					{region && district ? region + ', ' + district : region + district}
 				</Cell>
 			</div>
 			<Separator />

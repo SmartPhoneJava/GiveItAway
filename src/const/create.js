@@ -2,7 +2,7 @@ import { CategoryNo } from "../components/categories/Categories";
 import { NoRegion } from "../components/location/const";
 import { TYPE_CHOICE } from "./ads";
 
-export const PHOTO_TEXT = 'Не более трех фотографий (jpeg, png) размером 4мб';
+export const PHOTO_TEXT = 'Не более трех фотографий размером 4мб';
 
 export const defaultInputData = {
 	photoText: PHOTO_TEXT,

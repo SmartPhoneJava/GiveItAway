@@ -258,8 +258,10 @@ const CreateItem = (props) => {
 				<Group
 					header={<Header>Снимки</Header>}
 					style={{
-						display: platform == 'desktop_web' ? 'flex' : 'block',
+						display: 'block',
 						textAlign: 'center',
+						justifyContent: 'center',
+						alignItems: 'center',
 					}}
 				>
 					{inputData.photosUrl && inputData.photosUrl.length > 0 ? (

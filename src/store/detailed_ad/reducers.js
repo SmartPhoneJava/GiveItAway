@@ -306,8 +306,10 @@ export const adReducer = (state = initialState, action) => {
 		}
 
 		case CLEAR: {
+			const ad_id = action.payload.ad_id || initialState.ad_id;
 			return {
 				...initialState,
+				ad_id,
 			};
 		}
 

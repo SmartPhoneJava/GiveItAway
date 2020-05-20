@@ -130,8 +130,11 @@ export const backToPrevAd = () => ({
 	type: AD_BACK,
 });
 
-export const clearAds = () => ({
+export const clearAds = (ad_id) => ({
 	type: CLEAR,
+	payload: {
+		ad_id,
+	},
 });
 
 export const setExtraInfo = (ad, myID) => ({

@@ -13,7 +13,7 @@ import { CategoryNo } from '../../components/categories/Categories';
 
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { FORM_CREATE } from '../../components/categories/redux';
-import { setExtraInfo } from '../../store/detailed_ad/actions';
+import { setExtraInfo, clearAds } from '../../store/detailed_ad/actions';
 import { STORY_ADS } from '../../store/router/storyTypes';
 import { store } from '../..';
 import { defaultInputData } from '../../components/create/default';
@@ -88,6 +88,7 @@ const openAd = (ad, dispatch) => {
 	// ? кнопка назад
 	dispatch(setStory(STORY_ADS));
 	dispatch(setPage(PANEL_ONE));
+	dispatch(clearAds(ad.ad_id)) //! проверить, что это работает
 
 	dispatch(setExtraInfo(ad, store.getState().vkui.myID));
 };
