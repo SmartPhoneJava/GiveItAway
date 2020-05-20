@@ -3,3 +3,7 @@
     overflow: hidden;
 	text-overflow: ellipsis;
 }
+
+.panel-body {
+    margin:10px auto 5px;
+}

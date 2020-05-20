@@ -14,6 +14,7 @@ import {
 	InfoRow,
 	Radio,
 	ModalCard,
+	FormStatus,
 } from '@vkontakte/vkui';
 
 import Icon24BrowserForward from '@vkontakte/icons/dist/24/browser_forward';
@@ -50,9 +51,10 @@ const AddsModal = (props) => {
 	const { closeModal, inputData } = props;
 	const { openGeoSearch, openCountries, openCities, openCategories, openCarma } = props;
 	const [backUser, setBackUser] = useState();
+	const [valid, setValid] = useState(true);
 
 	const applyTimeSort = () => props.applyTimeSort(inputData);
-	const setRadius = (r) => props.setRadius(inputData, r);
+	const setRadius = (r) => props.setRadius(inputData, r, setValid);
 	const applyGeoSort = () => props.applyGeoSort(inputData);
 
 	const setGeoFilters = () => {
@@ -62,7 +64,10 @@ const AddsModal = (props) => {
 		}
 	};
 	const setGeoNear = () => {
-		props.setGeoNear(inputData);
+		props.setGeoNear(inputData, (v) => {
+			console.log('valid is', v);
+			setValid(v);
+		});
 		if (props.updateModalHeight) {
 			props.updateModalHeight();
 		}
@@ -80,7 +85,7 @@ const AddsModal = (props) => {
 	const isSubscriber = props.ad.isSub || 0;
 
 	useEffect(() => {
-		console.log("user want update")
+		console.log('user want update');
 		let cleanupFunction = false;
 		getUser(
 			props.myID,
@@ -188,7 +193,7 @@ const AddsModal = (props) => {
 					checked={geoType == GEO_TYPE_FILTERS}
 					onChange={setGeoFilters}
 				>
-					В указанных стране и городе
+					В указанном городе
 				</Radio>
 				<Radio
 					name="radio"
@@ -201,12 +206,17 @@ const AddsModal = (props) => {
 				</Radio>
 				<div>
 					{geoType == GEO_TYPE_FILTERS ? (
-						<Location
-							redux_form={ADS_FILTERS}
-							openCountries={openCountries}
-							openCities={openCities}
-							// useMine={false}
-						/>
+						<>
+							<Location redux_form={ADS_FILTERS} openCountries={openCountries} openCities={openCities} />
+							{valid ? null : (
+								<div style={{ padding: '10px' }}>
+									<FormStatus header="Нет доступа к GPS" mode={valid ? 'default' : 'error'}>
+										Проверьте, что у вас включена геолокация и вы предоставили сервису доступ к
+										нему.
+									</FormStatus>
+								</div>
+							)}
+						</>
 					) : (
 						<FormLayout>
 							<Slider
@@ -264,7 +274,9 @@ const AddsModal = (props) => {
 					</Cell>
 
 					<Cell>
-						<InfoRow header={isSubscriber ? 'Станет доступно после отписки' : 'Станет доступно после подписки'}>
+						<InfoRow
+							header={isSubscriber ? 'Станет доступно после отписки' : 'Станет доступно после подписки'}
+						>
 							<div style={{ color: isSubscriber ? 'var(--accent)' : 'var(--destructive)' }}>
 								{getCost()}
 							</div>

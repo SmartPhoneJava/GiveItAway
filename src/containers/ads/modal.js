@@ -23,6 +23,7 @@ function applyTimeSort(inputData, dispatch) {
 			sort: SORT_TIME,
 		})
 	);
+
 	dispatch(closeModal());
 }
 
@@ -109,16 +110,41 @@ const mapDispatchToProps = (dispatch) => {
 	return {
 		closeModal: () => dispatch(closeModal()),
 		closeAllModals: () => dispatch(closeAllModals()),
-		setRadius: (inputData, radius) => setRadius(inputData, radius, dispatch),
+		setRadius: (inputData, radius, setResult) => {
+			setRadius(inputData, radius, dispatch);
+			getGeodata(
+				(success) => {
+					setResult(true);
+				},
+				(err) => {
+					setResult(false);
+					setGeoFilters(inputData, dispatch);
+				}
+			);
+		},
 		applyTimeSort: (inputData) => applyTimeSort(inputData, dispatch),
 		applyGeoSort: (inputData) => {
-			applyGeoSort(inputData, dispatch);
-			getGeodata();
+			getGeodata(
+				(success) => {
+					applyGeoSort(inputData, dispatch);
+				},
+				(err) => {
+					applyTimeSort(inputData, dispatch, true);
+				}
+			);
 		},
 		setGeoFilters: (inputData) => setGeoFilters(inputData, dispatch),
-		setGeoNear: (inputData) => {
-			setGeoNear(inputData, dispatch);
-			getGeodata();
+		setGeoNear: (inputData, setResult) => {
+			getGeodata(
+				(success) => {
+					setResult(true);
+					setGeoNear(inputData, dispatch);
+				},
+				(err) => {
+					setResult(false);
+					setGeoFilters(inputData, dispatch)
+				}
+			);
 		},
 		openGeoSearch: () => openGeoSearch(dispatch),
 		openCountries: () => openCountries(dispatch),

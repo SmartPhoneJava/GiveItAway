@@ -59,14 +59,14 @@ const Location = (props) => {
 				display: width > 400 ? 'flex' : 'block',
 			}}
 		>
-			<FormLayout style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+			{/* <FormLayout style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
 				<SelectMimicry
 					top="Страна"
 					value={country ? country : 'Не определена'}
 					placeholder={country ? country : 'Не определена'}
 					onClick={() => props.openCountries()}
 				/>
-			</FormLayout>
+			</FormLayout> */}
 
 			<FormLayout style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
 				<SelectMimicry

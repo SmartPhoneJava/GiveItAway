@@ -1,2 +1,2 @@
 
-export const SNACKBAR_DURATION_DEFAULT = "2000"
+export const SNACKBAR_DURATION_DEFAULT = "2400"

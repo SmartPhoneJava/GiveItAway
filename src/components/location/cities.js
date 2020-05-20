@@ -17,7 +17,7 @@ const Cities = (props) => {
 	const { accessToken, apiVersion } = props;
 
 	useEffect(() => {
-		let country_id = inputData.country.id;
+		let country_id = inputData.country ? inputData.country.id : null || NoRegion.id;
 		if (country_id == NoRegion.id) {
 			country_id = 1;
 		}

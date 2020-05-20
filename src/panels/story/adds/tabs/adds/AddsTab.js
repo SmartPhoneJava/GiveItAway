@@ -92,9 +92,14 @@ const AddsTab = (props) => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
 	const [error404, setError404] = useState(false);
+	const [pullLoading, setPullLoading] = useState(false);
 	const [ads, setAds] = useState([]);
 	const [rads, setRads] = useState([]);
 	const [hasMore, setHasMore] = useState(false);
+
+	useEffect(() => {
+		setPullLoading(!error404 && loading);
+	}, [error404, loading]);
 
 	useEffect(() => {
 		setAds([]);
@@ -102,6 +107,7 @@ const AddsTab = (props) => {
 	}, [category, mode, searchR, city, country, sort, geodata, geoType, radius, refreshMe]);
 
 	useEffect(() => {
+		console.log('loading is', loading);
 		if (rads.length == 0) {
 			setRads(ads);
 		} else if (!loading || error404) {
@@ -112,9 +118,13 @@ const AddsTab = (props) => {
 	}, [loading, error404]);
 
 	useEffect(() => {
-		console.log('deleteID', props.deleteID);
 		if (props.deleteID > 0) {
-			setAds(
+			setRads((rads) =>
+				rads.filter((x) => {
+					return x.ad_id != props.deleteID;
+				})
+			);
+			setAds((ads) =>
 				ads.filter((x) => {
 					return x.ad_id != props.deleteID;
 				})
@@ -128,11 +138,10 @@ const AddsTab = (props) => {
 
 		setLoading(true);
 		setError(false);
-		setError404(false)
+		setError404(false);
 		setInited(false);
 
-
-		console.log("category category", category)
+		console.log('category category', category);
 
 		let cancel;
 		let rowsPerPage = 5;
@@ -197,11 +206,11 @@ const AddsTab = (props) => {
 				console.log('fail', e);
 				if (axios.isCancel(e)) return;
 				if (('' + e).indexOf('404') == -1) {
-					console.log("real err", e)
+					console.log('real err', e);
 					setError(true);
 				} else {
-					console.log("non real err", e)
-					setError404(true)
+					console.log('non real err', e);
+					setError404(true);
 				}
 				closePopout();
 				setInited(true);
@@ -244,7 +253,6 @@ const AddsTab = (props) => {
 		[loading, hasMore]
 	);
 
-
 	function handleSearch(e) {
 		setSearch(e.target.value);
 		closePopout();
@@ -271,7 +279,12 @@ const AddsTab = (props) => {
 
 	const width = document.body.clientWidth;
 	return (
-		<>
+		<PullToRefresh
+			onRefresh={() => {
+				setRefreshMe((prev) => prev + 1);
+			}}
+			isFetching={pullLoading}
+		>
 			<div
 				style={{
 					height: 'auto',
@@ -306,85 +319,77 @@ const AddsTab = (props) => {
 						</PanelHeaderButton>
 					) : null}
 				</div>
-				
 
-				<PullToRefresh
-					onRefresh={() => {
-						setRefreshMe((prev) => prev + 1);
-					}}
-					isFetching={loading}
-				>
-					<Group>
-						<List>
-							{rads.length > 0 ? (
-								rads.map((ad, index) => {
-									if (!width || width < 500) {
-										if (rads.length === index + 1) {
-											return (
-												<div key={ad.ad_id} ref={lastAdElementRef}>
-													{Ad(ad)}
-												</div>
-											);
-										}
-										return <div key={ad.ad_id}>{Ad(ad)}</div>;
-									}
-									if (index % 2) {
-										const prev = ads[index - 1];
-										const first = (
-											<div className="one-block" key={prev.ad_id}>
-												{Ad(prev)}
-											</div>
-										);
-
-										let second = (
-											<div className="one-block" key={ad.ad_id}>
-												{Ad(ad)}
-											</div>
-										);
-
-										if (rads.length === index + 1) {
-											second = (
-												<div className="one-block" key={ad.ad_id} ref={lastAdElementRef}>
-													{Ad(ad)}
-												</div>
-											);
-										}
-										return (
-											<div key={ad.ad_id} className="flex-blocks">
-												{first} {second}
-											</div>
-										);
-									}
-									if (index % 2 == 0 && rads.length - 1 == index) {
+				<Group>
+					<List>
+						{rads.length > 0 ? (
+							rads.map((ad, index) => {
+								if (!width || width < 500) {
+									if (rads.length === index + 1) {
 										return (
 											<div key={ad.ad_id} ref={lastAdElementRef}>
 												{Ad(ad)}
 											</div>
 										);
 									}
-								})
-							) : error ? (
-								<Error />
-							) : // addsArrDD.map((ad) => {
-							// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
-							// })
-							// addsArrDD.map(ad => {
-							// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
-							// })
-							!inited ? (
-								''
-							) : mode == MODE_ALL ? (
-								<AdNotFound dropFilters={props.dropFilters} />
-							) : mode == MODE_GIVEN ? (
-								<AdNoGiven setAllMode={setAllMode} />
-							) : (
-								<AdNoWanted setAllMode={setAllMode} />
-							)}
-						</List>
-					</Group>
-				</PullToRefresh>
+									return <div key={ad.ad_id}>{Ad(ad)}</div>;
+								}
+								if (index % 2) {
+									const prev = ads[index - 1];
+									const first = (
+										<div className="one-block" key={prev.ad_id}>
+											{Ad(prev)}
+										</div>
+									);
+
+									let second = (
+										<div className="one-block" key={ad.ad_id}>
+											{Ad(ad)}
+										</div>
+									);
+
+									if (rads.length === index + 1) {
+										second = (
+											<div className="one-block" key={ad.ad_id} ref={lastAdElementRef}>
+												{Ad(ad)}
+											</div>
+										);
+									}
+									return (
+										<div key={ad.ad_id} className="flex-blocks">
+											{first} {second}
+										</div>
+									);
+								}
+								if (index % 2 == 0 && rads.length - 1 == index) {
+									return (
+										<div key={ad.ad_id} ref={lastAdElementRef}>
+											{Ad(ad)}
+										</div>
+									);
+								}
+							})
+						) : error ? (
+							<Error />
+						) : // addsArrDD.map((ad) => {
+						// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
+						// })
+						// addsArrDD.map(ad => {
+						// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
+						// })
+						!inited ? (
+							''
+						) : mode == MODE_ALL ? (
+							<AdNotFound dropFilters={props.dropFilters} />
+						) : mode == MODE_GIVEN ? (
+							<AdNoGiven setAllMode={setAllMode} />
+						) : (
+							<AdNoWanted setAllMode={setAllMode} />
+						)}
+					</List>
+				</Group>
 			</div>
-		</>
+		</PullToRefresh>
 	);
 };
 
