@@ -12,11 +12,13 @@ const AdMap = (props) => {
 	const { setGeoData, setGeoDataString, inputData, max, AD } = props;
 	const geodata = (max
 		? AD.geo_position
+			? AD.geo_position.lat
+			: null
 		: inputData && inputData[GEO_DATA] && inputData[GEO_DATA].geodata && inputData[GEO_DATA].geodata.lat
 		? inputData[GEO_DATA].geodata
-		: { lat: 55.75, long: 37.57 }) || { lat: 55.75, long: 37.57 };
+		: null) || { lat: 1, long: 1 };
 
-	console.log('gleodata', geodata);
+	console.log('gleodata', geodata, AD.geo_position);
 
 	const center = [geodata.lat, geodata.long];
 	const [mapState, setMapState] = useState({ center: center, zoom: 15 });

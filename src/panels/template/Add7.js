@@ -15,6 +15,8 @@ import Icon16Clear from '@vkontakte/icons/dist/16/clear';
 
 import OpenActions from './components/actions';
 
+import Icon from './../../img/icon150.png';
+
 import { time } from '../../utils/time';
 
 import './Add7.css';
@@ -34,7 +36,7 @@ const Add7 = (props) => {
 		props.ad.status = status;
 	}, [status]);
 
-	const image = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : '';
+	const image = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : Icon;
 
 	function openSettings() {
 		props.setPopout(

@@ -51,6 +51,7 @@ const getAd = (myUser, inputData) => {
 	const geodata_string = inputData[GEO_DATA].geodata_string;
 	return {
 		ad_id,
+		author: { vk_id: myUser.id, name: myUser.name },
 		author_id: myUser.id,
 		header: item.name,
 		text: item.description,
@@ -86,11 +87,10 @@ const openAd = (ad, dispatch) => {
 	// ? вызывается так. Первая функция ставит историю и панель,
 	// ? вторая простая ставит панель. Благодаря этому работает
 	// ? кнопка назад
-	dispatch(setStory(STORY_ADS));
-	dispatch(setPage(PANEL_ONE));
-	dispatch(clearAds(ad.ad_id)) //! проверить, что это работает
 
 	dispatch(setExtraInfo(ad, store.getState().vkui.myID));
+	dispatch(setStory(STORY_ADS));
+	dispatch(setPage(PANEL_ONE));
 };
 const loadAd = (ad, dispatch) => {
 	dispatch(setExtraInfo(ad, store.getState().vkui.myID));

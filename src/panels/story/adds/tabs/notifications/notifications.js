@@ -11,6 +11,7 @@ import Tea from './../../../../../img/tea.jpg';
 import Playstein from './../../../../../img/playstein.jpg';
 import Bb from './../../../../../img/bb.jpg';
 
+import Icon56CheckCircleOutline from '@vkontakte/icons/dist/56/check_circle_outline';
 import Icon56ErrorOutline from '@vkontakte/icons/dist/56/error_outline';
 
 import Error from './../../../../placeholders/error';
@@ -492,15 +493,14 @@ const Notifications = (props) => {
 				''
 			) : arrNotRead.length + arrRead.length == 0 ? (
 				<Placeholder
-					icon={<Icon56ErrorOutline />}
-					header="Пусто"
+					icon={<Icon56CheckCircleOutline />}
 					action={
 						<Button onClick={() => props.goToAds()} size="l">
-							Вернуться в ленту обьявлений
+							Назад
 						</Button>
 					}
 				>
-					Вы еще не получили ни одного уведомления
+					Непрочитанных объявлений нет
 				</Placeholder>
 			) : (
 				''

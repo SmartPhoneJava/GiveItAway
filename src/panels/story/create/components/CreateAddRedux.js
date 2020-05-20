@@ -67,8 +67,6 @@ const CreateAddRedux = (props) => {
 			: 'Мой адрес'
 	);
 
-	console.log('geodata geodata', geodata, geodata_string);
-
 	const [pmOpen, setPmOpen] = useState(true);
 	useEffect(() => {
 		let cleanupFunction = false;
