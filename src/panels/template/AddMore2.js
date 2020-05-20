@@ -209,11 +209,12 @@ const AddMore2r = (props) => {
 		if (isNotValid()) {
 			return;
 		}
-		if (isSubs) {
-			setCost(c + 1);
-		} else {
-			setCost(c - 1);
-		}
+		// if (isSubs) {
+		// 	setCost(c + 1);
+		// } else {
+		// 	setCost(c - 1);
+		// }
+		updateCost(isSubs)
 		setIsSub(isSubs);
 	}
 
@@ -222,12 +223,13 @@ const AddMore2r = (props) => {
 			const id = AD.ad_id;
 
 			updateDealInfo();
-			updateCost();
+			
 			updateSubs();
 			getDetails(
 				id,
 				(details) => {
-					setExtraInfo(details, myID);
+					setExtraInfo(details, myID, true);
+					updateCost(details.is_subscriber);
 				},
 				(e) => {
 					setIsAuthor(false);
@@ -611,7 +613,7 @@ const AddMore2r = (props) => {
 					</div>
 					<PanelHeaderButton onClick={onCarmaClick}>
 						<div style={{ fontSize: '20px', color: 'var(--destructive)' }}>
-							{cost - 1}
+							{cost}
 							{K}
 						</div>
 					</PanelHeaderButton>

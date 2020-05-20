@@ -215,7 +215,7 @@ export async function getCost(ad_id, successCallback, failCallback) {
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
-			console.log('response response:', response);
+			console.log('getCost response:', response);
 			return response.data;
 		})
 		.then(function (response) {
@@ -226,6 +226,32 @@ export async function getCost(ad_id, successCallback, failCallback) {
 		})
 		.catch(function (error) {
 			console.log('ERROR getCost:', error);
+			if (failCallback) {
+				failCallback(error);
+			}
+		});
+}
+
+export async function getCashback(ad_id, successCallback, failCallback) {
+	let cancel;
+	axios({
+		method: 'get',
+		withCredentials: true,
+		url: Addr.getState() + BASE_AD + ad_id + '/return_bid_size',
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(function (response) {
+			console.log('getCashback response:', response);
+			return response.data;
+		})
+		.then(function (response) {
+			if (successCallback) {
+				successCallback(response);
+			}
+			return response;
+		})
+		.catch(function (error) {
+			console.log('ERROR getCashback:', error);
 			if (failCallback) {
 				failCallback(error);
 			}

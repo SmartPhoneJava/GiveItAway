@@ -137,11 +137,12 @@ export const clearAds = (ad_id) => ({
 	},
 });
 
-export const setExtraInfo = (ad, myID) => ({
+export const setExtraInfo = (ad, myID, extraMode) => ({
 	type: SET_EXTRA_INFO,
 	payload: {
 		ad,
 		myID,
+		extraMode,
 	},
 });
 

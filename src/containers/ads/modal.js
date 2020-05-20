@@ -101,24 +101,24 @@ const mapStateToProps = (state) => {
 		activeModals: state.router.activeModals,
 		inputData: state.formData.forms,
 		ad: state.ad,
+		myID: state.vkui.myID,
 	};
 };
 
 const mapDispatchToProps = (dispatch) => {
 	return {
-		
 		closeModal: () => dispatch(closeModal()),
 		closeAllModals: () => dispatch(closeAllModals()),
 		setRadius: (inputData, radius) => setRadius(inputData, radius, dispatch),
 		applyTimeSort: (inputData) => applyTimeSort(inputData, dispatch),
 		applyGeoSort: (inputData) => {
-			applyGeoSort(inputData, dispatch)
-			getGeodata()
+			applyGeoSort(inputData, dispatch);
+			getGeodata();
 		},
 		setGeoFilters: (inputData) => setGeoFilters(inputData, dispatch),
 		setGeoNear: (inputData) => {
-			setGeoNear(inputData, dispatch)
-			getGeodata()
+			setGeoNear(inputData, dispatch);
+			getGeodata();
 		},
 		openGeoSearch: () => openGeoSearch(dispatch),
 		openCountries: () => openCountries(dispatch),
@@ -131,4 +131,3 @@ const mapDispatchToProps = (dispatch) => {
 const AdsModal = connect(mapStateToProps, mapDispatchToProps)(AddsModal);
 
 export default AdsModal;
-

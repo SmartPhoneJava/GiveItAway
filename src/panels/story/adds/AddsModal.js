@@ -43,10 +43,13 @@ import { ADS_FILTERS } from './../../../store/create_post/types';
 import { STORY_ADS } from '../../../store/router/storyTypes';
 
 import { GEO_TYPE_FILTERS, GEO_TYPE_NEAR, SORT_TIME, SORT_GEO } from './../../../const/ads';
+import { useEffect } from 'react';
+import { getUser } from '../profile/requests';
 
 const AddsModal = (props) => {
 	const { closeModal, inputData } = props;
 	const { openGeoSearch, openCountries, openCities, openCategories, openCarma } = props;
+	const [backUser, setBackUser] = useState();
 
 	const applyTimeSort = () => props.applyTimeSort(inputData);
 	const setRadius = (r) => props.setRadius(inputData, r);
@@ -76,6 +79,24 @@ const AddsModal = (props) => {
 	const cost = props.ad.cost || 0;
 	const isSubscriber = props.ad.isSub || 0;
 
+	useEffect(() => {
+		console.log("user want update")
+		let cleanupFunction = false;
+		getUser(
+			props.myID,
+			(v) => {
+				if (cleanupFunction) {
+					return;
+				}
+				setBackUser(v);
+			},
+			(e) => {}
+		);
+		return () => {
+			cleanupFunction = true;
+		};
+	}, [isSubscriber]);
+
 	function isRadiusValid() {
 		return radius >= 0.5 && radius <= 100;
 	}
@@ -94,7 +115,13 @@ const AddsModal = (props) => {
 	}
 
 	function getCost() {
-		return props.ad ? (isSubscriber ? cost - 1 + '' + K : cost + '' + K) : 'Информация недоступна';
+		if (!(props.ad && backUser)) {
+			return 'Информация недоступна';
+		}
+
+		const c = isSubscriber ? cost : -cost;
+		const v = backUser.carma - backUser.frozen_carma + c;
+		return v + '' + K;
 	}
 
 	return (
@@ -232,14 +259,12 @@ const AddsModal = (props) => {
 				<List>
 					<Cell>
 						<InfoRow header="Моя карма">
-							{props.backUser
-								? props.backUser.carma - props.backUser.frozen_carma + '' + K
-								: 'Информация недоступна'}
+							{backUser ? backUser.carma - backUser.frozen_carma + '' + K : 'Информация недоступна'}
 						</InfoRow>
 					</Cell>
 
 					<Cell>
-						<InfoRow header={isSubscriber ? 'Будет возвращено' : 'Будет заморожено'}>
+						<InfoRow header={isSubscriber ? 'Станет доступно после отписки' : 'Станет доступно после подписки'}>
 							<div style={{ color: isSubscriber ? 'var(--accent)' : 'var(--destructive)' }}>
 								{getCost()}
 							</div>

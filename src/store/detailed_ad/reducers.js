@@ -254,6 +254,22 @@ export const adReducer = (state = initialState, action) => {
 
 			const image = (pathes_to_photo.length > 0 ? pathes_to_photo[0].PhotoUrl : null) || '';
 
+			const extraMode = action.payload.extraMode;
+			let deal = initialState.deal;
+			let isDealer = initialState.isDealer;
+			let dealer = initialState.dealer;
+			let subs = initialState.subs;
+			let cost = initialState.cost;
+
+			if (extraMode) {
+				deal = state.deal;
+				isDealer = state.isDealer;
+				dealer = state.dealer;
+				subs = state.subs;
+				cost = state.cost;
+			}
+			console.log("extraMode", extraMode, state.cost)
+
 			let history = state.history || [];
 			const Ad_id = state.ad_id || 0;
 			if (Ad_id > 0) {
@@ -287,6 +303,12 @@ export const adReducer = (state = initialState, action) => {
 				geo_position,
 				image,
 				isAuthor,
+
+				deal,
+				isDealer,
+				dealer,
+				subs,
+				cost,
 			};
 		}
 

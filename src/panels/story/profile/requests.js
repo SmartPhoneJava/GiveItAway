@@ -17,8 +17,10 @@ import { openPopout, closePopout } from '../../../store/router/actions';
 
 let request_id = 0;
 
-export async function getUser(user_id, successCallback, failCallback) {
-	store.dispatch(openPopout(<ScreenSpinner size="large" />))
+export async function getUser(user_id, successCallback, failCallback, inVisible) {
+	if (!inVisible) {
+		store.dispatch(openPopout(<ScreenSpinner size="large" />));
+	}
 	let err = false;
 	let cancel;
 
@@ -33,16 +35,22 @@ export async function getUser(user_id, successCallback, failCallback) {
 			return response.data;
 		})
 		.then(function (response) {
-			store.dispatch(closePopout())
+			if (!inVisible) {
+				store.dispatch(closePopout());
+			}
 			successCallback(response);
 			return response;
 		})
 		.catch(function (error) {
+			if (!inVisible) {
+				store.dispatch(closePopout());
+			}
 			console.log('ERROR getUser:', error);
 			err = true;
 			failCallback(error);
-			fail('Нет соединения с сервером');
-			store.dispatch(closePopout())
+			if (!inVisible) {
+				fail('Нет соединения с сервером');
+			}
 		});
 	return err;
 }

@@ -1,6 +1,6 @@
 import { setDeal, setIsDealer, setDealer, setSubs, setCost } from './actions';
 import { store } from '../..';
-import { getDeal, getSubscribers, getCost } from '../../requests';
+import { getDeal, getSubscribers, getCost, getCashback } from '../../requests';
 import { getUser } from '../../panels/story/profile/requests';
 
 export async function updateDealInfo() {
@@ -49,21 +49,35 @@ export async function updateSubs() {
 	};
 }
 
-export async function updateCost() {
+export async function updateCost(isSub) {
 	let cancel = false;
 	const ad_id = store.getState().ad.ad_id;
-	getCost(
-		ad_id,
-		(data) => {
-			console.log('set cost', data.bid);
-			store.dispatch(setCost(data.bid));
-		},
-		(e) => {
-			store.dispatch(setCost(0));
-		}
-	);
 
-	return () => {
-		cancel = true;
-	};
+	if (isSub) {
+		getCashback(
+			ad_id,
+			(data) => {
+				console.log('set cashback', data.bid);
+				store.dispatch(setCost(data.bid));
+			},
+			(e) => {
+				console.log('error cashback', e);
+				store.dispatch(setCost(0));
+			}
+		);
+	} else {
+		getCost(
+			ad_id,
+			(data) => {
+				console.log('set cost', data.bid);
+				store.dispatch(setCost(data.bid));
+			},
+			(e) => {
+				console.log('error cost', e);
+				store.dispatch(setCost(0));
+			}
+		);
+	}
+
+	return 
 }
