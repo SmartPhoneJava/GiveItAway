@@ -325,6 +325,7 @@ export const routerReducer = (state = initialState, action) => {
 			Panels.pop();
 
 			let finish = false;
+			let Panel = state.activePanels[Story]
 
 			if (Panels.length > 0) {
 				Panel = Panels[Panels.length - 1];
@@ -348,14 +349,14 @@ export const routerReducer = (state = initialState, action) => {
 
 			let Profile = state.activeProfile;
 			let Profiles = state.profileHistory;
-			if (state.activePanel == PANEL_USER) {
+			if (state.activePanels[Story] == PANEL_USER) {
 				Profiles.pop();
 				Profile = Profiles[Profiles.length - 1];
 			}
 
 			let Ad = state.activeAd;
 			let Ads = state.adHistory;
-			if (state.activePanel == PANEL_ONE) {
+			if (state.activePanels[Story] == PANEL_ONE) {
 				Ads.pop();
 				Ad = Ads[Ads.length - 1];
 				console.log('backToPrevAd');

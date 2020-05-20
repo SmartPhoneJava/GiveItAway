@@ -763,7 +763,9 @@ const AddMore2r = (props) => {
 							<CellButton onClick={shareInVK} before={<Icon24ShareExternal />}>
 								Поделиться
 							</CellButton>
-							<CellButton onClick={() => {}} before={<Icon24Report />}>
+							<CellButton onClick={() => {
+								window.open('https://vk.com/im?media=&sel=-194671970');
+							}} before={<Icon24Report />}>
 								Пожаловаться
 							</CellButton>
 						</div>
