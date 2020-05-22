@@ -44,7 +44,7 @@ import {
 import * as VK from '../services/VK';
 import { setAppID, setPlatform } from '../store/vk/actions';
 
-import { addComment, addSub, setStatus, setExtraInfo } from '../store/detailed_ad/actions';
+import { addComment, addSub, setStatus, setExtraInfo, setToHistory, clearAds } from '../store/detailed_ad/actions';
 
 import CategoriesPanel from './../components/categories/panel';
 import Countries from './../components/location/countries';
@@ -98,6 +98,7 @@ import { defaultInputData } from '../components/create/default';
 import { updateDealInfo } from '../store/detailed_ad/update';
 import { store } from '..';
 import AdMap from '../containers/location/map';
+import { SET_TO_HISTORY } from '../store/detailed_ad/actionTypes';
 
 const adsText = 'Объявления';
 const addText = 'Создать обьявление';
@@ -129,6 +130,7 @@ const App = (props) => {
 		addComment,
 		addSub,
 		scrollPosition,
+		clearAds,
 	} = props;
 
 	const needEdit = inputData[EDIT_MODE] ? inputData[EDIT_MODE].mode : false;
@@ -170,6 +172,9 @@ const App = (props) => {
 			setFormData(CREATE_AD_ITEM, { ...defaultInputData });
 		} else {
 			setStory(story, isProfile ? PANEL_USER : null);
+			if (story == STORY_ADS) {
+				clearAds()
+			}
 		}
 
 		addProfile(myID);
@@ -335,6 +340,7 @@ const App = (props) => {
 
 	function setReduxAd(ad) {
 		console.log('you ask to do this', ad);
+		store.dispatch(setToHistory());
 		store.dispatch(setExtraInfo(ad));
 		setAd(ad, 7);
 	}
@@ -565,6 +571,7 @@ function mapDispatchToProps(dispatch) {
 				addComment,
 				addSub,
 				setStatus,
+				clearAds,
 			},
 			dispatch
 		),

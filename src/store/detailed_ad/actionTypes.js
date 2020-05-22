@@ -4,6 +4,7 @@ export const DELETE_COMMENT = 'DELETE_COMMENT';
 export const EDIT_COMMENT = 'EDIT_COMMENT';
 
 export const SET_EXTRA_INFO = 'SET_EXTRA_INFO';
+export const SET_TO_HISTORY = 'SET_TO_HISTORY';
 export const AD_BACK = 'AD_BACK';
 export const CLEAR = 'CLEAR';
 

@@ -15,6 +15,7 @@ import {
 	SET_AD,
 	SET_DUMMY,
 	SET_TAB,
+	AD_IN,
 } from './actionTypes';
 
 import * as VK from '../../services/VK';
@@ -23,6 +24,7 @@ import { STORY_ADS, STORY_CREATE } from './storyTypes';
 import { PANEL_ADS, PANEL_CREATE, PANEL_USER, PANEL_ONE } from './panelTypes';
 import { AdDefault, TAB_ADS } from '../../const/ads';
 import { NO_DIRECTION, DIRECTION_BACK, DIRECTION_FORWARD } from './directionTypes';
+
 
 const initialState = {
 	activeStory: STORY_ADS,
@@ -64,6 +66,8 @@ const initialState = {
 
 	dummies: {},
 
+	adOut: false,
+
 	scrollPosition: [],
 };
 
@@ -79,6 +83,8 @@ export const routerReducer = (state = initialState, action) => {
 			let Story = state.activeStory;
 			let Panels = state.panelsHistory[Story] || [];
 			Panels = [...Panels, panel];
+
+			let ActivePanel = state.activePanels[Story]
 
 			console.log('page is here', Story, panel, Panels);
 			VK.swipeBackOn();
@@ -255,15 +261,11 @@ export const routerReducer = (state = initialState, action) => {
 
 		case GO_BACK: {
 			let Story = state.activeStory;
-			console.log("GO_BACK Info", Story)
-
 			let Popout = state.popouts[Story];
-
 			let Dummies = state.dummies[Story] || [];
 			
 			// если были открытые заглушки
 			if (Dummies.length > 0) {
-				console.log("GO_BACK DUMMY")
 				Dummies.pop();
 				return {
 					...state,
@@ -279,7 +281,6 @@ export const routerReducer = (state = initialState, action) => {
 			
 			// если были открытые попауты
 			if (Popout) {
-				console.log("GO_BACK Popout")
 				return {
 					...state,
 					direction: DIRECTION_BACK,
@@ -292,17 +293,13 @@ export const routerReducer = (state = initialState, action) => {
 
 			
 			let Modals = state.modalHistory[Story];
-			console.log("ONLINE4", Modals)
 			// если были открытые модальные окна
 			if (Modals && Modals.length > 0) {
-				console.log("GO_BACK Modals", Modals)
 				Modals.pop();
 				let activeModal = null;
 				if (Modals.length > 0) {
 					activeModal = Modals[Modals.length - 1];
 				}
-
-				// console.log("GO_BACK_MODAL ", Story, activeModals, modalHistory)
 
 				return {
 					...state,
@@ -354,13 +351,13 @@ export const routerReducer = (state = initialState, action) => {
 				Profile = Profiles[Profiles.length - 1];
 			}
 
+			let adOut = state.adOut;
 			let Ad = state.activeAd;
 			let Ads = state.adHistory;
 			if (state.activePanels[Story] == PANEL_ONE) {
 				Ads.pop();
 				Ad = Ads[Ads.length - 1];
-				console.log('backToPrevAd');
-				// store.dispatch(backToPrevAd());
+				adOut = true
 			}
 
 			const scrollPosition = state.scrollPosition || [];
@@ -387,7 +384,15 @@ export const routerReducer = (state = initialState, action) => {
 				profileHistory: Profiles,
 				adHistory: Ads,
 				scrollPosition,
+				adOut,
 			};
+		}
+
+		case AD_IN: {
+			return {
+				...state,
+				adOut: false,
+			}
 		}
 
 		case SET_TAB: {

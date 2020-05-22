@@ -7,6 +7,7 @@ export const ADD_AD = 'ADD_AD';
 export const SET_TAB = 'SET_TAB';
 export const SET_STORY = 'SET_STORY';
 export const GO_BACK = 'GO_BACK';
+export const AD_IN = 'AD_IN';
 
 export const OPEN_POPOUT = 'OPEN_POPOUT';
 export const CLOSE_POPOUT = 'CLOSE_POPOUT';

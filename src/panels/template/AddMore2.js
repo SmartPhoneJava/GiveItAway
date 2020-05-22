@@ -14,6 +14,7 @@ import {
 	ScreenSpinner,
 	CellButton,
 	Placeholder,
+	Spinner,
 } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
@@ -72,11 +73,10 @@ import './styles.css';
 import Comments from './../story/adds/tabs/comments/comments';
 
 import { time } from './../../utils/time';
-import { setDummy, openModal, setPage, openSnackbar, openPopout, setStory } from '../../store/router/actions';
+import { setDummy, openModal, setPage, openSnackbar, openPopout, setStory, setAdIn } from '../../store/router/actions';
 import { PANEL_COMMENTS, PANEL_SUBS, PANEL_MAP } from './../../store/router/panelTypes';
 import { MODAL_ADS_COST, MODAL_ADS_FROZEN } from '../../store/router/modalTypes';
 import {
-	setCost,
 	setIsSub,
 	setPhotos,
 	setIsHidden,
@@ -84,6 +84,7 @@ import {
 	setIsAuthor,
 	clearAds,
 	setPhotoIndex,
+	backToPrevAd,
 } from '../../store/detailed_ad/actions';
 import {
 	AdDefault,
@@ -106,10 +107,11 @@ import { FORM_CREATE } from '../../components/categories/redux';
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { updateDealInfo, updateCost, updateSubs } from '../../store/detailed_ad/update';
 
+let current_i = 0;
+
 const AddMore2r = (props) => {
 	const { myID, dispatch } = props;
 	const {
-		setCost,
 		setIsSub,
 		setIsAuthor,
 		setPhotos,
@@ -121,6 +123,8 @@ const AddMore2r = (props) => {
 		setFormData,
 		clearAds,
 		setPhotoIndex,
+		setAdIn,
+		backToPrevAd,
 	} = props;
 	const { setPage, openModal, setDummy, direction, AD } = props;
 	const {
@@ -164,6 +168,7 @@ const AddMore2r = (props) => {
 		bridge
 			.send('VKWebAppShowImages', {
 				images: imgs,
+				start_index: photoIndex,
 			})
 			.catch(function (error) {
 				setDummy('imager');
@@ -183,47 +188,43 @@ const AddMore2r = (props) => {
 		return AD == null || AD.ad_id == AD_LOADING.ad_id || AD.ad_id == AdDefault.ad_id;
 	}
 
-	useEffect(() => {
-		if (isNotValid() || (photos && photos.length != 0)) {
-			return;
-		}
-		const photoSwipeImgs = pathes_to_photo.map((v) => {
-			let img = new Image();
-			img.src = v.PhotoUrl;
-			let width = img.width;
-			let hight = img.height;
-			return {
-				src: v.PhotoUrl,
-				msrc: v.PhotoUrl,
-				w: width,
-				h: hight,
-				title: header,
-				thumbnail: v.PhotoUrl,
-			};
-		});
-		setPhotos(photoSwipeImgs);
-	}, [photos]);
+	// useEffect(() => {
+	// 	if (isNotValid() || (photos && photos.length != 0)) {
+	// 		return;
+	// 	}
+	// 	const photoSwipeImgs = pathes_to_photo.map((v) => {
+	// 		let img = new Image();
+	// 		img.src = v.PhotoUrl;
+	// 		let width = img.width;
+	// 		let hight = img.height;
+	// 		return {
+	// 			src: v.PhotoUrl,
+	// 			msrc: v.PhotoUrl,
+	// 			w: width,
+	// 			h: hight,
+	// 			title: header,
+	// 			thumbnail: v.PhotoUrl,
+	// 		};
+	// 	});
+	// 	setPhotos(photoSwipeImgs);
+	// }, [photos]);
 
 	function changeIsSub(isSubs, c) {
 		console.log('changeIsSub', isSubs);
 		if (isNotValid()) {
 			return;
 		}
-		// if (isSubs) {
-		// 	setCost(c + 1);
-		// } else {
-		// 	setCost(c - 1);
-		// }
-		updateCost(isSubs)
+		updateCost(isSubs);
 		setIsSub(isSubs);
 	}
 
 	useEffect(() => {
+		console.log('props.adOut', props.adOut);
 		const init = () => () => {
 			const id = AD.ad_id;
 
 			updateDealInfo();
-			
+
 			updateSubs();
 			getDetails(
 				id,
@@ -238,7 +239,10 @@ const AddMore2r = (props) => {
 		};
 		if (direction == DIRECTION_FORWARD) {
 			dispatch(init());
+		} else if (props.adOut) {
+			backToPrevAd();
 		}
+		setAdIn();
 	}, []);
 
 	function statusWrapper(block, color) {
@@ -429,13 +433,62 @@ const AddMore2r = (props) => {
 	};
 
 	const [imgs, setImgs] = useState([]);
+	const [imgsSpinner, setImgSpinner] = useState(false);
+
+	const [localPhotos, setLocalPhotos] = useState([]);
 
 	useEffect(() => {
-		if (isNotValid(AD)) {
-			return;
-		}
+		setImgSpinner(true);
+		current_i++;
+		let this_i = current_i;
+
+		const photoSwipeImgs = pathes_to_photo.map((v) => {
+			let img = new Image();
+			img.src = v.PhotoUrl;
+			let width = img.width;
+			let hight = img.height;
+			return {
+				src: v.PhotoUrl,
+				msrc: v.PhotoUrl,
+				w: width,
+				h: hight,
+				title: header,
+				thumbnail: v.PhotoUrl,
+			};
+		});
+		let photos_num = photoSwipeImgs.length;
+		photoSwipeImgs.forEach((r) => {
+			console.log('forEach e', r);
+			let img = new Image();
+			img.src = r.src;
+			img.onload = function () {
+				console.log('hey hey hey');
+				photos_num--;
+				r.w = img.width;
+				r.h = img.height;
+				console.log('i loaded', photos_num, this_i, current_i, photoSwipeImgs);
+				if (photos_num == 0 && this_i == current_i) {
+					setLocalPhotos(photoSwipeImgs);
+					setInterval(() => setImgSpinner(false), 250);
+				}
+			};
+		});
+		setLocalPhotos(photoSwipeImgs);
 		setImgs(pathes_to_photo.map((v) => v.PhotoUrl));
-	}, [AD]);
+		
+		console.log('loook at', photoSwipeImgs);
+		console.log('local', localPhotos);
+	}, [pathes_to_photo]);
+
+	// useEffect(() => {
+	// 	console.log('i loooook at pathes_to_photo', pathes_to_photo);
+	// 	if (isNotValid(AD)) {
+	// 		return;
+	// 	}
+	// 	setImgSpinner(true);
+	// 	setInterval(() => setImgSpinner(false), 50);
+	// 	setImgs(pathes_to_photo.map((v) => v.PhotoUrl));
+	// }, [pathes_to_photo]);
 
 	function unsub(c) {
 		unsubscribe(
@@ -499,94 +552,116 @@ const AddMore2r = (props) => {
 		setStory(STORY_CREATE, null, true);
 	}
 
+	function openMap() {
+		setPage(PANEL_MAP);
+	}
+
+	function getGeoPosition() {
+		let r = region || '';
+		let d = district || '';
+		if (r == undefined) {
+			r = '';
+		}
+		if (d == undefined) {
+			d = '';
+		}
+		return r && d ? r + ', ' + d : r + d;
+	}
+
 	return (
 		<div>
-			<div onClick={() => {}}>
-				<PhotoSwipe
-					style={{ marginTop: '50px' }}
-					isOpen={isOpen}
-					items={photos}
-					options={options}
-					onClose={handleClose}
-				/>
-			</div>
+			{!imgsSpinner ? (
+				<>
+					<PhotoSwipe
+						style={{ marginTop: '50px' }}
+						isOpen={isOpen}
+						items={localPhotos}
+						options={options}
+						onClose={handleClose}
+					/>
 
-			<div style={{ position: 'relative' }}>
-				<div style={{ right: '10px', position: 'absolute', top: '6px' }}>
-					<PanelHeaderButton
-						onClick={() => {
-							openImage(imgs);
-						}}
-						mode="secondary"
-						style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
-						size="m"
-					>
-						<Avatar style={{ background: 'rgba(0,0,0,0.7)' }} size={32}>
-							<Icon24Fullscreen fill="var(--white)" />
-						</Avatar>
-					</PanelHeaderButton>
-				</div>
-				{showStatus()}
-				<img
-					onClick={() => {
-						openImage(imgs);
-					}}
-					srcSet={image}
-					style={{
-						width: '100%',
-						objectFit: 'cover',
-						maxHeight: '250px',
-						margin: 'auto',
-					}}
-				/>
-			</div>
-
-			{pathes_to_photo.length <= 1 ? (
-				''
-			) : (
-				<HorizontalScroll>
-					<div style={{ display: 'flex' }}>
-						{pathes_to_photo.map((img, i) => {
-							return (
-								<div
-									key={img.AdPhotoId}
-									style={{
-										borderRadius: '10px',
-										alignItems: 'center',
-										justifyContent: 'center',
-										padding: '1px',
-									}}
-								>
-									<Button
-										mode="tertiary"
-										style={{
-											padding: '0px',
-											borderRadius: '10px',
-										}}
-										onClick={() => {
-											setPhotoIndex(i);
-										}}
-									>
-										<img
-											style={{
-												filter: i == photoIndex ? 'brightness(40%)' : 'brightness(90%)',
-											}}
-											src={img.PhotoUrl}
-											className="small_img"
-										/>
-									</Button>
-								</div>
-							);
-						})}
+					<div style={{ position: 'relative' }}>
+						<div style={{ right: '10px', position: 'absolute', top: '6px' }}>
+							<PanelHeaderButton
+								onClick={() => {
+									openImage(imgs);
+								}}
+								mode="secondary"
+								style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
+								size="m"
+							>
+								<Avatar style={{ background: 'rgba(0,0,0,0.7)' }} size={32}>
+									<Icon24Fullscreen fill="var(--white)" />
+								</Avatar>
+							</PanelHeaderButton>
+						</div>
+						{showStatus()}
+						<img
+							onClick={() => {
+								openImage(imgs);
+							}}
+							srcSet={image}
+							style={{
+								width: '100%',
+								objectFit: 'cover',
+								maxHeight: '250px',
+								margin: 'auto',
+							}}
+						/>
 					</div>
-				</HorizontalScroll>
+					{pathes_to_photo.length <= 1 ? null : (
+						<HorizontalScroll>
+							<div style={{ display: 'flex' }}>
+								{pathes_to_photo.map((img, i) => {
+									return (
+										<div
+											key={img.AdPhotoId}
+											style={{
+												borderRadius: '10px',
+												alignItems: 'center',
+												justifyContent: 'center',
+												padding: '1px',
+											}}
+										>
+											<Button
+												mode="tertiary"
+												style={{
+													padding: '0px',
+													borderRadius: '10px',
+												}}
+												onClick={() => {
+													setPhotoIndex(i);
+												}}
+											>
+												<img
+													style={{
+														filter: i == photoIndex ? 'brightness(40%)' : 'brightness(90%)',
+													}}
+													src={img.PhotoUrl}
+													className="small_img"
+												/>
+											</Button>
+										</div>
+									);
+								})}
+							</div>
+						</HorizontalScroll>
+					)}
+				</>
+			) : (
+				<Spinner size="large" />
 			)}
 
 			<div style={{ padding: '16px' }}>
 				<div style={{ display: 'block', alignItems: 'center' }}>
 					{isAuthor ? (
 						<div style={{ display: 'block' }}>
-							<Button disabled={isFinished() || (ad_type != TYPE_CHOICE && status != STATUS_OFFER)} mode="commerce" size="xl" onClick={openSubs}>
+							<Button
+								disabled={isFinished() || (ad_type != TYPE_CHOICE && status != STATUS_OFFER)}
+								mode="commerce"
+								size="xl"
+								onClick={openSubs}
+							>
 								{status == STATUS_OFFER ? 'Отдать' : 'Изменить получателя'}
 							</Button>
 						</div>
@@ -683,13 +758,9 @@ const AddMore2r = (props) => {
 				</tbody>
 			</table>
 			<Separator />
-			<div
-				onClick={() => {
-					setPage(PANEL_MAP);
-				}}
-			>
+			<div onClick={openMap}>
 				<Cell asideContent={<Icon24Chevron />} before={<Icon24Place />}>
-					{region && district ? region + ', ' + district : region + district}
+					{getGeoPosition()}
 				</Cell>
 			</div>
 			<Separator />
@@ -763,9 +834,12 @@ const AddMore2r = (props) => {
 							<CellButton onClick={shareInVK} before={<Icon24ShareExternal />}>
 								Поделиться
 							</CellButton>
-							<CellButton onClick={() => {
-								window.open('https://vk.com/im?media=&sel=-194671970');
-							}} before={<Icon24Report />}>
+							<CellButton
+								onClick={() => {
+									window.open('https://vk.com/im?media=&sel=-194671970');
+								}}
+								before={<Icon24Report />}
+							>
 								Пожаловаться
 							</CellButton>
 						</div>
@@ -780,6 +854,7 @@ const mapStateToProps = (state) => {
 	return {
 		AD: state.ad,
 		direction: state.router.direction,
+		adOut: state.router.adOut,
 		myID: state.vkui.myID,
 	};
 };
@@ -800,7 +875,6 @@ const mapDispatchToProps = (dispatch) => {
 				acceptDeal,
 				denyDeal,
 
-				setCost,
 				setIsSub,
 
 				setPhotos,
@@ -816,6 +890,9 @@ const mapDispatchToProps = (dispatch) => {
 
 				clearAds,
 				setPhotoIndex,
+
+				setAdIn,
+				backToPrevAd,
 			},
 			dispatch
 		),

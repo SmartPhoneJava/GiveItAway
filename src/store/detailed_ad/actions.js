@@ -19,6 +19,7 @@ import {
 	SET_DEALER,
 	AD_BACK,
 	SET_PHOTO_INDEX,
+	SET_TO_HISTORY,
 } from './actionTypes';
 
 export const setComments = (comments) => ({
@@ -129,6 +130,11 @@ export const setCost = (cost) => ({
 export const backToPrevAd = () => ({
 	type: AD_BACK,
 });
+
+export const setToHistory = () => ({
+	type: SET_TO_HISTORY,
+});
+
 
 export const clearAds = (ad_id) => ({
 	type: CLEAR,

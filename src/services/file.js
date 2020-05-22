@@ -33,7 +33,7 @@ export function NEWhandleFiles(file, addPhoto) {
 					height = MAX_HEIGHT;
 				}
 			}
-			console.log('we wanna write', file, width, height);
+
 			canvas.width = width;
 			canvas.height = height;
 			var ctx = canvas.getContext('2d');
@@ -49,83 +49,18 @@ export function NEWhandleFiles(file, addPhoto) {
 
 			var blobBin = atob(dataurl.split(',')[1]);
 			var array = [];
-			for(var i = 0; i < blobBin.length; i++) {
+			for (var i = 0; i < blobBin.length; i++) {
 				array.push(blobBin.charCodeAt(i));
 			}
-			var blob=new Blob([new Uint8Array(array)], {type: file.type});
-			let newFile = new File([blob], file.name, { type: file.type })
+			var blob = new Blob([new Uint8Array(array)], { type: file.type });
+			let newFile = new File([blob], file.name, { type: file.type });
+			KEY++;
 			addPhoto({ src: dataurl, id: KEY, origin: newFile });
-
-			// // Post the data
-			// var fd = new FormData();
-			// fd.append('name', 'some_filename.jpg');
-			// fd.append('image', dataurl);
-			// fd.append('info', 'lah_de_dah');
-			// $.ajax({
-			// 	url: '/ajax_photo',
-			// 	data: fd,
-			// 	cache: false,
-			// 	contentType: false,
-			// 	processData: false,
-			// 	type: 'POST',
-			// 	success: function (data) {
-			// 		$('#form_photo')[0].reset();
-			// 		location.reload();
-			// 	},
-			// });
-		}; // img.onload
+		};
 	};
 	// Load files into file reader
 	reader.readAsDataURL(file);
 }
-
-// function handleFileSelect(f, canvas, addPhoto) {
-// 	var reader = new FileReader();
-
-// 	// Closure to capture the file information.
-// 	reader.onload = (function (theFile) {
-// 		return function (e) {
-// 			let img = new Image();
-// 			img.src = e.target.result;
-
-// 			let width = img.width;
-// 			let hight = img.height;
-
-// 			KEY++;
-// 			var ctx = canvas.getContext('2d');
-// 			ctx.drawImage(img, 0, 0);
-
-// 			var MAX_WIDTH = 800;
-// 			var MAX_HEIGHT = 600;
-// 			var width = img.width;
-// 			var height = img.height;
-
-// 			if (width > height) {
-// 				if (width > MAX_WIDTH) {
-// 					height *= MAX_WIDTH / width;
-// 					width = MAX_WIDTH;
-// 				}
-// 			} else {
-// 				if (height > MAX_HEIGHT) {
-// 					width *= MAX_HEIGHT / height;
-// 					height = MAX_HEIGHT;
-// 				}
-// 			}
-// 			canvas.width = width;
-// 			canvas.height = height;
-// 			console.log('2d2d2d', theFile, width, height);
-// 			var ctx = canvas.getContext('2d');
-// 			ctx.drawImage(img, 0, 0, width, height);
-
-// 			const dataurl = canvas.toDataURL('image/png');
-// 			console.log('dataurl', dataurl);
-
-// 			addPhoto({ src: dataurl, id: KEY, origin: dataurl });
-// 		};
-// 	})(f);
-// 	// Read in the image file as a data URL.
-// 	reader.readAsDataURL(f);
-// }
 
 function detectVerticalSquash(img) {
 	var iw = img.naturalWidth,
@@ -186,22 +121,30 @@ function checkFileType(file) {
 }
 
 export const loadPhotos = (e, handleWrongSize, handleWrongType, addPhoto, end) => {
+	console.log('loadPhotos loop');
 	var files = e.target.files; // FileList object
 	// Loop through the FileList and render image files as thumbnails.
+	console.log('before loop', files.length);
 	for (var i = 0, file; (file = files[i]); i++) {
+		console.log('start', file);
 		if (!file) {
 			continue;
 		}
+		console.log('here we go');
 		if (!checkFileSize(file)) {
+			console.log('handleWrongSize', file);
 			handleWrongSize(file);
 			continue;
 		}
 		if (!checkFileType(file)) {
+			console.log('checkFileType', file);
 			handleWrongType(file);
 			continue;
 		}
+		console.log('work with file', file);
 		NEWhandleFiles(file, addPhoto);
 		// handleFileSelect(file, addPhoto);
 	}
+	console.log('after loop');
 	end();
 };

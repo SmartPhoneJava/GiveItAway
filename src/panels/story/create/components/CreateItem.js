@@ -13,6 +13,7 @@ import {
 	Avatar,
 	Snackbar,
 	Placeholder,
+	Spinner,
 } from '@vkontakte/vkui';
 
 import 'react-photoswipe/lib/photoswipe.css';
@@ -48,7 +49,6 @@ const CreateItem = (props) => {
 	const inputData = props.inputData[CREATE_AD_ITEM] || defaultInputData;
 	const name = props.inputData[CREATE_AD_ITEM].name || '';
 	const description = props.inputData[CREATE_AD_ITEM].description || '';
-	const photosUrl = props.inputData[CREATE_AD_ITEM].photosUrl || '';
 
 	// const [inputData, setInputData] = useState(props.inputData[CREATE_AD_ITEM] || props.defaultInputData);
 	const needEdit = props.inputData[EDIT_MODE] ? props.inputData[EDIT_MODE].mode : false;
@@ -65,6 +65,7 @@ const CreateItem = (props) => {
 	};
 
 	const [isOpen, setIsOpen] = useState(false);
+	const [loading, setLoading] = useState(false);
 	const [options, setOptions] = useState({});
 
 	const handleClose = () => {
@@ -116,6 +117,9 @@ const CreateItem = (props) => {
 	}
 
 	const loadPhoto = (e) => {
+		console.log('loadPhoto loop', e.target.files);
+
+		setLoading(true);
 		loadPhotos(
 			e,
 			handleWrongSize,
@@ -139,6 +143,7 @@ const CreateItem = (props) => {
 				});
 			},
 			() => {
+				setLoading(false);
 				// let photoText;
 				// if (!inputData.photosUrl) {
 				// 	photoText = PHOTO_TEXT + '. Загружено 0/3';
@@ -176,13 +181,7 @@ const CreateItem = (props) => {
 	}
 
 	function openPhotos(i) {
-		// if (platform != 'desktop_web' && platform != 'mobile_web') {
-		// 	bridge.send('VKWebAppShowImages', {
-		// 		images: inputData.photosUrl.map((v) => v.src),
-		// 	});
-		// } else {
 		openPhotoSwipe(i);
-		// }
 	}
 
 	const photoSwipeImgs = inputData.photosUrl
@@ -269,6 +268,7 @@ const CreateItem = (props) => {
 							{needEdit ? null : (
 								<>
 									<File
+										multiple={true}
 										before={<Icon24Camera />}
 										disabled={inputData.photosUrl.length == 3}
 										mode={inputData.photosUrl.length == 3 ? 'secondary' : 'primary'}
@@ -316,6 +316,7 @@ const CreateItem = (props) => {
 											</div>
 										);
 									})}
+									{loading ? <Spinner size="medium" /> : null}
 								</div>
 							</HorizontalScroll>
 						</>

@@ -19,6 +19,7 @@ import {
 	SET_EXTRA_INFO,
 	AD_BACK,
 	SET_PHOTO_INDEX,
+	SET_TO_HISTORY,
 } from './actionTypes';
 import Icon from './../../img/icon278.png';
 import { TYPE_CHOICE } from '../../const/ads';
@@ -291,12 +292,6 @@ export const adReducer = (state = initialState, action) => {
 				cost = state.cost;
 			}
 
-			let history = state.history || [];
-			const Ad_id = state.ad_id || 0;
-			if (Ad_id > 0) {
-				history = [...history, state];
-			}
-
 			return {
 				...initialState,
 				ad_id,
@@ -313,7 +308,6 @@ export const adReducer = (state = initialState, action) => {
 				hidden,
 				region,
 				district,
-				history,
 				ad_type,
 				ls_enabled,
 				comments_enabled,
@@ -324,6 +318,7 @@ export const adReducer = (state = initialState, action) => {
 				geo_position,
 				image,
 				isAuthor,
+				history: state.history,
 
 				deal,
 				isDealer,
@@ -333,14 +328,25 @@ export const adReducer = (state = initialState, action) => {
 			};
 		}
 
+		case SET_TO_HISTORY: {
+			const history = [...state.history, state]
+			console.log("SET_TO_HISTORY", history)
+			return {
+				...state,
+				history,
+			};
+		}
+
 		case AD_BACK: {
 			const history = state.history || [];
+			console.log('reducers AD_BACK history', history);
 			let newState = state;
 			if (history.length > 0) {
 				newState = history[history.length - 1];
 			}
-			console.log('reducers AD_BACK');
 			history.pop();
+			console.log('reducers AD_BACK', newState);
+			
 			newState.history = history;
 
 			return {
