@@ -415,18 +415,18 @@ export async function getSubscribers(ad_id, successCallback, failCallback, count
 			return response.data;
 		})
 		.then(function (response) {
-			successCallback(response);
 			store.dispatch(closePopout());
+			successCallback(response);
 			return response;
 		})
 		.catch(function (error) {
+			store.dispatch(closePopout());
 			if (err) {
 				fail('Нет соединения с сервером');
 			}
 			if (failCallback) {
 				failCallback(error);
 			}
-			store.dispatch(closePopout());
 		});
 	return { subscribers, err };
 }
@@ -531,8 +531,8 @@ export async function Auth(user, successCallback, failCallback) {
 			return response.data;
 		})
 		.then(function (data) {
-			successCallback(data);
 			store.dispatch(closePopout());
+			successCallback(data);
 			User.dispatch({ type: 'set', new_state: data });
 			return data;
 		})
@@ -626,8 +626,9 @@ export function CreateAd(ad, obj, photos, openAd, loadAd, successcallback) {
 			return response;
 		})
 		.catch(function (error) {
-			console.log('Request failed', error);
 			store.dispatch(closePopout());
+			console.log('Request failed', error);
+			
 			fail('Нет соединения с сервером', () => createAd(ad, obj, photos, openAd, loadAd, successcallback));
 		});
 	return;
@@ -655,8 +656,8 @@ export async function EditAd(ad, obj, openAd, successcallback) {
 			return response;
 		})
 		.catch(function (error) {
-			console.log('Request failed', error);
 			store.dispatch(closePopout());
+			console.log('Request failed', error);
 			fail('Нет соединения с сервером', () => EditAd(ad, obj, openAd, successcallback));
 		});
 	return;
@@ -683,8 +684,8 @@ export const deleteAd = (ad_id, refresh) => {
 			return response.data;
 		})
 		.catch(function (error) {
-			console.log('Request failed', error);
 			store.dispatch(closePopout());
+			console.log('Request failed', error);
 			fail('Нет соединения с сервером', () => deleteAd(ad_id, refresh));
 		});
 };

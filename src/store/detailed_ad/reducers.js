@@ -261,6 +261,21 @@ export const adReducer = (state = initialState, action) => {
 
 			const image = (pathes_to_photo.length > 0 ? pathes_to_photo[0].PhotoUrl : null) || '';
 
+			const photos = pathes_to_photo.map((v) => {
+				let img = new Image();
+				img.src = v.PhotoUrl;
+				let width = img.width;
+				let hight = img.height;
+				return {
+					src: v.PhotoUrl,
+					msrc: v.PhotoUrl,
+					w: width,
+					h: hight,
+					title: header,
+					thumbnail: v.PhotoUrl,
+				};
+			});
+
 			const extraMode = action.payload.extraMode;
 			let deal = initialState.deal;
 			let isDealer = initialState.isDealer;

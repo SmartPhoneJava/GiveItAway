@@ -38,7 +38,7 @@ import Icon44SmileOutline from '@vkontakte/icons/dist/44/smile_outline';
 import { openPopout, closePopout, setPage } from '../../../../../store/router/actions';
 import { setDealer } from '../../../../../store/detailed_ad/actions';
 import { PANEL_SUBS } from '../../../../../store/router/panelTypes';
-import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED } from '../../../../../const/ads';
+import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED, TYPE_CHOICE } from '../../../../../const/ads';
 import { updateDealInfo } from '../../../../../store/detailed_ad/update';
 
 export const Given = (props) => {
@@ -109,6 +109,7 @@ const Subs = (props) => {
 			openPopout(
 				<ActionSheet onClose={closePopout}>
 					{!dealer || v.vk_id != dealer.vk_id ? (
+						
 						<ActionSheetItem autoclose onClick={() => close(v)}>
 							Отдать
 						</ActionSheetItem>

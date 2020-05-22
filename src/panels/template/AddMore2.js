@@ -202,7 +202,7 @@ const AddMore2r = (props) => {
 			};
 		});
 		setPhotos(photoSwipeImgs);
-	}, [pathes_to_photo]);
+	}, [photos]);
 
 	function changeIsSub(isSubs, c) {
 		console.log('changeIsSub', isSubs);
@@ -586,7 +586,7 @@ const AddMore2r = (props) => {
 				<div style={{ display: 'block', alignItems: 'center' }}>
 					{isAuthor ? (
 						<div style={{ display: 'block' }}>
-							<Button disabled={isFinished()} mode="commerce" size="xl" onClick={openSubs}>
+							<Button disabled={isFinished() || (ad_type != TYPE_CHOICE && status != STATUS_OFFER)} mode="commerce" size="xl" onClick={openSubs}>
 								{status == STATUS_OFFER ? 'Отдать' : 'Изменить получателя'}
 							</Button>
 						</div>
