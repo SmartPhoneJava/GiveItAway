@@ -11,14 +11,12 @@ export const NO_CLICK = 'NO_CLICK';
 const AdMap = (props) => {
 	const { setGeoData, setGeoDataString, inputData, max, AD } = props;
 	const geodata = (max
-		? AD.geo_position
-			? AD.geo_position.lat
+		? AD.geo_position && AD.geo_position.lat
+			? AD.geo_position
 			: null
 		: inputData && inputData[GEO_DATA] && inputData[GEO_DATA].geodata && inputData[GEO_DATA].geodata.lat
 		? inputData[GEO_DATA].geodata
 		: null) || { lat: 1, long: 1 };
-
-	console.log('gleodata', geodata, AD.geo_position);
 
 	const center = [geodata.lat, geodata.long];
 	const [mapState, setMapState] = useState({ center: center, zoom: 15 });
@@ -27,6 +25,8 @@ const AdMap = (props) => {
 
 	const width = document.body.clientWidth - 40;
 	const height = document.body.clientHeight - 110;
+
+	console.log('gleodata', geodata, center);
 
 	if (max && geodata.lat == 1 && geodata.long == 1) {
 		return <Placeholder>Положение на карте не указано</Placeholder>;
