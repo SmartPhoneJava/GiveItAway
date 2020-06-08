@@ -83,9 +83,6 @@ export const routerReducer = (state = initialState, action) => {
 			let Story = state.activeStory;
 			let Panels = state.panelsHistory[Story] || [];
 			Panels = [...Panels, panel];
-
-			let ActivePanel = state.activePanels[Story]
-
 			console.log('page is here', Story, panel, Panels);
 			VK.swipeBackOn();
 
@@ -189,8 +186,7 @@ export const routerReducer = (state = initialState, action) => {
 		case SET_AD: {
 			window.history.pushState(null, null);
 			smoothScrollToTop();
-			console.log("SET_AD called", action.payload.panel, action.payload.num)
-
+	
 			let panel = action.payload.panel;
 			let ad = action.payload.ad;
 

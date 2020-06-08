@@ -9,3 +9,4 @@ export const PANEL_CITIES = 'cities';
 export const PANEL_COUNTRIES = 'countries';
 export const PANEL_IMAGE = 'image';
 export const PANEL_MAP = 'map';
+export const PANEL_ABOUT = 'about';

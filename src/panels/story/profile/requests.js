@@ -8,19 +8,15 @@ import { Addr, BASE_USER } from './../../../store/addr';
 
 import { fail, success } from './../../../requests';
 
-import Icon24Add from '@vkontakte/icons/dist/24/add';
-import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
-import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
-import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
 import { store } from '../../../index';
 import { openPopout, closePopout } from '../../../store/router/actions';
 
 let request_id = 0;
 
 export async function getUser(user_id, successCallback, failCallback, inVisible) {
-	if (!inVisible) {
-		store.dispatch(openPopout(<ScreenSpinner size="large" />));
-	}
+	// if (!inVisible) {
+	// 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
+	// }
 	let err = false;
 	let cancel;
 
@@ -35,16 +31,16 @@ export async function getUser(user_id, successCallback, failCallback, inVisible)
 			return response.data;
 		})
 		.then(function (response) {
-			if (!inVisible) {
-				store.dispatch(closePopout());
-			}
+			// if (!inVisible) {
+			// 	store.dispatch(closePopout());
+			// }
 			successCallback(response);
 			return response;
 		})
 		.catch(function (error) {
-			if (!inVisible) {
-				store.dispatch(closePopout());
-			}
+			// if (!inVisible) {
+			// 	store.dispatch(closePopout());
+			// }
 			console.log('ERROR getUser:', error);
 			err = true;
 			failCallback(error);

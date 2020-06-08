@@ -9,6 +9,8 @@ import {
 	TabbarItem,
 	ScreenSpinner,
 	ConfigProvider,
+	Footer,
+	Link,
 } from '@vkontakte/vkui';
 
 import { STORY_ADS, STORY_CREATE } from './../store/router/storyTypes';
@@ -23,6 +25,7 @@ import {
 	PANEL_CITIES,
 	PANEL_COUNTRIES,
 	PANEL_MAP,
+	PANEL_ABOUT,
 } from './../store/router/panelTypes';
 
 import { MODAL_ADS_FILTERS, MODAL_ADS_GEO, MODAL_ADS_SUBS } from './../store/router/modalTypes';
@@ -40,6 +43,7 @@ import {
 	addProfile,
 	openSnackbar,
 	openPopout,
+	setPage,
 } from '../store/router/actions';
 import * as VK from '../services/VK';
 import { setAppID, setPlatform } from '../store/vk/actions';
@@ -100,6 +104,8 @@ import { store } from '..';
 import AdMap from '../containers/location/map';
 import { SET_TO_HISTORY } from '../store/detailed_ad/actionTypes';
 
+import ProfilePanel from './profile';
+
 const adsText = 'Объявления';
 const addText = 'Создать обьявление';
 const profileText = 'Профиль';
@@ -108,6 +114,29 @@ const addr = AddrWS.getState() + '/connection/websocket';
 let centrifuge = new Centrifuge(addr);
 
 let notsCounterrr = 0;
+
+// const ProfilePanel = (props) => {
+// 	const { historyLen, profileName, setProfileName, openSnackbar, setReduxAd, goBack, snackbars } = props;
+// 	return (
+// 		<Panel id={PANEL_USER}>
+// 			<PanelHeader left={historyLen <= 1 ? null : <PanelHeaderBack onClick={goBack} />}>
+// 				<p className="panel-header"> {profileName} </p>
+// 			</PanelHeader>
+// 			<Profile setProfileName={setProfileName} setSnackbar={openSnackbar} openAd={setReduxAd} />
+// 			{snackbars[PANEL_USER]}
+// 			<Footer>
+// 				<Link
+// 					onClick={() => {
+// 						console.log('loooooos');
+// 						props.setPage(PANEL_ABOUT);
+// 					}}
+// 				>
+// 					3 cообщества
+// 				</Link>
+// 			</Footer>
+// 		</Panel>
+// 	);
+// };
 
 const App = (props) => {
 	const { colorScheme, myUser, myID, inputData, AD } = props;
@@ -173,7 +202,7 @@ const App = (props) => {
 		} else {
 			setStory(story, isProfile ? PANEL_USER : null);
 			if (story == STORY_ADS) {
-				clearAds()
+				clearAds();
 			}
 		}
 
@@ -342,7 +371,7 @@ const App = (props) => {
 		console.log('you ask to do this', ad);
 		store.dispatch(setToHistory());
 		store.dispatch(setExtraInfo(ad));
-		setAd(ad, 7);
+		setAd(ad);
 	}
 
 	function backToAdsFilters() {
@@ -456,11 +485,30 @@ const App = (props) => {
 						{snackbars[PANEL_ONE]}
 					</Panel>
 					<Panel id={PANEL_USER}>
+						<ProfilePanel setReduxAd={setReduxAd} />
+					</Panel>
+					{/* <Panel id={PANEL_USER}>
 						<PanelHeader left={historyLen <= 1 ? null : <PanelHeaderBack onClick={goBack} />}>
 							<p className="panel-header"> {profileName} </p>
 						</PanelHeader>
 						<Profile setProfileName={setProfileName} setSnackbar={openSnackbar} openAd={setReduxAd} />
 						{snackbars[PANEL_USER]}
+						<Footer>
+							<Link
+								onClick={() => {
+									console.log('loooooos');
+									props.setPage(PANEL_ABOUT);
+								}}
+							>
+								3 cообщества
+							</Link>
+						</Footer>
+					</Panel> */}
+					<Panel id={PANEL_ABOUT}>
+						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
+							<p className="panel-header">Комментарии</p>
+							{/* {choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошибка'} */}
+						</PanelHeader>
 					</Panel>
 					<Panel id={PANEL_COMMENTS}>
 						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
@@ -572,6 +620,7 @@ function mapDispatchToProps(dispatch) {
 				addSub,
 				setStatus,
 				clearAds,
+				setPage,
 			},
 			dispatch
 		),

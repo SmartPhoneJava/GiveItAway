@@ -68,12 +68,11 @@ export const setProfile = (profile) => ({
 	},
 });
 
-export const setAd = (ad, num) => ({
+export const setAd = (ad) => ({
 	type: SET_AD,
 	payload: {
 		panel: PANEL_ONE,
 		ad,
-		num: num || 0,
 	},
 });
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-import { ScreenSpinner } from '@vkontakte/vkui';
+import { ScreenSpinner, Spinner } from '@vkontakte/vkui';
 
 import { Addr, BASE_USER } from '../../../../../store/addr';
 
@@ -18,7 +18,8 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 	}, [user_id]);
 
 	useEffect(() => {
-		setPopout(<ScreenSpinner size="large" />);
+		setPopout(<Spinner size="medium"/>)
+		console.log("useAdReceived aaa", pageNumber, rowsPerPage, user_id)
 		setLoading(true);
 		setError(false);
 		setInited(false);
@@ -59,5 +60,5 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 		return () => cancel();
 	}, [pageNumber, user_id]);
 
-	return { received_loading: loading, received: ads, received_hasMore: hasMore, received_newPage: pageNumber };
+	return { loading, ads, hasMore, newPage: pageNumber };
 }
