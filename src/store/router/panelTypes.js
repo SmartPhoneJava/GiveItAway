@@ -10,3 +10,5 @@ export const PANEL_COUNTRIES = 'countries';
 export const PANEL_IMAGE = 'image';
 export const PANEL_MAP = 'map';
 export const PANEL_ABOUT = 'about';
+export const PANEL_FAQ = 'faq';
+export const PANEL_ADVICES = 'advice';

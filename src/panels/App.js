@@ -26,6 +26,8 @@ import {
 	PANEL_COUNTRIES,
 	PANEL_MAP,
 	PANEL_ABOUT,
+	PANEL_FAQ,
+	PANEL_ADVICES,
 } from './../store/router/panelTypes';
 
 import { MODAL_ADS_FILTERS, MODAL_ADS_GEO, MODAL_ADS_SUBS } from './../store/router/modalTypes';
@@ -105,6 +107,9 @@ import AdMap from '../containers/location/map';
 import { SET_TO_HISTORY } from '../store/detailed_ad/actionTypes';
 
 import ProfilePanel from './profile';
+import AboutPanel from './about';
+import FAQPanel from './faq';
+import AdvicePanel from './advice';
 
 const adsText = 'Объявления';
 const addText = 'Создать обьявление';
@@ -115,33 +120,10 @@ let centrifuge = new Centrifuge(addr);
 
 let notsCounterrr = 0;
 
-// const ProfilePanel = (props) => {
-// 	const { historyLen, profileName, setProfileName, openSnackbar, setReduxAd, goBack, snackbars } = props;
-// 	return (
-// 		<Panel id={PANEL_USER}>
-// 			<PanelHeader left={historyLen <= 1 ? null : <PanelHeaderBack onClick={goBack} />}>
-// 				<p className="panel-header"> {profileName} </p>
-// 			</PanelHeader>
-// 			<Profile setProfileName={setProfileName} setSnackbar={openSnackbar} openAd={setReduxAd} />
-// 			{snackbars[PANEL_USER]}
-// 			<Footer>
-// 				<Link
-// 					onClick={() => {
-// 						console.log('loooooos');
-// 						props.setPage(PANEL_ABOUT);
-// 					}}
-// 				>
-// 					3 cообщества
-// 				</Link>
-// 			</Footer>
-// 		</Panel>
-// 	);
-// };
-
 const App = (props) => {
 	const { colorScheme, myUser, myID, inputData, AD } = props;
+	const { activeStory, activePanels, panelsHistory, popouts, snackbars, scrollPosition, activeAd } = props;
 	const {
-		activeStory,
 		goBack,
 		setAd,
 		setStory,
@@ -151,14 +133,9 @@ const App = (props) => {
 		addProfile,
 		setFormData,
 		openSnackbar,
-		activePanels,
-		panelsHistory,
-		popouts,
 		openPopout,
-		snackbars,
 		addComment,
 		addSub,
-		scrollPosition,
 		clearAds,
 	} = props;
 
@@ -168,8 +145,6 @@ const App = (props) => {
 	const createPopout = popouts[STORY_CREATE];
 
 	const [inited, setInited] = useState(false);
-
-	const [profileName, setProfileName] = useState('Профиль');
 
 	const [notsCounterr, setNotsCounterr] = useState(notsCounterr);
 
@@ -384,12 +359,12 @@ const App = (props) => {
 		openModal(MODAL_ADS_GEO);
 	}
 
-	let adPanels = props.panelsHistory[STORY_ADS];
-	let adActivePanel = props.activePanels[STORY_ADS];
+	let adPanels = panelsHistory[STORY_ADS];
+	let adActivePanel = activePanels[STORY_ADS];
 
-	let createPanels = props.panelsHistory[STORY_CREATE];
-	let createActivePanel = props.activePanels[STORY_CREATE];
-	let choosen = props.activeAd;
+	let createPanels = panelsHistory[STORY_CREATE];
+	let createActivePanel = activePanels[STORY_CREATE];
+	let choosen = activeAd;
 
 	if (!inited) {
 		return <ScreenSpinner size="large" />;
@@ -487,28 +462,14 @@ const App = (props) => {
 					<Panel id={PANEL_USER}>
 						<ProfilePanel setReduxAd={setReduxAd} />
 					</Panel>
-					{/* <Panel id={PANEL_USER}>
-						<PanelHeader left={historyLen <= 1 ? null : <PanelHeaderBack onClick={goBack} />}>
-							<p className="panel-header"> {profileName} </p>
-						</PanelHeader>
-						<Profile setProfileName={setProfileName} setSnackbar={openSnackbar} openAd={setReduxAd} />
-						{snackbars[PANEL_USER]}
-						<Footer>
-							<Link
-								onClick={() => {
-									console.log('loooooos');
-									props.setPage(PANEL_ABOUT);
-								}}
-							>
-								3 cообщества
-							</Link>
-						</Footer>
-					</Panel> */}
 					<Panel id={PANEL_ABOUT}>
-						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
-							<p className="panel-header">Комментарии</p>
-							{/* {choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошибка'} */}
-						</PanelHeader>
+						<AboutPanel />
+					</Panel>
+					<Panel id={PANEL_FAQ}>
+						<FAQPanel />
+					</Panel>
+					<Panel id={PANEL_ADVICES}>
+						<AdvicePanel />
 					</Panel>
 					<Panel id={PANEL_COMMENTS}>
 						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
@@ -629,4 +590,4 @@ function mapDispatchToProps(dispatch) {
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
 
-// 477 -> 516 -> 674 -> 703 -> 795 -> 749 -> 587 -> 524
+// 477 -> 516 -> 674 -> 703 -> 795 -> 749 -> 587 -> 524 -> 583

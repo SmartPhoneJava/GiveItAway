@@ -121,7 +121,6 @@ export const getuser = (success) => (dispatch) => {
 };
 
 export const shareInVK = () => {
-	console.log("share in vk")
 	const appID = store.getState().vkui.appID;
 	const adID = store.getState().ad.ad_id;
 	return bridge
@@ -135,13 +134,133 @@ export const shareInVK = () => {
 		});
 };
 
+export const shareApp = () => {
+	const appID = store.getState().vkui.appID;
+	return bridge
+		.send('VKWebAppShare', { link: 'https://vk.com/app' + appID + '#' })
+		.then((data) => {
+			success('Вы успешно поделились объявлением');
+			return data;
+		})
+		.catch((error) => {
+			return error;
+		});
+};
+
+export const postApp = () => {
+	return bridge
+		.send('VKWebAppShowWallPostBox', {
+			message:
+				'https://vk.com/app7360033 - Отдавай и получай без-воз-мез-дно, т.е даром! Здесь вы можете отдать свой старый холодильник,  раздать котят,  получить вещи первой необходимости, расчистить свой балкон от ненужных вещей, тут же забить его новыми и многое другое!',
+		})
+		.then((data) => {
+			success('Вы успешно поделились объявлением');
+			return data;
+		})
+		.catch((error) => {
+			return error;
+		});
+};
+
+export const postStoryApp = () => {
+	return bridge
+		.send('VKWebAppShowStoryBox', {
+			background_type: 'image',
+			url: 'https://sun1-83.userapi.com/0QRpYvldpBt6X45omFT937P7JGluqtOT9IHK2Q/cIgz-evmWyw.jpg',
+
+			stickers: [
+				{
+					sticker_type: 'native',
+					sticker: {
+						action_type: 'text',
+						action: {
+							text: 'Отдать даром',
+							style: 'marker',
+							selection_color: '#33CCFF',
+							background_style: 'sticker',
+						},
+						transform: {
+							gravity: 'center_top',
+							translation_y: 0.1,
+							rotation: 10,
+							relation_width: 0.8,
+						},
+					},
+				},
+				{
+					sticker_type: 'native',
+					sticker: {
+						action_type: 'text',
+						action: {
+							text: 'отдавай ненужное,\n получай необходимое',
+							style: 'marker',
+							selection_color: '#99CCFF',
+							background_style: 'solid',
+						},
+						transform: {
+							translation_y: -0.1,
+							relation_width: 0.99,
+							gravity: 'center_bottom',
+						},
+					},
+				},
+				{
+					sticker_type: "renderable",
+					sticker: {
+						can_delete: 0,
+						content_type: 'image',
+						url: 'https://i.imgur.com/igRw4Dl.png',
+						clickable_zones: [
+							{
+								action_type: 'link',
+								action: {
+									link: 'https://vk.com/app7360033',
+									tooltip_text_key: 'tooltip_open_post',
+									transform: {
+										relation_width: 0.15,
+									}
+								},
+								clickable_area: [
+									{
+										x: 17,
+										y: 110,
+									},
+									{
+										x: 97,
+										y: 110,
+									},
+									{
+										x: 97,
+										y: 132,
+									},
+									{
+										x: 17,
+										y: 132,
+									},
+								],
+							},
+						],
+					},
+				},
+			],
+		})
+		.then((data) => {
+			success('Вы успешно поделились объявлением');
+			return data;
+		})
+		.catch((error) => {
+			console.log('errrr', error);
+			return error;
+		});
+};
+
 export const getGeodata = (successCallback, failCallback) => {
 	let cleanupFunction = false;
 	bridge
 		.send('VKWebAppGetGeodata')
 		.then((geodata) => {
 			if (successCallback) {
-				successCallback(geodata)
+				successCallback(geodata);
 			}
 			if (!cleanupFunction) {
 				store.dispatch(setGeoData(geodata));
@@ -150,9 +269,9 @@ export const getGeodata = (successCallback, failCallback) => {
 		.catch((error) => {
 			console.log('VKWebAppGetGeodata error', error);
 			if (failCallback) {
-				failCallback(error)
+				failCallback(error);
 			}
-			fail("Не удалось получить местоположение. Проверьте, включен ли GPS")
+			fail('Не удалось получить местоположение. Проверьте, включен ли GPS');
 		});
 	return () => (cleanupFunction = true);
 };
