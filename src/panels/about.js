@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Panel, PanelHeader, PanelHeaderBack, Footer, Link, Cell, Group, Header } from '@vkontakte/vkui';
+import { PanelHeader, PanelHeaderBack, Footer, Link, Cell, Group, Header } from '@vkontakte/vkui';
 
 import { STORY_ADS } from '../store/router/storyTypes';
-import { PANEL_USER, PANEL_ABOUT, PANEL_FAQ, PANEL_COMMENTS, PANEL_ADVICES } from '../store/router/panelTypes';
+import { PANEL_FAQ, PANEL_ADVICES, PANEL_LICENCE } from '../store/router/panelTypes';
 
 import './main.css';
 
 import { connect } from 'react-redux';
 import { goBack, setPage } from '../store/router/actions';
 
-import Profile from './story/profile/Profile';
-
-import Icon28MusicOutline from '@vkontakte/icons/dist/28/music_outline';
 import Icon28MessagesOutline from '@vkontakte/icons/dist/28/messages_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
 import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
@@ -19,7 +16,6 @@ import Icon28MoneyCircleOutline from '@vkontakte/icons/dist/28/money_circle_outl
 import Icon28Users3Outline from '@vkontakte/icons/dist/28/users_3_outline';
 import Icon28HelpOutline from '@vkontakte/icons/dist/28/help_outline';
 
-import Icon24Locate from '@vkontakte/icons/dist/24/locate';
 import Icon24ShareExternal from '@vkontakte/icons/dist/24/share_external';
 import Icon24Newsfeed from '@vkontakte/icons/dist/24/newsfeed';
 import Icon24StoryOutline from '@vkontakte/icons/dist/24/story_outline';
@@ -56,7 +52,14 @@ const AboutPanel = (props) => {
 				>
 					Полезные советы
 				</Cell>
-				<Cell expandable before={<Icon28ArticleOutline />} onClick={() => {}}>
+				<Cell
+					expandable
+					before={<Icon28ArticleOutline />}
+					description="Пользовательское соглашение"
+					onClick={() => {
+						setPage(PANEL_LICENCE);
+					}}
+				>
 					Условия использования
 				</Cell>
 			</Group>

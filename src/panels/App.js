@@ -9,8 +9,6 @@ import {
 	TabbarItem,
 	ScreenSpinner,
 	ConfigProvider,
-	Footer,
-	Link,
 } from '@vkontakte/vkui';
 
 import { STORY_ADS, STORY_CREATE } from './../store/router/storyTypes';
@@ -28,9 +26,10 @@ import {
 	PANEL_ABOUT,
 	PANEL_FAQ,
 	PANEL_ADVICES,
+	PANEL_LICENCE,
 } from './../store/router/panelTypes';
 
-import { MODAL_ADS_FILTERS, MODAL_ADS_GEO, MODAL_ADS_SUBS } from './../store/router/modalTypes';
+import { MODAL_ADS_FILTERS, MODAL_ADS_GEO } from './../store/router/modalTypes';
 
 import './main.css';
 
@@ -63,7 +62,6 @@ import AddsTabs from './story/adds/AddsTabs';
 import Create from './../containers/create/create';
 
 import Icon28User from '@vkontakte/icons/dist/28/user';
-import Icon24MoreHorizontal from '@vkontakte/icons/dist/24/more_horizontal';
 import Icon28NewsfeedOutline from '@vkontakte/icons/dist/28/newsfeed_outline';
 import Icon28Add from '@vkontakte/icons/dist/28/add_outline';
 
@@ -87,8 +85,6 @@ import { Auth, getToken, fail, getNotificationCounter } from '../requests';
 import Error from './placeholders/error';
 import NotHere from './placeholders/NotHere';
 
-import Profile from './story/profile/Profile';
-
 import { AddrWS } from '../store/addr_ws';
 
 import Comments from './story/adds/tabs/comments/comments';
@@ -96,7 +92,7 @@ import Comments from './story/adds/tabs/comments/comments';
 import { inputArgs } from '../utils/window';
 
 import Centrifuge from 'centrifuge';
-import { FORM_CREATE, FORM_ADS } from '../components/categories/redux';
+import { FORM_CREATE } from '../components/categories/redux';
 import { setFormData } from '../store/create_post/actions';
 import { ADS_FILTERS, EDIT_MODE, CREATE_AD_MAIN, CREATE_AD_ITEM } from '../store/create_post/types';
 import AdsModal from '../containers/ads/modal';
@@ -104,12 +100,12 @@ import { defaultInputData } from '../components/create/default';
 import { updateDealInfo } from '../store/detailed_ad/update';
 import { store } from '..';
 import AdMap from '../containers/location/map';
-import { SET_TO_HISTORY } from '../store/detailed_ad/actionTypes';
 
 import ProfilePanel from './profile';
 import AboutPanel from './about';
 import FAQPanel from './faq';
 import AdvicePanel from './advice';
+import LicencePanel from './licence';
 
 const adsText = 'Объявления';
 const addText = 'Создать обьявление';
@@ -222,7 +218,6 @@ const App = (props) => {
 				switch (noteType) {
 					case NT_RESPOND: {
 						const noteValue = note.data.payload.author;
-						console.log('we add new value');
 						addSub(noteValue);
 					}
 				}
@@ -233,7 +228,6 @@ const App = (props) => {
 	}
 
 	useEffect(() => {
-		console.log('connecting useEffect ', AD.ad_id);
 		if (AD.ad_id <= 0) {
 			return;
 		}
@@ -273,7 +267,6 @@ const App = (props) => {
 	}, [AD.ad_id]);
 
 	useEffect(() => {
-		//....
 		getNotificationCounter(
 			(r) => {
 				console.log('r.data.number', r.number);
@@ -299,20 +292,11 @@ const App = (props) => {
 		}
 
 		if (hash) {
-			console.log('we set hash', hash);
 			setReduxAd({ ad_id: Number(hash) });
 		}
 
 		dispatch(setPlatform(vk_platform));
 		dispatch(setAppID(app_id));
-
-		// bridge
-		// 	.send('VKWebAppGetAuthToken', { app_id: 7360033, scope: 'status' })
-		// 	.then((res) => {
-		// 		console.log('sucess VKWebAppGetAuthToken', res);
-		// 		return res.access_token;
-		// 	})
-
 		dispatch(VK.getAuthToken());
 
 		window.history.pushState({ currPanel: PANEL_ADS, ad: AdDefault }, PANEL_ADS);
@@ -470,6 +454,9 @@ const App = (props) => {
 					</Panel>
 					<Panel id={PANEL_ADVICES}>
 						<AdvicePanel />
+					</Panel>
+					<Panel id={PANEL_LICENCE}>
+						<LicencePanel />
 					</Panel>
 					<Panel id={PANEL_COMMENTS}>
 						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>

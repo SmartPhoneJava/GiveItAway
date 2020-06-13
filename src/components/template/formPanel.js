@@ -20,6 +20,7 @@ const FormPanel = (props) => {
 		snackbars,
 		story,
 		panels,
+		afterClick,
 	} = props;
 
 	const [search, setSearch] = useState('');
@@ -53,7 +54,9 @@ const FormPanel = (props) => {
 				[field]: cat,
 			});
 		}
-		goBack();
+		if (!afterClick) {
+			goBack();
+		}
 	}
 
 	return (
