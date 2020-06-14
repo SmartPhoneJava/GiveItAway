@@ -20,6 +20,7 @@ import {
 	PANEL_COMMENTS,
 	PANEL_CREATE,
 	PANEL_CATEGORIES,
+	PANEL_SUBCATEGORIES,
 	PANEL_CITIES,
 	PANEL_COUNTRIES,
 	PANEL_MAP,
@@ -106,6 +107,7 @@ import AboutPanel from './about';
 import FAQPanel from './faq';
 import AdvicePanel from './advice';
 import LicencePanel from './licence';
+import SubcategoriesPanel from '../components/categories/subcategory_panel';
 
 const adsText = 'Объявления';
 const addText = 'Создать обьявление';
@@ -475,11 +477,21 @@ const App = (props) => {
 						{snackbars[PANEL_SUBS]}
 					</Panel>
 					<Panel id={PANEL_CATEGORIES}>
-						<PanelHeader left={<PanelHeaderBack onClick={backToAdsFilters} />}>
-							Выберите категорию
-						</PanelHeader>
 						<CategoriesPanel goBack={backToAdsFilters} redux_form={ADS_FILTERS} />
 					</Panel>
+					<Panel id={PANEL_SUBCATEGORIES}>
+						<SubcategoriesPanel
+							goBack={goBack}
+							goNext={() => {
+								goBack();
+								goBack();
+								openModal(MODAL_ADS_FILTERS);
+							}}
+							redux_form={ADS_FILTERS}
+						/>
+					</Panel>
+				
+
 					<Panel id={PANEL_COUNTRIES}>
 						<PanelHeader left={<PanelHeaderBack onClick={backToGeoFilters} />}>Выберите страну</PanelHeader>
 						<Countries goBack={backToGeoFilters} redux_form={ADS_FILTERS} />
@@ -510,9 +522,19 @@ const App = (props) => {
 						{snackbars[PANEL_CREATE]}
 					</Panel>
 					<Panel id={PANEL_CATEGORIES}>
-						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>Выберите категорию</PanelHeader>
 						<CategoriesPanel redux_form={FORM_CREATE} goBack={goBack} />
 					</Panel>
+					<Panel id={PANEL_SUBCATEGORIES}>
+						<SubcategoriesPanel
+							goNext={() => {
+								goBack();
+								goBack();
+							}}
+							goBack={goBack}
+							redux_form={FORM_CREATE}
+						/>
+					</Panel>
+					
 					<Panel id={PANEL_COUNTRIES}>
 						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>Выберите страну</PanelHeader>
 						<Countries redux_form={FORM_LOCATION_CREATE} goBack={goBack} />

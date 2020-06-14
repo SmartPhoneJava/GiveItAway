@@ -56,6 +56,8 @@ const FormPanel = (props) => {
 		}
 		if (!afterClick) {
 			goBack();
+		} else {
+			afterClick()
 		}
 	}
 

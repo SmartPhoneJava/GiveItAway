@@ -49,7 +49,7 @@ import Icon24Place from '@vkontakte/icons/dist/24/place';
 import Subs, { Given } from './../story/adds/tabs/subs/subs';
 import { subscribe, unsubscribe } from './../story/adds/tabs/subs/requests';
 
-import { K } from './../story/profile/Profile';
+import { K } from './../story/profile/const';
 
 import Icon24Coins from '@vkontakte/icons/dist/24/coins';
 import Icon24Help from '@vkontakte/icons/dist/24/help';

@@ -29,7 +29,7 @@ import { NoRegion } from './../../../components/location/const';
 import Location from './../../../components/location/label';
 
 import { PeopleRB } from './../../template/People';
-import { K } from '../profile/Profile';
+import { K } from '../profile/const';
 
 import {
 	MODAL_ADS_FILTERS,

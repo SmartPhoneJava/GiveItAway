@@ -415,7 +415,7 @@ export function GetCategoryText(category) {
 		case CategoryPlay:
 			return 'Игры и развлечения';
 		case CategorySport:
-			return 'Спортивный инвентарь';
+			return 'Спорт и отдых';
 		case CategoryNo:
 			return 'Все категории';
 	}
