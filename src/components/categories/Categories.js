@@ -100,6 +100,7 @@ export const CategoryChildren = 'children';
 export const CategoryClothers = 'clothers';
 export const CategoryCosmetic = 'cosmetic';
 export const CategoryElectronics = 'electronics';
+export const CategoryTechnic = 'technic';
 export const CategoryFlora = 'flora';
 export const CategoryFood = 'food';
 export const CategoryFurniture = 'furniture';
@@ -399,21 +400,23 @@ export function GetCategoryText(category) {
 		case CategoryCosmetic:
 			return 'Косметика, бижутерия, парфюмерия';
 		case CategoryElectronics:
-			return 'Бытовая техника и электроника';
+			return 'Электроника';
+		case CategoryTechnic:
+			return 'Бытовая техника';
 		case CategoryFlora:
 			return 'Растения';
 		case CategoryFood:
 			return 'Продукты питания';
 		case CategoryFurniture:
 			return 'Мебель';
-		case CategoryMusic:
-			return 'Музыкальные инструменты';
+		// case CategoryMusic:
+		// 	return 'Музыкальные инструменты';
 		case CategoryOld:
 			return 'Средства реабилитации';
 		case CategoryPencil:
-			return 'Канцтовары';
-		case CategoryPlay:
-			return 'Игры и развлечения';
+			return 'Игры и хобби';
+		// case CategoryPlay:
+		// 	return 'Игры и развлечения';
 		case CategorySport:
 			return 'Спорт и отдых';
 		case CategoryNo:
@@ -428,7 +431,6 @@ export function GetCategoryImageBig(category) {
 }
 
 export function GetCategoryImage(category) {
-	
 	let image = GetCategory50(category);
 	return (
 		<img
@@ -455,13 +457,14 @@ export const categories = [
 	CategoryClothers,
 	CategoryCosmetic,
 	CategoryElectronics,
+	CategoryTechnic, //! new
 	CategoryFlora,
 	CategoryFood,
 	CategoryFurniture,
-	CategoryMusic,
+	// CategoryMusic,
 	CategoryOld,
 	CategoryPencil,
-	CategoryPlay,
+	// CategoryPlay,
 	CategorySport,
 	CategoryAnother,
 ];

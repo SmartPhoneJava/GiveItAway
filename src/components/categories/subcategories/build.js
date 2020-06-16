@@ -119,15 +119,15 @@ export const s11Build12 = 'Домофоны и вызывные панели';
 export const s11Build13 = 'Переносные светильники';
 export const s11Build14 = 'Аварийное освещение';
 
-export const gBuild12 = 'Инструменты';
-export const s12Build1 = 'Электроинструменты';
-export const s12Build2 = 'Оснастка для электроинструмента';
-export const s12Build3 = 'Оборудование для мастерской';
-export const s12Build4 = 'Измерительная техника';
-export const s12Build5 = 'Пневмоинструменты и аксессуары';
-export const s12Build6 = 'Строительная техника';
-export const s12Build7 = 'Ручные инструменты';
-export const s12Build8 = 'Организация рабочего места';
+export const gBuild2 = 'Инструменты';
+export const s2Build1 = 'Электроинструменты';
+export const s2Build2 = 'Оснастка для электроинструмента';
+export const s2Build3 = 'Оборудование для мастерской';
+export const s2Build4 = 'Измерительная техника';
+export const s2Build5 = 'Пневмоинструменты и аксессуары';
+export const s2Build6 = 'Строительная техника';
+export const s2Build7 = 'Ручные инструменты';
+export const s2Build8 = 'Организация рабочего места';
 
 export const BuildStruct = {
 	grouping: true,
@@ -154,6 +154,10 @@ export const BuildStruct = {
 				s1Build12,
 				s1Build13,
 			],
+		},
+		{
+			header: gBuild2,
+			array: [s2Build1, s2Build2, s2Build3, s2Build4, s2Build5, s2Build6, s2Build7, s2Build8],
 		},
 		{
 			header: gBuild3,
@@ -233,10 +237,6 @@ export const BuildStruct = {
 				s11Build13,
 				s11Build14,
 			],
-		},
-		{
-			header: gBuild12,
-			array: [s12Build1, s12Build2, s12Build3, s12Build4, s12Build5, s12Build6, s12Build7, s12Build8],
 		},
 	],
 };
