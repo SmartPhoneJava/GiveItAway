@@ -1,3 +1,5 @@
+import { GetCategoryText, CategoryAnimals } from "../Categories";
+
 export const gAnimal1 = 'Для кошек';
 export const s1Animal1 = 'Туалеты, совочки';
 export const s1Animal2 = 'Миски и поилки';
@@ -36,7 +38,6 @@ export const s2Animal15 = 'Туалеты и пеленки';
 export const s2Animal16 = 'Одежда и обувь';
 export const s2Animal17 = 'Контейнеры для корма';
 export const s2Animal18 = 'Аммуниция';
-export const s2Animal19 = 'Прочие аксессуары';
 
 export const gAnimal3 = 'Для грызунов и кроликов';
 export const s3Animal1 = 'Клетки, вольеры';
@@ -93,6 +94,7 @@ export const AnimalStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
+	header: GetCategoryText(CategoryAnimals),
 	show: 5,
 	data: [
 		{
@@ -138,7 +140,6 @@ export const AnimalStruct = {
 				s2Animal16,
 				s2Animal17,
 				s2Animal18,
-				s2Animal19,
 			],
 		},
 		{

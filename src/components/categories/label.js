@@ -7,7 +7,13 @@ import { GetCategoryImage, GetCategoryText, CategoryNo } from './Categories';
 
 const CategoriesLabel = (props) => {
 	const { redux_form, inputData } = props;
-	const category = inputData[redux_form] && inputData[redux_form].category ? inputData[redux_form].category : CategoryNo;
+	const category =
+		inputData[redux_form] && inputData[redux_form].category ? inputData[redux_form].category : CategoryNo;
+	const group = inputData[redux_form] && inputData[redux_form].group ? inputData[redux_form].group : CategoryNo;
+	const subcategory =
+		inputData[redux_form] && inputData[redux_form].subcategory ? inputData[redux_form].subcategory : CategoryNo;
+
+	// ! доделать const [category, setCategory] = us
 
 	return (
 		<div
@@ -27,6 +33,22 @@ const CategoriesLabel = (props) => {
 					placeholder={GetCategoryText(category)}
 					onClick={() => props.open()}
 				/>
+				{group ? (
+					<SelectMimicry
+						top="Раздел"
+						value={group}
+						placeholder={group}
+						onClick={() => props.open()}
+					/>
+				) : null}
+					{subcategory ? (
+					<SelectMimicry
+						top="Подкатегория"
+						value={subcategory}
+						placeholder={subcategory}
+						onClick={() => props.open()}
+					/>
+				) : null}
 			</FormLayout>
 		</div>
 	);

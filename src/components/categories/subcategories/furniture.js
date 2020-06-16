@@ -1,3 +1,5 @@
+import { CategoryFurniture, GetCategoryText } from "../Categories";
+
 export const gFurniture1 = 'Столы';
 export const s1Furniture1 = 'Компьютерные и письменные столы';
 export const s1Furniture2 = 'Парты';
@@ -50,6 +52,7 @@ export const FurnitureStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
+	header: GetCategoryText(CategoryFurniture),
 	show: 3,
 	data: [
 		{

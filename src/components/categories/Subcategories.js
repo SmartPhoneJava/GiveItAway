@@ -91,7 +91,7 @@ export function GetGroups(category) {
 	return groups;
 }
 
-export const AllStructs = [
+export const Subcategories = [
 	AnimalStruct,
 	BooksStruct,
 	BuildStruct,

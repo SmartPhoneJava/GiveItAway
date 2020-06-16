@@ -1,3 +1,5 @@
+import { GetCategoryText, CategoryOffice } from "../Categories";
+
 export const gOffice1 = 'Письменные принадлежности';
 export const s1Office1 = 'Ручки';
 export const s1Office2 = 'Аксессуары и расходники для ручек';
@@ -61,6 +63,7 @@ export const OfficeStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
+	header: GetCategoryText(CategoryOffice),
 	show: 3,
 	data: [
 		{

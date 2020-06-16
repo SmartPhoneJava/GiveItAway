@@ -1,3 +1,5 @@
+import { CategoryElectronics, GetCategoryText } from "../Categories";
+
 export const gElectronics1 = 'Портативная техника';
 export const s1Electronics1 = 'Смартфоны';
 export const s1Electronics2 = 'Планшеты';
@@ -83,6 +85,7 @@ export const ElectronicsStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
+	header: GetCategoryText(CategoryElectronics),
 	show: 3,
 	data: [
 		{

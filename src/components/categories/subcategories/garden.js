@@ -1,3 +1,5 @@
+import { CategoryGarden, GetCategoryText } from "../Categories";
+
 export const gGarden1 = 'Сезонные товары';
 export const s1Garden1 = 'Грили, мангалы, решетки';
 export const s1Garden2 = 'Биотуалеты';
@@ -65,6 +67,7 @@ export const GardenStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
+	header: GetCategoryText(CategoryGarden),
 	show: 3,
 	data: [
 		{

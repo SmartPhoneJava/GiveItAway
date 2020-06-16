@@ -1,3 +1,5 @@
+import { CategoryHealth, GetCategoryText } from "../Categories";
+
 export const gHealth1 = 'Оптика';
 export const s1Health1 = 'Контактные линзы';
 export const s1Health2 = 'Растворы для контактных линз';
@@ -69,6 +71,7 @@ export const HealthStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
+	header: GetCategoryText(CategoryHealth),
 	show: 3,
 	data: [
 		{

@@ -1,3 +1,5 @@
+import { CategoryHobby, GetCategoryText } from "../Categories";
+
 export const gHobby1 = 'Рисование';
 export const s1Hobby1 = 'Графические планшеты';
 export const s1Hobby2 = 'Мольберты';
@@ -108,7 +110,6 @@ export const s8Hobby17 = 'Пепельницы, зажигалки';
 export const s8Hobby18 = 'Пластиковые и спортивные карточки';
 export const s8Hobby19 = 'Фотографии, письма';
 export const s8Hobby20 = 'Этикетки, бутылки, пробки';
-export const s8Hobby21 = 'Другое';
 
 export const gHobby9 = 'Билеты и атрибутика для путешествий';
 export const s9Hobby1 = 'Карты и купоны';
@@ -124,6 +125,7 @@ export const HobbyStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
+	header: GetCategoryText(CategoryHobby),
 	show: 3,
 	data: [
 		{
@@ -243,7 +245,6 @@ export const HobbyStruct = {
 				s8Hobby18,
 				s8Hobby19,
 				s8Hobby20,
-				s8Hobby21,
 			],
 		},
 		{

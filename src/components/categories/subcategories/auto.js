@@ -1,3 +1,5 @@
+import { GetCategoryText, CategoryAuto } from "../Categories";
+
 export const gAuto1 = 'Шины и диски';
 export const s1Auto1 = 'Шины';
 export const s1Auto2 = 'Колесные диски';
@@ -55,10 +57,9 @@ export const s5Auto6 = 'Ключи';
 export const s5Auto7 = 'Отвертки';
 export const s5Auto8 = 'Плоскогубцы';
 export const s5Auto9 = 'Пассатижи';
-export const s5Auto10 = 'Прочие инструменты';
-export const s5Auto11 = 'Фонари';
-export const s5Auto12 = 'Насосы для подкачки шин';
-export const s5Auto13 = 'Мойки высокого давления';
+export const s5Auto10 = 'Фонари';
+export const s5Auto11 = 'Насосы для подкачки шин';
+export const s5Auto12 = 'Мойки высокого давления';
 
 export const gAuto6 = 'Противоугонные устройства';
 export const s6Auto1 = 'Автосигнализации';
@@ -116,6 +117,7 @@ export const AutoStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
+	header: GetCategoryText(CategoryAuto),
 	show: 3,
 	data: [
 		{
@@ -164,7 +166,6 @@ export const AutoStruct = {
 				s5Auto10,
 				s5Auto11,
 				s5Auto12,
-				s5Auto13,
 			],
 		},
 		{

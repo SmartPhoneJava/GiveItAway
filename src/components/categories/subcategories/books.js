@@ -1,3 +1,5 @@
+import { GetCategoryText, CategoryBooks } from "../Categories";
+
 export const gBooks1 = 'Развитие и образование';
 export const s1Books1 = 'Историческая литература';
 export const s1Books2 = 'Наука и образование';
@@ -28,7 +30,7 @@ export const s2Books11 = 'Фантастика и фэнтези';
 export const s2Books12 = 'юмор и сатира';
 export const s2Books13 = 'Мир увлечений';
 
-export const gBooks3 = 'Другое';
+export const gBooks3 = 'Другая литература';
 export const s3Books1 = 'Журналы и газеты';
 export const s3Books2 = 'Фотоальбомы';
 export const s3Books3 = 'Биографии и автобиографии';
@@ -43,6 +45,7 @@ export const BooksStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
+	header: GetCategoryText(CategoryBooks),
 	show: 5,
 	data: [
 		{

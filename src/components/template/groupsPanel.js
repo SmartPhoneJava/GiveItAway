@@ -16,6 +16,7 @@ import {
 	Footer,
 	CellButton,
 	Button,
+	Separator,
 } from '@vkontakte/vkui';
 
 import Icon24Done from '@vkontakte/icons/dist/24/done';
@@ -40,12 +41,20 @@ const GroupsPanel = (props) => {
 
 		allowCustom,
 		customText,
+
+		onlyHeaders,
+		settingsPanel,
+
+		searchArr,
+		userFieldName,
+
+		noVariant,
+		setNoVariant,
 	} = props;
 	if (Groups == null) {
 		return;
 	}
 
-	const [noVariant, setNoVariant] = useState(false);
 	const [myVariant, setMyVariant] = useState('');
 	const [myVariantClicked, setMyVariantClicked] = useState(false);
 
@@ -59,23 +68,25 @@ const GroupsPanel = (props) => {
 
 	const value = props.inputData[redux_form] ? props.inputData[redux_form][field] : null;
 
-	function isDone(cat) {
+	function isDone(cat, getText) {
 		if (!value) {
 			return cat == none_value;
 		}
 		return getText(value) == getText(cat);
 	}
 
-	function onCellClick(cat) {
+	function onCellClick(group, cat) {
+		const setNewValue =
+			group.array.filter((g) => cat).length > 0 || cat == 'Другое' ? group.header + '|>_<|' + cat : cat;
 		if (props.clear) {
 			props.setFormData(redux_form, {
 				...defaultInputData,
-				[field]: cat,
+				[field]: setNewValue,
 			});
 		} else {
 			props.setFormData(redux_form, {
 				...props.inputData[redux_form],
-				[field]: cat,
+				[field]: setNewValue,
 			});
 		}
 		if (!afterClick) {
@@ -102,13 +113,134 @@ const GroupsPanel = (props) => {
 		setNoVariant(true);
 	};
 
+	const ShowCell = (gr, v, gt, gi, withB, descriptionArr) => {
+		const getText = gt || ((v) => v);
+		const getImage = gi || ((v) => null);
+		const text = getText(v);
+		const darr = descriptionArr || [];
+		const dlen = darr.length;
+		const addSymbol = dlen > 6 ? '...' : '';
+		const isHeader = gr.header == v;
+		let done = false;
+		if (isHeader) {
+			done = gr.array.filter((a) => isDone(a, getText)).length > 0;
+		} else {
+			done = isDone(v, getText);
+		}
+		return (
+			<Cell
+				// expandable
+				multiline
+				key={text}
+				before={getImage(v)}
+				description={darr.length == 0 ? null : darr.filter((v, i) => i < 6).join(', ') + addSymbol}
+				asideContent={done ? <Icon24Done /> : null}
+				onClick={() => {
+					if (descriptionArr) {
+						setChoosenGroup(gr);
+					} else {
+						onCellClick(v);
+					}
+				}}
+			>
+				{withB ? <b>{text}</b> : text}
+			</Cell>
+		);
+	};
+
+	const ShowGroup = (gr) => {
+		const getImage = gr.getImageFunc || ((v) => null);
+		const getText = gr.getTextFunc || ((v) => v);
+		const cellArr = gr.data
+			.map((group) => {
+				const canShow = (i) => {
+					const g1show = group.show || 0;
+					const g2show = gr.show || 0;
+					let show = g1show;
+					if (show < g2show) {
+						show = g2show;
+					}
+					return gr.showAll || group.showAllBtn || i < show;
+				};
+				let arr = [...group.array, group.header].filter((v) => filter(v).toLowerCase().indexOf(search) != -1);
+				const notFound = arr.length == 0;
+				arr = arr.filter((g) => group.header != g);
+				const len1 = arr.length;
+				arr = arr.filter((v, i) => canShow(i));
+				const len2 = arr.length;
+
+				const needShowAllBtn = len1 != len2;
+
+				return notFound ? null : onlyHeaders ? (
+					ShowCell(group, group.header, getText, getImage, false, arr)
+				) : (
+					<Group key={group.header} header={ShowCell(group, group.header, getText, getImage, true)}>
+						<List>{arr.map((v) => ShowCell(group, v, getText, getImage))}</List>
+						{needShowAllBtn ? (
+							<Div>
+								<Link
+									onClick={() => {
+										setChoosenGroup(group);
+									}}
+								>
+									Показать все
+								</Link>
+							</Div>
+						) : null}
+					</Group>
+				);
+			})
+			.filter((el) => el);
+		console.log('cellArr', gr.header, cellArr);
+		return cellArr.length > 0 ? (
+			<Group header={<Header mode="secondary">{gr.header}</Header>}>{cellArr}</Group>
+		) : null;
+	};
+
+	const ShowList = (gr) => {
+		const getImage = gr.getImageFunc || ((v) => null);
+		const getText = gr.getTextFunc || ((v) => v);
+		return gr.data
+			.filter((v) => filter(v).toLowerCase().indexOf(search) != -1)
+			.map((v) => ShowCell(gr, v, getText, getImage));
+	};
+
+	const ShowGroups = () => {
+		const mainGroup = ShowGroup(Groups);
+		const otherGroups = search.length > 0 ? SearchEverywere() : null;
+		return mainGroup || otherGroups ? (
+			<>
+				<Separator />
+				{mainGroup}
+				{otherGroups}
+				{allowCustom ? (
+					<Footer>
+						<Link onClick={showMyVariant}>{customText}</Link>
+					</Footer>
+				) : null}
+			</>
+		) : (
+			props.placeholder
+		);
+	};
+
+	const SearchEverywere = () => {
+		const foundCells = searchArr
+			.filter((g) => g.header != Groups.header)
+			.map((sGroup) => ShowGroup(sGroup))
+			.filter((v) => v);
+		return foundCells.length > 0 ? (
+			<Group header={<Header mode="primary">Найдено в других категориях</Header>}>
+				<Separator />
+				{foundCells}
+			</Group>
+		) : null;
+	};
+
 	const isValid = () => myVariant && myVariant.length > 2 && myVariant.length < 30;
 
 	const grouping = Groups.grouping;
 	const filter = props.filterFunc || ((v) => v);
-	const getImage = Groups.getImageFunc || ((v) => null);
-	const getText = Groups.getTextFunc || ((v) => v);
-	console.log('grouping', grouping);
 
 	return (
 		<>
@@ -119,8 +251,8 @@ const GroupsPanel = (props) => {
 					</CellButton>
 					<FormLayout>
 						<Input
-							top="Подкатегория"
-							name="Подкатегория"
+							top={userFieldName}
+							name={userFieldName}
 							value={myVariant}
 							placeholder="Мой вариант"
 							onChange={handleInput}
@@ -147,128 +279,21 @@ const GroupsPanel = (props) => {
 					{grouping ? (
 						choosenGroup ? (
 							<List>
-								{choosenGroup.array.map((v, i) => {
-									return (
-										<Cell
-											key={getText(v)}
-											before={getImage(v)}
-											onClick={() => {
-												onCellClick(v);
-											}}
-											asideContent={isDone(v) ? <Icon24Done /> : null}
-											// draggable
-											// onDragFinish={({ from, to }) => {
-											// 	const draggingList = [...cats];
-											// 	draggingList.splice(from, 1);
-											// 	draggingList.splice(to, 0, cats[from]);
-											// 	setCats(draggingList);
-											// }}
-										>
-											{getText ? getText(v) : v}
-										</Cell>
-									);
-								})}
+								{choosenGroup.array
+									.filter((v) => v.toLowerCase().indexOf(search) != -1)
+									.map((v) => ShowCell(choosenGroup, v, Groups.getTextFunc, Groups.getImageFunc))}
 							</List>
 						) : (
 							<>
-								{Groups.data.map((group, gindex) => {
-									const canShow = (i) => {
-										const g1show = group.show || 0;
-										const g2show = Groups.show || 0;
-										let show = g1show;
-										if (show < g2show) {
-											show = g2show;
-										}
-										return Groups.showAll || group.showAllBtn || i < show;
-									};
-									let arr = group.array.filter((v) => filter(v).toLowerCase().indexOf(search) != -1);
-									const len1 = arr.length;
-									arr = arr.filter((v, i) => canShow(i));
-									const len2 = arr.length;
-
-									const needShowAllBtn = len1 != len2;
-									return arr.length == 0 ? null : (
-										<Group
-											key={group.header}
-											header={
-												<Header
-													onClick={() => {
-														onCellClick(group.header);
-													}}
-												>
-													{group.header}
-												</Header>
-											}
-										>
-											<List>
-												{arr.map((v, i) => {
-													return (
-														<Cell
-															key={getText(v)}
-															before={getImage(v)}
-															onClick={() => {
-																onCellClick(v);
-															}}
-															asideContent={isDone(v) ? <Icon24Done /> : null}
-															// draggable
-															// onDragFinish={({ from, to }) => {
-															// 	const draggingList = [...cats];
-															// 	draggingList.splice(from, 1);
-															// 	draggingList.splice(to, 0, cats[from]);
-															// 	setCats(draggingList);
-															// }}
-														>
-															{getText ? getText(v) : v}
-														</Cell>
-													);
-												})}
-											</List>
-											{needShowAllBtn ? (
-												<Div>
-													<Link
-														onClick={() => {
-															setChoosenGroup(group);
-														}}
-													>
-														Показать все
-													</Link>
-												</Div>
-											) : null}
-										</Group>
-									);
-								})}
-
-								{allowCustom ? (
-									<Footer>
-										<Link onClick={showMyVariant}>{customText}</Link>
-									</Footer>
-								) : null}
+								{/* {settingsPanel ? (
+									<Group header={<Header mode="secondary">Настройки</Header>}>{settingsPanel}</Group>
+								) : null} */}
+								{settingsPanel}
+								{ShowGroups()}
 							</>
 						)
 					) : (
-						<Group>
-							{Groups.data
-								.filter((v) => filter(v).toLowerCase().indexOf(search) != -1)
-								.map((v) => (
-									<Cell
-										key={getText(v)}
-										before={getImage(v)}
-										onClick={() => {
-											onCellClick(v);
-										}}
-										asideContent={isDone(v) ? <Icon24Done /> : null}
-										// draggable
-										// onDragFinish={({ from, to }) => {
-										// 	const draggingList = [...cats];
-										// 	draggingList.splice(from, 1);
-										// 	draggingList.splice(to, 0, cats[from]);
-										// 	setCats(draggingList);
-										// }}
-									>
-										<Div>{getText(v)}</Div>
-									</Cell>
-								))}
-						</Group>
+						ShowList(Groups)
 					)}
 				</>
 			)}
@@ -292,3 +317,5 @@ const mapDispatchToProps = {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(GroupsPanel);
+
+// 272

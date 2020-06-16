@@ -1,3 +1,5 @@
+import { CategoryOnline, GetCategoryText } from "../Categories";
+
 export const gOnline1 = 'Программное обеспечение';
 export const s1Online1 = 'Удаленная работа';
 export const s1Online2 = 'Антивирусы и безопасность';
@@ -71,6 +73,7 @@ export const OnlineStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
+	header: GetCategoryText(CategoryOnline),
 	show: 3,
 	data: [
 		{

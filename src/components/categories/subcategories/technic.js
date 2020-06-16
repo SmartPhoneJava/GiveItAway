@@ -1,3 +1,5 @@
+import { GetCategoryText, CategoryTechnic } from "../Categories";
+
 export const gTechnic1 = 'Крупная техника для кухни';
 export const s1Technic1 = 'Холодильники';
 export const s1Technic2 = 'Посудомоечные машины';
@@ -54,7 +56,6 @@ export const s5Technic6 = 'Мясорубки';
 export const s5Technic7 = 'Приготовление напитков';
 export const s5Technic8 = 'Измельчение и смешивание';
 export const s5Technic9 = 'Приготовление блюд';
-export const s5Technic10 = 'Прочая техника';
 
 export const gTechnic6 = 'Техника для красоты';
 export const s6Technic1 = 'Фены и фен-щётки';
@@ -123,6 +124,7 @@ export const TechnicStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
+	header: GetCategoryText(CategoryTechnic),
 	show: 3,
 	data: [
 		{
@@ -188,7 +190,6 @@ export const TechnicStruct = {
 				s5Technic7,
 				s5Technic8,
 				s5Technic9,
-				s5Technic10,
 			],
 		},
 		{
