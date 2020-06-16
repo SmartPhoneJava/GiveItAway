@@ -5,9 +5,11 @@ import { ChildStruct } from './subcategories/child';
 import { connect } from 'react-redux';
 
 import { PanelHeader, PanelHeaderBack } from '@vkontakte/vkui';
+import { GetGroups } from './Subcategories';
 const SubcategoriesPanel = (props) => {
 	const [category, setCategory] = useState(CategoryNo);
 	const [choosenGroup, setChoosenGroup] = useState();
+	const [struct, setStruct] = useState(ChildStruct);
 
 	useEffect(() => {
 		const cat =
@@ -15,6 +17,7 @@ const SubcategoriesPanel = (props) => {
 			CategoryNo;
 		if (cat != CategoryNo) {
 			setCategory(cat);
+			setStruct(GetGroups(cat))
 		}
 		console.log('loook at cat', cat, props.formData.forms[props.redux_form]);
 	}, [props.formData.forms[props.redux_form].category]);
@@ -45,7 +48,7 @@ const SubcategoriesPanel = (props) => {
 				<p className="panel-header">{choosenGroup ? choosenGroup.header : GetCategoryText(category)}</p>
 			</PanelHeader>
 			<GroupsPanel
-				Groups={ChildStruct}
+				Groups={struct}
 				choosenGroup={choosenGroup}
 				setChoosenGroup={setChoosenGroup}
 				redux_form={props.redux_form}

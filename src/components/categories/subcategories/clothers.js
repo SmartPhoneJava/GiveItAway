@@ -1,22 +1,3 @@
-import React, { useState } from 'react';
-import { Group, Cell, Header, List, FormLayout, FormLayoutGroup, Radio, SelectMimicry, Avatar } from '@vkontakte/vkui';
-
-// export const SubCategoryAnimals = 'animals';
-// export const CategoryAnother = 'another';
-// export const CategoryBooks = 'books';
-// export const CategoryClothes = 'Clothes';
-// export const CategoryClothers = 'clothers';
-// export const CategoryCosmetic = 'cosmetic';
-// export const CategoryElectronics = 'electronics';
-// export const CategoryFlora = 'flora';
-// export const CategoryFood = 'food';
-// export const CategoryFurniture = 'furniture';
-// export const CategoryMusic = 'music';
-// export const CategoryOld = 'old';
-// export const CategoryPencil = 'pencil';
-// export const CategoryPlay = 'play';
-// export const CategorySport = 'sport';
-
 export const gClothes1 = 'Женская одежда';
 export const s1Clothes1 = 'Футболки';
 export const s1Clothes2 = 'Платья';
@@ -209,31 +190,31 @@ export const s12Clothes15 = 'Распашонки';
 export const s12Clothes16 = 'Спальные мешки';
 export const s12Clothes17 = 'Футболки и топы';
 
-export const gClothes12 = 'Аксессуары';
-export const s12Clothes1 = 'Аксессуары для волос';
-export const s12Clothes2 = 'Бижутерия';
-export const s12Clothes3 = 'Веера';
-export const s12Clothes4 = 'Галстуки и бабочки';
-export const s12Clothes5 = 'Декор для одежды';
-export const s12Clothes6 = 'Зажигалки';
-export const s12Clothes7 = 'Зеркальца';
-export const s12Clothes8 = 'Зонты';
-export const s12Clothes9 = 'Клипсы для брюк';
-export const s12Clothes10 = 'Кошельки и кредитницы';
-export const s12Clothes11 = 'Маски для сна';
-export const s12Clothes12 = 'Носовые платки';
-export const s12Clothes13 = 'Перчатки и варежки';
-export const s12Clothes14 = 'Религиозные';
-export const s12Clothes15 = 'Ремни и пояса';
-export const s12Clothes16 = 'Трекеры световые';
-export const s12Clothes17 = 'Часы и ремешки';
-export const s12Clothes18 = 'Чехлы';
-export const s12Clothes19 = 'Обложки для документов';
-export const s12Clothes20 = 'Визитницы и кредитницы';
+export const gClothes13 = 'Аксессуары';
+export const s13Clothes1 = 'Аксессуары для волос';
+export const s13Clothes2 = 'Бижутерия';
+export const s13Clothes3 = 'Веера';
+export const s13Clothes4 = 'Галстуки и бабочки';
+export const s13Clothes5 = 'Декор для одежды';
+export const s13Clothes6 = 'Зажигалки';
+export const s13Clothes7 = 'Зеркальца';
+export const s13Clothes8 = 'Зонты';
+export const s13Clothes9 = 'Клипсы для брюк';
+export const s13Clothes10 = 'Кошельки и кредитницы';
+export const s13Clothes11 = 'Маски для сна';
+export const s13Clothes12 = 'Носовые платки';
+export const s13Clothes13 = 'Перчатки и варежки';
+export const s13Clothes14 = 'Религиозные';
+export const s13Clothes15 = 'Ремни и пояса';
+export const s13Clothes16 = 'Трекеры световые';
+export const s13Clothes17 = 'Часы и ремешки';
+export const s13Clothes18 = 'Чехлы';
+export const s13Clothes19 = 'Обложки для документов';
+export const s13Clothes20 = 'Визитницы и кредитницы';
 
-export const gClothes13 = 'Другая одежда';
-export const s13Clothes1 = 'Свадьба';
-export const s13Clothes2 = 'Спецодежда';
+export const gClothes14 = 'Другая одежда';
+export const s14Clothes1 = 'Свадьба';
+export const s14Clothes2 = 'Спецодежда';
 
 export const ClothesStruct = {
 	grouping: true,
@@ -441,14 +422,36 @@ export const ClothesStruct = {
 				s12Clothes15,
 				s12Clothes16,
 				s12Clothes17,
-				s12Clothes18,
-				s12Clothes19,
-				s12Clothes20,
 			],
 		},
 		{
 			header: gClothes13,
-			array: [s13Clothes1, s13Clothes2],
+			array: [
+				s13Clothes1,
+				s13Clothes2,
+				s13Clothes3,
+				s13Clothes4,
+				s13Clothes5,
+				s13Clothes6,
+				s13Clothes7,
+				s13Clothes8,
+				s13Clothes9,
+				s13Clothes10,
+				s13Clothes11,
+				s13Clothes12,
+				s13Clothes13,
+				s13Clothes14,
+				s13Clothes15,
+				s13Clothes16,
+				s13Clothes17,
+				s13Clothes18,
+				s13Clothes19,
+				s13Clothes20,
+			],
+		},
+		{
+			header: gClothes14,
+			array: [s14Clothes1, s14Clothes2],
 		},
 	],
 };

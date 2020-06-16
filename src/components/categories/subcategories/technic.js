@@ -1,22 +1,3 @@
-import React, { useState } from 'react';
-import { Group, Cell, Header, List, FormLayout, FormLayoutGroup, Radio, SelectMimicry, Avatar } from '@vkontakte/vkui';
-
-// export const SubCategoryAnimals = 'animals';
-// export const CategoryAnother = 'another';
-// export const CategoryBooks = 'books';
-// export const CategoryTechnic = 'build';
-// export const CategoryClothers = 'clothers';
-// export const CategoryCosmetic = 'cosmetic';
-// export const CategoryElectronics = 'electronics';
-// export const CategoryFlora = 'flora';
-// export const CategoryFood = 'food';
-// export const CategoryFurniture = 'furniture';
-// export const CategoryMusic = 'music';
-// export const CategoryOld = 'old';
-// export const CategoryPencil = 'pencil';
-// export const CategoryPlay = 'play';
-// export const CategorySport = 'sport';
-
 export const gTechnic1 = 'Крупная техника для кухни';
 export const s1Technic1 = 'Холодильники';
 export const s1Technic2 = 'Посудомоечные машины';
@@ -32,13 +13,13 @@ export const s1Technic10 = 'Фильтры и умягчители для вод
 export const gTechnic2 = 'Техника для дома';
 export const s2Technic1 = 'Пылесосы';
 export const s2Technic2 = 'Веники и швабры';
-export const s2Technic2 = 'Электровеники и электрошвабры';
-export const s2Technic3 = 'Стиральный машины';
-export const s2Technic4 = 'Утюги';
-export const s2Technic5 = 'Парогенераторы';
-export const s2Technic6 = 'Сушильные машины';
-export const s2Technic7 = 'Отпариватели';
-export const s2Technic8 = 'Техника для ухода за одеждой';
+export const s2Technic3 = 'Электровеники и электрошвабры';
+export const s2Technic4 = 'Стиральный машины';
+export const s2Technic5 = 'Утюги';
+export const s2Technic6 = 'Парогенераторы';
+export const s2Technic7 = 'Сушильные машины';
+export const s2Technic8 = 'Отпариватели';
+export const s2Technic9 = 'Техника для ухода за одеждой';
 
 export const gTechnic3 = 'Климатическая техника';
 export const s3Technic1 = 'Кондиционеры';
@@ -161,7 +142,17 @@ export const TechnicStruct = {
 		},
 		{
 			header: gTechnic2,
-			array: [s2Technic1, s2Technic2, s2Technic3, s2Technic4, s2Technic5, s2Technic6, s2Technic7, s2Technic8],
+			array: [
+				s2Technic1,
+				s2Technic2,
+				s2Technic3,
+				s2Technic4,
+				s2Technic5,
+				s2Technic6,
+				s2Technic7,
+				s2Technic8,
+				s2Technic9,
+			],
 		},
 		{
 			header: gTechnic3,

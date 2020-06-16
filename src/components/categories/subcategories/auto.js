@@ -1,22 +1,3 @@
-import React, { useState } from 'react';
-import { Group, Cell, Header, List, FormLayout, FormLayoutGroup, Radio, SelectMimicry, Avatar } from '@vkontakte/vkui';
-
-// export const SubCategoryAnimals = 'animals';
-// export const CategoryAnother = 'another';
-// export const CategoryBooks = 'books';
-// export const CategoryAuto = 'build';
-// export const CategoryClothers = 'clothers';
-// export const CategoryCosmetic = 'cosmetic';
-// export const CategoryAuto = 'electronics';
-// export const CategoryFlora = 'flora';
-// export const CategoryFood = 'food';
-// export const CategoryFurniture = 'furniture';
-// export const CategoryMusic = 'music';
-// export const CategoryOld = 'old';
-// export const CategoryPencil = 'pencil';
-// export const CategoryPlay = 'play';
-// export const CategorySport = 'sport';
-
 export const gAuto1 = 'Шины и диски';
 export const s1Auto1 = 'Шины';
 export const s1Auto2 = 'Колесные диски';

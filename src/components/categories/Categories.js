@@ -19,23 +19,23 @@ import Play from './../../img/play.png';
 import Sport from './../../img/sport.png';
 import Question from './../../img/question.png';
 
-// import Animal400 from './../../img/400/animal.png';
-// import Another400 from './../../img/400/another.png';
-// import Book400 from './../../img/400/book.png';
-// import Build400 from './../../img/400/build.png';
-// import Child400 from './../../img/400/child.png';
-// import Clothers400 from './../../img/400/clothers.png';
-// import Cosmetic400 from './../../img/400/cosmetic.png';
-// import Electronics400 from './../../img/400/electronics.png';
-// import Flora400 from './../../img/400/flora.png';
-// import Food400 from './../../img/400/food.png';
-// import Furniture400 from './../../img/400/furniture.png';
-// import Music400 from './../../img/400/music.png';
-// import Old400 from './../../img/400/old.png';
-// import Pencil400 from './../../img/400/pencil.png';
-// import Play400 from './../../img/400/play.png';
-// import Sport400 from './../../img/400/sport.png';
-// import Question400 from './../../img/400/question.png';
+import Animal400 from './../../img/400/animal.png';
+import Another400 from './../../img/400/another.png';
+import Book400 from './../../img/400/book.png';
+import Build400 from './../../img/400/build.png';
+import Child400 from './../../img/400/child.png';
+import Clothers400 from './../../img/400/clothers.png';
+import Cosmetic400 from './../../img/400/cosmetic.png';
+import Electronics400 from './../../img/400/electronics.png';
+import Flora400 from './../../img/400/flora.png';
+import Food400 from './../../img/400/food.png';
+import Furniture400 from './../../img/400/furniture.png';
+import Music400 from './../../img/400/music.png';
+import Old400 from './../../img/400/old.png';
+import Pencil400 from './../../img/400/pencil.png';
+import Play400 from './../../img/400/play.png';
+import Sport400 from './../../img/400/sport.png';
+import Question400 from './../../img/400/question.png';
 
 import Animal100 from './../../img/100/animal.png';
 import Another100 from './../../img/100/another.png';
@@ -92,78 +92,93 @@ import Sport30 from './../../img/30/sport.png';
 import Question30 from './../../img/30/question.png';
 
 export const CategoryNo = 'Все категории';
-export const CategoryAnimals = 'animals';
 export const CategoryAnother = 'another';
+// export const CategoryCosmetic = 'cosmetic';
+// export const CategoryPlay = 'play';
+// export const CategoryFood = 'food';
+export const CategoryAnimals = 'animals';
 export const CategoryBooks = 'books';
 export const CategoryBuild = 'build';
 export const CategoryChildren = 'children';
 export const CategoryClothers = 'clothers';
-export const CategoryCosmetic = 'cosmetic';
 export const CategoryElectronics = 'electronics';
 export const CategoryTechnic = 'technic';
-export const CategoryFlora = 'flora';
-export const CategoryFood = 'food';
+export const CategoryGarden = 'garden';
 export const CategoryFurniture = 'furniture';
-export const CategoryMusic = 'music';
-export const CategoryOld = 'old';
-export const CategoryPencil = 'pencil';
-export const CategoryPlay = 'play';
+export const CategoryHobby = 'hobby';
+export const CategoryHealth = 'health';
+export const CategoryAuto = 'auto';
 export const CategorySport = 'sport';
+export const CategoryOffice = 'office';
+export const CategoryHome = 'home';
+export const CategoryOnline = 'online';
 
-// export function GetCategory400(category) {
-// 	let image = Another400;
-// 	switch (category) {
-// 		case CategoryAnimals:
-// 			image = Animal400;
-// 			break;
-// 		case CategoryBooks:
-// 			image = Book400;
-// 			break;
-// 		case CategoryBuild:
-// 			image = Build400;
-// 			break;
-// 		case CategoryChildren:
-// 			image = Child400;
-// 			break;
-// 		case CategoryClothers:
-// 			image = Clothers400;
-// 			break;
-// 		case CategoryCosmetic:
-// 			image = Cosmetic400;
-// 			break;
-// 		case CategoryElectronics:
-// 			image = Electronics400;
-// 			break;
-// 		case CategoryFlora:
-// 			image = Flora400;
-// 			break;
-// 		case CategoryFood:
-// 			image = Food400;
-// 			break;
-// 		case CategoryFurniture:
-// 			image = Furniture400;
-// 			break;
-// 		case CategoryMusic:
-// 			image = Music400;
-// 			break;
-// 		case CategoryOld:
-// 			image = Old400;
-// 			break;
-// 		case CategoryPencil:
-// 			image = Pencil400;
-// 			break;
-// 		case CategoryPlay:
-// 			image = Play400;
-// 			break;
-// 		case CategorySport:
-// 			image = Sport400;
-// 			break;
-// 		case CategoryNo:
-// 			image = Question400;
-// 			break;
-// 	}
-// 	return image;
-// }
+export function GetCategory400(category) {
+	let image = Another400;
+	switch (category) {
+		case CategoryAnimals:
+			image = Animal400;
+			break;
+		case CategoryBooks:
+			image = Book400;
+			break;
+		case CategoryBuild:
+			image = Build400;
+			break;
+		case CategoryChildren:
+			image = Child400;
+			break;
+		case CategoryClothers:
+			image = Clothers400;
+			break;
+		// case CategoryCosmetic:
+		// 	image = Cosmetic400;
+		// 	break;
+		case CategoryElectronics:
+			image = Electronics400;
+			break;
+		case CategoryTechnic:
+			image = Electronics400;
+			break;
+		case CategoryGarden:
+			image = Flora400;
+			break;
+		// case CategoryFood:
+		// 	image = Food400;
+		// 	break;
+		case CategoryFurniture:
+			image = Furniture400;
+			break;
+		case CategoryHobby:
+			image = Music400;
+			break;
+		case CategoryHealth:
+			image = Old400;
+			break;
+		case CategoryAuto:
+			image = Pencil400;
+			break;
+		case CategorySport:
+			image = Sport400;
+			break;
+		case CategoryOffice:
+			image = Pencil400;
+			break;
+		case CategoryHome:
+			image = Pencil400;
+			break;
+		case CategoryOnline:
+			image = Pencil400;
+			break;
+		// case CategoryPlay:
+		// 	image = Play400;
+		// 	break;
+		case CategoryNo:
+			image = Question400;
+			break;
+	}
+	return image;
+}
 
 export function GetCategory100(category) {
 	let image = Another100;
@@ -183,35 +198,47 @@ export function GetCategory100(category) {
 		case CategoryClothers:
 			image = Clothers100;
 			break;
-		case CategoryCosmetic:
-			image = Cosmetic100;
-			break;
+		// case CategoryCosmetic:
+		// 	image = Cosmetic100;
+		// 	break;
 		case CategoryElectronics:
 			image = Electronics100;
 			break;
-		case CategoryFlora:
+		case CategoryTechnic:
+			image = Electronics100;
+			break;
+		case CategoryGarden:
 			image = Flora100;
 			break;
-		case CategoryFood:
-			image = Food100;
-			break;
+		// case CategoryFood:
+		// 	image = Food100;
+		// 	break;
 		case CategoryFurniture:
 			image = Furniture100;
 			break;
-		case CategoryMusic:
+		case CategoryHobby:
 			image = Music100;
 			break;
-		case CategoryOld:
+		case CategoryHealth:
 			image = Old100;
 			break;
-		case CategoryPencil:
+		case CategoryAuto:
 			image = Pencil100;
-			break;
-		case CategoryPlay:
-			image = Play100;
 			break;
 		case CategorySport:
 			image = Sport100;
+			break;
+		// case CategoryPlay:
+		// 	image = Play100;
+		// 	break;
+		case CategoryOffice:
+			image = Pencil100;
+			break;
+		case CategoryHome:
+			image = Pencil100;
+			break;
+		case CategoryOnline:
+			image = Pencil100;
 			break;
 		case CategoryNo:
 			image = Question100;
@@ -238,33 +265,45 @@ export function GetCategory50(category) {
 		case CategoryClothers:
 			image = Clothers50;
 			break;
-		case CategoryCosmetic:
-			image = Cosmetic50;
-			break;
+		// case CategoryCosmetic:
+		// 	image = Cosmetic50;
+		// 	break;
 		case CategoryElectronics:
 			image = Electronics50;
 			break;
-		case CategoryFlora:
+		case CategoryTechnic:
+			image = Electronics50;
+			break;
+		case CategoryGarden:
 			image = Flora50;
 			break;
-		case CategoryFood:
-			image = Food50;
-			break;
+		// case CategoryFood:
+		// 	image = Food50;
+		// 	break;
 		case CategoryFurniture:
 			image = Furniture50;
 			break;
-		case CategoryMusic:
+		case CategoryHobby:
 			image = Music50;
 			break;
-		case CategoryOld:
+		case CategoryHealth:
 			image = Old50;
 			break;
-		case CategoryPencil:
+		case CategoryAuto:
 			image = Pencil50;
 			break;
-		case CategoryPlay:
-			image = Play50;
+		case CategoryOffice:
+			image = Pencil50;
 			break;
+		case CategoryHome:
+			image = Pencil50;
+			break;
+		case CategoryOnline:
+			image = Pencil50;
+			break;
+		// case CategoryPlay:
+		// 	image = Play50;
+		// 	break;
 		case CategorySport:
 			image = Sport50;
 			break;
@@ -293,33 +332,45 @@ export function GetCategory30(category) {
 		case CategoryClothers:
 			image = Clothers30;
 			break;
-		case CategoryCosmetic:
-			image = Cosmetic30;
-			break;
+		// case CategoryCosmetic:
+		// 	image = Cosmetic30;
+		// 	break;
 		case CategoryElectronics:
 			image = Electronics30;
 			break;
-		case CategoryFlora:
+		case CategoryTechnic:
+			image = Electronics30;
+			break;
+		case CategoryGarden:
 			image = Flora30;
 			break;
-		case CategoryFood:
-			image = Food30;
-			break;
+		// case CategoryFood:
+		// 	image = Food30;
+		// 	break;
 		case CategoryFurniture:
 			image = Furniture30;
 			break;
-		case CategoryMusic:
+		case CategoryHobby:
 			image = Music30;
 			break;
-		case CategoryOld:
+		case CategoryHealth:
 			image = Old30;
 			break;
-		case CategoryPencil:
+		case CategoryAuto:
 			image = Pencil30;
 			break;
-		case CategoryPlay:
-			image = Play30;
+		case CategoryOffice:
+			image = Pencil30;
 			break;
+		case CategoryHome:
+			image = Pencil30;
+			break;
+		case CategoryOnline:
+			image = Pencil30;
+			break;
+		// case CategoryPlay:
+		// 	image = Play30;
+		// 	break;
 		case CategorySport:
 			image = Sport30;
 			break;
@@ -348,33 +399,45 @@ export function GetCategory(category) {
 		case CategoryClothers:
 			image = Clothers;
 			break;
-		case CategoryCosmetic:
-			image = Cosmetic;
-			break;
+		// case CategoryCosmetic:
+		// 	image = Cosmetic;
+		// 	break;
 		case CategoryElectronics:
 			image = Electronics;
 			break;
-		case CategoryFlora:
+		case CategoryTechnic:
+			image = Electronics;
+			break;
+		case CategoryGarden:
 			image = Flora;
 			break;
-		case CategoryFood:
-			image = Food;
-			break;
+		// case CategoryFood:
+		// 	image = Food;
+		// 	break;
 		case CategoryFurniture:
 			image = Furniture;
 			break;
-		case CategoryMusic:
+		case CategoryHobby:
 			image = Music;
 			break;
-		case CategoryOld:
+		case CategoryHealth:
 			image = Old;
 			break;
-		case CategoryPencil:
+		case CategoryAuto:
 			image = Pencil;
 			break;
-		case CategoryPlay:
-			image = Play;
+		case CategoryOffice:
+			image = Pencil;
 			break;
+		case CategoryHome:
+			image = Pencil;
+			break;
+		case CategoryOnline:
+			image = Pencil;
+			break;
+		// case CategoryPlay:
+		// 	image = Play;
+		// 	break;
 		case CategorySport:
 			image = Sport;
 			break;
@@ -397,26 +460,32 @@ export function GetCategoryText(category) {
 			return 'Товары для детей';
 		case CategoryClothers:
 			return 'Одежда, обувь и сумки';
-		case CategoryCosmetic:
-			return 'Косметика, бижутерия, парфюмерия';
+		// case CategoryCosmetic:
+		// 	return 'Косметика, бижутерия, парфюмерия';
 		case CategoryElectronics:
 			return 'Электроника';
 		case CategoryTechnic:
 			return 'Бытовая техника';
-		case CategoryFlora:
-			return 'Растения';
-		case CategoryFood:
-			return 'Продукты питания';
+		case CategoryGarden:
+			return 'Дача и огород';
+		// case CategoryFood:
+		// 	return 'Продукты питания';
 		case CategoryFurniture:
 			return 'Мебель';
-		// case CategoryMusic:
-		// 	return 'Музыкальные инструменты';
-		case CategoryOld:
-			return 'Средства реабилитации';
-		case CategoryPencil:
+		case CategoryHobby:
 			return 'Игры и хобби';
+		case CategoryHealth:
+			return 'Здоровье';
+		case CategoryAuto:
+			return 'Автозапчасти';
+		case CategoryOffice:
+			return 'Офисные и письменные принадлежности';
 		// case CategoryPlay:
 		// 	return 'Игры и развлечения';
+		case CategoryHome:
+			return 'Для дома';
+		case CategoryOnline:
+			return 'Цифровые товары';
 		case CategorySport:
 			return 'Спорт и отдых';
 		case CategoryNo:
@@ -450,21 +519,26 @@ export function GetCategoryImageSmall(category) {
 
 export const categories = [
 	CategoryNo,
+
+	CategoryOnline,
 	CategoryAnimals,
 	CategoryBooks,
 	CategoryBuild,
 	CategoryChildren,
 	CategoryClothers,
-	CategoryCosmetic,
+	// CategoryCosmetic,
 	CategoryElectronics,
-	CategoryTechnic, //! new
-	CategoryFlora,
-	CategoryFood,
+	CategoryTechnic,
+	CategoryGarden,
+	// CategoryFood,
 	CategoryFurniture,
+	CategoryHobby,
 	// CategoryMusic,
-	CategoryOld,
-	CategoryPencil,
+	CategoryHealth,
+	CategoryAuto,
+	CategoryOffice,
 	// CategoryPlay,
 	CategorySport,
+	CategoryHome,
 	CategoryAnother,
 ];

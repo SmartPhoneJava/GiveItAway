@@ -1,22 +1,3 @@
-import React, { useState } from 'react';
-import { Group, Cell, Header, List, FormLayout, FormLayoutGroup, Radio, SelectMimicry, Avatar } from '@vkontakte/vkui';
-
-// export const SubCategoryAnimals = 'animals';
-// export const CategoryAnother = 'another';
-// export const CategoryBooks = 'books';
-// export const CategoryHealth = 'build';
-// export const CategoryClothers = 'clothers';
-// export const CategoryCosmetic = 'cosmetic';
-// export const CategoryElectronics = 'electronics';
-// export const CategoryFlora = 'flora';
-// export const CategoryFood = 'food';
-// export const CategoryFurniture = 'furniture';
-// export const CategoryMusic = 'music';
-// export const CategoryOld = 'old';
-// export const CategoryPencil = 'pencil';
-// export const CategoryPlay = 'play';
-// export const CategorySport = 'sport';
-
 export const gHealth1 = 'Оптика';
 export const s1Health1 = 'Контактные линзы';
 export const s1Health2 = 'Растворы для контактных линз';
@@ -62,9 +43,9 @@ export const gHealth6 = 'Массажеры';
 export const s6Health1 = 'Вибромассажеры';
 export const s6Health2 = 'Гидромассажеры';
 export const s6Health3 = 'Другие массажеры';
-export const s6Health3 = 'Массажные кресла';
-export const s6Health3 = 'Массажные матрасы и подушки';
-export const s6Health3 = 'Массажные столы и стулья';
+export const s6Health4 = 'Массажные кресла';
+export const s6Health5 = 'Массажные матрасы и подушки';
+export const s6Health6 = 'Массажные столы и стулья';
 
 export const gHealth7 = 'Медицинские изделия';
 export const s7Health1 = 'Аптечки и таблетницы';
@@ -73,14 +54,14 @@ export const s7Health3 = 'Вата';
 export const s7Health4 = 'Грелки';
 export const s7Health5 = 'Дезинфицирующие средства';
 export const s7Health6 = 'Маски и шапочки';
-export const s7Health6 = 'Медицинские шприцы, иглы';
-export const s7Health6 = 'Перевязочные бинты';
-export const s7Health6 = 'Перчатки медицинские';
-export const s7Health6 = 'Пластыри';
-export const s7Health6 = 'Повязки раневые';
-export const s7Health6 = 'Спринцовки';
-export const s7Health6 = 'Материалы для анализов и инъекций';
-export const s7Health6 = 'Кислородные баллончики';
+export const s7Health7 = 'Медицинские шприцы, иглы';
+export const s7Health8 = 'Перевязочные бинты';
+export const s7Health9 = 'Перчатки медицинские';
+export const s7Health10 = 'Пластыри';
+export const s7Health11 = 'Повязки раневые';
+export const s7Health12 = 'Спринцовки';
+export const s7Health13 = 'Материалы для анализов и инъекций';
+export const s7Health14 = 'Кислородные баллончики';
 
 export const HealthStruct = {
 	grouping: true,
@@ -112,11 +93,26 @@ export const HealthStruct = {
 		},
 		{
 			header: gHealth6,
-			array: [s6Health1, s6Health2, s6Health3],
+			array: [s6Health1, s6Health2, s6Health3, s6Health4, s6Health5, s6Health6],
 		},
 		{
 			header: gHealth7,
-			array: [s7Health1, s7Health2, s7Health3, s7Health4, s7Health5, s7Health6],
+			array: [
+				s7Health1,
+				s7Health2,
+				s7Health3,
+				s7Health4,
+				s7Health5,
+				s7Health6,
+				s7Health7,
+				s7Health8,
+				s7Health9,
+				s7Health10,
+				s7Health11,
+				s7Health12,
+				s7Health13,
+				s7Health14,
+			],
 		},
 	],
 };
