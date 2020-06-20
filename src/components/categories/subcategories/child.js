@@ -1,4 +1,4 @@
-import { CategoryChildren, GetCategoryText } from "../Categories";
+import { CategoryChildren } from "../const";
 
 export const gChild1 = 'Для мам и малышей';
 export const s1Child1 = 'Подгузники и пеленки';
@@ -97,7 +97,7 @@ export const ChildStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
-	header: GetCategoryText(CategoryChildren),
+	header: CategoryChildren, //GetCategoryText(CategoryChildren),
 	show: 3,
 	data: [
 		{

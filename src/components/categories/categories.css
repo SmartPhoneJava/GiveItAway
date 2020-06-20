@@ -1,3 +1,24 @@
-::placeholder { /* Internet Explorer 10-11 */
-    color: red;
-  }
+::placeholder {
+	/* Internet Explorer 10-11 */
+	color: red;
+}
+
+.hyphenate {
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	-webkit-hyphens: auto;
+	-ms-hyphens: auto;
+	-moz-hyphens: auto;
+	hyphens: auto;
+	color: grey;
+	flex: 1;
+	margin: 10px;
+	border-radius: 20px;
+	text-align: center;
+	align-items: center;
+	justify-content: center;
+	background-size: contain;
+	font-weight: 600;
+	/* background: linear-gradient(to top left, powderblue, pink); */
+	/* background: radial-gradient(circle at 50% 50%, aqua, darkblue); */
+}

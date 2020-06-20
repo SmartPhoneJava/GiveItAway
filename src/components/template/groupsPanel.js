@@ -17,10 +17,20 @@ import {
 	CellButton,
 	Button,
 	Separator,
+	Placeholder,
 } from '@vkontakte/vkui';
 
 import Icon24Done from '@vkontakte/icons/dist/24/done';
-import { setPage } from '../../store/router/actions';
+
+import Icon56InfoOutline from '@vkontakte/icons/dist/56/info_outline';
+import Columns from '../../panels/template/columns';
+
+export const CHOOSE_ANOTHER = 'another';
+
+const UserGroup = {
+	header: 'Пользовательское',
+	array: [],
+};
 
 const GroupsPanel = (props) => {
 	const {
@@ -50,10 +60,13 @@ const GroupsPanel = (props) => {
 
 		noVariant,
 		setNoVariant,
+		imageLeft,
 	} = props;
 	if (Groups == null) {
 		return;
 	}
+
+	console.log('imageLeftimageLeft', imageLeft);
 
 	const [myVariant, setMyVariant] = useState('');
 	const [myVariantClicked, setMyVariantClicked] = useState(false);
@@ -75,26 +88,50 @@ const GroupsPanel = (props) => {
 		return getText(value) == getText(cat);
 	}
 
-	function onCellClick(group, cat) {
-		const setNewValue =
-			group.array.filter((g) => cat).length > 0 || cat == 'Другое' ? group.header + '|>_<|' + cat : cat;
+	function onCellClick(group, value) {
 		if (props.clear) {
 			props.setFormData(redux_form, {
 				...defaultInputData,
-				[field]: setNewValue,
+				[field]: value,
 			});
 		} else {
 			props.setFormData(redux_form, {
 				...props.inputData[redux_form],
-				[field]: setNewValue,
+				[field]: value,
 			});
 		}
 		if (!afterClick) {
 			goBack();
 		} else {
-			afterClick();
+			afterClick(group, value);
 		}
 	}
+
+	const placeholder =
+		props.placeholder == CHOOSE_ANOTHER ? (
+			<Placeholder
+				style={{ whiteSpace: 'normal' }}
+				icon={<Icon56InfoOutline />}
+				header="Пусто"
+				action={
+					allowCustom ? (
+						<Button
+							onClick={() => {
+								onCellClick(choosenGroup, 'Другое');
+							}}
+							size="l"
+						>
+							Другое
+						</Button>
+					) : null
+				}
+			>
+				Результатов не найдено: измените поисковой запрос. Если ни один предложенный вариант не подходит,
+				выберите пункт "Другое".
+			</Placeholder>
+		) : (
+			props.placeholder
+		);
 
 	const handleInput = (e) => {
 		setMyVariant(e.currentTarget.value);
@@ -102,7 +139,7 @@ const GroupsPanel = (props) => {
 	};
 
 	const saveClick = () => {
-		onCellClick(myVariant);
+		onCellClick({ ...UserGroup, array: [myVariant] }, myVariant);
 	};
 
 	const hideMyVariant = () => {
@@ -127,23 +164,23 @@ const GroupsPanel = (props) => {
 		} else {
 			done = isDone(v, getText);
 		}
+
+		const img = <div style={{ marginRight: '10px' }}>{getImage(v)}</div>;
+		const description = darr.length == 0 ? null : darr.filter((v, i) => i < 6).join(', ') + addSymbol;
+
 		return (
 			<Cell
 				// expandable
 				multiline
 				key={text}
-				before={getImage(v)}
-				description={darr.length == 0 ? null : darr.filter((v, i) => i < 6).join(', ') + addSymbol}
-				asideContent={done ? <Icon24Done /> : null}
-				onClick={() => {
-					if (descriptionArr) {
-						setChoosenGroup(gr);
-					} else {
-						onCellClick(v);
-					}
-				}}
+				before={imageLeft ? img : null}
+				description={description}
+				onClick={() => onCellClick(gr, v)}
 			>
-				{withB ? <b>{text}</b> : text}
+				<div style={{ display: 'block' }}>
+					{imageLeft ? null : <div>{getImage(v)}</div>}
+					{withB ? <b>{text}</b> : <div>{text}</div>}
+				</div>
 			</Cell>
 		);
 	};
@@ -191,7 +228,7 @@ const GroupsPanel = (props) => {
 				);
 			})
 			.filter((el) => el);
-		console.log('cellArr', gr.header, cellArr);
+
 		return cellArr.length > 0 ? (
 			<Group header={<Header mode="secondary">{gr.header}</Header>}>{cellArr}</Group>
 		) : null;
@@ -215,13 +252,41 @@ const GroupsPanel = (props) => {
 				{otherGroups}
 				{allowCustom ? (
 					<Footer>
-						<Link onClick={showMyVariant}>{customText}</Link>
+						<Link
+							onClick={() => {
+								setNoVariant(true);
+							}}
+						>
+							{customText}
+						</Link>
 					</Footer>
 				) : null}
 			</>
 		) : (
-			props.placeholder
+			placeholder
 		);
+	};
+
+	const ShowChoosenGroup = () => {
+		const oneCellStyle = choosenGroup.oneCellStyle || ((v, i) => v);
+		const searchFunc =
+			choosenGroup.search ||
+			((arr, searchText) => {
+				return arr.filter((v) => v.toLowerCase().indexOf(searchText) != -1);
+			});
+		console.log('searchFuncsearchFunc', searchFunc);
+		const searched = searchFunc(choosenGroup.array, search);
+		if (searched == null) {
+			return null;
+		}
+		const gr = searched
+			.map((v) => ShowCell(choosenGroup, v, Groups.getTextFunc, Groups.getImageFunc))
+			.filter((v) => v)
+			.map((v, i) => oneCellStyle(v, i));
+
+		const listCellStyle = choosenGroup.listCellStyle || ((v) => v);
+
+		return gr.length > 0 ? listCellStyle(gr) : placeholder;
 	};
 
 	const SearchEverywere = () => {
@@ -278,11 +343,7 @@ const GroupsPanel = (props) => {
 					<Search value={search} onChange={handleSearch} />
 					{grouping ? (
 						choosenGroup ? (
-							<List>
-								{choosenGroup.array
-									.filter((v) => v.toLowerCase().indexOf(search) != -1)
-									.map((v) => ShowCell(choosenGroup, v, Groups.getTextFunc, Groups.getImageFunc))}
-							</List>
+							ShowChoosenGroup()
 						) : (
 							<>
 								{/* {settingsPanel ? (
@@ -313,7 +374,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
 	setFormData,
-	setPage,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(GroupsPanel);

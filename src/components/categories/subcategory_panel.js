@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { GetCategoryText, CategoryNo, categories, GetCategoryImageSmall } from './Categories';
-import GroupsPanel from '../template/groupsPanel';
-import { ChildStruct } from './subcategories/child';
 import { connect } from 'react-redux';
+
+import { PanelHeader, PanelHeaderBack, Switch, Cell, Placeholder, Button } from '@vkontakte/vkui';
 
 import Icon56InfoOutline from '@vkontakte/icons/dist/56/info_outline';
 
-import { PanelHeader, PanelHeaderBack, Switch, InfoRow, Cell, Placeholder, Button } from '@vkontakte/vkui';
+import { CategoryNo } from './const';
+import GroupsPanel, { CHOOSE_ANOTHER } from '../template/groupsPanel';
+import { ChildStruct } from './subcategories/child';
 import { GetGroups, Subcategories } from './Subcategories';
+import { setFormData } from '../../store/create_post/actions';
+
 const SubcategoriesPanel = (props) => {
 	const [category, setCategory] = useState(CategoryNo);
 	const [choosenGroup, setChoosenGroup] = useState();
@@ -16,26 +19,31 @@ const SubcategoriesPanel = (props) => {
 	const [searchEverywhere, setSearchEverywhere] = useState(true);
 	const [noVariant, setNoVariant] = useState(false);
 
+	const { formData, redux_form, setFormData } = props;
+
 	useEffect(() => {
-		const cat =
-			(props.formData.forms[props.redux_form] ? props.formData.forms[props.redux_form].category : null) ||
-			CategoryNo;
+		if (choosenGroup != formData.forms[redux_form].sublist) {
+			setChoosenGroup(formData.forms[redux_form].sublist);
+		}
+	}, [formData.forms[redux_form].sublist]);
+
+	useEffect(() => {
+		const cat = (formData.forms[redux_form] ? formData.forms[redux_form].category : null) || CategoryNo;
 		if (cat != CategoryNo) {
 			setCategory(cat);
 			setStruct(GetGroups(cat));
 		}
-		console.log('loook at cat', cat, props.formData.forms[props.redux_form]);
-	}, [props.formData.forms[props.redux_form].category]);
+	}, [formData.forms[redux_form].category]);
 
-	// useEffect(() => {
-	// 	const gr = props.formData.forms[props.redux_form] ? props.formData.forms[props.redux_form].group : null;
-	// 	setGroup(gr);
-	// 	console.log('loook at gr', gr, props.formData.forms[props.redux_form]);
-	// }, [props.formData.forms[props.redux_form].group]);
-
-	console.log('loook at ', props.formData);
-	console.log('we like ' + props.redux_form);
 	const allowCustom = true;
+
+	const setSubList = (v) => {
+		setFormData(redux_form, {
+			...formData.forms[redux_form],
+			sublist: v,
+		});
+	};
+
 	return (
 		<>
 			<PanelHeader
@@ -44,14 +52,15 @@ const SubcategoriesPanel = (props) => {
 						onClick={
 							choosenGroup
 								? () => {
-										setChoosenGroup(null);
+										setSubList(null);
+										props.goBack();
 								  }
 								: props.goBack
 						}
 					/>
 				}
 			>
-				<p className="panel-header">{choosenGroup ? choosenGroup.header : GetCategoryText(category)}</p>
+				<p className="panel-header">{choosenGroup ? choosenGroup.header : category}</p>
 			</PanelHeader>
 			<GroupsPanel
 				Groups={struct}
@@ -62,13 +71,23 @@ const SubcategoriesPanel = (props) => {
 						? choosenGroup
 						: { ...choosenGroup, array: [...choosenGroup.array, 'Другое'] }
 				}
-				setChoosenGroup={setChoosenGroup}
-				redux_form={props.redux_form}
+				setChoosenGroup={setSubList}
+				redux_form={redux_form}
 				goBack={props.goBack}
-				field={'subcategory'}
+				field={choosenGroup ? 'incategory' : 'subcategory'}
 				none_value={CategoryNo}
 				defaultInputData={CategoryNo}
-				afterClick={props.goNext}
+				afterClick={
+					choosenGroup
+						? (group, cell) => {
+								setSubList(null);
+								props.goNext();
+						  }
+						: (group, cell) => {
+								setSubList(group);
+								props.goNext();
+						  }
+				}
 				allowCustom={allowCustom}
 				customText="Нет нужного варианта?"
 				userFieldName="Подкатегория"
@@ -78,26 +97,30 @@ const SubcategoriesPanel = (props) => {
 				searchEverywhere={searchEverywhere}
 				searchArr={searchEverywhere ? Subcategories : []}
 				placeholder={
-					<Placeholder
-						style={{ whiteSpace: 'normal' }}
-						icon={<Icon56InfoOutline />}
-						header="Пусто"
-						action={
-							allowCustom ? (
-								<Button
-									onClick={() => {
-										setNoVariant(true);
-									}}
-									size="l"
-								>
-									Указать категорию вручную
-								</Button>
-							) : null
-						}
-					>
-						Попробуйте подобрать другие слова или создайте свою подкатегорию. Рекомендуем использовать
-						предлагаемые варианты, чтобы облегчить поиск другим пользователям
-					</Placeholder>
+					!choosenGroup ? (
+						<Placeholder
+							style={{ whiteSpace: 'normal' }}
+							icon={<Icon56InfoOutline />}
+							header="Пусто"
+							action={
+								allowCustom ? (
+									<Button
+										onClick={() => {
+											setNoVariant(true);
+										}}
+										size="l"
+									>
+										Указать категорию вручную
+									</Button>
+								) : null
+							}
+						>
+							Попробуйте подобрать другие слова или создайте свою подкатегорию. Рекомендуем использовать
+							предлагаемые варианты, чтобы облегчить поиск другим пользователям
+						</Placeholder>
+					) : (
+						CHOOSE_ANOTHER
+					)
 				}
 				settingsPanel={
 					<>
@@ -153,6 +176,8 @@ const mapStateToProps = (state) => {
 	};
 };
 
-const mapDispatchToProps = {};
+const mapDispatchToProps = {
+	setFormData,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(SubcategoriesPanel);

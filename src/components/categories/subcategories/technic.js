@@ -1,4 +1,4 @@
-import { GetCategoryText, CategoryTechnic } from "../Categories";
+import { CategoryTechnic } from "../const";
 
 export const gTechnic1 = 'Крупная техника для кухни';
 export const s1Technic1 = 'Холодильники';
@@ -124,7 +124,7 @@ export const TechnicStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
-	header: GetCategoryText(CategoryTechnic),
+	header: CategoryTechnic, //GetCategoryText(CategoryTechnic),
 	show: 3,
 	data: [
 		{

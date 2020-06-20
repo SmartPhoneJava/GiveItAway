@@ -1,4 +1,4 @@
-import { CategoryNo } from "../components/categories/Categories";
+import { CategoryNo } from "../components/categories/const";
 import { NoRegion } from "../components/location/const";
 import { TYPE_CHOICE } from "./ads";
 

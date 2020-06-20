@@ -1,4 +1,4 @@
-import { GetCategoryText, CategorySport } from "../Categories";
+import { CategorySport } from "../const";
 
 export const gSport1 = 'Велоспорт';
 export const s1Sport1 = 'Велосипеды';
@@ -158,7 +158,7 @@ export const s13Sport2 = 'Чемоданы';
 export const s13Sport3 = 'Дорожные сумки';
 export const s13Sport4 = 'Дорожные аксессуары';
 
-export const gSport14 = 'Чемоданы, сумки, рюкзаки';
+export const gSport14 = 'Зимние виды спорта';
 export const s14Sport1 = 'Сноуборды';
 export const s14Sport2 = 'Беговые лыжи';
 export const s14Sport3 = 'Горные лыжи';
@@ -174,7 +174,7 @@ export const SportStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
-	header: GetCategoryText(CategorySport),
+	header: CategorySport, //GetCategoryText(CategorySport),
 	show: 3,
 	data: [
 		{

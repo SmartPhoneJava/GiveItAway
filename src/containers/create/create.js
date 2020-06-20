@@ -9,7 +9,7 @@ import { CREATE_AD_MAIN, CREATE_AD_ITEM, GEO_DATA } from '../../store/create_pos
 import CreateAddRedux from './../../panels/story/create/components/CreateAddRedux';
 
 import { CreateAd, EditAd } from '../../requests';
-import { CategoryNo } from '../../components/categories/Categories';
+import { CategoryNo } from '../../components/categories/const';
 
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { FORM_CREATE } from '../../components/categories/redux';
@@ -19,7 +19,6 @@ import { store } from '../..';
 import { defaultInputData } from '../../components/create/default';
 
 const clearForm = (dispatch) => {
-	console.log('clicked clearForm');
 	dispatch(setFormData(FORM_CREATE, null));
 	dispatch(setFormData(CREATE_AD_MAIN, { ...defaultInputData }));
 	dispatch(setFormData(CREATE_AD_ITEM, { ...defaultInputData }));

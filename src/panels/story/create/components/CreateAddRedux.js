@@ -6,15 +6,12 @@ import {
 	Header,
 	Div,
 	FormStatus,
-	Separator,
 	Link,
 	Spinner,
 	Snackbar,
 	Avatar,
 	PanelHeaderButton,
 	Cell,
-	FormLayout,
-	Checkbox,
 } from '@vkontakte/vkui';
 import { ReactDadata } from 'react-dadata';
 

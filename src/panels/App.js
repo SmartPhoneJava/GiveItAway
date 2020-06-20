@@ -21,6 +21,7 @@ import {
 	PANEL_CREATE,
 	PANEL_CATEGORIES,
 	PANEL_SUBCATEGORIES,
+	PANEL_SUBSUBCATEGORIES,
 	PANEL_CITIES,
 	PANEL_COUNTRIES,
 	PANEL_MAP,
@@ -135,6 +136,7 @@ const App = (props) => {
 		addComment,
 		addSub,
 		clearAds,
+		setPage,
 	} = props;
 
 	const needEdit = inputData[EDIT_MODE] ? inputData[EDIT_MODE].mode : false;
@@ -527,8 +529,16 @@ const App = (props) => {
 					<Panel id={PANEL_SUBCATEGORIES}>
 						<SubcategoriesPanel
 							goNext={() => {
-								goBack();
-								goBack();
+								setPage(PANEL_SUBSUBCATEGORIES)
+							}}
+							goBack={goBack}
+							redux_form={FORM_CREATE}
+						/>
+					</Panel>
+					<Panel id={PANEL_SUBSUBCATEGORIES}>
+						<SubcategoriesPanel
+							goNext={() => {
+								setPage(PANEL_CREATE)
 							}}
 							goBack={goBack}
 							redux_form={FORM_CREATE}

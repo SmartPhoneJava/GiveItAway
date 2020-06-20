@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Group, Cell, Header, List, FormLayout, FormLayoutGroup, Radio, SelectMimicry, Avatar } from '@vkontakte/vkui';
 
 import Animal from './../../img/animal.png';
 import Another from './../../img/another.png';
@@ -20,6 +19,8 @@ import Sport from './../../img/sport.png';
 import Question from './../../img/question.png';
 
 import Animal400 from './../../img/400/animal.png';
+import Animals400 from './../../img/400/animals.png';
+import Auto400 from './../../img/400/auto.png';
 import Another400 from './../../img/400/another.png';
 import Book400 from './../../img/400/book.png';
 import Build400 from './../../img/400/build.png';
@@ -32,12 +33,19 @@ import Food400 from './../../img/400/food.png';
 import Furniture400 from './../../img/400/furniture.png';
 import Music400 from './../../img/400/music.png';
 import Old400 from './../../img/400/old.png';
+import Home400 from './../../img/400/home.png';
+import Repair400 from './../../img/400/repair.png';
 import Pencil400 from './../../img/400/pencil.png';
 import Play400 from './../../img/400/play.png';
 import Sport400 from './../../img/400/sport.png';
+import Sports400 from './../../img/400/sports.png';
+import Technic400 from './../../img/400/technic.png';
 import Question400 from './../../img/400/question.png';
+import Online400 from './../../img/400/online.png';
 
 import Animal100 from './../../img/100/animal.png';
+import Animals100 from './../../img/100/animals.png';
+import Auto100 from './../../img/100/auto.png';
 import Another100 from './../../img/100/another.png';
 import Book100 from './../../img/100/book.png';
 import Build100 from './../../img/100/build.png';
@@ -50,10 +58,15 @@ import Food100 from './../../img/100/food.png';
 import Furniture100 from './../../img/100/furniture.png';
 import Music100 from './../../img/100/music.png';
 import Old100 from './../../img/100/old.png';
+import Home100 from './../../img/100/home.png';
+import Repair100 from './../../img/100/repair.png';
 import Pencil100 from './../../img/100/pencil.png';
 import Play100 from './../../img/100/play.png';
 import Sport100 from './../../img/100/sport.png';
+import Sports100 from './../../img/100/sports.png';
+import Technic100 from './../../img/100/technic.png';
 import Question100 from './../../img/100/question.png';
+import Online100 from './../../img/100/online.png';
 
 import Animal50 from './../../img/50/animal.png';
 import Another50 from './../../img/50/another.png';
@@ -91,39 +104,41 @@ import Play30 from './../../img/30/play.png';
 import Sport30 from './../../img/30/sport.png';
 import Question30 from './../../img/30/question.png';
 
-export const CategoryNo = 'Все категории';
-export const CategoryAnother = 'another';
-// export const CategoryCosmetic = 'cosmetic';
-// export const CategoryPlay = 'play';
-// export const CategoryFood = 'food';
-export const CategoryAnimals = 'animals';
-export const CategoryBooks = 'books';
-export const CategoryBuild = 'build';
-export const CategoryChildren = 'children';
-export const CategoryClothers = 'clothers';
-export const CategoryElectronics = 'electronics';
-export const CategoryTechnic = 'technic';
-export const CategoryGarden = 'garden';
-export const CategoryFurniture = 'furniture';
-export const CategoryHobby = 'hobby';
-export const CategoryHealth = 'health';
-export const CategoryAuto = 'auto';
-export const CategorySport = 'sport';
-export const CategoryOffice = 'office';
-export const CategoryHome = 'home';
-export const CategoryOnline = 'online';
+import './categories.css';
+import { Subcategories } from './Subcategories';
+import {
+	CategoryAnimals,
+	CategoryNo,
+	CategoryAnother,
+	CategoryBooks,
+	CategoryBuild,
+	CategoryChildren,
+	CategoryClothers,
+	CategoryElectronics,
+	CategoryTechnic,
+	CategoryGarden,
+	CategoryFurniture,
+	CategoryHobby,
+	CategoryHealth,
+	CategoryAuto,
+	CategorySport,
+	CategoryOffice,
+	CategoryHome,
+	CategoryOnline,
+} from './const';
+import Columns from '../../panels/template/columns';
 
 export function GetCategory400(category) {
 	let image = Another400;
 	switch (category) {
 		case CategoryAnimals:
-			image = Animal400;
+			image = Animals400;
 			break;
 		case CategoryBooks:
 			image = Book400;
 			break;
 		case CategoryBuild:
-			image = Build400;
+			image = Repair400;
 			break;
 		case CategoryChildren:
 			image = Child400;
@@ -138,7 +153,7 @@ export function GetCategory400(category) {
 			image = Electronics400;
 			break;
 		case CategoryTechnic:
-			image = Electronics400;
+			image = Technic400;
 			break;
 		case CategoryGarden:
 			image = Flora400;
@@ -156,19 +171,19 @@ export function GetCategory400(category) {
 			image = Old400;
 			break;
 		case CategoryAuto:
-			image = Pencil400;
+			image = Auto400;
 			break;
 		case CategorySport:
-			image = Sport400;
+			image = Sports400;
 			break;
 		case CategoryOffice:
 			image = Pencil400;
 			break;
 		case CategoryHome:
-			image = Pencil400;
+			image = Home400;
 			break;
 		case CategoryOnline:
-			image = Pencil400;
+			image = Online400;
 			break;
 		// case CategoryPlay:
 		// 	image = Play400;
@@ -184,13 +199,13 @@ export function GetCategory100(category) {
 	let image = Another100;
 	switch (category) {
 		case CategoryAnimals:
-			image = Animal100;
+			image = Animals100;
 			break;
 		case CategoryBooks:
 			image = Book100;
 			break;
 		case CategoryBuild:
-			image = Build100;
+			image = Repair100;
 			break;
 		case CategoryChildren:
 			image = Child100;
@@ -205,7 +220,7 @@ export function GetCategory100(category) {
 			image = Electronics100;
 			break;
 		case CategoryTechnic:
-			image = Electronics100;
+			image = Technic100;
 			break;
 		case CategoryGarden:
 			image = Flora100;
@@ -223,10 +238,10 @@ export function GetCategory100(category) {
 			image = Old100;
 			break;
 		case CategoryAuto:
-			image = Pencil100;
+			image = Auto100;
 			break;
 		case CategorySport:
-			image = Sport100;
+			image = Sports100;
 			break;
 		// case CategoryPlay:
 		// 	image = Play100;
@@ -235,10 +250,10 @@ export function GetCategory100(category) {
 			image = Pencil100;
 			break;
 		case CategoryHome:
-			image = Pencil100;
+			image = Home100;
 			break;
 		case CategoryOnline:
-			image = Pencil100;
+			image = Online100;
 			break;
 		case CategoryNo:
 			image = Question100;
@@ -499,6 +514,11 @@ export function GetCategoryImageBig(category) {
 	return <img src={image} className="category100" />;
 }
 
+export function GetCategoryImage100(category) {
+	let image = GetCategory400(category);
+	return <img src={image} className="category100v" />;
+}
+
 export function GetCategoryImage(category) {
 	let image = GetCategory50(category);
 	return (
@@ -517,28 +537,204 @@ export function GetCategoryImageSmall(category) {
 	return <img src={image} className="category30" />;
 }
 
-export const categories = [
-	CategoryNo,
+// https://casesandberg.github.io/react-color/
+const ColorsS1 = [
+	'#F44336',
+	'#E91E63',
+	'#9C27B0',
+	'#FFC107',
 
+	'#FFC107',
+	'#FFEB3B',
+	'#03A9F4',
+	'#CDDC39',
+
+	'#FF5722',
+	'#FFEB3B',
+	'#8BC34A',
+	'#00BCD4',
+
+	'#4CAF50',
+	'#2196F3',
+	'#FF9800',
+	'#009688',
+];
+
+const ColorsS0 = [
+	'#E5B6B3',
+	'#E5B3C4',
+	'#DEB3E5',
+	'#B3E5E1',
+
+	'#B3BAE5',
+	'#B3CFE5',
+	'#C5B3E5',
+	'#B3E5B5',
+
+	'#CEE5B3',
+	'#E1E5B3',
+	'#E0E8D7',
+	'#B3D5E5',
+
+	'#E5BFB3',
+	'#FAFFCD',
+	'#FFE7CD',
+	'#B7E9E7',
+];
+
+const Colors2 = [
+	'#FFCFD3',
+	'#FFCFC1',
+	'#FFE7CD',
+	'#FAFFCD',
+	'#DDF5D9',
+	'#B9E8D3',
+	'#B7E9E6',
+	'#B7D4E9',
+	'#B7C3E9',
+	'#C4B7E9',
+	'#B3BFE6',
+	'#9683C6',
+	'#BF9DD4',
+	'#E9C6E5',
+	'#E9DEC3',
+	'#E0E8D7',
+];
+
+const cFrom = reverse(ColorsS1); //shuffle(ColorsS0)
+const cTo = ColorsS0; //shuffle(ColorsS1)
+
+function reverse(arr) {
+	let array = [...arr];
+	let output = [];
+	while (array.length) {
+		output.push(array.pop());
+	}
+
+	return output;
+}
+
+const Colors1 = [
+	'#F6FFB2',
+	'#9AE990',
+	'#2BD397',
+	'#1DCFC9',
+	'#6579C7',
+	'#6844B3',
+	'#8F47B0',
+	'#CD5BB5',
+	'#FF666F',
+	'#FF8477',
+	'#FDAC76',
+	'#FED37D',
+	'#62BEFF',
+	'#62FFC5',
+];
+
+export const categories = [
 	CategoryOnline,
-	CategoryAnimals,
-	CategoryBooks,
-	CategoryBuild,
-	CategoryChildren,
 	CategoryClothers,
+	CategoryBooks,
+	CategoryHealth,
+	CategoryChildren,
+	CategoryAnimals,
 	// CategoryCosmetic,
-	CategoryElectronics,
-	CategoryTechnic,
+	CategoryAuto,
+	CategoryHome,
 	CategoryGarden,
 	// CategoryFood,
 	CategoryFurniture,
-	CategoryHobby,
+	CategorySport,
 	// CategoryMusic,
-	CategoryHealth,
-	CategoryAuto,
+	CategoryElectronics,
+	CategoryBuild,
 	CategoryOffice,
 	// CategoryPlay,
-	CategorySport,
-	CategoryHome,
-	CategoryAnother,
+	CategoryHobby,
+	CategoryTechnic,
+	//CategoryAnother,
 ];
+
+function shuffle(array) {
+	var currentIndex = array.length,
+		temporaryValue,
+		randomIndex;
+
+	// While there remain elements to shuffle...
+	while (0 !== currentIndex) {
+		// Pick a remaining element...
+		randomIndex = Math.floor(Math.random() * currentIndex);
+		currentIndex -= 1;
+
+		// And swap it with the current element.
+		temporaryValue = array[currentIndex];
+		array[currentIndex] = array[randomIndex];
+		array[randomIndex] = temporaryValue;
+	}
+
+	return array;
+}
+
+const width = document.body.clientWidth;
+
+export const CategoriesStruct = {
+	grouping: true,
+	showAll: true,
+	getTextFunc: null,
+	getImageFunc: GetCategoryImage100,
+	filterFunc: null,
+	header: 'Выберите категорию',
+	data: [
+		{
+			header: null,
+			array: categories,
+			oneCellStyle: (v, i) => {
+				return (
+					<div
+						className="hyphenate"
+						style={{
+							background: 'linear-gradient(to top left, ' + cFrom[i] + ', ' + cTo[i] + ')',
+						}}
+					>
+						<div
+							style={{
+								height: '100%',
+							}}
+						>
+							{v}
+						</div>
+					</div>
+
+					// <div className="hyphenate">{v}</div>
+				);
+			},
+			listCellStyle: (gr) => {
+				return (
+					<Columns
+						needOneColumn={width < 200}
+						array={gr}
+						columnsAmount={width < 500 ? 2 : width < 1000 ? 4 : 8}
+					/>
+				);
+			},
+			search: (arr, searchText) => {
+				if (searchText == '') {
+					return arr;
+				}
+
+				const first = arr.filter((v) => v.toLowerCase().indexOf(searchText) != -1);
+				let second = Subcategories.filter((s) => {
+					return (
+						s.data.filter((d) => {
+							return d.array.filter((v) => v.toLowerCase().indexOf(searchText) != -1).length > 0;
+						}).length > 0
+					);
+				});
+				console.log('looook at second', second);
+				second = [...first, ...second.map((v) => v.header)];
+				second = second.filter((a, i) => second.indexOf(a) == i);
+				return second;
+			},
+		},
+	],
+};

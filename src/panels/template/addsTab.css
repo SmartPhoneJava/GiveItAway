@@ -1,8 +1,16 @@
 .category30 {
-  transition: margin .5s;
+	transition: margin 0.5s;
 }
 
 .category100 {
-  transition: margin .5s;
-  margin: 5px;
+	transition: margin 0.5s;
+	margin: 5px;
+}
+
+.category100v {
+	transition: margin 0.5s;
+	padding: 5px;
+	max-width: 100px;
+	object-fit: cover;
+	max-height: 100px;
 }

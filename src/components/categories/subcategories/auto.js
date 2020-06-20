@@ -1,4 +1,4 @@
-import { GetCategoryText, CategoryAuto } from "../Categories";
+import { CategoryAuto } from '../const';
 
 export const gAuto1 = 'Шины и диски';
 export const s1Auto1 = 'Шины';
@@ -117,7 +117,7 @@ export const AutoStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
-	header: GetCategoryText(CategoryAuto),
+	header: CategoryAuto, // GetCategoryText(CategoryAuto),
 	show: 3,
 	data: [
 		{

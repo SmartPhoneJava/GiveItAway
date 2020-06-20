@@ -15,7 +15,7 @@ import {
 	CategoryOffice,
 	CategoryHome,
 	CategoryOnline,
-} from './Categories';
+} from './const';
 import { AnimalStruct } from './subcategories/animal';
 import { BooksStruct } from './subcategories/books';
 import { BuildStruct } from './subcategories/build';

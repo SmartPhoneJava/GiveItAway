@@ -1,4 +1,4 @@
-import { CategoryHealth, GetCategoryText } from "../Categories";
+import { CategoryHealth } from "../const";
 
 export const gHealth1 = 'Оптика';
 export const s1Health1 = 'Контактные линзы';
@@ -71,7 +71,7 @@ export const HealthStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
-	header: GetCategoryText(CategoryHealth),
+	header: CategoryHealth, //GetCategoryText(CategoryHealth),
 	show: 3,
 	data: [
 		{

@@ -10,7 +10,7 @@ import { User } from './AddsTab/../../../../../../store/user';
 import { store } from './../../../../../index';
 import { openPopout, closePopout } from '../../../../../store/router/actions';
 import { MODE_WANTED, MODE_ALL, GEO_TYPE_NEAR } from '../../../../../const/ads';
-import { CategoryNo } from '../../../../../components/categories/Categories';
+import { CategoryNo } from '../../../../../components/categories/const';
 
 export default function useAdSearch(
 	isMounted,

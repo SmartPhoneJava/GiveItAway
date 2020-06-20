@@ -20,8 +20,6 @@ export function NEWhandleFiles(file, addPhoto) {
 			var width = img.width;
 			var height = img.height;
 
-			console.log('img content', width, height);
-
 			if (width > height) {
 				if (width > MAX_WIDTH) {
 					height *= MAX_WIDTH / width;
@@ -40,12 +38,6 @@ export function NEWhandleFiles(file, addPhoto) {
 			ctx.drawImage(img, 0, 0, width, height);
 
 			dataurl = canvas.toDataURL(file.type);
-
-			// console.log('dataurl', dataurl);
-			// console.log('filefile', '' + e);
-			// let result = new Promise((resolve) => {
-			// 	canvas.toBlob(resolve, 'image/jpeg', 0.95);
-			// });
 
 			var blobBin = atob(dataurl.split(',')[1]);
 			var array = [];

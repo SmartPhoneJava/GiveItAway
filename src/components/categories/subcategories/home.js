@@ -1,4 +1,4 @@
-import { CategoryHome, GetCategoryText } from "../Categories";
+import { CategoryHome } from "../const";
 
 export const gHome1 = 'Посуда и кухонные принадлежности';
 export const s1Home1 = 'Кухонные аксессуары';
@@ -123,7 +123,7 @@ export const HomeStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
-	header: GetCategoryText(CategoryHome),
+	header: CategoryHome,//GetCategoryText(CategoryHome),
 	show: 3,
 	data: [
 		{

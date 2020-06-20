@@ -5,6 +5,7 @@ export const PANEL_SUBS = 'subs';
 export const PANEL_COMMENTS = 'comments';
 export const PANEL_CATEGORIES = 'categories';
 export const PANEL_SUBCATEGORIES = 'subcategories';
+export const PANEL_SUBSUBCATEGORIES = 'subsubcategories';
 export const PANEL_CREATE = 'create';
 export const PANEL_CITIES = 'cities';
 export const PANEL_COUNTRIES = 'countries';

@@ -1,4 +1,4 @@
-import { GetCategoryText, CategoryAnimals } from "../Categories";
+import { CategoryAnimals } from '../const';
 
 export const gAnimal1 = 'Для кошек';
 export const s1Animal1 = 'Туалеты, совочки';
@@ -94,7 +94,7 @@ export const AnimalStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
-	header: GetCategoryText(CategoryAnimals),
+	header: CategoryAnimals, //GetCategoryText(CategoryAnimals),
 	show: 5,
 	data: [
 		{

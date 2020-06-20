@@ -1,4 +1,4 @@
-import { CategoryHobby, GetCategoryText } from "../Categories";
+import { CategoryHobby } from "../const";
 
 export const gHobby1 = 'Рисование';
 export const s1Hobby1 = 'Графические планшеты';
@@ -125,7 +125,7 @@ export const HobbyStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
-	header: GetCategoryText(CategoryHobby),
+	header: CategoryHobby, //GetCategoryText(CategoryHobby),
 	show: 3,
 	data: [
 		{

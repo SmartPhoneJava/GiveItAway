@@ -1,4 +1,4 @@
-import { GetCategoryText, CategoryBooks } from "../Categories";
+import { CategoryBooks } from "../const";
 
 export const gBooks1 = 'Развитие и образование';
 export const s1Books1 = 'Историческая литература';
@@ -45,7 +45,7 @@ export const BooksStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
-	header: GetCategoryText(CategoryBooks),
+	header: CategoryBooks, //GetCategoryText(CategoryBooks),
 	show: 5,
 	data: [
 		{

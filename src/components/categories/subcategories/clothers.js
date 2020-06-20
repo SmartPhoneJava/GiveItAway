@@ -1,4 +1,4 @@
-import { CategoryClothers, GetCategoryText } from "../Categories";
+import { CategoryClothers } from "../const";
 
 export const gClothes1 = 'Женская одежда';
 export const s1Clothes1 = 'Футболки';
@@ -224,7 +224,7 @@ export const ClothesStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
-	header: GetCategoryText(CategoryClothers),
+	header: CategoryClothers, //GetCategoryText(CategoryClothers),
 	show: 3,
 	data: [
 		{

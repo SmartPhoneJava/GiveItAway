@@ -8,8 +8,6 @@ import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 import Add7 from './../../../../template/Add7';
 import axios from 'axios';
 
-import useAdSearch from './useAdSearch';
-
 import './addsTab.css';
 
 import Error from './../../../../placeholders/error';
@@ -35,7 +33,8 @@ import AdNoWanted from '../../../../placeholders/adNoWanted';
 import { setFormData } from '../../../../../store/create_post/actions';
 import AdNoGiven from '../../../../placeholders/adNoGiven';
 import { NoRegion } from '../../../../../components/location/const';
-import { CategoryNo } from '../../../../../components/categories/Categories';
+import { CategoryNo } from '../../../../../components/categories/const';
+import Columns from '../../../../template/columns';
 
 let i = 0;
 
@@ -118,7 +117,7 @@ const AddsTab = (props) => {
 	}, [loading, error404]);
 
 	useEffect(() => {
-		console.log("props.deleteID", props.deleteID)
+		console.log('props.deleteID', props.deleteID);
 		if (props.deleteID > 0) {
 			setRads((rads) =>
 				rads.filter((x) => {
@@ -222,23 +221,6 @@ const AddsTab = (props) => {
 		};
 	}, [category, mode, searchR, pageNumber, city, country, sort, geoType, geodata, radius, refreshMe]);
 
-	// let { inited, loading, ads, error, hasMore, newPage } = useAdSearch(
-	// 	isMounted,
-	// 	searchR,
-	// 	category,
-	// 	mode,
-	// 	pageNumber,
-	// 	5,
-	// 	props.deleteID,
-	// 	city,
-	// 	country,
-	// 	sort,
-	// 	geodata,
-	// 	geoType,
-	// 	radius,
-	// 	refreshMe
-	// );
-
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
 		(node) => {
@@ -324,54 +306,12 @@ const AddsTab = (props) => {
 				<Group>
 					<List>
 						{rads.length > 0 ? (
-							rads.map((ad, index) => {
-								if (!width || width < 500) {
-									if (ads.length === index + 1) {
-										return (
-											<div key={ad.ad_id} ref={lastAdElementRef}>
-												{Ad(ad)}
-											</div>
-										);
-									}
-									return <div key={ad.ad_id}>{Ad(ad)}</div>;
-								}
-								if (index % 2) {
-									console.log("index is", index)
-									const prev = rads[index - 1];
-									console.log("prev is", prev)
-									const first = (
-										<div className="one-block" key={prev.ad_id}>
-											{Ad(prev)}
-										</div>
-									);
-
-									let second = (
-										<div className="one-block" key={ad.ad_id}>
-											{Ad(ad)}
-										</div>
-									);
-
-									if (rads.length === index + 1) {
-										second = (
-											<div className="one-block" key={ad.ad_id} ref={lastAdElementRef}>
-												{Ad(ad)}
-											</div>
-										);
-									}
-									return (
-										<div key={ad.ad_id} className="flex-blocks">
-											{first} {second}
-										</div>
-									);
-								}
-								if (index % 2 == 0 && rads.length - 1 == index) {
-									return (
-										<div key={ad.ad_id} ref={lastAdElementRef}>
-											{Ad(ad)}
-										</div>
-									);
-								}
-							})
+							<Columns
+								needOneColumn={!width || width < 500}
+								array={rads.map((ad) => Ad(ad))}
+								columnsAmount={2}
+								ref={lastAdElementRef}
+							/>
 						) : error ? (
 							<Error />
 						) : // addsArrDD.map((ad) => {
@@ -415,4 +355,4 @@ const mapDispatchToProps = {
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddsTab);
 
-//283 -> 380
+//283 -> 380 -> 418 -> 358

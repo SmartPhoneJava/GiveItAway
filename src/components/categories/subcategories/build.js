@@ -1,4 +1,4 @@
-import { GetCategoryText, CategoryBuild } from "../Categories";
+import { CategoryBuild } from "../const";
 
 export const gBuild1 = 'Ванная комната';
 export const s1Build1 = 'Ванны и комплектующие';
@@ -118,7 +118,7 @@ export const BuildStruct = {
 	getTextFunc: null,
 	getImageFunc: null,
 	filterFunc: null,
-	header: GetCategoryText(CategoryBuild),
+	header: CategoryBuild, //GetCategoryText(CategoryBuild),
 	show: 3,
 	data: [
 		{

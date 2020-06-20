@@ -1,19 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FormLayout, SelectMimicry } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
-import { GetCategoryImage, GetCategoryText, CategoryNo } from './Categories';
+import { GetCategoryImage } from './Categories';
+import { CategoryNo } from './const';
 
 const CategoriesLabel = (props) => {
 	const { redux_form, inputData } = props;
-	const category =
-		inputData[redux_form] && inputData[redux_form].category ? inputData[redux_form].category : CategoryNo;
-	const group = inputData[redux_form] && inputData[redux_form].group ? inputData[redux_form].group : CategoryNo;
-	const subcategory =
-		inputData[redux_form] && inputData[redux_form].subcategory ? inputData[redux_form].subcategory : CategoryNo;
 
-	// ! доделать const [category, setCategory] = us
+	const [category, setCategory] = useState(CategoryNo);
+	const [subcategory, setSubcategory] = useState(CategoryNo);
+	const [incategory, setIncategory] = useState(CategoryNo);
+
+	if (!inputData[redux_form]) {
+		return (
+			<div
+				style={{
+					display: 'flex',
+					alignContent: 'center',
+					alignItems: 'center',
+					// color: "var(--text_primary)",
+					paddingLeft: props.leftMargin,
+				}}
+			>
+				{GetCategoryImage(category)}
+				<FormLayout style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+					<SelectMimicry top="Категория" placeholder="Не выбрано" onClick={() => props.open()} />
+				</FormLayout>
+			</div>
+		);
+	}
+
+	useEffect(() => {
+		const s = inputData[redux_form].category || CategoryNo;
+		if (s != category) {
+			setCategory(s);
+		}
+	}, [inputData[redux_form].category]);
+
+	useEffect(() => {
+		const s = inputData[redux_form].subcategory || CategoryNo;
+		if (s != subcategory) {
+			setSubcategory(s);
+		}
+	}, [inputData[redux_form].subcategory]);
+
+	useEffect(() => {
+		const s = inputData[redux_form].incategory || CategoryNo;
+		if (s != incategory) {
+			setIncategory(s);
+		}
+	}, [inputData[redux_form].incategory]);
 
 	return (
 		<div
@@ -29,25 +67,15 @@ const CategoriesLabel = (props) => {
 			<FormLayout style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
 				<SelectMimicry
 					top="Категория"
-					value={GetCategoryText(category)}
-					placeholder={GetCategoryText(category)}
+					value={category}
+					placeholder={category}
 					onClick={() => props.open()}
 				/>
-				{group ? (
-					<SelectMimicry
-						top="Раздел"
-						value={group}
-						placeholder={group}
-						onClick={() => props.open()}
-					/>
+				{subcategory ? (
+					<SelectMimicry value={subcategory} placeholder={subcategory} onClick={() => props.open()} />
 				) : null}
-					{subcategory ? (
-					<SelectMimicry
-						top="Подкатегория"
-						value={subcategory}
-						placeholder={subcategory}
-						onClick={() => props.open()}
-					/>
+				{incategory ? (
+					<SelectMimicry value={incategory} placeholder={incategory} onClick={() => props.open()} />
 				) : null}
 			</FormLayout>
 		</div>
