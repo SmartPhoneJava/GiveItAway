@@ -8,9 +8,20 @@ import { CategoryNo } from './const';
 
 import { DraggableArea } from 'react-draggable-tags';
 
+import { Transition } from 'react-transition-group';
+
 import ChangeIcon from './../../img/100/change_icon2.png';
 
 import { randomColor } from 'randomcolor';
+
+const duration = 100;
+
+const transitionStyles = {
+	entering: { opacity: 1, transition: `opacity ${duration}ms ease-in-out` },
+	entered: { opacity: 1, transition: `opacity ${duration}ms ease-in-out` },
+	exiting: { opacity: 0, transition: `opacity ${duration}ms ease-in-out` },
+	exited: { opacity: 0, transition: `opacity ${duration}ms ease-in-out` },
+};
 
 // https://www.npmjs.com/package/randomcolor
 
@@ -24,6 +35,8 @@ const CategoriesLabel = (props) => {
 		content: CategoryNo,
 	};
 	const [tags, setTags] = useState([notChoosenElement]);
+
+	const [tagsUpdate, setTagsUpdate] = useState(true);
 
 	const tag = (text, color, background, borderColor) => {
 		const c = color || 'var(--accent)'; //'#ffffff';
@@ -55,6 +68,10 @@ const CategoriesLabel = (props) => {
 
 		console.log('str is', str);
 		setTags(str);
+		setTimeout(() => {
+			setTagsUpdate(true);
+		}, 500);
+		setTagsUpdate(false);
 	}, [inputData[redux_form]]);
 
 	return (
@@ -69,17 +86,22 @@ const CategoriesLabel = (props) => {
 				<DraggableArea
 					tags={tags}
 					render={({ tag, index }) => (
-						<div
-							className="row"
-							onClick={props.open}
-							style={{
-								background: tag.background,
-								color: tag.color,
-								fontWeight: 600,
-								borderColor: tag.borderColor,
-							}}
-						>
-							{/* <img
+						<>
+							<Transition in={tagsUpdate} timeout={duration}>
+								{(state) => {
+									const s = (
+										<div
+											className="row"
+											onClick={props.open}
+											style={{
+												...transitionStyles[state],
+												background: tag.background,
+												color: tag.color,
+												fontWeight: 600,
+												borderColor: tag.borderColor,
+											}}
+										>
+											{/* <img
 							className="edit-tag"
 							src={ChangeIcon}
 							onClick={() => {
@@ -89,8 +111,13 @@ const CategoriesLabel = (props) => {
 								}
 							}}
 						/> */}
-							{tag.content}
-						</div>
+											{tag.content}
+										</div>
+									);
+									return s;
+								}}
+							</Transition>
+						</>
 					)}
 					onChange={(tags) => console.log(tags)}
 				/>

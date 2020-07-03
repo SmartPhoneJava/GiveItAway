@@ -94,7 +94,7 @@ import Comments from './story/adds/tabs/comments/comments';
 import { inputArgs } from '../utils/window';
 
 import Centrifuge from 'centrifuge';
-import { FORM_CREATE } from '../components/categories/redux';
+import { FORM_CREATE, FORM_CREATE_B } from '../components/categories/redux';
 import { setFormData } from '../store/create_post/actions';
 import { ADS_FILTERS, EDIT_MODE, CREATE_AD_MAIN, CREATE_AD_ITEM } from '../store/create_post/types';
 import AdsModal from '../containers/ads/modal';
@@ -492,7 +492,6 @@ const App = (props) => {
 							redux_form={ADS_FILTERS}
 						/>
 					</Panel>
-				
 
 					<Panel id={PANEL_COUNTRIES}>
 						<PanelHeader left={<PanelHeaderBack onClick={backToGeoFilters} />}>Выберите страну</PanelHeader>
@@ -527,27 +526,26 @@ const App = (props) => {
 						<LicencePanel />
 					</Panel>
 					<Panel id={PANEL_CATEGORIES}>
-						<CategoriesPanel redux_form={FORM_CREATE} goBack={goBack} />
+						<CategoriesPanel redux_form={FORM_CREATE_B} goBack={goBack} />
 					</Panel>
 					<Panel id={PANEL_SUBCATEGORIES}>
 						<SubcategoriesPanel
 							goNext={() => {
-								setPage(PANEL_SUBSUBCATEGORIES)
+								setPage(PANEL_SUBSUBCATEGORIES);
 							}}
 							goBack={goBack}
-							redux_form={FORM_CREATE}
+							redux_form={FORM_CREATE_B}
 						/>
 					</Panel>
 					<Panel id={PANEL_SUBSUBCATEGORIES}>
 						<SubcategoriesPanel
-							goNext={() => {
-								setPage(PANEL_CREATE)
-							}}
+							goNext={() => setPage(PANEL_CREATE)}
 							goBack={goBack}
-							redux_form={FORM_CREATE}
+							redux_form={FORM_CREATE_B}
+							redux_main_form={FORM_CREATE}
 						/>
 					</Panel>
-					
+
 					<Panel id={PANEL_COUNTRIES}>
 						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>Выберите страну</PanelHeader>
 						<Countries redux_form={FORM_LOCATION_CREATE} goBack={goBack} />

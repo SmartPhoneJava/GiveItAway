@@ -23,6 +23,7 @@ const CategoriesPanel = (props) => {
 				field={'category'}
 				none_value={CategoryNo}
 				defaultInputData={CategoryNo}
+				clear={true}
 				afterClick={(group, cat) => {
 					props.setPage(PANEL_SUBCATEGORIES);
 				}}
@@ -31,7 +32,7 @@ const CategoriesPanel = (props) => {
 				userFieldName="Подкатегория"
 				searchEverywhere={true}
 				searchArr={Subcategories}
-				placeholder= {
+				placeholder={
 					<Placeholder style={{ whiteSpace: 'normal' }} icon={<Icon56InfoOutline />} header="Пусто">
 						Категорий не найдено. Измените поисковой запрос.
 					</Placeholder>

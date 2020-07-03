@@ -469,7 +469,7 @@ const AddMore2r = (props) => {
 				console.log('i loaded', photos_num, this_i, current_i, photoSwipeImgs);
 				if (photos_num == 0 && this_i == current_i) {
 					setLocalPhotos(photoSwipeImgs);
-					setInterval(() => setImgSpinner(false), 250);
+					setTimeout(() => setImgSpinner(false), 250);
 				}
 			};
 		});

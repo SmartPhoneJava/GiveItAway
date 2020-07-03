@@ -19,6 +19,8 @@ import {
 import 'react-photoswipe/lib/photoswipe.css';
 import { PhotoSwipe, PhotoSwipeGallery } from 'react-photoswipe';
 
+import { Transition } from 'react-transition-group';
+
 import { setFormData } from './../../../../store/create_post/actions';
 import { CREATE_AD_ITEM, EDIT_MODE } from './../../../../store/create_post/types';
 
@@ -45,6 +47,15 @@ import { CategoryOnline } from '../../../../components/categories/const';
 const nameLabel = 'Название';
 const descriptionLabel = 'Описание';
 
+const duration = 100;
+
+const allStyles = {
+	entering: { opacity: 1, transition: `opacity ${duration}ms ease-in-out` },
+	entered: { opacity: 1, transition: `opacity ${duration}ms ease-in-out` },
+	exiting: { opacity: 0, transition: `opacity ${duration}ms ease-in-out` },
+	exited: { opacity: 0, transition: `opacity ${duration}ms ease-in-out` },
+};
+
 const CreateItem = (props) => {
 	const { AD, defaultInputData, category } = props;
 	const { setFormData, openSnackbar, closeSnackbar, setDummy } = props;
@@ -60,10 +71,6 @@ const CreateItem = (props) => {
 			...inputData,
 			[e.currentTarget.name]: value,
 		});
-		// setInputData({
-		// 	...inputData,
-		// 	[e.currentTarget.name]: value,
-		// });
 	};
 
 	const [isOpen, setIsOpen] = useState(false);
@@ -119,24 +126,13 @@ const CreateItem = (props) => {
 	}
 
 	const loadPhoto = (e) => {
-		console.log('loadPhoto loop', e.target.files);
-
 		setLoading(true);
 		loadPhotos(
 			e,
 			handleWrongSize,
 			handleWrongType,
 			(value) => {
-				let photosUrl;
-				if (!inputData.photosUrl) {
-					photosUrl = [value];
-				} else {
-					photosUrl = [...inputData.photosUrl, value];
-				} // setInputData({
-				// 	...inputData,
-				// 	photosUrl,
-				// });
-				console.log('PHOTO_TEXT', PHOTO_TEXT);
+				const photosUrl = !inputData.photosUrl ? [value] : [...inputData.photosUrl, value];
 				const photoText = '' + PHOTO_TEXT + '. Загружено ' + photosUrl.length + '/3';
 				setFormData(CREATE_AD_ITEM, {
 					...inputData,
@@ -146,20 +142,6 @@ const CreateItem = (props) => {
 			},
 			() => {
 				setLoading(false);
-				// let photoText;
-				// if (!inputData.photosUrl) {
-				// 	photoText = PHOTO_TEXT + '. Загружено 0/3';
-				// } else {
-				// 	photoText = PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length + 1) + '/3';
-				// }
-				// // setInputData({
-				// // 	...inputData,
-				// // 	photoText,
-				// // });
-				// setFormData(CREATE_AD_ITEM, {
-				// 	...inputData,
-				// 	photoText,
-				// });
 			}
 		);
 	};
@@ -167,14 +149,6 @@ const CreateItem = (props) => {
 	function deletePhoto(i) {
 		const photoText = PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length - 1) + '/3';
 		const photosUrl = [...inputData.photosUrl.slice(0, i), ...inputData.photosUrl.slice(i + 1)];
-		// setInputData({
-		// 	...inputData,
-		// 	photoText,
-		// });
-		// setInputData({
-		// 	...inputData,
-		// 	photosUrl,
-		// });
 		setFormData(CREATE_AD_ITEM, {
 			...inputData,
 			photoText,
@@ -203,6 +177,37 @@ const CreateItem = (props) => {
 		  })
 		: [];
 
+	const [prevPhotosLen, setPrevPhotosLen] = useState(0);
+	const [noPhotos, setNoPhotos] = useState(true);
+	const [noPhotosA, setNoPhotosA] = useState(true);
+	const [photosDelete, setPhotosDelete] = useState(-1);
+	useEffect(() => {
+		const r = !inputData.photosUrl || inputData.photosUrl.length == 0;
+
+		if (r) {
+			setNoPhotosA(false);
+			setTimeout(() => {
+				setNoPhotos(r);
+				setNoPhotosA(false);
+				setTimeout(() => {
+					setNoPhotosA(true);
+				}, duration);
+			}, duration);
+		} else {
+			setNoPhotosA(false);
+			setPhotosDelete(prevPhotosLen);
+			setTimeout(() => {
+				setPhotosDelete(prevPhotosLen);
+				setNoPhotos(r);
+				setNoPhotosA(false);
+				setTimeout(() => {
+					setPhotosDelete(-1);
+				}, duration);
+			}, duration);
+		}
+		setPrevPhotosLen(inputData.photosUrl ? inputData.photosUrl.length : 0);
+	}, [inputData.photosUrl]);
+
 	return (
 		<>
 			{!needEdit ? (
@@ -213,9 +218,7 @@ const CreateItem = (props) => {
 					options={options}
 					onClose={handleClose}
 				/>
-			) : (
-				''
-			)}
+			) : null}
 			<CardGrid>
 				<Card size="l">
 					<FormLayout>
@@ -257,30 +260,39 @@ const CreateItem = (props) => {
 							alignItems: 'center',
 						}}
 					>
-						{inputData.photosUrl && inputData.photosUrl.length > 0 ? (
+						{!noPhotos ? (
 							<>
 								{needEdit ? null : (
-									<>
-										<File
-											multiple={true}
-											before={<Icon24Camera />}
-											disabled={inputData.photosUrl.length == 3}
-											mode={inputData.photosUrl.length == 3 ? 'secondary' : 'primary'}
-											onChange={loadPhoto}
-										>
-											Загрузить
-										</File>
-										<InfoRow
-											style={{
-												color: 'var(--text_secondary)',
-												marginTop: '6px',
-												paddingLeft: '6px',
-												paddingRight: '6px',
-											}}
-										>
-											{inputData.photoText}
-										</InfoRow>
-									</>
+									<Transition in={prevPhotosLen > 0} timeout={duration}>
+										{(state) => (
+											<div
+												style={{
+													...allStyles[state],
+												}}
+											>
+												<File
+													multiple={true}
+													before={<Icon24Camera />}
+													disabled={inputData.photosUrl.length == 3}
+													mode={inputData.photosUrl.length == 3 ? 'secondary' : 'primary'}
+													onChange={loadPhoto}
+													style={{transition:`${duration}ms ease-in-out`}}
+												>
+													Загрузить
+												</File>
+												<InfoRow
+													style={{
+														color: 'var(--text_secondary)',
+														marginTop: '6px',
+														paddingLeft: '6px',
+														paddingRight: '6px',
+													}}
+												>
+													{inputData.photoText}
+												</InfoRow>
+											</div>
+										)}
+									</Transition>
 								)}
 
 								<HorizontalScroll>
@@ -290,23 +302,45 @@ const CreateItem = (props) => {
 												img.src = img.PhotoUrl;
 												img.id = img.AdPhotoId;
 											}
+
+											const v = (
+												<div className="create-photo-panel">
+													<img
+														onClick={() => openPhotos(i)}
+														src={img.src}
+														className="create-photo"
+													/>
+													{needEdit ? null : (
+														<div
+															onClick={() => {
+																setPhotosDelete(i);
+																setTimeout(() => {
+																	setPhotosDelete(-1);
+																	deletePhoto(i);
+																}, duration);
+															}}
+															className="create-photo-delete"
+														>
+															<Icon24Cancel />
+														</div>
+													)}
+												</div>
+											);
 											return (
 												<div key={img.id} style={{ padding: '4px' }}>
-													<div className="create-photo-panel">
-														<img
-															onClick={() => openPhotos(i)}
-															src={img.src}
-															className="create-photo"
-														/>
-														{needEdit ? null : (
-															<div
-																onClick={() => deletePhoto(i)}
-																className="create-photo-delete"
-															>
-																<Icon24Cancel />
-															</div>
-														)}
-													</div>
+													{
+														<Transition in={photosDelete != i} timeout={duration}>
+															{(state) => (
+																<div
+																	style={{
+																		...allStyles[state],
+																	}}
+																>
+																	{v}
+																</div>
+															)}
+														</Transition>
+													}
 												</div>
 											);
 										})}
@@ -315,28 +349,38 @@ const CreateItem = (props) => {
 								</HorizontalScroll>
 							</>
 						) : (
-							<Placeholder
-								header="Загрузи снимок"
-								icon={<Icon48Camera />}
-								action={
-									<File
-										top="Снимки вещей"
-										disabled={inputData.photosUrl && inputData.photosUrl.length == 3}
-										mode={
-											inputData.photosUrl && inputData.photosUrl.length == 3
-												? 'secondary'
-												: 'primary'
-										}
-										onChange={loadPhoto}
+							<Transition in={noPhotosA} timeout={duration}>
+								{(state) => (
+									<div
+										style={{
+											...allStyles[state],
+										}}
 									>
-										Загрузить
-									</File>
-								}
-							>
-								{inputData.photoText
-									? inputData.photoText
-									: 'Снимки должны передавать реальное состояние вещи, не используй чужие картинки или отредактированные фотографии'}
-							</Placeholder>
+										<Placeholder
+											header="Загрузи снимок"
+											icon={<Icon48Camera />}
+											action={
+												<File
+													top="Снимки вещей"
+													disabled={inputData.photosUrl && inputData.photosUrl.length == 3}
+													mode={
+														inputData.photosUrl && inputData.photosUrl.length == 3
+															? 'secondary'
+															: 'primary'
+													}
+													onChange={loadPhoto}
+												>
+													Загрузить
+												</File>
+											}
+										>
+											{inputData.photoText
+												? inputData.photoText
+												: 'Снимки должны передавать реальное состояние вещи, не используй чужие картинки или отредактированные фотографии'}
+										</Placeholder>
+									</div>
+								)}
+							</Transition>
 						)}
 					</Group>
 				</FormLayout>
@@ -363,4 +407,4 @@ const mapDispatchToProps = {
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateItem);
 
-// 342 -> 296 -> 336
+// 342 -> 296 -> 336 -> 415

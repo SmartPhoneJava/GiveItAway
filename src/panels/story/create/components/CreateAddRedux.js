@@ -27,7 +27,6 @@ import Icon24Place from '@vkontakte/icons/dist/24/place';
 
 import { PANEL_CITIES, PANEL_CATEGORIES, PANEL_COUNTRIES } from './../../../../store/router/panelTypes';
 
-import TransitionGroup from 'react-addons-transition-group';
 import { Transition } from 'react-transition-group';
 
 import { canWritePrivateMessage } from '../../../../requests';
@@ -40,22 +39,6 @@ import { NoRegion } from '../../../../components/location/const';
 import { CategoryNo, CategoryOnline } from '../../../../components/categories/const';
 import { FORM_CREATE } from '../../../../components/categories/redux';
 import { GetCategoryImage, GetCategory50, GetCategory400 } from '../../../../components/categories/Categories';
-
-// const FFFORM = (props) => {
-// 	const {errorText, errorHeader, valid} = props
-// 	useEffect(()=>{
-// 		return ()=>{
-
-// 		}
-// 	},[])
-// 	return (
-// 		<div style={{ padding: '10px' }}>
-// 			<FormStatus header={errorHeader} mode={valid ? 'default' : 'error'}>
-// 				{errorText}
-// 			</FormStatus>
-// 		</div>
-// 	);
-// };
 
 const duration = 300;
 
@@ -130,7 +113,7 @@ const CreateAddRedux = (props) => {
 	const [addOffset, setAddOffset] = useState(0);
 	const needEdit = inputData[EDIT_MODE] ? inputData[EDIT_MODE].mode : false;
 
-	const [notShow, setNotShow] = useState(false)
+	const [notShow, setNotShow] = useState(false);
 
 	const [licenceAgree, setLicenceAgree] = useState(false);
 
@@ -148,14 +131,14 @@ const CreateAddRedux = (props) => {
 		if (!v) {
 			setErrorHeader(header);
 			setErrorText(text);
-			setNotShow(false)
+			setNotShow(false);
 		} else {
 			console.log('trudwdjk');
-			const h = agreeRef.current.clientHeight
+			const h = agreeRef.current.clientHeight;
 			setAddOffset(h);
-			setInterval(()=>{
+			setTimeout(() => {
 				setAddOffset(h);
-			}, 1000)
+			}, 1000);
 		}
 	}, [inputData, licenceAgree]);
 
@@ -198,7 +181,7 @@ const CreateAddRedux = (props) => {
 						}
 						set_geodata_string(data_string);
 						setNeedRefreshL(true);
-						setInterval(() => {
+						setTimeout(() => {
 							if (cancelFunc) {
 								return;
 							}
@@ -435,32 +418,21 @@ const CreateAddRedux = (props) => {
 					</Checkbox>
 				</FormLayout>
 			</div>
-			{/* <TransitionGroup>
-				{valid && (
-					<div style={{ padding: '10px' }}>
+			<Transition in={!valid} timeout={duration}>
+				{(state) => (
+					<div
+						style={{
+							...defaultStyle,
+							...transitionStyles[state],
+							padding: '10px',
+						}}
+					>
 						<FormStatus header={errorHeader} mode={valid ? 'default' : 'error'}>
 							{errorText}
 						</FormStatus>
 					</div>
 				)}
-			</TransitionGroup> */}
-			{notShow ? null : (
-				<Transition in={!valid} timeout={duration}>
-					{(state) => (
-						<div
-							style={{
-								...defaultStyle,
-								...transitionStyles[state],
-								padding: '10px',
-							}}
-						>
-							<FormStatus header={errorHeader} mode={valid ? 'default' : 'error'}>
-								{errorText}
-							</FormStatus>
-						</div>
-					)}
-				</Transition>
-			)}
+			</Transition>
 			<Transition in={valid} timeout={duration}>
 				{(state) => (
 					<Div

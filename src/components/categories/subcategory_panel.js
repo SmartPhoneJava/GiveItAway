@@ -80,11 +80,12 @@ const SubcategoriesPanel = (props) => {
 				afterClick={
 					choosenGroup
 						? (group, cell) => {
-								setFormData(redux_form, {
+								setFormData(props.redux_main_form, {
 									...formData.forms[redux_form],
 									incategory: cell,
 									subcategory: group.header,
 								});
+								console.log("i seet", redux_form, cell, group.header)
 								props.goNext();
 						  }
 						: (group, cell) => {
