@@ -27,7 +27,8 @@ import Icon24Place from '@vkontakte/icons/dist/24/place';
 
 import { PANEL_CITIES, PANEL_CATEGORIES, PANEL_COUNTRIES } from './../../../../store/router/panelTypes';
 
-import Location from '../../../../components/location/label';
+import TransitionGroup from 'react-addons-transition-group';
+import { Transition } from 'react-transition-group';
 
 import { canWritePrivateMessage } from '../../../../requests';
 import { FORM_LOCATION_CREATE } from '../../../../components/location/redux';
@@ -36,9 +37,44 @@ import { EDIT_MODE, CREATE_AD_ITEM, GEO_DATA } from '../../../../store/create_po
 import { getGeodata } from '../../../../services/VK';
 import { getAdress, getMetro } from '../../../../services/geodata';
 import { NoRegion } from '../../../../components/location/const';
-import { CategoryAuto, CategoryNo, CategoryOnline } from '../../../../components/categories/const';
+import { CategoryNo, CategoryOnline } from '../../../../components/categories/const';
 import { FORM_CREATE } from '../../../../components/categories/redux';
 import { GetCategoryImage, GetCategory50, GetCategory400 } from '../../../../components/categories/Categories';
+
+// const FFFORM = (props) => {
+// 	const {errorText, errorHeader, valid} = props
+// 	useEffect(()=>{
+// 		return ()=>{
+
+// 		}
+// 	},[])
+// 	return (
+// 		<div style={{ padding: '10px' }}>
+// 			<FormStatus header={errorHeader} mode={valid ? 'default' : 'error'}>
+// 				{errorText}
+// 			</FormStatus>
+// 		</div>
+// 	);
+// };
+
+const duration = 300;
+
+const defaultStyle = {
+	// transition: `opacity ${duration}ms ease-in-out`,
+	transition: '300ms',
+
+	opacity: 0,
+};
+
+const transitionStyles = {
+	entering: { opacity: 1 },
+	entered: { opacity: 1 },
+	exiting: {
+		opacity: 0,
+		transform: 'scale(0.1)',
+	},
+	exited: { opacity: 0, transform: 'scale(0.1)' },
+};
 
 const CreateAddRedux = (props) => {
 	const { myUser, appID, apiVersion, snackbar, inputData } = props;
@@ -58,6 +94,10 @@ const CreateAddRedux = (props) => {
 			? inputData[FORM_LOCATION_CREATE].city.title
 			: 'Мой адрес'
 	);
+
+	// refs
+	const addRef = useRef();
+	const agreeRef = useRef();
 
 	const [category, setCategory] = useState(CategoryNo);
 	useEffect(() => {
@@ -87,23 +127,36 @@ const CreateAddRedux = (props) => {
 	const [errorHeader, setErrorHeader] = useState('');
 	const [errorText, setErrorText] = useState('');
 	const [valid, setValid] = useState(false);
+	const [addOffset, setAddOffset] = useState(0);
 	const needEdit = inputData[EDIT_MODE] ? inputData[EDIT_MODE].mode : false;
+
+	const [notShow, setNotShow] = useState(false)
 
 	const [licenceAgree, setLicenceAgree] = useState(false);
 
 	useEffect(() => {
 		let { v, header, text } = props.isValid(inputData);
-		console.log("origin v is", v)
+		console.log('origin v is', v);
 		if (v && !licenceAgree) {
-			v = licenceAgree
-			text = "Прочтите и согласитель с правилами использования"
+			v = licenceAgree;
+			text = 'Прочтите и согласитель с правилами использования';
 		}
-		v = v && licenceAgree
-		console.log("v is", v, licenceAgree)
-		
+		v = v && licenceAgree;
+		console.log('v is', v, licenceAgree);
+
 		setValid(v);
-		setErrorHeader(header);
-		setErrorText(text);
+		if (!v) {
+			setErrorHeader(header);
+			setErrorText(text);
+			setNotShow(false)
+		} else {
+			console.log('trudwdjk');
+			const h = agreeRef.current.clientHeight
+			setAddOffset(h);
+			setInterval(()=>{
+				setAddOffset(h);
+			}, 1000)
+		}
 	}, [inputData, licenceAgree]);
 
 	const ON_REFRESH_CLICK = 'ON_REFRESH_CLICK';
@@ -246,6 +299,15 @@ const CreateAddRedux = (props) => {
 		// 	});
 	}
 
+	const styleAdd = () => {
+		var m = addOffset || 0;
+		console.log('move move', m);
+		return {
+			entered: { transform: `translateY(-${m}px)`, opacity: 1 },
+			exited: { transform: `translateY(1px)`, opacity: 1 },
+		};
+	};
+
 	const [width, setWidth] = useState(document.body.clientWidth - 40);
 	const [ymapsL, setYmapsL] = useState({});
 
@@ -361,37 +423,67 @@ const CreateAddRedux = (props) => {
 
 			<ChooseFeedback pmOpen={pmOpen} />
 			<ChooseType />
-			<FormLayout>
-				<Checkbox
-					onChange={(event) => {
-						console.log("setter", event.target.checked)
-						setLicenceAgree(event.target.checked);
-					}}
-				>
-					Я ознакомлен(-а) и согласен(-а) с <Link onClick={openLicence}>правилами использования</Link>
-				</Checkbox>
-			</FormLayout>
-			{valid ? (
-				''
-			) : (
-				<div style={{ padding: '10px' }}>
-					<FormStatus header={errorHeader} mode={valid ? 'default' : 'error'}>
-						{errorText}
-					</FormStatus>
-				</div>
-			)}
-
-			<Div style={{ display: 'flex' }}>
-				{needEdit ? (
-					<Button onClick={editAd} mode={valid ? 'commerce' : 'secondary'} size="l" stretched>
-						Сохранить
-					</Button>
-				) : (
-					<Button onClick={createAd} mode={valid ? 'commerce' : 'secondary'} size="l" stretched>
-						Добавить
-					</Button>
+			{/** ref={agreeRef} */}
+			<div ref={agreeRef}>
+				<FormLayout>
+					<Checkbox
+						onChange={(event) => {
+							setLicenceAgree(event.target.checked);
+						}}
+					>
+						Я ознакомлен(-а) и согласен(-а) с <Link onClick={openLicence}>правилами использования</Link>
+					</Checkbox>
+				</FormLayout>
+			</div>
+			{/* <TransitionGroup>
+				{valid && (
+					<div style={{ padding: '10px' }}>
+						<FormStatus header={errorHeader} mode={valid ? 'default' : 'error'}>
+							{errorText}
+						</FormStatus>
+					</div>
 				)}
-			</Div>
+			</TransitionGroup> */}
+			{notShow ? null : (
+				<Transition in={!valid} timeout={duration}>
+					{(state) => (
+						<div
+							style={{
+								...defaultStyle,
+								...transitionStyles[state],
+								padding: '10px',
+							}}
+						>
+							<FormStatus header={errorHeader} mode={valid ? 'default' : 'error'}>
+								{errorText}
+							</FormStatus>
+						</div>
+					)}
+				</Transition>
+			)}
+			<Transition in={valid} timeout={duration}>
+				{(state) => (
+					<Div
+						style={{
+							...defaultStyle,
+							...styleAdd()[state],
+							display: 'flex',
+							opacity: 1,
+						}}
+					>
+						{needEdit ? (
+							<Button onClick={editAd} mode={valid ? 'commerce' : 'secondary'} size="l" stretched>
+								Сохранить
+							</Button>
+						) : (
+							<Button onClick={createAd} mode={valid ? 'commerce' : 'secondary'} size="l" stretched>
+								Добавить
+							</Button>
+						)}
+					</Div>
+				)}
+			</Transition>
+
 			{snackbar}
 		</div>
 	);
@@ -399,4 +491,4 @@ const CreateAddRedux = (props) => {
 
 export default CreateAddRedux;
 
-// 609 -> 462 -> 321 -> 348 -> 282 -> 126
+// 609 -> 462 -> 321 -> 348 -> 282 -> 126 -> 494
