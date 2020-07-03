@@ -1,7 +1,13 @@
 import { connect } from 'react-redux';
 
 import { setPage, openPopout, openSnackbar, closeSnackbar, setStory, setAd } from '../../store/router/actions';
-import { PANEL_CATEGORIES, PANEL_CITIES, PANEL_COUNTRIES, PANEL_ONE } from '../../store/router/panelTypes';
+import {
+	PANEL_CATEGORIES,
+	PANEL_CITIES,
+	PANEL_COUNTRIES,
+	PANEL_ONE,
+	PANEL_LICENCE,
+} from '../../store/router/panelTypes';
 
 import { setFormData, setGeoDataString, setGeoData } from '../../store/create_post/actions';
 import { CREATE_AD_MAIN, CREATE_AD_ITEM, GEO_DATA } from '../../store/create_post/types';
@@ -9,7 +15,7 @@ import { CREATE_AD_MAIN, CREATE_AD_ITEM, GEO_DATA } from '../../store/create_pos
 import CreateAddRedux from './../../panels/story/create/components/CreateAddRedux';
 
 import { CreateAd, EditAd } from '../../requests';
-import { CategoryNo } from '../../components/categories/const';
+import { CategoryNo, CategoryOnline } from '../../components/categories/const';
 
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { FORM_CREATE } from '../../components/categories/redux';
@@ -69,16 +75,8 @@ const getAd = (myUser, inputData) => {
 	};
 };
 
-const openCategories = () => {
-	setPage(PANEL_CATEGORIES);
-};
-
-const openCountries = () => {
-	setPage(PANEL_COUNTRIES);
-};
-
-const openCities = () => {
-	setPage(PANEL_CITIES);
+const openLicence = (dispatch) => {
+	dispatch(setPage(PANEL_LICENCE));
 };
 
 const openAd = (ad, dispatch) => {
@@ -130,6 +128,7 @@ const editAd = (myUser, inputData, dispatch) => {
 };
 
 const isValid = (inputData) => {
+	let category = CategoryNo;
 	const itemInfo = getItemInfo(inputData);
 	if (itemInfo) {
 		const { name, description, photosUrl } = itemInfo;
@@ -175,12 +174,34 @@ const isValid = (inputData) => {
 				text: 'Краткость сестра таланта!(максимум: 1000 символов)',
 			};
 		}
-		if (!photosUrl || photosUrl.length == 0) {
+
+		const categoryInfo = getCategoryInfo(inputData);
+		if (categoryInfo) {
+			category = categoryInfo.category;
+			if (category == CategoryNo) {
+				return {
+					v: false,
+					header: 'Категория предмета не указана',
+					text: 'Выберите категорию предметов в выпадающем списке в начале страницы',
+				};
+			}
+		} else {
 			return {
 				v: false,
-				header: 'Не загружено ни одной фотографии',
-				text: 'Загрузите от 1 до 3 фотографий предмета!',
+				header: 'Категория предмета не указана',
+				text: 'Выберите категорию предметов в выпадающем списке в начале страницы',
 			};
+		}
+
+		console.log('isValid check category is', category);
+		if (category != CategoryOnline) {
+			if (!photosUrl || photosUrl.length == 0) {
+				return {
+					v: false,
+					header: 'Не загружено ни одной фотографии',
+					text: 'Загрузите от 1 до 3 фотографий предмета!',
+				};
+			}
 		}
 		const mainInfo = getMainInfo(inputData);
 		if (mainInfo) {
@@ -201,40 +222,24 @@ const isValid = (inputData) => {
 		};
 	}
 
-	const categoryInfo = getCategoryInfo(inputData);
-	if (categoryInfo) {
-		const { category } = categoryInfo;
-		if (category == CategoryNo) {
-			return {
-				v: false,
-				header: 'Категория предмета не указана',
-				text: 'Выберите категорию предметов в выпадающем списке в начале страницы',
-			};
-		}
-	} else {
-		return {
-			v: false,
-			header: 'Категория предмета не указана',
-			text: 'Выберите категорию предметов в выпадающем списке в начале страницы',
-		};
-	}
-
-	const locationInfo = getLocationInfo(inputData);
-	if (locationInfo) {
-		const { city, country } = locationInfo;
-		if (city.id < 0 || country.id < 0) {
+	if (category != CategoryOnline) {
+		const locationInfo = getLocationInfo(inputData);
+		if (locationInfo) {
+			const { city, country } = locationInfo;
+			if (city.id < 0 || country.id < 0) {
+				return {
+					v: false,
+					header: 'Местоположение не указано',
+					text: 'Укажите свою страну и город с помощью выпадающих списков выше',
+				};
+			}
+		} else {
 			return {
 				v: false,
 				header: 'Местоположение не указано',
 				text: 'Укажите свою страну и город с помощью выпадающих списков выше',
 			};
 		}
-	} else {
-		return {
-			v: false,
-			header: 'Местоположение не указано',
-			text: 'Укажите свою страну и город с помощью выпадающих списков выше',
-		};
 	}
 	return {
 		v: true,
@@ -264,6 +269,7 @@ const mapDispatchToProps = (dispatch) => {
 		setGeoDataString: (s) => dispatch(setGeoDataString(s)),
 		setFormData: (p, s) => dispatch(setFormData(p, s)),
 		setPage: (p) => dispatch(setPage(p)),
+		openLicence: () => openLicence(dispatch),
 		openSnackbar: (p) => dispatch(openSnackbar(p)),
 		closeSnackbar: () => dispatch(closeSnackbar()),
 		createAd: (myUser, inputData) => createAd(myUser, inputData, dispatch),

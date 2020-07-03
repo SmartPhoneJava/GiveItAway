@@ -41,7 +41,6 @@ const ChooseFeedback = (props) => {
 			...inputData,
 			[e.currentTarget.name]: e.currentTarget.checked,
 		});
-		console.log('debuuug', e.currentTarget.name, e.currentTarget.checked);
 		props.setFormData(CREATE_AD_MAIN, {
 			...inputData,
 			[e.currentTarget.name]: e.currentTarget.checked,
@@ -49,7 +48,17 @@ const ChooseFeedback = (props) => {
 	}
 
 	return (
-		<Group separator="hide" header={<Header>Обратная связь</Header>}>
+		<Group
+			separator="hide"
+			header={
+				<Cell
+					multiline={true}
+					description="Как откливнушиеся смогут связаться с тобой?"
+				>
+					<div style={{ fontWeight: 600 }}>Обратная связь</div>
+				</Cell>
+			}
+		>
 			<Cell
 				before={<Icon24Message fill="var(--header_tab_inactive_text)" />}
 				multiline

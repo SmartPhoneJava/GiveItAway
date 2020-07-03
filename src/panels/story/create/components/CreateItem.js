@@ -40,12 +40,14 @@ import { PHOTO_TEXT } from '../../../../const/create';
 
 import './createItem.css';
 import { closeSnackbar, openSnackbar, setDummy } from '../../../../store/router/actions';
+import { CategoryOnline } from '../../../../components/categories/const';
 
 const nameLabel = 'Название';
 const descriptionLabel = 'Описание';
 
 const CreateItem = (props) => {
-	const { AD, defaultInputData, setFormData, openSnackbar, closeSnackbar, setDummy } = props;
+	const { AD, defaultInputData, category } = props;
+	const { setFormData, openSnackbar, closeSnackbar, setDummy } = props;
 	const inputData = props.inputData[CREATE_AD_ITEM] || defaultInputData;
 	const name = props.inputData[CREATE_AD_ITEM].name || '';
 	const description = props.inputData[CREATE_AD_ITEM].description || '';
@@ -216,132 +218,129 @@ const CreateItem = (props) => {
 			)}
 			<CardGrid>
 				<Card size="l">
-					<div
-						style={{
-							display: platform == 'desktop_web' ? 'flex' : 'block',
-							alignItems: 'flex-start',
-						}}
-					>
-						<div
-							style={{
-								paddingLeft: '10px',
-							}}
-						>
-							<CategoriesLabel open={props.openCategories} redux_form={FORM_CREATE} />
-						</div>
-						<FormLayout>
-							<Input
-								top={nameLabel}
-								name="name"
-								size="50"
-								placeholder="футбольный мяч"
-								value={name}
-								onChange={handleInput}
-							/>
-						</FormLayout>
-					</div>
-					<div>
-						<FormLayout>
-							<Textarea
-								top={descriptionLabel}
-								name="description"
-								placeholder="Количество, состояние, габариты, дата покупки, особенности и т.д."
-								value={description}
-								onChange={handleInput}
-							/>
-						</FormLayout>
+					<FormLayout>
+						<Input
+							top={nameLabel}
+							name="name"
+							size="50"
+							placeholder="футбольный мяч"
+							value={name}
+							onChange={handleInput}
+						/>
+					</FormLayout>
+					<FormLayout>
+						<Textarea
+							top={descriptionLabel}
+							name="description"
+							placeholder="Количество, состояние, габариты, дата покупки, особенности и т.д."
+							value={description}
+							onChange={handleInput}
+						/>
+					</FormLayout>
+					<div style={{ paddingBottom: '8px' }}>
+						<CategoriesLabel
+							open={props.openCategories}
+							redux_form={FORM_CREATE}
+							notChoosenElement={{ id: -1, content: 'Не выбрано' }}
+						/>
 					</div>
 				</Card>
 			</CardGrid>
-			<FormLayout>
-				<Group
-					header={<Header>Снимки</Header>}
-					style={{
-						display: 'block',
-						textAlign: 'center',
-						justifyContent: 'center',
-						alignItems: 'center',
-					}}
-				>
-					{inputData.photosUrl && inputData.photosUrl.length > 0 ? (
-						<>
-							{needEdit ? null : (
-								<>
+			{category == CategoryOnline ? null : (
+				<FormLayout>
+					<Group
+						header={<Header>Снимки</Header>}
+						style={{
+							display: 'block',
+							textAlign: 'center',
+							justifyContent: 'center',
+							alignItems: 'center',
+						}}
+					>
+						{inputData.photosUrl && inputData.photosUrl.length > 0 ? (
+							<>
+								{needEdit ? null : (
+									<>
+										<File
+											multiple={true}
+											before={<Icon24Camera />}
+											disabled={inputData.photosUrl.length == 3}
+											mode={inputData.photosUrl.length == 3 ? 'secondary' : 'primary'}
+											onChange={loadPhoto}
+										>
+											Загрузить
+										</File>
+										<InfoRow
+											style={{
+												color: 'var(--text_secondary)',
+												marginTop: '6px',
+												paddingLeft: '6px',
+												paddingRight: '6px',
+											}}
+										>
+											{inputData.photoText}
+										</InfoRow>
+									</>
+								)}
+
+								<HorizontalScroll>
+									<div style={{ display: 'flex', marginLeft: '10px', marginRight: '10px' }}>
+										{inputData.photosUrl.map((img, i) => {
+											if (needEdit) {
+												img.src = img.PhotoUrl;
+												img.id = img.AdPhotoId;
+											}
+											return (
+												<div key={img.id} style={{ padding: '4px' }}>
+													<div className="create-photo-panel">
+														<img
+															onClick={() => openPhotos(i)}
+															src={img.src}
+															className="create-photo"
+														/>
+														{needEdit ? null : (
+															<div
+																onClick={() => deletePhoto(i)}
+																className="create-photo-delete"
+															>
+																<Icon24Cancel />
+															</div>
+														)}
+													</div>
+												</div>
+											);
+										})}
+										{loading ? <Spinner size="medium" /> : null}
+									</div>
+								</HorizontalScroll>
+							</>
+						) : (
+							<Placeholder
+								header="Загрузи снимок"
+								icon={<Icon48Camera />}
+								action={
 									<File
-										multiple={true}
-										before={<Icon24Camera />}
-										disabled={inputData.photosUrl.length == 3}
-										mode={inputData.photosUrl.length == 3 ? 'secondary' : 'primary'}
+										top="Снимки вещей"
+										disabled={inputData.photosUrl && inputData.photosUrl.length == 3}
+										mode={
+											inputData.photosUrl && inputData.photosUrl.length == 3
+												? 'secondary'
+												: 'primary'
+										}
 										onChange={loadPhoto}
 									>
 										Загрузить
 									</File>
-									<InfoRow
-										style={{
-											color: 'var(--text_secondary)',
-											marginTop: '6px',
-											paddingLeft: '6px',
-											paddingRight: '6px',
-										}}
-									>
-										{inputData.photoText}
-									</InfoRow>
-								</>
-							)}
-
-							<HorizontalScroll>
-								<div style={{ display: 'flex', marginLeft: '10px', marginRight: '10px' }}>
-									{inputData.photosUrl.map((img, i) => {
-										if (needEdit) {
-											img.src = img.PhotoUrl;
-											img.id = img.AdPhotoId;
-										}
-										return (
-											<div key={img.id} style={{ padding: '4px' }}>
-												<div className="create-photo-panel">
-													<img
-														onClick={() => openPhotos(i)}
-														src={img.src}
-														className="create-photo"
-													/>
-													{needEdit ? null : (
-														<div
-															onClick={() => deletePhoto(i)}
-															className="create-photo-delete"
-														>
-															<Icon24Cancel />
-														</div>
-													)}
-												</div>
-											</div>
-										);
-									})}
-									{loading ? <Spinner size="medium" /> : null}
-								</div>
-							</HorizontalScroll>
-						</>
-					) : (
-						<Placeholder
-							header="Ничего не загружено"
-							icon={<Icon48Camera />}
-							action={
-								<File
-									top="Снимки вещей"
-									disabled={inputData.photosUrl && inputData.photosUrl.length == 3}
-									mode={
-										inputData.photosUrl && inputData.photosUrl.length == 3 ? 'secondary' : 'primary'
-									}
-									onChange={loadPhoto}
-								>
-									Загрузить
-								</File>
-							}
-						>
-							{inputData.photoText}
-						</Placeholder>
-					)}
-				</Group>
-			</FormLayout>
+								}
+							>
+								{inputData.photoText
+									? inputData.photoText
+									: 'Снимки должны передавать реальное состояние вещи, не используй чужие картинки или отредактированные фотографии'}
+							</Placeholder>
+						)}
+					</Group>
+				</FormLayout>
+			)}
 		</>
 	);
 };

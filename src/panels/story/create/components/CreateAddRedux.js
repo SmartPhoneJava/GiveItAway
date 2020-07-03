@@ -12,6 +12,9 @@ import {
 	Avatar,
 	PanelHeaderButton,
 	Cell,
+	Banner,
+	Checkbox,
+	FormLayout,
 } from '@vkontakte/vkui';
 import { ReactDadata } from 'react-dadata';
 
@@ -33,22 +36,14 @@ import { EDIT_MODE, CREATE_AD_ITEM, GEO_DATA } from '../../../../store/create_po
 import { getGeodata } from '../../../../services/VK';
 import { getAdress, getMetro } from '../../../../services/geodata';
 import { NoRegion } from '../../../../components/location/const';
+import { CategoryAuto, CategoryNo, CategoryOnline } from '../../../../components/categories/const';
+import { FORM_CREATE } from '../../../../components/categories/redux';
+import { GetCategoryImage, GetCategory50, GetCategory400 } from '../../../../components/categories/Categories';
 
 const CreateAddRedux = (props) => {
-	const {
-		openSnackbar,
-		closeSnackbar,
-		setGeoDataString,
-		setGeoData,
-		setFormData,
-		myUser,
-		appID,
-		apiVersion,
-		setPage,
-		snackbar,
-		inputData,
-		AD,
-	} = props;
+	const { myUser, appID, apiVersion, snackbar, inputData } = props;
+
+	const { openSnackbar, closeSnackbar, setGeoDataString, setGeoData, setFormData, setPage, openLicence } = props;
 
 	const geodata =
 		inputData && inputData[GEO_DATA] && inputData[GEO_DATA].geodata && inputData[GEO_DATA].geodata.lat
@@ -63,6 +58,14 @@ const CreateAddRedux = (props) => {
 			? inputData[FORM_LOCATION_CREATE].city.title
 			: 'Мой адрес'
 	);
+
+	const [category, setCategory] = useState(CategoryNo);
+	useEffect(() => {
+		if (!inputData[FORM_CREATE]) {
+			return;
+		}
+		setCategory(inputData[FORM_CREATE].category);
+	}, [inputData[FORM_CREATE]]);
 
 	const [pmOpen, setPmOpen] = useState(true);
 	useEffect(() => {
@@ -83,20 +86,25 @@ const CreateAddRedux = (props) => {
 
 	const [errorHeader, setErrorHeader] = useState('');
 	const [errorText, setErrorText] = useState('');
-	// const [geodata, setGeodata] = useState({
-	// 	long: -1,
-	// 	lat: -1,
-	// });
-
 	const [valid, setValid] = useState(false);
 	const needEdit = inputData[EDIT_MODE] ? inputData[EDIT_MODE].mode : false;
 
+	const [licenceAgree, setLicenceAgree] = useState(false);
+
 	useEffect(() => {
-		const { v, header, text } = props.isValid(inputData);
+		let { v, header, text } = props.isValid(inputData);
+		console.log("origin v is", v)
+		if (v && !licenceAgree) {
+			v = licenceAgree
+			text = "Прочтите и согласитель с правилами использования"
+		}
+		v = v && licenceAgree
+		console.log("v is", v, licenceAgree)
+		
 		setValid(v);
 		setErrorHeader(header);
 		setErrorText(text);
-	}, [inputData]);
+	}, [inputData, licenceAgree]);
 
 	const ON_REFRESH_CLICK = 'ON_REFRESH_CLICK';
 	const ON_SUGGESTION_CLICK = 'ON_SUGGESTION_CLICK';
@@ -245,6 +253,7 @@ const CreateAddRedux = (props) => {
 		<div>
 			<Group separator="hide" header={<Header mode="secondary">Опишите выставляемые предметы</Header>}>
 				<CreateItem
+					category={category}
 					defaultInputData={props.defaultInputData}
 					openCategories={() => {
 						setPage(PANEL_CATEGORIES);
@@ -260,96 +269,108 @@ const CreateAddRedux = (props) => {
 				/>
 			</Group> */}
 
-			<Group
-				separator="hide"
-				header={
-					<Cell
-						multiline={true}
-						description="Кликни по полю ввода, чтобы указать свое местоположение или по иконке, чтобы определить его автоматически"
-					>
-						<div style={{ fontWeight: 600 }}>Местоположение объявления</div>
-					</Cell>
-				}
-			>
-				<>
-					<div style={{ paddingRight: '15px' }}>
-						<div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-							<PanelHeaderButton
-								style={{ padding: '0px', margin: '0px' }}
-								onClick={() => {
-									setDadataB(ON_REFRESH_CLICK);
-								}}
-							>
-								<Icon24Place fill="var(--accent)" />
-							</PanelHeaderButton>
-
-							<div style={{ flex: 1 }}>
-								{needRefreshL ? null : (
-									<ReactDadata
-										disabled={needEdit}
-										token={'efb37d1dc6b04c11116d3ab7ef9482fa13e0b664'}
-										query={geodata_string}
-										onChange={(e) => {
-											console.log('geoDataString', e);
-											setGeoDataString(e.value);
-											set_geodata_string(e.value);
-											setDadataB(ON_SUGGESTION_CLICK);
-
-											const city_title = e.data.city
-												? e.data.city
-												: e.data.region
-												? e.data.region
-												: NoRegion.title;
-											setFormData(FORM_LOCATION_CREATE, {
-												...inputData[FORM_LOCATION_CREATE],
-												country: { id: 1, title: e.data.country },
-												city: { id: 1, title: city_title },
-											});
-											findMetro(ymapsL, e.value);
-
-											// if (!e.data.geo_lat) {
-											// 	getMetro(e.data.postal_code);
-											// }
-											// setMapState({ ...mapState, center: [e.geo_lat, e.geo_long] });
-										}}
-										autocomplete={geodata_string}
-										placeholder={'Введите адрес'}
-									/>
-								)}
-							</div>
-
-							{dadataB == NO_CLICK ? null : <Spinner size="small" />}
-						</div>
-
-						<div style={{ paddingLeft: '15px' }}>
-							{/* {needRefreshM ? null : ( */}
-							<YMaps query={{ apikey: '7f6269fb-0f48-4182-bd23-13b3cb155a06' }}>
-								<Map
-									width={width}
-									state={mapState}
-									modules={['geocode']}
-									onLoad={(ymaps) => {
-										setYmapsL(ymaps);
-										findMetro(ymaps);
+			{category == CategoryOnline ? (
+				<Banner
+					before={<Avatar size={48} src={GetCategory400(category)} />}
+					subheader="Вы отдаете электронную вещь, поэтому указание снимков и геопозиции не требуется"
+				/>
+			) : (
+				<Group
+					separator="hide"
+					header={
+						<Cell
+							multiline={true}
+							description="Кликни по полю ввода, чтобы указать свое местоположение или по иконке, чтобы определить его автоматически"
+						>
+							<div style={{ fontWeight: 600 }}>Где забрать вещь</div>
+						</Cell>
+					}
+				>
+					<>
+						<div style={{ paddingRight: '15px' }}>
+							<div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+								<PanelHeaderButton
+									style={{ padding: '0px', margin: '0px' }}
+									onClick={() => {
+										setDadataB(ON_REFRESH_CLICK);
 									}}
 								>
-									<Placemark geometry={place} />
-									<FullscreenControl options={{ float: 'left' }} />
-								</Map>
-							</YMaps>
-							{/* )} */}
+									<Icon24Place fill="var(--accent)" />
+								</PanelHeaderButton>
+
+								<div style={{ flex: 1 }}>
+									{needRefreshL ? null : (
+										<ReactDadata
+											disabled={needEdit}
+											token={'efb37d1dc6b04c11116d3ab7ef9482fa13e0b664'}
+											query={geodata_string}
+											onChange={(e) => {
+												console.log('geoDataString', e);
+												setGeoDataString(e.value);
+												set_geodata_string(e.value);
+												setDadataB(ON_SUGGESTION_CLICK);
+
+												const city_title = e.data.city
+													? e.data.city
+													: e.data.region
+													? e.data.region
+													: NoRegion.title;
+												setFormData(FORM_LOCATION_CREATE, {
+													...inputData[FORM_LOCATION_CREATE],
+													country: { id: 1, title: e.data.country },
+													city: { id: 1, title: city_title },
+												});
+												findMetro(ymapsL, e.value);
+
+												// if (!e.data.geo_lat) {
+												// 	getMetro(e.data.postal_code);
+												// }
+												// setMapState({ ...mapState, center: [e.geo_lat, e.geo_long] });
+											}}
+											autocomplete={geodata_string}
+											placeholder={'Введите адрес'}
+										/>
+									)}
+								</div>
+
+								{dadataB == NO_CLICK ? null : <Spinner size="small" />}
+							</div>
+
+							<div style={{ paddingLeft: '15px' }}>
+								{/* {needRefreshM ? null : ( */}
+								<YMaps query={{ apikey: '7f6269fb-0f48-4182-bd23-13b3cb155a06' }}>
+									<Map
+										width={width}
+										state={mapState}
+										modules={['geocode']}
+										onLoad={(ymaps) => {
+											setYmapsL(ymaps);
+											findMetro(ymaps);
+										}}
+									>
+										<Placemark geometry={place} />
+										<FullscreenControl options={{ float: 'left' }} />
+									</Map>
+								</YMaps>
+								{/* )} */}
+							</div>
 						</div>
-					</div>
-				</>
-			</Group>
+					</>
+				</Group>
+			)}
 
 			<ChooseFeedback pmOpen={pmOpen} />
 			<ChooseType />
-			{/* <FormLayout>
-				<Checkbox>
-					Я прочитал и согласен c <Link onClick={openSubs}>пользовательским соглашением</Link>
+			<FormLayout>
+				<Checkbox
+					onChange={(event) => {
+						console.log("setter", event.target.checked)
+						setLicenceAgree(event.target.checked);
+					}}
+				>
+					Я ознакомлен(-а) и согласен(-а) с <Link onClick={openLicence}>правилами использования</Link>
 				</Checkbox>
-			</FormLayout> */}
+			</FormLayout>
 			{valid ? (
 				''
 			) : (

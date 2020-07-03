@@ -89,6 +89,7 @@ const GroupsPanel = (props) => {
 	}
 
 	function onCellClick(group, value) {
+		console.log('we are set this', redux_form, field, value);
 		if (props.clear) {
 			props.setFormData(redux_form, {
 				...defaultInputData,
@@ -100,6 +101,7 @@ const GroupsPanel = (props) => {
 				[field]: value,
 			});
 		}
+		console.log('did this', props.inputData);
 		if (!afterClick) {
 			goBack();
 		} else {

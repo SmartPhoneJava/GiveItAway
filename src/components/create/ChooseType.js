@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Radio, Group, Header } from '@vkontakte/vkui';
+import { Radio, Group, Header, Cell } from '@vkontakte/vkui';
 
 import { setFormData } from '../../store/create_post/actions';
 import { connect } from 'react-redux';
@@ -25,7 +25,14 @@ const ChooseType = (props) => {
 	}
 
 	return (
-		<Group separator="hide" header={<Header>Определение получателя</Header>}>
+		<Group
+			separator="hide"
+			header={
+				<Cell multiline={true} description="Как будет проходить выбор получателя вещи?">
+					<div style={{ fontWeight: 600 }}>Определение получателя</div>
+				</Cell>
+			}
+		>
 			<Radio
 				disabled={edited}
 				name="radio"

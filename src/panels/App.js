@@ -523,6 +523,9 @@ const App = (props) => {
 						<Create />
 						{snackbars[PANEL_CREATE]}
 					</Panel>
+					<Panel id={PANEL_LICENCE}>
+						<LicencePanel />
+					</Panel>
 					<Panel id={PANEL_CATEGORIES}>
 						<CategoriesPanel redux_form={FORM_CREATE} goBack={goBack} />
 					</Panel>

@@ -22,3 +22,47 @@
 	/* background: linear-gradient(to top left, powderblue, pink); */
 	/* background: radial-gradient(circle at 50% 50%, aqua, darkblue); */
 }
+
+.Simple {
+	border: 1px solid #E9E9E9;
+	border-radius: 4px;
+	padding-left: 12px;
+  }
+  .tag {
+	margin: 3px;
+	font-size: 13px;
+	border: 1px dashed #cccccc;
+	border-radius: 4px;
+	padding: 0 8px;
+	line-height: 30px;
+	color: #666666;
+	background: rgba(255, 255, 255, 0.7);
+  }
+
+  .row {
+    position: relative;
+    margin: 5px;
+    font-size: 13px;
+    border: 1px solid #3b9de9;
+	border-radius: 4px;
+	/* padding: 0 8px; */
+	/* padding-right: 24px; */
+	padding-left: 8px;
+	padding-right: 8px;
+    line-height: 30px;
+    color: #666666;
+    background: rgba(255, 255, 255, 0.7);
+  }
+  .edit-tag {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    width: 30px;
+	height: 30px;
+    cursor: pointer;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+  }
