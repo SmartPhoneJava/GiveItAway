@@ -236,6 +236,8 @@ export const adReducer = (state = initialState, action) => {
 			const creation_date = ad.creation_date;
 			const feedback_type = ad.feedback_type;
 			const category = ad.category;
+			const subcat_list = ad.subcat_list;
+			const subcat = ad.subcat;
 			const extra_field = ad.extra_field;
 
 			const views_count = ad.views_count;
@@ -301,6 +303,8 @@ export const adReducer = (state = initialState, action) => {
 				creation_date,
 				feedback_type,
 				category,
+				subcat_list,
+				subcat,
 				extra_field,
 				views_count,
 				pathes_to_photo,

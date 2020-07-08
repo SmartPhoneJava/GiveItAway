@@ -119,13 +119,12 @@ const CreateAddRedux = (props) => {
 
 	useEffect(() => {
 		let { v, header, text } = props.isValid(inputData);
-		console.log('origin v is', v);
-		if (v && !licenceAgree) {
-			v = licenceAgree;
+		var l = needEdit ? true : licenceAgree;
+		if (v && !l) {
+			v = l;
 			text = 'Прочтите и согласитель с правилами использования';
 		}
-		v = v && licenceAgree;
-		console.log('v is', v, licenceAgree);
+		v = v && l;
 
 		setValid(v);
 		if (!v) {
@@ -133,12 +132,13 @@ const CreateAddRedux = (props) => {
 			setErrorText(text);
 			setNotShow(false);
 		} else {
-			console.log('trudwdjk');
-			const h = agreeRef.current.clientHeight;
-			setAddOffset(h);
-			setTimeout(() => {
+			if (!needEdit) {
+				const h = agreeRef.current.clientHeight;
 				setAddOffset(h);
-			}, 1000);
+				setTimeout(() => {
+					setAddOffset(h);
+				}, 1000);
+			}
 		}
 	}, [inputData, licenceAgree]);
 
@@ -169,7 +169,6 @@ const CreateAddRedux = (props) => {
 				if (cancelFunc) {
 					return;
 				}
-				console.log('go deeper', data);
 				const center = [data.lat, data.long];
 				setMapState({ ...mapState, center });
 				setPlace(center);
@@ -284,7 +283,6 @@ const CreateAddRedux = (props) => {
 
 	const styleAdd = () => {
 		var m = addOffset || 0;
-		console.log('move move', m);
 		return {
 			entered: { transform: `translateY(-${m}px)`, opacity: 1 },
 			exited: { transform: `translateY(1px)`, opacity: 1 },
@@ -407,17 +405,19 @@ const CreateAddRedux = (props) => {
 			<ChooseFeedback pmOpen={pmOpen} />
 			<ChooseType />
 			{/** ref={agreeRef} */}
-			<div ref={agreeRef}>
-				<FormLayout>
-					<Checkbox
-						onChange={(event) => {
-							setLicenceAgree(event.target.checked);
-						}}
-					>
-						Я ознакомлен(-а) и согласен(-а) с <Link onClick={openLicence}>правилами использования</Link>
-					</Checkbox>
-				</FormLayout>
-			</div>
+			{needEdit ? null : (
+				<div ref={agreeRef}>
+					<FormLayout>
+						<Checkbox
+							onChange={(event) => {
+								setLicenceAgree(event.target.checked);
+							}}
+						>
+							Я ознакомлен(-а) и согласен(-а) с <Link onClick={openLicence}>правилами использования</Link>
+						</Checkbox>
+					</FormLayout>
+				</div>
+			)}
 			<Transition in={!valid} timeout={duration}>
 				{(state) => (
 					<div

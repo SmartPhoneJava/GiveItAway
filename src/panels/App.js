@@ -31,7 +31,7 @@ import {
 	PANEL_LICENCE,
 } from './../store/router/panelTypes';
 
-import { MODAL_ADS_FILTERS, MODAL_ADS_GEO } from './../store/router/modalTypes';
+import { MODAL_ADS_FILTERS, ADS_FILTERS_B, MODAL_ADS_GEO } from './../store/router/modalTypes';
 
 import './main.css';
 
@@ -479,17 +479,28 @@ const App = (props) => {
 						{snackbars[PANEL_SUBS]}
 					</Panel>
 					<Panel id={PANEL_CATEGORIES}>
-						<CategoriesPanel goBack={backToAdsFilters} redux_form={ADS_FILTERS} />
+						<CategoriesPanel redux_form={ADS_FILTERS_B} goBack={backToAdsFilters} />
 					</Panel>
 					<Panel id={PANEL_SUBCATEGORIES}>
 						<SubcategoriesPanel
-							goBack={goBack}
 							goNext={() => {
+								setPage(PANEL_SUBSUBCATEGORIES);
+							}}
+							goBack={goBack}
+							redux_form={ADS_FILTERS_B}
+						/>
+					</Panel>
+					<Panel id={PANEL_SUBSUBCATEGORIES}>
+						<SubcategoriesPanel
+							goNext={() => {
+								goBack();
 								goBack();
 								goBack();
 								openModal(MODAL_ADS_FILTERS);
 							}}
-							redux_form={ADS_FILTERS}
+							goBack={goBack}
+							redux_form={ADS_FILTERS_B}
+							redux_main_form={ADS_FILTERS}
 						/>
 					</Panel>
 

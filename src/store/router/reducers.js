@@ -172,17 +172,6 @@ export const routerReducer = (state = initialState, action) => {
 			};
 		}
 
-		case ADD_AD: {
-			let ad = action.payload.ad;
-			let Ads = state.adHistory;
-			Ads = state.activeAd ? [...Ads, state.activeAd] : Ads;
-			return {
-				...state,
-				activeAd: ad,
-				adHistory: Ads,
-			};
-		}
-
 		case SET_AD: {
 			window.history.pushState(null, null);
 			smoothScrollToTop();
@@ -319,11 +308,13 @@ export const routerReducer = (state = initialState, action) => {
 
 			let finish = false;
 			let Panel = state.activePanels[Story]
+			let storyChange = false;
 
 			if (Panels.length > 0) {
 				Panel = Panels[Panels.length - 1];
 			} else {
 				Stories.pop();
+				storyChange = true;
 				if (Stories.length > 0) {
 					Story = Stories[Stories.length - 1];
 
@@ -342,7 +333,7 @@ export const routerReducer = (state = initialState, action) => {
 
 			let Profile = state.activeProfile;
 			let Profiles = state.profileHistory;
-			if (state.activePanels[Story] == PANEL_USER) {
+			if (state.activePanels[Story] == PANEL_USER && !storyChange) {
 				Profiles.pop();
 				Profile = Profiles[Profiles.length - 1];
 			}
@@ -350,7 +341,7 @@ export const routerReducer = (state = initialState, action) => {
 			let adOut = state.adOut;
 			let Ad = state.activeAd;
 			let Ads = state.adHistory;
-			if (state.activePanels[Story] == PANEL_ONE) {
+			if (state.activePanels[Story] == PANEL_ONE && !storyChange) {
 				Ads.pop();
 				Ad = Ads[Ads.length - 1];
 				adOut = true
@@ -358,7 +349,7 @@ export const routerReducer = (state = initialState, action) => {
 
 			const scrollPosition = state.scrollPosition || [];
 			scrollPosition.pop();
-
+			console.log("GO_BACK INFO", Story, Panel)
 			return {
 				...state,
 

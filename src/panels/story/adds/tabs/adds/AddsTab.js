@@ -64,6 +64,8 @@ const AddsTab = (props) => {
 	const country = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].country : null) || NoRegion;
 	const city = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].city : null) || NoRegion;
 	const category = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].category : null) || CategoryNo;
+	const subcategory = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].subcategory : null) || CategoryNo;
+	const incategory = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].incategory : null) || CategoryNo;
 	const sort = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].sort : null) || SORT_TIME;
 	const mode = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].mode : null) || MODE_ALL;
 
@@ -86,6 +88,7 @@ const AddsTab = (props) => {
 			setIsMounted(false);
 		};
 	}, []);
+	const width = document.body.clientWidth;
 
 	const [inited, setInited] = useState(false);
 	const [loading, setLoading] = useState(true);
@@ -156,6 +159,12 @@ const AddsTab = (props) => {
 		}
 		if (category != CategoryNo) {
 			params.category = category;
+			if (subcategory != CategoryNo) {
+				params.subcat_list = subcategory;
+				if (incategory != CategoryNo) {
+					params.subcat = incategory;
+				}
+			}
 		}
 
 		if (geodata) {
@@ -260,7 +269,6 @@ const AddsTab = (props) => {
 		);
 	}
 
-	const width = document.body.clientWidth;
 	return (
 		<PullToRefresh
 			onRefresh={() => {
@@ -311,6 +319,7 @@ const AddsTab = (props) => {
 								array={rads.map((ad) => Ad(ad))}
 								columnsAmount={2}
 								ref={lastAdElementRef}
+								loading={loading}
 							/>
 						) : error ? (
 							<Error />

@@ -159,6 +159,11 @@ const AddMore2r = (props) => {
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [options, setOptions] = useState({});
+	const [rAd, setrAd] = useState(AD);
+
+	useEffect(() => {
+		setrAd(AD);
+	}, [AD]);
 
 	const handleClose = () => {
 		setIsOpen(false);
@@ -231,6 +236,8 @@ const AddMore2r = (props) => {
 				(details) => {
 					setExtraInfo(details, myID, true);
 					updateCost(details.is_subscriber);
+					console.log('ADDD', details);
+					setrAd(details);
 				},
 				(e) => {
 					setIsAuthor(false);
@@ -390,7 +397,7 @@ const AddMore2r = (props) => {
 			case STATUS_ABORTED:
 				return showAborted();
 		}
-		return '';
+		return null;
 	}
 
 	const openSubs = () => {
@@ -475,7 +482,7 @@ const AddMore2r = (props) => {
 		});
 		setLocalPhotos(photoSwipeImgs);
 		setImgs(pathes_to_photo.map((v) => v.PhotoUrl));
-		
+
 		console.log('loook at', photoSwipeImgs);
 		console.log('local', localPhotos);
 	}, [pathes_to_photo]);
@@ -541,6 +548,8 @@ const AddMore2r = (props) => {
 		});
 		setFormData(FORM_CREATE, {
 			category: AD.category,
+			subcategory: AD.subcat_list,
+			incategory: AD.subcat,
 		});
 
 		setFormData(CREATE_AD_MAIN, {
@@ -738,7 +747,15 @@ const AddMore2r = (props) => {
 					</tr>
 					<tr>
 						<td className="first">Категория</td>
-						<td>{GetCategoryText(category)}</td>
+						<td>{rAd.category}</td>
+					</tr>
+					<tr>
+						<td className="first">Раздел</td>
+						<td>{rAd.subcat_list}</td>
+					</tr>
+					<tr>
+						<td className="first">Подраздел</td>
+						<td>{rAd.subcat}</td>
 					</tr>
 					<tr>
 						<td className="first">Просмотров</td>

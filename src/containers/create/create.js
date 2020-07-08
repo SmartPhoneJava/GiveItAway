@@ -66,6 +66,9 @@ const getAd = (myUser, inputData) => {
 		// feedback_type: (main.ls ? ' ls' : '') + (main.comments ? ' comments' : ''),
 		extra_field: geodata_string,
 		category: category.category,
+		subcat_list: category.subcategory,
+		subcat: category.incategory,
+		category: category.category,
 		region: location.country.title,
 		district: location.city.title,
 		geo_position: {
@@ -95,6 +98,7 @@ const loadAd = (ad, dispatch) => {
 
 const createAd = (myUser, inputData, dispatch) => {
 	const ad = getAd(myUser, inputData);
+	console.log("i send it", ad)
 	const obj = JSON.stringify(ad);
 	const photos = getItemInfo(inputData).photosUrl;
 	CreateAd(

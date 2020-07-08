@@ -2,7 +2,6 @@ export const SET_PAGE = 'SET_PAGE';
 export const SET_PROFILE = 'SET_PROFILE';
 export const SET_AD = 'SET_AD';
 export const ADD_PROFILE = 'ADD_PROFILE';
-export const ADD_AD = 'ADD_AD';
 
 export const SET_TAB = 'SET_TAB';
 export const SET_STORY = 'SET_STORY';

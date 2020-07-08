@@ -56,6 +56,7 @@ const CategoriesLabel = (props) => {
 
 	useEffect(() => {
 		const data = inputData[redux_form];
+		console.log("i see this", data)
 		if (!data) {
 			return;
 		}

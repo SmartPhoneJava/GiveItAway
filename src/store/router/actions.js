@@ -1,6 +1,5 @@
 import {
 	ADD_PROFILE,
-	ADD_AD,
 	SET_PAGE,
 	SET_STORY,
 	GO_BACK,
@@ -50,13 +49,6 @@ export const addProfile = (profile) => ({
 	type: ADD_PROFILE,
 	payload: {
 		profile,
-	},
-});
-
-export const addAd = (ad) => ({
-	type: ADD_AD,
-	payload: {
-		ad,
 	},
 });
 
