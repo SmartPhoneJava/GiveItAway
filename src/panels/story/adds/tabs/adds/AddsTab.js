@@ -1,5 +1,15 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, Group, ScreenSpinner, PanelHeaderButton, Avatar, Banner, List, PullToRefresh } from '@vkontakte/vkui';
+import {
+	Search,
+	Group,
+	ScreenSpinner,
+	PanelHeaderButton,
+	Avatar,
+	Banner,
+	List,
+	PullToRefresh,
+	Spinner,
+} from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
@@ -18,6 +28,18 @@ import { Addr, BASE_AD } from './../../../../../store/addr';
 import { User } from './AddsTab/../../../../../../store/user';
 
 import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';
+
+import { bounce } from 'react-animations';
+import Radium, { StyleRoot } from 'radium';
+
+import { AnimateOnChange, AnimateGroup } from 'react-animation';
+
+const stylesAnimation = {
+	bounce: {
+		animation: 'x 5s',
+		animationName: Radium.keyframes(bounce, 'bounce'),
+	},
+};
 
 import {
 	SORT_TIME,
@@ -136,94 +158,97 @@ const AddsTab = (props) => {
 	}, [props.deleteID]);
 
 	useEffect(() => {
+		let cancel;
 		let cleanupFunction = false;
-		openPopout(<ScreenSpinner size="large" />);
-
 		setLoading(true);
 		setError(false);
 		setError404(false);
 		setInited(false);
 
-		console.log('category category', category);
+		async function f() {
+			if (rads.length == 0) {
+				openPopout(<Spinner size="large" />);
+			}
 
-		let cancel;
-		let rowsPerPage = 7;
-		let query = searchR;
-		let params = {
-			rows_per_page: rowsPerPage,
-			page: pageNumber,
-			sort_by: sort,
-		};
-		if (query != '') {
-			params.query = '' + query;
-		}
-		if (category != CategoryNo) {
-			params.category = category;
-			if (subcategory != CategoryNo) {
-				params.subcat_list = subcategory;
-				if (incategory != CategoryNo) {
-					params.subcat = incategory;
+			let rowsPerPage = 12;
+			let query = searchR;
+			let params = {
+				rows_per_page: rowsPerPage,
+				page: pageNumber,
+				sort_by: sort,
+			};
+			if (query != '') {
+				params.query = '' + query;
+			}
+			if (category != CategoryNo) {
+				params.category = category;
+				if (subcategory != CategoryNo) {
+					params.subcat_list = subcategory;
+					if (incategory != CategoryNo) {
+						params.subcat = incategory;
+					}
 				}
 			}
-		}
 
-		if (geodata) {
-			params.lat = geodata.lat;
-			params.long = geodata.long;
-		}
-
-		if (geoType == GEO_TYPE_NEAR) {
-			params.radius = radius || 0.5;
-		} else {
-			if (city && city.id != -1) {
-				params.district = city.title;
+			if (geodata) {
+				params.lat = geodata.lat;
+				params.long = geodata.long;
 			}
 
-			if (country && country.id != -1) {
-				params.region = country.title;
-			}
-		}
-
-		let url = BASE_AD + 'find';
-		if (mode != MODE_ALL && mode != MODE_WANTED) {
-			params.author_id = User.getState().vk_id;
-		} else if (mode == MODE_WANTED) {
-			url = BASE_AD + 'wanted';
-		}
-
-		axios({
-			method: 'GET',
-			url: Addr.getState() + url,
-			params,
-			withCredentials: true,
-			cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		})
-			.then((res) => {
-				const newAds = res.data;
-				if (cleanupFunction || !isMounted) {
-					return;
+			if (geoType == GEO_TYPE_NEAR) {
+				params.radius = radius || 0.5;
+			} else {
+				if (city && city.id != -1) {
+					params.district = city.title;
 				}
-				setAds((prev) => {
-					return [...new Set([...prev, ...newAds])];
-				});
-				setHasMore(newAds.length > 0);
-				setLoading(false);
-				closePopout();
-				setInited(true);
+
+				if (country && country.id != -1) {
+					params.region = country.title;
+				}
+			}
+
+			let url = BASE_AD + 'find';
+			if (mode != MODE_ALL && mode != MODE_WANTED) {
+				params.author_id = User.getState().vk_id;
+			} else if (mode == MODE_WANTED) {
+				url = BASE_AD + 'wanted';
+			}
+
+			axios({
+				method: 'GET',
+				url: Addr.getState() + url,
+				params,
+				withCredentials: true,
+				cancelToken: new axios.CancelToken((c) => (cancel = c)),
 			})
-			.catch((e) => {
-				console.log('fail', e);
-				if (axios.isCancel(e)) return;
-				if (('' + e).indexOf('404') == -1) {
-					console.log('real err', e);
-					setError(true);
-				} else {
-					console.log('non real err', e);
-					setError404(true);
-				}
-				closePopout();
-				setInited(true);
-			});
+				.then((res) => {
+					const newAds = res.data;
+					if (cleanupFunction || !isMounted) {
+						return;
+					}
+					setAds((prev) => {
+						return [...new Set([...prev, ...newAds])];
+					});
+					setHasMore(newAds.length > 0);
+					setLoading(false);
+					closePopout();
+					setInited(true);
+				})
+				.catch((e) => {
+					console.log('fail', e);
+					if (axios.isCancel(e)) return;
+					if (('' + e).indexOf('404') == -1) {
+						console.log('real err', e);
+						setError(true);
+					} else {
+						console.log('non real err', e);
+						setError404(true);
+					}
+					closePopout();
+					setInited(true);
+				});
+		}
+		f();
 		return () => {
 			cancel();
 			cleanupFunction = true;
@@ -270,78 +295,89 @@ const AddsTab = (props) => {
 	}
 
 	return (
-		<PullToRefresh
-			onRefresh={() => {
-				setRefreshMe((prev) => prev + 1);
-			}}
-			isFetching={pullLoading}
-		>
-			<div
-				style={{
-					height: 'auto',
-					display: 'flex',
-					background: 'var(--background_page)',
-					flexDirection: 'column',
-					overflow: 'hidden',
-					textOverflow: 'ellipsis',
-					whiteSpace: ads.length > 0 ? 'nowrap' : 'normal',
+		<>
+			<PullToRefresh
+				onRefresh={() => {
+					setRefreshMe((prev) => prev + 1);
 				}}
+				isFetching={pullLoading}
 			>
-				<div style={{ display: 'flex', background: 'var(--background_content)' }}>
-					<Search
-						value={search}
-						onChange={handleSearch}
-						icon={<Icon24Filter />}
-						onIconClick={props.onFiltersClick}
-					/>
-					{filtersOn ? (
-						<PanelHeaderButton
-							mode="secondary"
-							size="m"
-							onClick={() => {
-								props.dropFilters();
-							}}
-						>
-							<div style={{ paddingRight: '10px' }}>
-								<Avatar size={24}>
-									<Icon24Dismiss />
-								</Avatar>
-							</div>
-						</PanelHeaderButton>
-					) : null}
-				</div>
+				<div
+					style={{
+						height: 'auto',
+						display: 'flex',
+						background: 'var(--background_page)',
+						flexDirection: 'column',
+						overflow: 'hidden',
+						textOverflow: 'ellipsis',
+						whiteSpace: ads.length > 0 ? 'nowrap' : 'normal',
+					}}
+				>
+					<div style={{ display: 'flex', background: 'var(--background_content)' }}>
+						<Search
+							value={search}
+							onChange={handleSearch}
+							icon={<Icon24Filter />}
+							onIconClick={props.onFiltersClick}
+						/>
+						{filtersOn ? (
+							<PanelHeaderButton
+								mode="secondary"
+								size="m"
+								onClick={() => {
+									props.dropFilters();
+								}}
+							>
+								<div style={{ paddingRight: '10px' }}>
+									<Avatar size={24}>
+										<Icon24Dismiss />
+									</Avatar>
+								</div>
+							</PanelHeaderButton>
+						) : null}
+					</div>
 
-				<Group>
-					<List>
-						{rads.length > 0 ? (
-							<Columns
-								needOneColumn={!width || width < 500}
-								array={rads.map((ad) => Ad(ad))}
-								columnsAmount={2}
-								ref={lastAdElementRef}
-								loading={loading}
-							/>
-						) : error ? (
-							<Error />
-						) : // addsArrDD.map((ad) => {
-						// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
-						// })
-						// addsArrDD.map(ad => {
-						// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
-						// })
-						!inited ? (
-							''
-						) : mode == MODE_ALL ? (
-							<AdNotFound dropFilters={props.dropFilters} />
-						) : mode == MODE_GIVEN ? (
-							<AdNoGiven setAllMode={setAllMode} />
-						) : (
-							<AdNoWanted setAllMode={setAllMode} />
-						)}
-					</List>
-				</Group>
-			</div>
-		</PullToRefresh>
+					<Group>
+						{/* <>
+							<AnimateGroup animation="bounce">{rads.map((ad) => Ad(ad))}</AnimateGroup>
+						</> */}
+						{/* <AnimateGroup animation="bounce">
+							{rads.map((w) => (
+								<div>aaa</div>
+							))}
+						</AnimateGroup> */}
+						{/* <AnimateGroup animation="bounce"> */}
+						<Columns
+							refreshIndex={5}
+							needOneColumn={!width || width < 500}
+							array={rads.map((ad) => Ad(ad))}
+							columnsAmount={2}
+							ref={lastAdElementRef}
+							loading={loading}
+						/>
+						<List>
+							{rads.length > 0 ? null : error ? (
+								<Error />
+							) : // addsArrDD.map((ad) => {
+							// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
+							// })
+							// addsArrDD.map(ad => {
+							// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
+							// })
+							!inited ? (
+								''
+							) : mode == MODE_ALL ? (
+								<AdNotFound dropFilters={props.dropFilters} />
+							) : mode == MODE_GIVEN ? (
+								<AdNoGiven setAllMode={setAllMode} />
+							) : (
+								<AdNoWanted setAllMode={setAllMode} />
+							)}
+						</List>
+					</Group>
+				</div>
+			</PullToRefresh>
+		</>
 	);
 };
 

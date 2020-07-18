@@ -52,8 +52,8 @@ const getAd = (myUser, inputData) => {
 	const item = getItemInfo(inputData);
 	const category = getCategoryInfo(inputData);
 	const ad_id = store.getState().ad ? store.getState().ad.ad_id : 0;
-	const geodata = inputData[GEO_DATA].geodata;
-	const geodata_string = inputData[GEO_DATA].geodata_string;
+	const geodata = inputData[GEO_DATA] ? inputData[GEO_DATA].geodata : { long: 0, lat: 0 };
+	const geodata_string = inputData[GEO_DATA] ? inputData[GEO_DATA].geodata_string : '';
 	return {
 		ad_id,
 		author: { vk_id: myUser.id, name: myUser.name },
@@ -98,7 +98,7 @@ const loadAd = (ad, dispatch) => {
 
 const createAd = (myUser, inputData, dispatch) => {
 	const ad = getAd(myUser, inputData);
-	console.log("i send it", ad)
+	console.log('i send it', ad);
 	const obj = JSON.stringify(ad);
 	const photos = getItemInfo(inputData).photosUrl;
 	CreateAd(
@@ -117,9 +117,9 @@ const createAd = (myUser, inputData, dispatch) => {
 };
 
 const editAd = (myUser, inputData, dispatch) => {
-	const tgeodata = inputData[GEO_DATA].geodata;
 	const ad = getAd(myUser, inputData);
 	const obj = JSON.stringify(ad);
+	console.log('we redit', obj);
 
 	EditAd(
 		ad,

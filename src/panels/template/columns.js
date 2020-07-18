@@ -1,6 +1,8 @@
 import React, { forwardRef, useState, useEffect } from 'react';
 import { Transition } from 'react-transition-group';
 
+import { AnimateOnChange, AnimateGroup } from 'react-animation';
+
 import './addsTab.css';
 
 let keyI = 0;
@@ -19,6 +21,7 @@ let thisI = 0;
 const Columns = forwardRef((props, ref) => {
 	const { needOneColumn } = props;
 	const array = props.array || [];
+	const refreshIndex = props.refreshIndex || 0;
 	const columnsAmount = props.columnsAmount || 2;
 	const [canShow, setCanShow] = useState(-1);
 	let components = [];
@@ -33,7 +36,7 @@ const Columns = forwardRef((props, ref) => {
 	console.log('arrayarrayarray', array.length, columnsAmount, needOneColumn);
 
 	const isLast = (index) => {
-		return array.length === index + 1;
+		return array.length - refreshIndex === index + 1;
 	};
 
 	const m = array.map((component, index) => {
@@ -68,7 +71,6 @@ const Columns = forwardRef((props, ref) => {
 				</div>
 			);
 		}
-		console.log('not only one');
 		components = [
 			...components,
 			<div className="one-block" key={keyI} ref={isLast(index) ? ref : null}>
@@ -82,11 +84,22 @@ const Columns = forwardRef((props, ref) => {
 				</div>
 			);
 			components = [];
+
 			return list;
 		}
 		return null;
 	});
-	return m;
+	// const popped = m.pop();
+	return (
+		<>
+			<AnimateGroup animationIn="fadeInUp" animationOut="fadeOutDown" durationOut={500}>
+				{m.map((s) => (
+					<div>{s}</div>
+				))}
+			</AnimateGroup>
+			{/* {popped} */}
+		</>
+	);
 });
 
 export default Columns;
