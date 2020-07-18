@@ -9,6 +9,36 @@
 	background: var(--background_content);
 }
 
+.subscribe-button {
+	position: fixed;
+	margin-top: 72px;
+	margin-left: 8px;
+	height: auto;
+	top: 0;
+	left: 0;
+	z-index: 101;
+}
+
+.subscribe-num {
+	position: fixed;
+	margin-top: 72px;
+	margin-left: 165px;
+	height: auto;
+	top: 0;
+	left: 0;
+	z-index: 101;
+}
+
+.subscribe-question {
+	position: fixed;
+	margin-top: 76px;
+	margin-left: 197px;
+	height: auto;
+	top: 0;
+	left: 0;
+	z-index: 101;
+}
+
 .write {
 	position: fixed;
 	margin-bottom: 52px;

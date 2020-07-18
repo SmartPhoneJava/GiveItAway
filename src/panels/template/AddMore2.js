@@ -471,7 +471,7 @@ const AddMore2r = (props) => {
 				photos_num--;
 				r.w = img.width;
 				r.h = img.height;
-				
+
 				if (photos_num == 0 && this_i == current_i) {
 					setLocalPhotos(photoSwipeImgs);
 					// setTimeout(() => setImgSpinner(false), 250);
@@ -526,6 +526,72 @@ const AddMore2r = (props) => {
 			</Placeholder>
 		);
 	}
+
+	const [subButton, setSubButton] = useState();
+
+	useEffect(() => {
+		console.log('how much i called');
+
+		if (isAuthor) {
+			setSubButton(null)
+			// setSubButton(
+			// 	<div className="subscribe-button">
+			// 		<div style={{ display: 'block', alignItems: 'center' }}>
+			// 			<Button
+			// 				disabled={isFinished() || (ad_type != TYPE_CHOICE && status != STATUS_OFFER)}
+			// 				mode="commerce"
+			// 				size="xl"
+			// 				onClick={openSubs}
+			// 			>
+			// 				{status == STATUS_OFFER ? 'Выбрать получателя' : 'Изменить получателя'}
+			// 			</Button>
+			// 		</div>
+			// 	</div>
+			// );
+		} else {
+			const mainButton = isSub ? (
+				<Button
+					stretched
+					size="m"
+					mode="destructive"
+					onClick={() => unsub(cost)}
+					before={<Icon24MarketOutline />}
+				>
+					Отказаться
+				</Button>
+			) : (
+				<Button stretched size="m" mode="primary" onClick={() => sub(cost)} before={<Icon24MarketOutline />}>
+					Хочу забрать!
+				</Button>
+			);
+
+			const color = isSub ? 'var(--destructive)' : 'var(--header_tint)';
+			setSubButton(
+				isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED  ? null : (
+					<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+						<div className="subscribe-button">{mainButton}</div>
+						<div className="subscribe-num">
+							<Avatar style={{ background: 'rgba(255,255,255,0.8)' }} size={32}>
+								<PanelHeaderButton onClick={onCarmaClick}>
+									<div style={{ fontSize: '20px', color: color }}>
+										{cost}
+										{K}
+									</div>
+								</PanelHeaderButton>
+							</Avatar>
+						</div>
+						{/* <div className="subscribe-question">
+						<Avatar style={{ background: 'rgba(255,255,255,0.8)' }} size={21}>
+							<PanelHeaderButton onClick={onFreezeClick}>
+								<Icon24Help fill={color} />
+							</PanelHeaderButton>
+						</Avatar>
+					</div> */}
+					</div>
+				)
+			);
+		}
+	}, [isDealer, status, isAuthor, isSub, cost]);
 
 	function onEditClick() {
 		setFormData(EDIT_MODE, {
@@ -655,75 +721,7 @@ const AddMore2r = (props) => {
 			) : (
 				<Spinner size="large" />
 			)}
-
-			<div style={{ padding: '16px' }}>
-				<div style={{ display: 'block', alignItems: 'center' }}>
-					{isAuthor ? (
-						<div style={{ display: 'block' }}>
-							<Button
-								disabled={isFinished() || (ad_type != TYPE_CHOICE && status != STATUS_OFFER)}
-								mode="commerce"
-								size="xl"
-								onClick={openSubs}
-							>
-								{status == STATUS_OFFER ? 'Отдать' : 'Изменить получателя'}
-							</Button>
-						</div>
-					) : (
-						''
-					)}
-				</div>
-			</div>
-
-			{isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED || isAuthor ? (
-				''
-			) : isSub ? (
-				<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-					<div style={{ margin: '12px' }}>
-						<Button
-							stretched
-							size="m"
-							mode="destructive"
-							onClick={() => unsub(cost)}
-							before={<Icon24MarketOutline />}
-						>
-							Отказаться
-						</Button>
-					</div>
-					<PanelHeaderButton onClick={onCarmaClick}>
-						<div style={{ fontSize: '20px', color: 'var(--destructive)' }}>
-							{cost}
-							{K}
-						</div>
-					</PanelHeaderButton>
-					<PanelHeaderButton onClick={onFreezeClick}>
-						<Icon24Help fill="var(--destructive)" />
-					</PanelHeaderButton>
-				</div>
-			) : (
-				<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-					<div style={{ margin: '12px' }}>
-						<Button
-							stretched
-							size="m"
-							mode="primary"
-							onClick={() => sub(cost)}
-							before={<Icon24MarketOutline />}
-						>
-							Хочу забрать!
-						</Button>
-					</div>
-					<PanelHeaderButton onClick={onCarmaClick}>
-						<div style={{ fontSize: '20px', color: 'var(--header_tint)' }}>
-							{cost}
-							{K}
-						</div>
-					</PanelHeaderButton>
-					<PanelHeaderButton onClick={onFreezeClick}>
-						<Icon24Help fill="var(--header_tint)" />
-					</PanelHeaderButton>
-				</div>
-			)}
+			{subButton}
 			<div className="CellLeft__head">{header}</div>
 			<div className="CellLeft__block">{text}</div>
 			<Separator />
