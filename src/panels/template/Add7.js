@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Avatar, InfoRow } from '@vkontakte/vkui';
+import { Avatar, InfoRow, Spinner } from '@vkontakte/vkui';
 
 import Icon16Place from '@vkontakte/icons/dist/16/place';
 
@@ -8,6 +8,8 @@ import MetroImage30 from './../../img/30/metro.png';
 import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
 
 import Icon20ArticleBoxOutline from '@vkontakte/icons/dist/20/article_box_outline';
+
+import { HideUntilLoaded } from 'react-animation';
 
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';
 import Icon16CheckCircle from '@vkontakte/icons/dist/16/check_circle';
@@ -28,6 +30,33 @@ const Add7 = (props) => {
 	const [status, setStatus] = useState(props.ad.status);
 	const [isVisible, setIsVisible] = useState(!props.ad.hidden);
 
+	const [image, setImage] = useState();
+	const [inCache, setInCache] = useState();
+
+	useEffect(() => {
+		const url = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : Icon;
+		var i = new Image();
+		i.src = url;
+		setInCache(i.complete);
+		setImage(
+			i.complete ? (
+				<img src={url} className="atiled" />
+			) : (
+				<HideUntilLoaded
+					animationIn="bounceIn"
+					imageToLoad={url}
+					Spinner={() => (
+						<div style={{ paddingLeft: '120px', paddingTop: '60px' }}>
+							<Spinner size="large" />
+						</div>
+					)}
+				>
+					<img src={url} className="atiled" />
+				</HideUntilLoaded>
+			)
+		);
+	}, [ad.pathes_to_photo]);
+
 	useEffect(() => {
 		props.ad.hidden = !isVisible;
 	}, [isVisible]);
@@ -35,8 +64,6 @@ const Add7 = (props) => {
 	useEffect(() => {
 		props.ad.status = status;
 	}, [status]);
-
-	const image = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : Icon;
 
 	function openSettings() {
 		props.setPopout(
@@ -78,7 +105,7 @@ const Add7 = (props) => {
 			// }}
 			>
 				<div className="aauthor">
-					<div style={{ marginRight: '5px', minWidth:"20px" }}>
+					<div style={{ marginRight: '5px', minWidth: '20px' }}>
 						<Avatar size={20} src={ad.author.photo_url} />
 					</div>
 					<div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -96,7 +123,8 @@ const Add7 = (props) => {
 		<div className="aoutter">
 			<div className="atile">
 				<div onClick={props.openAd} className="amain-left">
-					<img src={image} className="atiled" />
+					{image}
+
 					<div className="acity">
 						<Icon16Place /> {ad.district ? ad.district : ad.region}
 					</div>

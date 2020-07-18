@@ -56,7 +56,7 @@ import { setFormData } from '../../../../../store/create_post/actions';
 import AdNoGiven from '../../../../placeholders/adNoGiven';
 import { NoRegion } from '../../../../../components/location/const';
 import { CategoryNo } from '../../../../../components/categories/const';
-import Columns from '../../../../template/columns';
+import Columns, { ColumnsFunc } from '../../../../template/columns';
 
 let i = 0;
 
@@ -93,6 +93,7 @@ const AddsTab = (props) => {
 
 	const [refreshMe, setRefreshMe] = useState(1);
 	const [pageNumber, setPageNumber] = useState(1);
+	const [ppageNumber, setPpageNumber] = useState(1);
 
 	const [filtersOn, setFiltersOn] = useState(false);
 	useEffect(() => {
@@ -128,7 +129,29 @@ const AddsTab = (props) => {
 	useEffect(() => {
 		setAds([]);
 		setPageNumber(1);
+		setPpageNumber(1);
+		setCols([]);
 	}, [category, mode, searchR, city, country, sort, geodata, geoType, radius, refreshMe]);
+
+	const [cols, setCols] = useState([]);
+
+	useEffect(() => {
+		if (rads.length == 0) {
+			return;
+		}
+		const c = ColumnsFunc(
+			!width || width < 500,
+			rads.map((ad) => Ad(ad)),
+			5,
+			2,
+			lastAdElementRef
+		);
+		setCols(c.map((s) => <div>{s}</div>));
+	}, [rads]);
+
+	useEffect(() => {
+		console.log('loading real is', loading, hasMore);
+	}, [loading, hasMore]);
 
 	useEffect(() => {
 		console.log('loading is', loading, ads);
@@ -136,6 +159,7 @@ const AddsTab = (props) => {
 			setRads(ads);
 		} else if (!loading || error404) {
 			setTimeout(() => {
+				console.log('lallala', loading, ads);
 				setRads(ads);
 			}, 50);
 		}
@@ -243,7 +267,9 @@ const AddsTab = (props) => {
 					} else {
 						console.log('non real err', e);
 						setError404(true);
+						setHasMore(false);
 					}
+					setLoading(false);
 					closePopout();
 					setInited(true);
 				});
@@ -261,8 +287,10 @@ const AddsTab = (props) => {
 			if (loading) return;
 			if (observer.current) observer.current.disconnect();
 			observer.current = new IntersectionObserver((entries) => {
+				console.log('sadsadsadsadsadsa', hasMore, pageNumber);
 				if (entries[0].isIntersecting && hasMore) {
-					setPageNumber((prevPageNumber) => prevPageNumber + 1);
+					setPageNumber(ppageNumber + 1);
+					setPpageNumber(pageNumber + 1);
 				}
 			});
 			if (node) observer.current.observe(node);
@@ -280,6 +308,7 @@ const AddsTab = (props) => {
 	};
 
 	function Ad(ad) {
+		console.log('ad called', loading, ad.header);
 		return (
 			<Add7
 				vkPlatform={props.vkPlatform}
@@ -338,33 +367,15 @@ const AddsTab = (props) => {
 					</div>
 
 					<Group>
-						{/* <>
-							<AnimateGroup animation="bounce">{rads.map((ad) => Ad(ad))}</AnimateGroup>
-						</> */}
-						{/* <AnimateGroup animation="bounce">
-							{rads.map((w) => (
-								<div>aaa</div>
+						<AnimateGroup animationIn="fadeInUp" animationOut="popOut" duration={500}>
+							{cols.map((s) => (
+								<div>{s}</div>
 							))}
-						</AnimateGroup> */}
-						{/* <AnimateGroup animation="bounce"> */}
-						<Columns
-							refreshIndex={5}
-							needOneColumn={!width || width < 500}
-							array={rads.map((ad) => Ad(ad))}
-							columnsAmount={2}
-							ref={lastAdElementRef}
-							loading={loading}
-						/>
+						</AnimateGroup>
 						<List>
 							{rads.length > 0 ? null : error ? (
 								<Error />
-							) : // addsArrDD.map((ad) => {
-							// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
-							// })
-							// addsArrDD.map(ad => {
-							// 	return <div key={ad.ad_id}>{Ad(ad)}</div>;
-							// })
-							!inited ? (
+							) : !inited ? (
 								''
 							) : mode == MODE_ALL ? (
 								<AdNotFound dropFilters={props.dropFilters} />
@@ -400,4 +411,4 @@ const mapDispatchToProps = {
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddsTab);
 
-//283 -> 380 -> 418 -> 358
+//283 -> 380 -> 418 -> 358 -> 406

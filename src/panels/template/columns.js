@@ -102,6 +102,46 @@ const Columns = forwardRef((props, ref) => {
 	);
 });
 
+export const ColumnsFunc = ((needOneColumn, array, refreshIndex, columnsAmount, ref) => {
+	let components = [];
+
+	console.log('arrayarrayarray', array.length, columnsAmount, needOneColumn);
+
+	const isLast = (index) => {
+		return array.length - refreshIndex === index + 1;
+	};
+
+	const m = array.map((component, index) => {
+		keyI += 1;
+		let c = component
+		if (needOneColumn) {
+			return (
+				<div key={keyI} ref={isLast(index) ? ref : null}>
+					{c}
+				</div>
+			);
+		}
+		components = [
+			...components,
+			<div className="one-block" key={keyI} ref={isLast(index) ? ref : null}>
+				{c}
+			</div>,
+		];
+		if ((index != 0 && index % columnsAmount == columnsAmount - 1) || isLast(index)) {
+			const list = (
+				<div key={keyI} className="flex-blocks">
+					{components}
+				</div>
+			);
+			components = [];
+
+			return list;
+		}
+		return null;
+	});
+	return m
+});
+
 export default Columns;
 
 //47

@@ -445,7 +445,7 @@ const AddMore2r = (props) => {
 	const [localPhotos, setLocalPhotos] = useState([]);
 
 	useEffect(() => {
-		setImgSpinner(true);
+		// setImgSpinner(true);
 		current_i++;
 		let this_i = current_i;
 
@@ -465,26 +465,21 @@ const AddMore2r = (props) => {
 		});
 		let photos_num = photoSwipeImgs.length;
 		photoSwipeImgs.forEach((r) => {
-			console.log('forEach e', r);
 			let img = new Image();
 			img.src = r.src;
 			img.onload = function () {
-				console.log('hey hey hey');
 				photos_num--;
 				r.w = img.width;
 				r.h = img.height;
-				console.log('i loaded', photos_num, this_i, current_i, photoSwipeImgs);
+				
 				if (photos_num == 0 && this_i == current_i) {
 					setLocalPhotos(photoSwipeImgs);
-					setTimeout(() => setImgSpinner(false), 250);
+					// setTimeout(() => setImgSpinner(false), 250);
 				}
 			};
 		});
 		setLocalPhotos(photoSwipeImgs);
 		setImgs(pathes_to_photo.map((v) => v.PhotoUrl));
-
-		console.log('loook at', photoSwipeImgs);
-		console.log('local', localPhotos);
 	}, [pathes_to_photo]);
 
 	// useEffect(() => {
