@@ -8,7 +8,7 @@ import { Addr, BASE_AD } from '../../../../../store/addr';
 import { fail, success } from '../../../../../requests';
 
 export function subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallback, failCallback, end) {
-	setPopout(<ScreenSpinner size="large" />);
+	// setPopout(<ScreenSpinner size="large" />);
 	let err = false;
 	let cancel;
 	axios({
@@ -21,7 +21,7 @@ export function subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallba
 			return response.data;
 		})
 		.then(function (response) {
-			setPopout(null);
+			// setPopout(null);
 			successCallback(response);
 			success('Теперь вы будете получать уведомления, связанные с этим постом', clCancel, end);
 			return response;
@@ -41,13 +41,13 @@ export function subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallba
 					end
 				);
 			}
-			setPopout(null);
+			// setPopout(null);
 		});
 	return err;
 }
 
 export function unsubscribe(setPopout, setSnackbar, ad_id, clCancel, successCallback, failCallback, end) {
-	setPopout(<ScreenSpinner size="large" />);
+	// setPopout(<ScreenSpinner size="large" />);
 	let err = false;
 	let cancel;
 	axios({
@@ -60,7 +60,7 @@ export function unsubscribe(setPopout, setSnackbar, ad_id, clCancel, successCall
 			return response.data;
 		})
 		.then(function (response) {
-			setPopout(null);
+			// setPopout(null);
 			successCallback(response);
 			success('Больше вы не будете получать связанные с этим постом уведомления', clCancel, end);
 			return response;
@@ -76,7 +76,7 @@ export function unsubscribe(setPopout, setSnackbar, ad_id, clCancel, successCall
 				setSnackbar,
 				end
 			);
-			setPopout(null);
+			// setPopout(null);
 		});
 	return err;
 }

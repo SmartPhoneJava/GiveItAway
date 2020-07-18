@@ -57,6 +57,7 @@ export default function useCommentsGet(ignorePopout, pageNumber, rowsPerPage, ad
 					store.dispatch(closePopout());
 				}
 				setInited(true);
+				console.log("success get comments", newNots)
 			})
 			.catch((e) => {
 				console.log('fail comments', e);

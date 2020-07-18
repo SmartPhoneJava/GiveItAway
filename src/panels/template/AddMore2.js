@@ -790,7 +790,7 @@ const AddMore2r = (props) => {
 				>
 					<div style={{ display: 'flex' }}>
 						{author.name + ' ' + author.surname}{' '}
-						{ls_enabled ? (
+						{/* {ls_enabled ? (
 							<Link
 								style={{ marginLeft: '15px' }}
 								href={'https://vk.com/im?sel=' + author.vk_id}
@@ -800,7 +800,7 @@ const AddMore2r = (props) => {
 							</Link>
 						) : (
 							''
-						)}
+						)} */}
 					</div>
 				</Cell>
 			</Group>
@@ -812,7 +812,8 @@ const AddMore2r = (props) => {
 			) : (
 				<Placeholder icon={<Icon56WriteOutline />} header="Комментарии закрыты"></Placeholder>
 			)}
-			<Group separator="show" header={<Header mode="secondary">Действия</Header>}>
+			<Separator />
+			<Group separator="show" header={null}>
 				<div style={{ display: 'block', alignItems: 'center' }}>
 					{isAuthor ? (
 						<div style={{ display: 'block' }}>
@@ -920,4 +921,4 @@ const AddMore2 = connect(mapStateToProps, mapDispatchToProps)(AddMore2r);
 
 export default AddMore2;
 
-// 857 -> 936 -> 838
+// 857 -> 936 -> 838 -> 923

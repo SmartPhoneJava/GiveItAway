@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
 	Header,
 	Group,
@@ -40,7 +40,7 @@ const CommentsI = (props) => {
 	const osname = usePlatform();
 	const { AD, deleteCommentByID, myID, openPopout, openSnackbar, closeSnackbar, closePopout } = props;
 
-	const nots = AD.comments || [];
+	const [nots, setNots] = useState([]);
 
 	const [text, setText] = useState('');
 	const [hide, setHide] = useState(false);
@@ -55,6 +55,11 @@ const CommentsI = (props) => {
 		AD.ad_id,
 		props.maxAmount
 	);
+
+	useEffect(()=>{
+		console.log("AD is", AD.comments, pageNumber)
+		setNots(AD.comments)
+	}, [AD.comments])
 
 	const observer = useRef();
 	const lastAdElementRef = useCallback(

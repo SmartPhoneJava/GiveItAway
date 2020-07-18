@@ -259,6 +259,7 @@ export const adReducer = (state = initialState, action) => {
 			const district = ad.district;
 			const pathes_to_photo = ad.pathes_to_photo || [{ AdPhotoId: 1, PhotoUrl: Icon }];
 			const hidden = ad.hidden;
+			const comments = ad.comments || state.comments || [];
 			const author = ad.author || { vk_id: -1 };
 			const isAuthor = author.vk_id == action.payload.myID;
 
@@ -323,6 +324,7 @@ export const adReducer = (state = initialState, action) => {
 				image,
 				isAuthor,
 				history: state.history,
+				comments,
 
 				deal,
 				isDealer,
