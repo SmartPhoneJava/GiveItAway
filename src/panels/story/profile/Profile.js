@@ -221,7 +221,7 @@ const Profile = (props) => {
 
 				<Group header={<Header mode="secondary">Отдано вещей - {backuser.total_given_ads}</Header>}>
 					{backuser.null || backuser.total_given_ads > 0 ? (
-						<GivenPanel profileID={profileID} />
+						<GivenPanel profileID={profileID} openAd={props.openAd} />
 					) : backuser && myID == backuser.vk_id ? (
 						<Placeholder
 							icon={<Icon56DoNotDisturbOutline />}
@@ -242,7 +242,7 @@ const Profile = (props) => {
 				</Group>
 				<Group header={<Header mode="secondary">Получено вещей - {backuser.total_received_ads}</Header>}>
 					{backuser.null || backuser.total_received_ads > 0 ? (
-						<ReceivedPanel profileID={profileID} />
+						<ReceivedPanel profileID={profileID} openAd={props.openAd} />
 					) : backuser && myID == backuser.vk_id ? (
 						<Placeholder
 							icon={<Icon56DoNotDisturbOutline />}

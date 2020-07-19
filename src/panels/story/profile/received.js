@@ -6,7 +6,7 @@ import AdsPanel from './adsPanel';
 import useAdReceived from '../adds/tabs/adds/useAdReceived';
 
 const ReceivedPanel = (props) => {
-	return <AdsPanel pack={ReceivedPack} useGet={useAdReceived} profileID={props.profileID} />;
+	return <AdsPanel pack={ReceivedPack} useGet={useAdReceived} profileID={props.profileID} openAd={props.openAd} />;
 };
 
 export default ReceivedPanel

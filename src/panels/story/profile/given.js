@@ -6,7 +6,7 @@ import AdsPanel from './adsPanel';
 import useAdGiven from '../adds/tabs/adds/useAdGiven';
 
 const GivenPanel = (props) => {
-	return <AdsPanel pack={GivenPack} useGet={useAdGiven} profileID={props.profileID} />;
+	return <AdsPanel pack={GivenPack} useGet={useAdGiven} profileID={props.profileID} openAd={props.openAd} />;
 };
 
-export default GivenPanel
+export default GivenPanel;

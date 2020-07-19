@@ -448,7 +448,7 @@ const App = (props) => {
 						{snackbars[PANEL_ONE]}
 					</Panel>
 					<Panel id={PANEL_USER}>
-						<ProfilePanel setReduxAd={setReduxAd} />
+						<ProfilePanel openAd={setReduxAd} />
 					</Panel>
 					<Panel id={PANEL_ABOUT}>
 						<AboutPanel />

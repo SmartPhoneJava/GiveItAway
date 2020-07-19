@@ -37,9 +37,6 @@ import Icon24VideoFill from '@vkontakte/icons/dist/24/video_fill';
 
 import Icon24Delete from '@vkontakte/icons/dist/24/delete';
 
-import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
-import Icon24Done from '@vkontakte/icons/dist/24/done';
-
 import Icon24Chevron from '@vkontakte/icons/dist/24/chevron';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
 import Icon24ShareExternal from '@vkontakte/icons/dist/24/share_external';
@@ -88,9 +85,6 @@ import {
 import {
 	AdDefault,
 	AD_LOADING,
-	COLOR_DEFAULT,
-	COLOR_DONE,
-	COLOR_CANCEL,
 	STATUS_OFFER,
 	STATUS_CHOSEN,
 	STATUS_CLOSED,
@@ -105,6 +99,7 @@ import { setFormData } from '../../store/create_post/actions';
 import { FORM_CREATE } from '../../components/categories/redux';
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { updateDealInfo, updateCost, updateSubs } from '../../store/detailed_ad/update';
+import { showStatus } from '../../components/detailed_ad/status';
 
 let current_i = 0;
 
@@ -164,6 +159,11 @@ const AddMore2r = (props) => {
 		setrAd(AD);
 	}, [AD]);
 
+	const [componentStatus, setComponentStatus] = useState();
+	useEffect(() => {
+		setComponentStatus(showStatus(status, isDealer, isAuthor));
+	}, [status, isDealer,isAuthor]);
+
 	const handleClose = () => {
 		setIsOpen(false);
 	};
@@ -217,7 +217,6 @@ const AddMore2r = (props) => {
 	// }, [photos]);
 
 	function changeIsSub(isSubs, c) {
-		console.log('changeIsSub', isSubs);
 		if (isNotValid()) {
 			return;
 		}
@@ -226,7 +225,6 @@ const AddMore2r = (props) => {
 	}
 
 	useEffect(() => {
-		console.log('props.adOut', props.adOut);
 		const init = () => () => {
 			const id = AD.ad_id;
 
@@ -238,7 +236,7 @@ const AddMore2r = (props) => {
 				(details) => {
 					setExtraInfo(details, myID, true);
 					updateCost(details.is_subscriber);
-					console.log('ADDD', details);
+
 					setrAd(details);
 				},
 				(e) => {
@@ -253,154 +251,6 @@ const AddMore2r = (props) => {
 		}
 		setAdIn();
 	}, []);
-
-	function statusWrapper(block, color) {
-		color = color || COLOR_DEFAULT;
-		return (
-			<div
-				style={{
-					background: color,
-					padding: '8px',
-					position: 'absolute',
-					widht: '100%',
-					left: 0,
-					right: 0,
-					top: '0px',
-				}}
-			>
-				{block}
-			</div>
-		);
-	}
-
-	function showClosed() {
-		if (isAuthor) {
-			return statusWrapper(
-				<InfoRow className="status-text">Спасибо за помощь другим людям!</InfoRow>,
-				COLOR_DONE
-			);
-		}
-		if (isDealer) {
-			return statusWrapper(<InfoRow className="status-text">Вещь перешла в ваше владение!</InfoRow>, COLOR_DONE);
-		}
-		return statusWrapper(<InfoRow className="status-text">Отдано!</InfoRow>, COLOR_DONE);
-	}
-
-	function showAborted() {
-		if (isAuthor) {
-			return statusWrapper(
-				<InfoRow className="status-text">Вторая сторона отказалась от сделки</InfoRow>,
-				COLOR_CANCEL
-			);
-		}
-		if (isDealer) {
-			return statusWrapper(<InfoRow className="status-text">Вы прервали сделку</InfoRow>, COLOR_CANCEL);
-		}
-		return statusWrapper(<InfoRow className="status-text">Передача не состоялась</InfoRow>, COLOR_CANCEL);
-	}
-
-	function showChosen() {
-		console.log('showOffer', isDealer, !isAuthor);
-		if (isDealer && !isAuthor) {
-			return statusWrapper(
-				<>
-					<InfoRow style={{ padding: '10px', color: 'rgb(200,200,200)', textAlign: 'center' }}>
-						Автор решил отдать вещь вам. Подтвердите получение вещи после получения:
-					</InfoRow>
-					<div style={{ display: 'flex' }}>
-						<Button
-							stretched
-							size="l"
-							mode="commerce"
-							onClick={() => {
-								acceptDeal(
-									deal.deal_id,
-									(v) => {
-										setStory(STORY_ADS);
-									},
-									(e) => {
-										console.log('acceptDeal err', e);
-									}
-								);
-							}}
-							style
-							style={{ marginRight: 8 }}
-							before={<Icon24Done />}
-						>
-							Подтвердить
-						</Button>
-						<Button
-							stretched
-							size="l"
-							mode="destructive"
-							onClick={() => {
-								denyDeal(
-									deal.deal_id,
-									(v) => {
-										setStory(STORY_ADS);
-									},
-									(e) => {
-										console.log('denyDeal error', e);
-									}
-								);
-							}}
-							style={{ marginRight: 8 }}
-							before={<Icon24Cancel />}
-						>
-							Отклонить
-						</Button>
-					</div>
-				</>,
-				COLOR_DEFAULT
-			);
-		}
-		if (!isAuthor) {
-			return statusWrapper(
-				<InfoRow
-					style={{
-						padding: '10px',
-						color: 'rgb(200,200,200)',
-						textAlign: 'center',
-					}}
-				>
-					Автор назначил человека для передачи вещи
-				</InfoRow>,
-				COLOR_DEFAULT
-			);
-		} else {
-			return statusWrapper(
-				<div style={{ width: '100%', color: 'rgb(220,220,220)', fontSize: '13px', padding: '2px' }}>
-					<div style={{ display: 'flex' }}>
-						Ожидание подтверждения от
-						<div style={{ display: 'flex' }} onClick={() => props.openUser(dealer.vk_id)}>
-							<Avatar
-								style={{
-									marginLeft: '15px',
-									marginRight: '4px',
-								}}
-								size={16}
-								src={dealer ? dealer.photo_url : ''}
-							/>
-							{dealer ? dealer.name + ' ' + dealer.surname + '  ' : ''}
-						</div>
-					</div>
-				</div>,
-				COLOR_DEFAULT
-			);
-		}
-	}
-
-	function showStatus() {
-		switch (status) {
-			case STATUS_CHOSEN:
-				return showChosen();
-			case STATUS_CLOSED:
-				return showClosed();
-			case STATUS_ABORTED:
-				return showAborted();
-		}
-		return null;
-	}
 
 	const openSubs = () => {
 		if (ad_type == TYPE_CHOICE) {
@@ -613,6 +463,7 @@ const AddMore2r = (props) => {
 	const [allActions, setAllActions] = useState();
 
 	useState(() => {
+		console.log('allActions isAuthor', isAuthor);
 		setAllActions(
 			<Group separator="show" header={null}>
 				<div style={{ display: 'block', alignItems: 'center' }}>
@@ -726,7 +577,7 @@ const AddMore2r = (props) => {
 										</Avatar>
 									</PanelHeaderButton>
 								</div>
-								{showStatus()}
+								{componentStatus}
 								<img
 									onClick={() => {
 										openImage(imgs);
@@ -950,73 +801,7 @@ const AddMore2r = (props) => {
 				</div>
 			</div>
 			<Separator />
-			<Group separator="show" header={null}>
-				<div style={{ display: 'block', alignItems: 'center' }}>
-					{isAuthor ? (
-						<div style={{ display: 'block' }}>
-							<div
-								style={{
-									display: 'flex',
-								}}
-							>
-								<div style={{ flex: 1, paddingLeft: paddingActions }}>
-									<CellButton disabled={isFinished()} before={<Icon24Write />} onClick={onEditClick}>
-										Редактировать
-									</CellButton>
-								</div>
-								<div style={{ flex: 1, paddingLeft: paddingActions }}>
-									<CellButton
-										mode="danger"
-										disabled={isFinished()}
-										before={<Icon24Delete />}
-										onClick={() => deleteAd(ad_id, props.refresh)}
-									>
-										Удалить
-									</CellButton>
-								</div>
-							</div>
-							<div style={{ display: 'flex' }}>
-								<div style={{ flex: 1, paddingLeft: paddingActions }}>
-									<CellButton
-										onClick={() => {
-											hidden
-												? adVisible(ad_id, () => setIsHidden(false))
-												: adHide(ad_id, () => setIsHidden(true));
-										}}
-										disabled={isFinished()}
-										before={hidden ? <Icon24Globe /> : <Icon24Hide />}
-									>
-										{hidden ? 'Сделать видимым' : 'Сделать невидимым'}
-									</CellButton>
-								</div>
-								<div style={{ flex: 1, paddingLeft: paddingActions }}>
-									<CellButton onClick={shareInVK} before={<Icon24ShareExternal />}>
-										Поделиться
-									</CellButton>
-								</div>
-							</div>
-						</div>
-					) : (
-						<div style={{ display: 'flex' }}>
-							<div style={{ flex: 1, paddingLeft: paddingActions }}>
-								<CellButton onClick={shareInVK} before={<Icon24ShareExternal />}>
-									Поделиться
-								</CellButton>
-							</div>
-							<div style={{ flex: 1, paddingLeft: paddingActions }}>
-								<CellButton
-									onClick={() => {
-										window.open('https://vk.com/im?media=&sel=-194671970');
-									}}
-									before={<Icon24Report />}
-								>
-									Пожаловаться
-								</CellButton>
-							</div>
-						</div>
-					)}
-				</div>
-			</Group>
+			{allActions}
 		</div>
 	);
 };
@@ -1074,4 +859,4 @@ const AddMore2 = connect(mapStateToProps, mapDispatchToProps)(AddMore2r);
 
 export default AddMore2;
 
-// 857 -> 936 -> 838 -> 923 -> 1016 -> 1077
+// 857 -> 936 -> 838 -> 923 -> 1016
