@@ -18,7 +18,7 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 	}, [user_id]);
 
 	useEffect(() => {
-		setPopout(<Spinner size="medium"/>)
+		setPopout(<Spinner size="small"/>)
 		setLoading(true);
 		setError(false);
 		setInited(false);

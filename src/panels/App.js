@@ -31,7 +31,7 @@ import {
 	PANEL_LICENCE,
 } from './../store/router/panelTypes';
 
-import { MODAL_ADS_FILTERS, ADS_FILTERS_B, MODAL_ADS_GEO } from './../store/router/modalTypes';
+import { MODAL_ADS_FILTERS, MODAL_ADS_GEO } from './../store/router/modalTypes';
 
 import './main.css';
 
@@ -96,7 +96,7 @@ import { inputArgs } from '../utils/window';
 import Centrifuge from 'centrifuge';
 import { FORM_CREATE, FORM_CREATE_B } from '../components/categories/redux';
 import { setFormData } from '../store/create_post/actions';
-import { ADS_FILTERS, EDIT_MODE, CREATE_AD_MAIN, CREATE_AD_ITEM } from '../store/create_post/types';
+import { ADS_FILTERS, EDIT_MODE, CREATE_AD_MAIN, CREATE_AD_ITEM, ADS_FILTERS_B } from '../store/create_post/types';
 import AdsModal from '../containers/ads/modal';
 import { defaultInputData } from '../components/create/default';
 import { updateDealInfo } from '../store/detailed_ad/update';

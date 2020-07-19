@@ -1,6 +1,6 @@
 export const K = 'Ҝ';
-export const GivenPack = 10;
-export const ReceivedPack = 10;
+export const GivenPack = 3;
+export const ReceivedPack = 3;
 export const NO_USER = {
 	vk_id: 0,
 	carma: 0,

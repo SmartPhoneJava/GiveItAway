@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Icon20ArticleBoxOutline from '@vkontakte/icons/dist/20/article_box_outline';
 
@@ -10,25 +10,17 @@ import { shortText } from './../../utils/short_text';
 import './addsTab.css';
 import './Add7.css';
 import { STATUS_ABORTED, STATUS_CLOSED, STATUS_CHOSEN } from '../../const/ads';
+import { ImageCache } from '../../components/image/image_cache';
 
-export function AdLight(ad, image, openAd) {
+export const AdLight = (props) => {
+	const { ad, imageURL, openAd } = props;
+	const [image] = useState(<ImageCache className="light-tiled" url={imageURL} />);
+
 	return (
-		<div onClick={openAd} className="light-main-left">
-			<img src={image} className="light-tiled" />
-			<div className="light-name">
-				<div
-					style={{
-						display: 'flex',
-						justifyContent: 'center',
-						alignItems: 'center',
-						padding: '2px',
-					}}
-				>
-					<Icon20ArticleBoxOutline /> {shortText(ad.header, 20)}
-				</div>
-			</div>
-
-			{ad.status == STATUS_ABORTED ? (
+		<div onClick={openAd}>
+			{image}
+			<div style={{ padding: '2px' }}>{shortText(ad.header, 30)}</div>
+			{/* {ad.status == STATUS_ABORTED ? (
 				<div className="light-failed">
 					<div className="on-img-text">
 						<Icon16Clear style={{ marginRight: '5px' }} />
@@ -46,7 +38,7 @@ export function AdLight(ad, image, openAd) {
 					</div>
 				</div>
 			) : (
-				''
+				null
 			)}
 			{ad.status == STATUS_CHOSEN ? (
 				<div className="light-deal">
@@ -64,9 +56,9 @@ export function AdLight(ad, image, openAd) {
 				</div>
 			) : (
 				''
-			)}
+			)} */}
 		</div>
 	);
-}
+};
 
 // 329 -> 71

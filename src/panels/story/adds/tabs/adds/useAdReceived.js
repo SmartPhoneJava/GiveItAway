@@ -18,8 +18,7 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 	}, [user_id]);
 
 	useEffect(() => {
-		setPopout(<Spinner size="medium"/>)
-		console.log("useAdReceived aaa", pageNumber, rowsPerPage, user_id)
+		setPopout(<Spinner size="small"/>)
 		setLoading(true);
 		setError(false);
 		setInited(false);

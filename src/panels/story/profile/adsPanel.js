@@ -1,23 +1,22 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { HorizontalScroll } from '@vkontakte/vkui';
+import { HorizontalScroll, Card, CardScroll, Header, Gradient, Group, Link } from '@vkontakte/vkui';
 
-import { connect } from 'react-redux';
+import { AnimateGroup } from 'react-animation';
 
 import { AdLight } from '../../template/Add6';
+
+import Icon from './../../../img/icon150.png';
 
 import './profile.css';
 
 const AdsPanel = (props) => {
 	const { pack, useGet, profileID } = props;
 
-	console.log("looook at it", profileID)
-
 	const [pageNumber, setPageNumber] = useState(1);
 	const [spinner, setSpinner] = useState(null);
 
 	let { loading, ads, hasMore, newPage } = useGet(setSpinner, pageNumber, pack, profileID);
 
-	console.log('loooook at ads', ads);
 	const observer = useRef();
 	const lastElementRef = useCallback(
 		(node) => {
@@ -41,38 +40,61 @@ const AdsPanel = (props) => {
 	}, [profileID]);
 
 	function Ad(ad) {
-		const image = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : '';
-		return AdLight(ad, image, () => {
-			props.openAd(ad);
-		});
+		const image = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : Icon;
+
+		return (
+			<AdLight
+				ad={ad}
+				imageURL={image}
+				opendAd={() => {
+					props.openAd(ad);
+				}}
+			/>
+		);
 	}
 
-	return (
-		<>
-			{spinner}
-			{!ads ? null : (
-				<HorizontalScroll>
-					<div style={{ marginLeft: '10px', display: 'flex' }}>
-						{ads.map((ad, index) => {
-							if (ads.length === index + 1) {
-								return (
-									<div style={{ padding: '4px' }} key={ad.ad_id} ref={lastElementRef}>
-										{Ad(ad)}
-									</div>
-								);
-							} else {
-								return (
-									<div style={{ padding: '4px' }} key={ad.ad_id}>
-										{Ad(ad)}
-									</div>
-								);
-							}
-						})}
-					</div>
-				</HorizontalScroll>
-			)}
-		</>
-	);
+	const [body, setBody] = useState(<></>);
+	useEffect(() => {
+		setBody(
+			!ads ? null : (
+				<Gradient>
+					<Group
+						header={
+							<Header subtitle={props.description} aside={spinner}>
+								{props.header}
+							</Header>
+						}
+					>
+						<CardScroll style={{ paddingBottom: 2 }}>
+							<AnimateGroup
+								animationIn="fadeInUp"
+								animationOut="fadeOutDown"
+								durationOut={500}
+								style={{ display: 'flex' }}
+							>
+								<div style={{ display: 'flex' }}>
+									{ads.map((ad, index) => (
+										<div
+											onClick={() => props.openAd(ad)}
+											style={{ padding: '4px', width: 144, textAlign: 'center' }}
+											key={ad.ad_id}
+											ref={ads.length === index + 1 ? lastElementRef : null}
+										>
+											<Card mode="outline" size="s">
+												{Ad(ad)}
+											</Card>
+										</div>
+									))}
+								</div>
+							</AnimateGroup>
+						</CardScroll>
+					</Group>
+				</Gradient>
+			)
+		);
+	}, [spinner]);
+
+	return body;
 };
 
 export default AdsPanel;

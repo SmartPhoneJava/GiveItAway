@@ -2,7 +2,7 @@
 	display: flex;
 	border-radius: 5px;
 	padding: 10px 15px;
-	background: var(--background_content);
+	/* background: var(--background_content); */
 }
 
 img.atiled {
@@ -47,14 +47,10 @@ img.atiled {
 }
 
 img.light-tiled {
-	position: absolute;
-	top: 0;
-	left: 0;
-
-	border-radius: 10px;
+	border-radius: 5px;
 	object-fit: cover;
-	width: 100px;
-	height: 100px;
+	width: 144px;
+	height: 96px;
 }
 
 .light-main-left {
@@ -87,7 +83,7 @@ img.light-tiled {
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	width: 116px;
+	width: 120px;
 	background: rgba(0, 100, 0, 0.9);
 }
 
@@ -96,7 +92,7 @@ img.light-tiled {
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	width: 116px;
+	width: 120px;
 	background: rgba(100, 0, 0, 0.9);
 }
 
@@ -105,7 +101,7 @@ img.light-tiled {
 	position: absolute;
 	top: 0px;
 	left: 0px;
-	width: 116px;
+	width: 120px;
 	background: rgba(215, 125, 49, 0.9);
 }
 
@@ -114,7 +110,7 @@ img.light-tiled {
 	position: absolute;
 	top: 35px;
 	left: 0px;
-	width: 116px;
+	width: 120px;
 	background: rgba(215, 125, 49, 0.9);
 }
 
@@ -192,7 +188,7 @@ img.light-tiled {
 }
 
 .aright-main {
-	position: relative; 
+	position: relative;
 	display: block;
 	overflow: hidden;
 	text-overflow: ellipsis;

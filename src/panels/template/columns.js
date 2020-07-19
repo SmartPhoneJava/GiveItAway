@@ -16,8 +16,6 @@ const transitionStyles = {
 	exited: { opacity: 0, transition: `opacity ${duration}ms ease-in-out` },
 };
 
-let thisI = 0;
-
 const Columns = forwardRef((props, ref) => {
 	const { needOneColumn } = props;
 	const array = props.array || [];
@@ -40,16 +38,6 @@ const Columns = forwardRef((props, ref) => {
 	};
 
 	const m = array.map((component, index) => {
-		// if (index == 0) {
-		// 	var timer = setTimeout(() => {
-		// 		console.log('thisI', thisI);
-		// 		setCanShow(thisI);
-		// 		thisI++;
-		// 		if (thisI >= array.length) {
-		// 			clearInterval(timer);
-		// 		}
-		// 	}, duration);
-		// }
 		keyI += 1;
 		let c = (
 			<Transition in={index > canShow} timeout={duration}>
@@ -89,41 +77,44 @@ const Columns = forwardRef((props, ref) => {
 		}
 		return null;
 	});
-	// const popped = m.pop();
 	return (
-		<>
-			<AnimateGroup animationIn="fadeInUp" animationOut="fadeOutDown" durationOut={500}>
-				{m.map((s) => (
-					<div>{s}</div>
-				))}
-			</AnimateGroup>
-			{/* {popped} */}
-		</>
+		<AnimateGroup animationIn="fadeInUp" animationOut="fadeOutDown" durationOut={500}>
+			{m.map((s) => (
+				<div>{s}</div>
+			))}
+		</AnimateGroup>
 	);
 });
 
-export const ColumnsFunc = ((needOneColumn, array, refreshIndex, columnsAmount, ref) => {
+export const ColumnsFunc = (needOneColumn, array, refreshIndex, columnsAmount, ref) => {
 	let components = [];
 
 	console.log('arrayarrayarray', array.length, columnsAmount, needOneColumn);
 
 	const isLast = (index) => {
-		return array.length - refreshIndex === index + 1;
+		return array.length === index + 1;
+	};
+
+	const needRef = (index) => {
+		if (array.length - refreshIndex > 0) {
+			return array.length - refreshIndex === index + 1;
+		}
+		return array.length === index + 1;
 	};
 
 	const m = array.map((component, index) => {
 		keyI += 1;
-		let c = component
+		let c = component;
 		if (needOneColumn) {
 			return (
-				<div key={keyI} ref={isLast(index) ? ref : null}>
+				<div key={keyI} ref={needRef(index) ? ref : null}>
 					{c}
 				</div>
 			);
 		}
 		components = [
 			...components,
-			<div className="one-block" key={keyI} ref={isLast(index) ? ref : null}>
+			<div className="one-block" key={keyI} ref={needRef(index) ? ref : null}>
 				{c}
 			</div>,
 		];
@@ -139,8 +130,8 @@ export const ColumnsFunc = ((needOneColumn, array, refreshIndex, columnsAmount, 
 		}
 		return null;
 	});
-	return m
-});
+	return m;
+};
 
 export default Columns;
 

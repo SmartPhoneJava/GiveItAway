@@ -335,7 +335,7 @@ const AddsTab = (props) => {
 					style={{
 						height: 'auto',
 						display: 'flex',
-						background: 'var(--background_page)',
+						// background: 'var(--background_page)',
 						flexDirection: 'column',
 						overflow: 'hidden',
 						textOverflow: 'ellipsis',
@@ -372,19 +372,18 @@ const AddsTab = (props) => {
 								<div>{s}</div>
 							))}
 						</AnimateGroup>
-						<List>
-							{rads.length > 0 ? null : error ? (
-								<Error />
-							) : !inited ? (
-								''
-							) : mode == MODE_ALL ? (
-								<AdNotFound dropFilters={props.dropFilters} />
-							) : mode == MODE_GIVEN ? (
-								<AdNoGiven setAllMode={setAllMode} />
-							) : (
-								<AdNoWanted setAllMode={setAllMode} />
-							)}
-						</List>
+
+						{rads.length > 0 ? null : error ? (
+							<Error />
+						) : !inited ? (
+							''
+						) : mode == MODE_ALL ? (
+							<AdNotFound dropFilters={props.dropFilters} />
+						) : mode == MODE_GIVEN ? (
+							<AdNoGiven setAllMode={setAllMode} />
+						) : (
+							<AdNoWanted setAllMode={setAllMode} />
+						)}
 					</Group>
 				</div>
 			</PullToRefresh>

@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Avatar, InfoRow, Spinner } from '@vkontakte/vkui';
+import { Avatar, InfoRow, Spinner, Card } from '@vkontakte/vkui';
 
 import Icon16Place from '@vkontakte/icons/dist/16/place';
 
 import MetroImage30 from './../../img/30/metro.png';
 
 import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
-
-import Icon20ArticleBoxOutline from '@vkontakte/icons/dist/20/article_box_outline';
-
-import { HideUntilLoaded } from 'react-animation';
 
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';
 import Icon16CheckCircle from '@vkontakte/icons/dist/16/check_circle';
@@ -24,37 +20,18 @@ import { time } from '../../utils/time';
 import './Add7.css';
 import { GetCategoryText } from '../../components/categories/Categories';
 import { STATUS_ABORTED, STATUS_CLOSED, STATUS_CHOSEN, STATUS_OFFER } from '../../const/ads';
+import { ImageCache } from '../../components/image/image_cache';
 
 const Add7 = (props) => {
-	const [ad, setAd] = useState(props.ad);
+	const [ad] = useState(props.ad);
 	const [status, setStatus] = useState(props.ad.status);
 	const [isVisible, setIsVisible] = useState(!props.ad.hidden);
 
 	const [image, setImage] = useState();
-	const [inCache, setInCache] = useState();
-
 	useEffect(() => {
 		const url = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : Icon;
-		var i = new Image();
-		i.src = url;
-		setInCache(i.complete);
-		setImage(
-			i.complete ? (
-				<img src={url} className="atiled" />
-			) : (
-				<HideUntilLoaded
-					animationIn="bounceIn"
-					imageToLoad={url}
-					Spinner={() => (
-						<div style={{ paddingLeft: '120px', paddingTop: '60px' }}>
-							<Spinner size="large" />
-						</div>
-					)}
-				>
-					<img src={url} className="atiled" />
-				</HideUntilLoaded>
-			)
-		);
+		const im = <ImageCache url={url} className="atiled" />;
+		setImage(im);
 	}, [ad.pathes_to_photo]);
 
 	useEffect(() => {
@@ -121,75 +98,79 @@ const Add7 = (props) => {
 	}
 	return (
 		<div className="aoutter">
-			<div className="atile">
-				<div onClick={props.openAd} className="amain-left">
-					{image}
+			<Card size="l" mode="shadow">
+				<div className="atile">
+					<div onClick={props.openAd} className="amain-left">
+						<div display={{ paddingLeft: '120px', paddingTop: '60px', height: '100px', width: '100px' }}>
+							{image}
+						</div>
 
-					<div className="acity">
-						<Icon16Place /> {ad.district ? ad.district : ad.region}
-					</div>
+						<div className="acity">
+							<Icon16Place /> {ad.district ? ad.district : ad.region}
+						</div>
 
-					{ad.status == STATUS_ABORTED ? (
-						<div className="failed">
-							<div className="on-img-text">
-								<Icon16Clear style={{ marginRight: '5px' }} />
-								Отменено
-							</div>
-						</div>
-					) : (
-						''
-					)}
-					{ad.status == STATUS_CLOSED ? (
-						<div className="success">
-							<div className="on-img-text">
-								<Icon16CheckCircle style={{ marginRight: '5px' }} />
-								Вещь отдана
-							</div>
-						</div>
-					) : (
-						''
-					)}
-					{ad.status == STATUS_CHOSEN && isAuthor() && ad.status == STATUS_CHOSEN ? (
-						<div className="deal">
-							<div style={{ color: 'rgb(220,220,220)', fontSize: '12px', padding: '2px' }}>
-								Ожидание ответа
-							</div>
-						</div>
-					) : (
-						''
-					)}
-					{!isVisible ? (
-						isAuthor() && ad.status == STATUS_CHOSEN ? (
-							<div className="hidden2 on-img-text">
-								<Icon12Lock />
-								Видно только вам
+						{ad.status == STATUS_ABORTED ? (
+							<div className="failed">
+								<div className="on-img-text">
+									<Icon16Clear style={{ marginRight: '5px' }} />
+									Отменено
+								</div>
 							</div>
 						) : (
-							<div className="hidden on-img-text">
-								<Icon12Lock />
-								Видно только вам
+							''
+						)}
+						{ad.status == STATUS_CLOSED ? (
+							<div className="success">
+								<div className="on-img-text">
+									<Icon16CheckCircle style={{ marginRight: '5px' }} />
+									Вещь отдана
+								</div>
 							</div>
-						)
-					) : (
-						''
-					)}
-				</div>
-				<div className="aright-main">
-					<div style={{ display: 'flex' }}>
-						<InfoRow onClick={props.openAd} className="aheader">
-							{ad.header}
-						</InfoRow>
+						) : (
+							''
+						)}
+						{ad.status == STATUS_CHOSEN && isAuthor() && ad.status == STATUS_CHOSEN ? (
+							<div className="deal">
+								<div style={{ color: 'rgb(220,220,220)', fontSize: '12px', padding: '2px' }}>
+									Ожидание ответа
+								</div>
+							</div>
+						) : (
+							''
+						)}
+						{!isVisible ? (
+							isAuthor() && ad.status == STATUS_CHOSEN ? (
+								<div className="hidden2 on-img-text">
+									<Icon12Lock />
+									Видно только вам
+								</div>
+							) : (
+								<div className="hidden on-img-text">
+									<Icon12Lock />
+									Видно только вам
+								</div>
+							)
+						) : (
+							''
+						)}
+					</div>
+					<div className="aright-main">
+						<div style={{ display: 'flex' }}>
+							<InfoRow onClick={props.openAd} className="aheader">
+								{ad.header}
+							</InfoRow>
 
-						{controllButton()}
-					</div>
-					<div onClick={props.openAd}>
-						<InfoRow className="atext"> {GetCategoryText(ad.category)} </InfoRow>
-						<InfoRow className="atext"> {time(ad.creation_date, 300)} </InfoRow>
-						{metroPanel()}
-						{authorPanel()}
+							{controllButton()}
+						</div>
+						<div onClick={props.openAd}>
+							<InfoRow className="atext"> {GetCategoryText(ad.category)} </InfoRow>
+							<InfoRow className="atext"> {time(ad.creation_date, 300)} </InfoRow>
+							{metroPanel()}
+							{authorPanel()}
+						</div>
 					</div>
 				</div>
-			</div>
+			</Card>
 		</div>
 	);
 };

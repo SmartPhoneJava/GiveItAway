@@ -5,6 +5,7 @@ import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 
 import { STATUS_CHOSEN, STATUS_CLOSED, STATUS_ABORTED, COLOR_DEFAULT, COLOR_DONE, COLOR_CANCEL } from '../../const/ads';
+import Centrifuge from 'centrifuge';
 
 export const statusWrapper = (block, color) => {
 	color = color || COLOR_DEFAULT;
@@ -26,77 +27,60 @@ export const statusWrapper = (block, color) => {
 };
 
 export const showClosed = (isDealer, isAuthor) => {
+	let text = 'Отдано!';
 	if (isAuthor) {
-		return statusWrapper(<InfoRow className="status-text">Спасибо за помощь другим людям!</InfoRow>, COLOR_DONE);
+		text = 'Спасибо за помощь другим людям!';
+	} else if (isDealer) {
+		text = 'Вещь перешла в ваше владение!';
 	}
-	if (isDealer) {
-		return statusWrapper(<InfoRow className="status-text">Вещь перешла в ваше владение!</InfoRow>, COLOR_DONE);
-	}
-	return statusWrapper(<InfoRow className="status-text">Отдано!</InfoRow>, COLOR_DONE);
+	return statusWrapper(<InfoRow className="status-text">{text}</InfoRow>, COLOR_DONE);
 };
 
 export const showAborted = (isDealer, isAuthor) => {
+	let text = 'Передача не состоялась!';
 	if (isAuthor) {
-		return statusWrapper(
-			<InfoRow className="status-text">Вторая сторона отказалась от сделки</InfoRow>,
-			COLOR_CANCEL
-		);
+		text = 'Вторая сторона отказалась от получения';
+	} else if (isDealer) {
+		text = 'Не было получено подтверждение получения';
 	}
-	if (isDealer) {
-		return statusWrapper(<InfoRow className="status-text">Вы прервали сделку</InfoRow>, COLOR_CANCEL);
-	}
-	return statusWrapper(<InfoRow className="status-text">Передача не состоялась</InfoRow>, COLOR_CANCEL);
+	return statusWrapper(<InfoRow className="status-text">{text}</InfoRow>, COLOR_CANCEL);
 };
 
-export const showChosen = (isDealer, isAuthor) => {
+export const showChosen = (isDealer, isAuthor, dealer, acceptClick, cancelClick, openUser) => {
+	const width = document.body.clientWidth;
 	if (isDealer && !isAuthor) {
 		return statusWrapper(
 			<>
 				<InfoRow style={{ padding: '10px', color: 'rgb(200,200,200)', textAlign: 'center' }}>
 					Автор решил отдать вещь вам. Подтвердите получение вещи после получения:
 				</InfoRow>
-				<div style={{ display: 'flex' }}>
-					<Button
-						stretched
-						size="l"
-						mode="commerce"
-						onClick={() => {
-							acceptDeal(
-								deal.deal_id,
-								(v) => {
-									setStory(STORY_ADS);
-								},
-								(e) => {
-									console.log('acceptDeal err', e);
-								}
-							);
-						}}
-						style
-						style={{ marginRight: 8 }}
-						before={<Icon24Done />}
-					>
-						Подтвердить
-					</Button>
-					<Button
-						stretched
-						size="l"
-						mode="destructive"
-						onClick={() => {
-							denyDeal(
-								deal.deal_id,
-								(v) => {
-									setStory(STORY_ADS);
-								},
-								(e) => {
-									console.log('denyDeal error', e);
-								}
-							);
-						}}
-						style={{ marginRight: 8 }}
-						before={<Icon24Cancel />}
-					>
-						Отклонить
-					</Button>
+				<div
+					style={{ display: width < 500 ? 'flex' : 'block', alignItems: 'center', justifyContent: 'center' }}
+				>
+					<div style={{ padding: '4px' }}>
+						<Button
+							stretched
+							size="l"
+							mode="commerce"
+							onClick={acceptClick}
+							style={{ marginRight: 8 }}
+							before={<Icon24Done />}
+						>
+							Подтвердить
+						</Button>
+					</div>
+					<div style={{ padding: '4px' }}>
+						<Button
+							stretched
+							size="l"
+							mode="destructive"
+							onClick={cancelClick}
+							style={{ marginRight: 8 }}
+							before={<Icon24Cancel />}
+						>
+							Отклонить
+						</Button>
+					</div>
 				</div>
 			</>,
 			COLOR_DEFAULT
@@ -118,9 +102,9 @@ export const showChosen = (isDealer, isAuthor) => {
 	} else {
 		return statusWrapper(
 			<div style={{ width: '100%', color: 'rgb(220,220,220)', fontSize: '13px', padding: '2px' }}>
-				<div style={{ display: 'flex' }}>
+				<div style={{ display: width < 500 ? 'flex' : 'block' }}>
 					Ожидание подтверждения от
-					<div style={{ display: 'flex' }} onClick={() => props.openUser(dealer.vk_id)}>
+					<div style={{ display: 'flex' }} onClick={() => openUser(dealer.vk_id)}>
 						<Avatar
 							style={{
 								marginLeft: '15px',
@@ -138,11 +122,11 @@ export const showChosen = (isDealer, isAuthor) => {
 	}
 };
 
-export const showStatus = (status, isDealer, isAuthor) => {
+export const showStatus = (status, isDealer, isAuthor, dealer, acceptClick, cancelClick, openUser) => {
 	console.log('showStatus call me once pls', status, isDealer, isAuthor);
 	switch (status) {
 		case STATUS_CHOSEN:
-			return showChosen(isDealer, isAuthor);
+			return showChosen(isDealer, isAuthor, dealer, acceptClick, cancelClick, openUser);
 		case STATUS_CLOSED:
 			return showClosed(isDealer, isAuthor);
 		case STATUS_ABORTED:

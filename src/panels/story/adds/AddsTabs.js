@@ -144,7 +144,7 @@ const AddsTabs = (props) => {
 					onCloseClick={() => {
 						openModal(MODAL_ADS_SUBS);
 					}}
-				></AddsTab>
+				/>
 			)}
 		</React.Fragment>
 	);

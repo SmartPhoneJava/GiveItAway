@@ -161,8 +161,38 @@ const AddMore2r = (props) => {
 
 	const [componentStatus, setComponentStatus] = useState();
 	useEffect(() => {
-		setComponentStatus(showStatus(status, isDealer, isAuthor));
-	}, [status, isDealer,isAuthor]);
+		setComponentStatus(
+			showStatus(
+				status,
+				isDealer,
+				isAuthor,
+				dealer,
+				() => {
+					acceptDeal(
+						deal.deal_id,
+						(v) => {
+							setStory(STORY_ADS);
+						},
+						(e) => {
+							console.log('acceptDeal err', e);
+						}
+					);
+				},
+				() => {
+					denyDeal(
+						deal.deal_id,
+						(v) => {
+							setStory(STORY_ADS);
+						},
+						(e) => {
+							console.log('denyDeal error', e);
+						}
+					);
+				},
+				props.openUser
+			)
+		);
+	}, [status, isDealer, isAuthor, dealer]);
 
 	const handleClose = () => {
 		setIsOpen(false);
@@ -684,74 +714,72 @@ const AddMore2r = (props) => {
 
 			<Separator />
 			<table>
-				<tbody>
-					{width < 500 ? (
-						<tbody>
-							<tr>
-								<td className="first">Вид объявления</td>
-								<td>
-									<div style={{ display: 'flex', alignItems: 'center' }}>
-										<div>
-											{ad_type == TYPE_CHOICE
-												? 'Сделка'
-												: ad_type == TYPE_AUCTION
-												? 'Аукцион'
-												: 'Лотерея'}
-										</div>
-										<div>
+				{width < 500 ? (
+					<tbody>
+						<tr>
+							<td className="first">Вид объявления</td>
+							<td>
+								<div style={{ display: 'flex', alignItems: 'center' }}>
+									<div>
+										{ad_type == TYPE_CHOICE
+											? 'Сделка'
+											: ad_type == TYPE_AUCTION
+											? 'Аукцион'
+											: 'Лотерея'}
+									</div>
+									<div>
+										<PanelHeaderButton onClick={() => {}}>
+											<Icon24Help fill="var(--text_subhead)" />
+										</PanelHeaderButton>
+									</div>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td className="first">Где забрать</td>
+							<td>
+								<div style={{ display: 'flex', alignItems: 'center' }}>
+									<div onClick={openMap}>{getGeoPosition()}</div>
+									<div>
+										<PanelHeaderButton onClick={() => {}}>
+											<Icon24Chevron />
+										</PanelHeaderButton>
+									</div>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				) : (
+					<tbody>
+						{' '}
+						<tr>
+							<td className="first">Вид объявления</td>
+							<td>
+								<div style={{ display: 'flex', alignItems: 'center' }}>
+									<Cell
+										asideContent={
 											<PanelHeaderButton onClick={() => {}}>
 												<Icon24Help fill="var(--text_subhead)" />
 											</PanelHeaderButton>
-										</div>
-									</div>
-								</td>
-							</tr>
-							<tr>
-								<td className="first">Где забрать</td>
-								<td>
-									<div style={{ display: 'flex', alignItems: 'center' }}>
-										<div onClick={openMap}>{getGeoPosition()}</div>
-										<div>
-											<PanelHeaderButton onClick={() => {}}>
-												<Icon24Chevron />
-											</PanelHeaderButton>
-										</div>
-									</div>
-								</td>
-							</tr>
-						</tbody>
-					) : (
-						<tbody>
-							{' '}
-							<tr>
-								<td className="first">Вид объявления</td>
-								<td>
-									<div style={{ display: 'flex', alignItems: 'center' }}>
-										<Cell
-											asideContent={
-												<PanelHeaderButton onClick={() => {}}>
-													<Icon24Help fill="var(--text_subhead)" />
-												</PanelHeaderButton>
-											}
-										>
-											{ad_type == TYPE_CHOICE
-												? 'Сделка'
-												: ad_type == TYPE_AUCTION
-												? 'Аукцион'
-												: 'Лотерея'}
-										</Cell>
-									</div>
-								</td>
-								<td className="first">Где забрать</td>
-								<td>
-									<div onClick={openMap}>
-										<Cell asideContent={<Icon24Chevron />}>{getGeoPosition()}</Cell>
-									</div>
-								</td>
-							</tr>
-						</tbody>
-					)}
-				</tbody>
+										}
+									>
+										{ad_type == TYPE_CHOICE
+											? 'Сделка'
+											: ad_type == TYPE_AUCTION
+											? 'Аукцион'
+											: 'Лотерея'}
+									</Cell>
+								</div>
+							</td>
+							<td className="first">Где забрать</td>
+							<td>
+								<div onClick={openMap}>
+									<Cell asideContent={<Icon24Chevron />}>{getGeoPosition()}</Cell>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				)}
 			</table>
 			<Separator />
 			<div style={{ display: width < 500 ? 'block' : 'flex' }}>
