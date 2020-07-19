@@ -5,6 +5,7 @@ import { Spinner } from '@vkontakte/vkui';
 
 export const ImageCache = (props) => {
 	const [image, setImage] = useState(<></>);
+	const spinS = props.spinnerStyle || {};
 	useEffect(() => {
 		var i = new Image();
 		i.src = props.url;
@@ -16,7 +17,15 @@ export const ImageCache = (props) => {
 					animationIn="bounceIn"
 					imageToLoad={props.url}
 					Spinner={() => (
-						<div style={{ height: '100%', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+						<div
+							style={{
+								height: '100%',
+								width: '100%',
+								justifyContent: 'center',
+								alignItems: 'center',
+								...spinS,
+							}}
+						>
 							<Spinner size="large" />
 						</div>
 					)}

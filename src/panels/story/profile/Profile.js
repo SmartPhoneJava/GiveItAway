@@ -13,8 +13,6 @@ import { old, fromSeconds } from './../../../utils/time';
 
 import Icon24Chevron from '@vkontakte/icons/dist/24/chevron';
 
-import { AnimateOnChange, HideUntilLoaded } from 'react-animation';
-
 import './profile.css';
 import { setFormData } from '../../../store/create_post/actions';
 import { setStory } from '../../../store/router/actions';
@@ -367,4 +365,4 @@ const mapDispatchToProps = {
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);
 
-// 337 -> 431
+// 337 -> 431 -> 368

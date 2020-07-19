@@ -30,7 +30,9 @@ const Add7 = (props) => {
 	const [image, setImage] = useState();
 	useEffect(() => {
 		const url = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : Icon;
-		const im = <ImageCache url={url} className="atiled" />;
+		const im = (
+			<ImageCache url={url} className="atiled" spinnerStyle={{ paddingLeft: '60px', paddingTop: '100px' }} />
+		);
 		setImage(im);
 	}, [ad.pathes_to_photo]);
 
@@ -101,10 +103,14 @@ const Add7 = (props) => {
 			<Card size="l" mode="shadow">
 				<div className="atile">
 					<div onClick={props.openAd} className="amain-left">
-						<div display={{ paddingLeft: '120px', paddingTop: '60px', height: '100px', width: '100px' }}>
+						<div
+							style={{
+								alignItems: 'center',
+								justifyContent: 'center',
+							}}
+						>
 							{image}
 						</div>
-
 						<div className="acity">
 							<Icon16Place /> {ad.district ? ad.district : ad.region}
 						</div>

@@ -9,6 +9,14 @@
 	background: var(--background_content);
 }
 
+.subscribe-withLoadingIf {
+	position: fixed;
+	width: 100%;
+	top: 0;
+	left: 0;
+	z-index: 101;
+}
+
 .subscribe-button {
 	position: fixed;
 	margin-top: 72px;

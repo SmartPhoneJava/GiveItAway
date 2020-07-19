@@ -3,9 +3,11 @@ import { store } from '../..';
 import { getDeal, getSubscribers, getCost, getCashback } from '../../requests';
 import { getUser } from '../../panels/story/profile/requests';
 
-export async function updateDealInfo() {
+export async function updateDealInfo(successCallback, failCallback) {
 	const myID = store.getState().vkui.myID;
 	const ad_id = store.getState().ad.ad_id;
+	const successC = successCallback || (() => {});
+	const failC = failCallback || (() => {});
 	getDeal(
 		ad_id,
 		(d) => {
@@ -17,9 +19,11 @@ export async function updateDealInfo() {
 				d.subscriber_id,
 				(user) => {
 					store.dispatch(setDealer(user));
+					successC()
 				},
 				(e) => {
 					store.dispatch(setDealer(null));
+					failC()
 				}
 			);
 		},
@@ -34,13 +38,21 @@ export async function updateDealInfo() {
 
 const SUBS_AMOUNT = 10;
 
-export async function updateSubs() {
+export async function updateSubs(successCallback, failCallback) {
 	let cancel = false;
+	const successC = successCallback || (() => {});
+	const failC = failCallback || (() => {});
 	const ad_id = store.getState().ad.ad_id;
 	getSubscribers(
 		ad_id,
-		(s) => store.dispatch(setSubs(s)),
-		(e) => store.dispatch(setSubs([])),
+		(s) => {
+			store.dispatch(setSubs(s));
+			successC();
+		},
+		(e) => {
+			store.dispatch(setSubs([]));
+			failC;
+		},
 		SUBS_AMOUNT
 	);
 
@@ -49,8 +61,10 @@ export async function updateSubs() {
 	};
 }
 
-export async function updateCost(isSub) {
+export async function updateCost(isSub, successCallback, failCallback) {
 	let cancel = false;
+	const successC = successCallback || (() => {});
+	const failC = failCallback || (() => {});
 	const ad_id = store.getState().ad.ad_id;
 
 	if (isSub) {
@@ -59,10 +73,12 @@ export async function updateCost(isSub) {
 			(data) => {
 				console.log('set cashback', data.bid);
 				store.dispatch(setCost(data.bid));
+				successC();
 			},
 			(e) => {
 				console.log('error cashback', e);
 				store.dispatch(setCost(0));
+				failC();
 			}
 		);
 	} else {
@@ -71,13 +87,15 @@ export async function updateCost(isSub) {
 			(data) => {
 				console.log('set cost', data.bid);
 				store.dispatch(setCost(data.bid));
+				successC();
 			},
 			(e) => {
 				console.log('error cost', e);
 				store.dispatch(setCost(0));
+				failC();
 			}
 		);
 	}
 
-	return 
+	return;
 }

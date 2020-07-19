@@ -6,7 +6,6 @@ import {
 	Button,
 	Group,
 	Header,
-	InfoRow,
 	HorizontalScroll,
 	Cell,
 	Separator,
@@ -15,6 +14,8 @@ import {
 	Placeholder,
 	Spinner,
 } from '@vkontakte/vkui';
+
+import { AnimateOnChange, AnimateGroup } from 'react-animation';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -78,7 +79,6 @@ import {
 	setIsHidden,
 	setExtraInfo,
 	setIsAuthor,
-	clearAds,
 	setPhotoIndex,
 	backToPrevAd,
 } from '../../store/detailed_ad/actions';
@@ -100,6 +100,7 @@ import { FORM_CREATE } from '../../components/categories/redux';
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { updateDealInfo, updateCost, updateSubs } from '../../store/detailed_ad/update';
 import { showStatus } from '../../components/detailed_ad/status';
+import { withLoading, withLoadingIf, animatedDiv } from '../../components/image/image_cache';
 
 let current_i = 0;
 
@@ -115,7 +116,6 @@ const AddMore2r = (props) => {
 		openPopout,
 		setStory,
 		setFormData,
-		clearAds,
 		setPhotoIndex,
 		setAdIn,
 		backToPrevAd,
@@ -134,16 +134,12 @@ const AddMore2r = (props) => {
 		ad_id,
 		subscribers_num,
 		district,
-		region,
 		text,
-		category,
 		views_count,
 		creation_date,
 		author,
 		ad_type,
-		ls_enabled,
 		comments_enabled,
-		extra_enabled,
 		extra_field,
 		cost,
 		hidden,
@@ -154,6 +150,11 @@ const AddMore2r = (props) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [options, setOptions] = useState({});
 	const [rAd, setrAd] = useState(AD);
+
+	const [costRequestSuccess, setCostRequestSuccess] = useState(false);
+	const [dealRequestSuccess, setDealRequestSuccess] = useState(false);
+	const [subsRequestSuccess, setSubsRequestSuccess] = useState(false);
+	const [detailsRequestSuccess, setDetailsRequestSuccess] = useState(false);
 
 	useEffect(() => {
 		setrAd(AD);
@@ -250,7 +251,15 @@ const AddMore2r = (props) => {
 		if (isNotValid()) {
 			return;
 		}
-		updateCost(isSubs);
+		updateCost(
+			isSubs,
+			() => {
+				setCostRequestSuccess(true);
+			},
+			() => {
+				setCostRequestSuccess(false);
+			}
+		);
 		setIsSub(isSubs);
 	}
 
@@ -258,19 +267,39 @@ const AddMore2r = (props) => {
 		const init = () => () => {
 			const id = AD.ad_id;
 
-			updateDealInfo();
+			setDealRequestSuccess(false);
+			updateDealInfo(
+				() => setDealRequestSuccess(true),
+				() => setDealRequestSuccess(false)
+			);
 
-			updateSubs();
+			setSubsRequestSuccess(false);
+			updateSubs(
+				() => setSubsRequestSuccess(true),
+				() => setSubsRequestSuccess(false)
+			);
+
+			setDetailsRequestSuccess(false);
 			getDetails(
 				id,
 				(details) => {
 					setExtraInfo(details, myID, true);
-					updateCost(details.is_subscriber);
-
+					setCostRequestSuccess(false);
+					updateCost(
+						details.is_subscriber,
+						() => {
+							setCostRequestSuccess(true);
+						},
+						() => {
+							setCostRequestSuccess(false);
+						}
+					);
+					setDetailsRequestSuccess(true);
 					setrAd(details);
 				},
 				(e) => {
 					setIsAuthor(false);
+					setDetailsRequestSuccess(false);
 				}
 			);
 		};
@@ -278,6 +307,11 @@ const AddMore2r = (props) => {
 			dispatch(init());
 		} else if (props.adOut) {
 			backToPrevAd();
+		} else {
+			setCostRequestSuccess(true);
+			setDealRequestSuccess(true);
+			setSubsRequestSuccess(true);
+			setDetailsRequestSuccess(true);
 		}
 		setAdIn();
 	}, []);
@@ -396,18 +430,10 @@ const AddMore2r = (props) => {
 			() => {}
 		);
 	}
-	if (isNotValid(AD)) {
-		return (
-			<Placeholder stretched header="Загрузка объявления">
-				<ScreenSpinner size="large" />
-			</Placeholder>
-		);
-	}
 
-	const [subButton, setSubButton] = useState();
-
+	const [subButton, setSubButton] = useState(<></>);
 	useEffect(() => {
-		if (isAuthor) {
+		if (isAuthor || !detailsRequestSuccess || !costRequestSuccess) {
 			setSubButton(null);
 			// setSubButton(
 			// 	<div className="subscribe-button">
@@ -442,31 +468,41 @@ const AddMore2r = (props) => {
 
 			const color = isSub ? 'var(--destructive)' : 'var(--header_tint)';
 			setSubButton(
-				isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED ? null : (
-					<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-						<div className="subscribe-button">{mainButton}</div>
-						<div className="subscribe-num">
-							<Avatar style={{ background: 'rgba(255,255,255,0.8)' }} size={32}>
-								<PanelHeaderButton onClick={onCarmaClick}>
-									<div style={{ fontSize: '20px', color: color }}>
-										{cost}
-										{K}
-									</div>
-								</PanelHeaderButton>
-							</Avatar>
-						</div>
-						{/* <div className="subscribe-question">
+				<div className="subscribe-withLoadingIf">
+					{withLoadingIf(
+						!(isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED),
+						<AnimateOnChange animation="bounce">
+							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+								<div className="subscribe-button">{mainButton}</div>
+								<div className="subscribe-num">
+									<Avatar style={{ background: 'rgba(255,255,255,0.8)' }} size={32}>
+										<PanelHeaderButton onClick={onCarmaClick}>
+											{withLoadingIf(
+												costRequestSuccess,
+												<div style={{ fontSize: '20px', color: color }}>
+													{cost}
+													{K}
+												</div>,
+												'small'
+											)}
+										</PanelHeaderButton>
+									</Avatar>
+								</div>
+
+								{/* <div className="subscribe-question">
 						<Avatar style={{ background: 'rgba(255,255,255,0.8)' }} size={21}>
 							<PanelHeaderButton onClick={onFreezeClick}>
 								<Icon24Help fill={color} />
 							</PanelHeaderButton>
 						</Avatar>
 					</div> */}
-					</div>
-				)
+							</div>
+						</AnimateOnChange>
+					)}
+				</div>
 			);
 		}
-	}, [isDealer, status, isAuthor, isSub, cost]);
+	}, [isDealer, status, isAuthor, isSub, cost, costRequestSuccess, detailsRequestSuccess]);
 
 	function actionGroup(els) {
 		return (
@@ -493,7 +529,6 @@ const AddMore2r = (props) => {
 	const [allActions, setAllActions] = useState();
 
 	useState(() => {
-		console.log('allActions isAuthor', isAuthor);
 		setAllActions(
 			<Group separator="show" header={null}>
 				<div style={{ display: 'block', alignItems: 'center' }}>
@@ -578,6 +613,15 @@ const AddMore2r = (props) => {
 		return r && d ? r + ', ' + d : r + d;
 	}
 
+	if (isNotValid(AD)) {
+		return (
+			<Placeholder stretched header="Загрузка объявления">
+				<ScreenSpinner size="large" />
+			</Placeholder>
+		);
+	}
+
+	// слишком много вызовов надо все переносить в UseState
 	return (
 		<div>
 			<div style={{ display: width < 500 ? 'block' : 'flex' }}>
@@ -667,7 +711,9 @@ const AddMore2r = (props) => {
 						<Spinner size="large" />
 					)}
 				</div>
+
 				{subButton}
+
 				<div style={{ display: 'block' }}>
 					<div className="CellLeft__head">{header}</div>
 					<div className="CellLeft__block">{text}</div>
@@ -872,7 +918,6 @@ const mapDispatchToProps = (dispatch) => {
 				openPopout,
 				openSnackbar,
 
-				clearAds,
 				setPhotoIndex,
 
 				setAdIn,
@@ -887,4 +932,4 @@ const AddMore2 = connect(mapStateToProps, mapDispatchToProps)(AddMore2r);
 
 export default AddMore2;
 
-// 857 -> 936 -> 838 -> 923 -> 1016
+// 857 -> 936 -> 838 -> 923 -> 1016 -> 935
