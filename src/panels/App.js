@@ -9,8 +9,10 @@ import {
 	TabbarItem,
 	ScreenSpinner,
 	ConfigProvider,
+	Group,
+	CellButton,
 } from '@vkontakte/vkui';
-
+import bridge from '@vkontakte/vk-bridge';
 import { STORY_ADS, STORY_CREATE } from './../store/router/storyTypes';
 import {
 	PANEL_ADS,
@@ -109,6 +111,7 @@ import FAQPanel from './faq';
 import AdvicePanel from './advice';
 import LicencePanel from './licence';
 import SubcategoriesPanel from '../components/categories/subcategory_panel';
+import { DIRECTION_BACK, DIRECTION_FORWARD } from '../store/router/directionTypes';
 
 const adsText = 'Объявления';
 const addText = 'Создать обьявление';
@@ -157,8 +160,8 @@ const App = (props) => {
 	}
 
 	useEffect(() => {
-		window.scroll(0, scrollPosition[scrollPosition.length - 1]);
-	}, [scrollPosition]);
+		console.log('panelsHistory ', panelsHistory);
+	}, [panelsHistory]);
 
 	const onStoryChange = (e) => {
 		const isProfile = e.currentTarget.dataset.text == profileText;
@@ -190,16 +193,44 @@ const App = (props) => {
 		}
 	};
 
-	async function scroll() {
-		// await bridge.send('VKWebAppScroll', { top: 10000, speed: 600 });
-		// window.scrollTo(0, 0);
-		// setOnline(
-		// 	appID,
-		// 	ApiVersion,
-		// 	(v) => {},
-		// 	(e) => {}
-		// );
+	function scrollWindow(to) {
+		var scrolledSoFar = window.scrollY;
+
+		var scrollEnd = to;
+		if (scrolledSoFar == scrollEnd) {
+			return;
+		}
+		var timerID = setInterval(function () {
+			window.scrollTo(0, scrollEnd);
+			if (scrolledSoFar != window.scrollY) clearInterval(timerID);
+		}, 10);
 	}
+	useEffect(() => {
+		if (props.direction == DIRECTION_BACK) {
+			scrollWindow(scrollPosition.y);
+		} else {
+			scrollWindow(0);
+		}
+	}, [props.direction]);
+
+	console.log('APP CALLED');
+	const [addsTabs, setAddsTabs] = useState(<></>);
+	useEffect(() => {
+		const v = (
+			<AddsTabs
+				notsCounter={notsCounterrr}
+				zeroNots={() => {
+					notsCounterrr = 0;
+				}}
+				refresh={SetDeleteID}
+				deleteID={deleteID}
+				openUser={setProfile}
+				dropFilters={dropFilters}
+				openAd={setReduxAd}
+			/>
+		);
+		setAddsTabs(v);
+	}, []);
 
 	const [notHere, setNotHere] = useState(false);
 	const [subscription, setSubscription] = useState(null);
@@ -331,7 +362,6 @@ const App = (props) => {
 	}, []);
 
 	function setReduxAd(ad) {
-		console.log('you ask to do this', ad);
 		store.dispatch(setToHistory());
 		store.dispatch(setExtraInfo(ad));
 		setAd(ad);
@@ -402,6 +432,14 @@ const App = (props) => {
 				}
 			>
 				<View
+					// onTransition={(struct) => {
+					// 	console.log('looog', struct, scrollPosition.y);
+					// 	if (struct.isBack) {
+					// 		scrollWindow(scrollPosition.y);
+					// 	} else {
+					// 		scrollWindow(0);
+					// 	}
+					// }}
 					popout={adPopout}
 					id={STORY_ADS}
 					activePanel={adActivePanel}
@@ -411,17 +449,7 @@ const App = (props) => {
 					header={false}
 				>
 					<Panel id={PANEL_ADS} separator={false}>
-						<AddsTabs
-							notsCounter={notsCounterrr}
-							zeroNots={() => {
-								notsCounterrr = 0;
-							}}
-							refresh={SetDeleteID}
-							deleteID={deleteID}
-							openUser={setProfile}
-							dropFilters={dropFilters}
-							openAd={setReduxAd}
-						/>
+						{addsTabs}
 						{snackbars[PANEL_ADS]}
 					</Panel>
 					<Panel id={PANEL_ONE}>
@@ -436,7 +464,6 @@ const App = (props) => {
 
 									setStory(STORY_ADS, PANEL_ADS);
 									SetDeleteID(id);
-									scroll();
 								}}
 								back={goBack}
 								openUser={setProfile}
@@ -520,6 +547,13 @@ const App = (props) => {
 
 				<View
 					id={STORY_CREATE}
+					// onTransition={(struct) => {
+					// 	if (struct.isBack) {
+					// 		scrollWindow(scrollPosition.y);
+					// 	} else {
+					// 		scrollWindow(0);
+					// 	}
+					// }}
 					activePanel={createActivePanel}
 					popout={createPopout}
 					onSwipeBack={goBack}
@@ -591,6 +625,7 @@ const mapStateToProps = (state) => {
 		colorScheme: state.vkui.colorScheme,
 		myID: state.vkui.myID,
 		myUser: state.vkui.myUser,
+		direction: state.router.direction,
 	};
 };
 
@@ -622,3 +657,4 @@ function mapDispatchToProps(dispatch) {
 export default connect(mapStateToProps, mapDispatchToProps)(App);
 
 // 477 -> 516 -> 674 -> 703 -> 795 -> 749 -> 587 -> 524 -> 583
+// 722

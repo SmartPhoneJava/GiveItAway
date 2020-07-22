@@ -6,16 +6,17 @@ import { Spinner } from '@vkontakte/vkui';
 export const ImageCache = (props) => {
 	const [image, setImage] = useState(<></>);
 	const spinS = props.spinnerStyle || {};
+	const { url, className, onClick } = props;
 	useEffect(() => {
 		var i = new Image();
-		i.src = props.url;
+		i.src = url;
 		setImage(
 			i.complete ? (
-				<img src={props.url} className={props.className} />
+				<img srcSet={url} className={className} onClick={onClick} />
 			) : (
 				<HideUntilLoaded
 					animationIn="bounceIn"
-					imageToLoad={props.url}
+					imageToLoad={url}
 					Spinner={() => (
 						<div
 							style={{
@@ -30,7 +31,7 @@ export const ImageCache = (props) => {
 						</div>
 					)}
 				>
-					<img src={props.url} className={props.className} />
+					<img src={url} className={className} onClick={onClick} />
 				</HideUntilLoaded>
 			)
 		);

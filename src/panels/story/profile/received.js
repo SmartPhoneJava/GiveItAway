@@ -14,8 +14,8 @@ const ReceivedPanel = (props) => {
 			openAd={props.openAd}
 			header={
 				<div style={{ display: 'flex' }}>
-					<p>{'Получено вещей -'}&nbsp;</p>
-					<p>{props.amount}</p>
+					{'Получено вещей -'}&nbsp;
+					{props.amount}
 				</div>
 			}
 			description="Список забранных предметов"

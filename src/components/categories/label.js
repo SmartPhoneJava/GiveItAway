@@ -55,8 +55,8 @@ const CategoriesLabel = (props) => {
 	};
 
 	useEffect(() => {
+		let cancel = false;
 		const data = inputData[redux_form];
-		console.log("i see this", data)
 		if (!data) {
 			return;
 		}
@@ -67,12 +67,17 @@ const CategoriesLabel = (props) => {
 		const s3 = data.incategory ? tag(data.incategory) : null;
 		let str = s1 ? (s2 ? (s3 ? [s1, p1, s2, p2, s3] : [s1, p1, s2]) : [s1]) : [notChoosenElement];
 
-		console.log('str is', str);
 		setTags(str);
 		setTimeout(() => {
+			if (cancel) {
+				return;
+			}
 			setTagsUpdate(true);
 		}, 500);
 		setTagsUpdate(false);
+		return () => {
+			cancel = true;
+		};
 	}, [inputData[redux_form]]);
 
 	return (

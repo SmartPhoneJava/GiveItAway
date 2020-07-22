@@ -126,7 +126,7 @@ import {
 	CategoryHome,
 	CategoryOnline,
 } from './const';
-import Columns from '../../panels/template/columns';
+import { ColumnsFunc } from '../../panels/template/columns';
 
 export function GetCategory400(category) {
 	let image = Another400;
@@ -704,19 +704,9 @@ export const CategoriesStruct = {
 							{v}
 						</div>
 					</div>
-
-					// <div className="hyphenate">{v}</div>
 				);
 			},
-			listCellStyle: (gr) => {
-				return (
-					<Columns
-						needOneColumn={width < 200}
-						array={gr}
-						columnsAmount={width < 500 ? 2 : width < 1000 ? 4 : 8}
-					/>
-				);
-			},
+			listCellStyle: (gr) => ColumnsFunc(width < 200, gr, 0, width < 500 ? 2 : width < 1000 ? 4 : 8),
 			search: (arr, searchText) => {
 				if (searchText == '') {
 					return arr;
@@ -730,7 +720,6 @@ export const CategoriesStruct = {
 						}).length > 0
 					);
 				});
-				console.log('looook at second', second);
 				second = [...first, ...second.map((v) => v.header)];
 				second = second.filter((a, i) => second.indexOf(a) == i);
 				return second;

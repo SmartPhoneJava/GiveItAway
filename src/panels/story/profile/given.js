@@ -14,8 +14,8 @@ const GivenPanel = (props) => {
 			openAd={props.openAd}
 			header={
 				<div style={{ display: 'flex' }}>
-					<p>{'Отдано вещей -'}&nbsp;</p>
-					<p> {props.amount}</p>
+					{'Отдано вещей -'}&nbsp;
+					{props.amount}
 				</div>
 			}
 			description="Список переданных предметов"

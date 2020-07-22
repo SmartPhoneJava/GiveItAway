@@ -18,11 +18,12 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 	}, [user_id]);
 
 	useEffect(() => {
-		setPopout(<Spinner size="small"/>)
+		setPopout(<Spinner size="small" />);
 		setLoading(true);
 		setError(false);
 		setInited(false);
 		let cancel;
+		let clear = false;
 
 		let params = {
 			rows_per_page: rowsPerPage,
@@ -37,6 +38,9 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
 		})
 			.then((res) => {
+				if (clear) {
+					return
+				}
 				console.log('useAdReceived', res);
 				const newAds = res.data;
 				setAds((prev) => {
@@ -48,6 +52,9 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 				setInited(true);
 			})
 			.catch((e) => {
+				if (clear) {
+					return
+				}
 				console.log('fail', e);
 				if (axios.isCancel(e)) return;
 				if (('' + e).indexOf('404') == -1) {
@@ -56,7 +63,10 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 				setPopout(null);
 				setInited(true);
 			});
-		return () => cancel();
+		return () => {
+			cancel();
+			clear = true;
+		};
 	}, [pageNumber, user_id]);
 
 	return { loading, ads, hasMore, newPage: pageNumber };

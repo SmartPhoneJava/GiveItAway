@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Textarea, Radio, Group, Header, Cell, Avatar, Checkbox, Snackbar, FormLayout, Switch } from '@vkontakte/vkui';
+import { Group, Cell, Avatar, Snackbar, Switch } from '@vkontakte/vkui';
 
 import { setFormData } from './../../store/create_post/actions';
 import { connect } from 'react-redux';
@@ -51,10 +51,7 @@ const ChooseFeedback = (props) => {
 		<Group
 			separator="hide"
 			header={
-				<Cell
-					multiline={true}
-					description="Как откливнушиеся смогут связаться с тобой?"
-				>
+				<Cell multiline={true} description="Как откливнушиеся смогут связаться с тобой?">
 					<div style={{ fontWeight: 600 }}>Обратная связь</div>
 				</Cell>
 			}

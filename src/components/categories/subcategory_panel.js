@@ -16,7 +16,7 @@ const SubcategoriesPanel = (props) => {
 	const [choosenGroup, setChoosenGroup] = useState();
 	const [struct, setStruct] = useState(ChildStruct);
 	const [onlyHeaders, setOnlyHeaders] = useState(true);
-	const [searchEverywhere, setSearchEverywhere] = useState(true);
+	const [searchEverywhere, setSearchEverywhere] = useState(false);
 	const [noVariant, setNoVariant] = useState(false);
 
 	const { formData, redux_form, setFormData } = props;
@@ -136,7 +136,7 @@ const SubcategoriesPanel = (props) => {
 								<i>Нет нужного варианта?</i> для ручного ввода названия
 							</Div>
 						</InfoRow> */}
-						<Cell
+						{/* <Cell
 							multiline
 							description={'Когда эта опция включена, поиск проводится во всех категориях'}
 							asideContent={
@@ -150,7 +150,7 @@ const SubcategoriesPanel = (props) => {
 							}
 						>
 							Искать во всех разделах{' '}
-						</Cell>
+						</Cell> */}
 						{/* <Cell
 							multiline
 							description={

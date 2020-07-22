@@ -182,14 +182,21 @@ const CreateItem = (props) => {
 	const [noPhotosA, setNoPhotosA] = useState(true);
 	const [photosDelete, setPhotosDelete] = useState(-1);
 	useEffect(() => {
+		let cancelFunc = false;
 		const r = !inputData.photosUrl || inputData.photosUrl.length == 0;
 
 		if (r) {
 			setNoPhotosA(false);
 			setTimeout(() => {
+				if (cancelFunc) {
+					return;
+				}
 				setNoPhotos(r);
 				setNoPhotosA(false);
 				setTimeout(() => {
+					if (cancelFunc) {
+						return;
+					}
 					setNoPhotosA(true);
 				}, duration);
 			}, duration);
@@ -197,15 +204,24 @@ const CreateItem = (props) => {
 			setNoPhotosA(false);
 			setPhotosDelete(prevPhotosLen);
 			setTimeout(() => {
+				if (cancelFunc) {
+					return;
+				}
 				setPhotosDelete(prevPhotosLen);
 				setNoPhotos(r);
 				setNoPhotosA(false);
 				setTimeout(() => {
+					if (cancelFunc) {
+							return;
+						}
 					setPhotosDelete(-1);
 				}, duration);
 			}, duration);
 		}
 		setPrevPhotosLen(inputData.photosUrl ? inputData.photosUrl.length : 0);
+		return () => {
+			cancelFunc = true;
+		};
 	}, [inputData.photosUrl]);
 
 	return (

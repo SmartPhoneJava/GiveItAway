@@ -118,6 +118,7 @@ const CreateAddRedux = (props) => {
 	const [licenceAgree, setLicenceAgree] = useState(false);
 
 	useEffect(() => {
+		let cleanupFunction = false;
 		let { v, header, text } = props.isValid(inputData);
 		var l = needEdit ? true : licenceAgree;
 		if (v && !l) {
@@ -136,10 +137,14 @@ const CreateAddRedux = (props) => {
 				const h = agreeRef.current.clientHeight;
 				setAddOffset(h);
 				setTimeout(() => {
+					if (cleanupFunction) {
+						return;
+					}
 					setAddOffset(h);
 				}, 1000);
 			}
 		}
+		return () => (cleanupFunction = true);
 	}, [inputData, licenceAgree]);
 
 	const ON_REFRESH_CLICK = 'ON_REFRESH_CLICK';

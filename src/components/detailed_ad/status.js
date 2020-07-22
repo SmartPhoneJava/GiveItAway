@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Avatar, Button, InfoRow } from '@vkontakte/vkui';
 
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
+import { AnimateOnChange } from 'react-animation';
 
 import { STATUS_CHOSEN, STATUS_CLOSED, STATUS_ABORTED, COLOR_DEFAULT, COLOR_DONE, COLOR_CANCEL } from '../../const/ads';
-import Centrifuge from 'centrifuge';
 
 export const statusWrapper = (block, color) => {
 	color = color || COLOR_DEFAULT;
@@ -26,6 +26,14 @@ export const statusWrapper = (block, color) => {
 	);
 };
 
+const textWrapper = (text) => {
+	return (
+		<InfoRow className="status-text">
+			<AnimateOnChange>{text}</AnimateOnChange>
+		</InfoRow>
+	);
+};
+
 export const showClosed = (isDealer, isAuthor) => {
 	let text = 'Отдано!';
 	if (isAuthor) {
@@ -33,7 +41,7 @@ export const showClosed = (isDealer, isAuthor) => {
 	} else if (isDealer) {
 		text = 'Вещь перешла в ваше владение!';
 	}
-	return statusWrapper(<InfoRow className="status-text">{text}</InfoRow>, COLOR_DONE);
+	return statusWrapper(textWrapper(text), COLOR_DONE);
 };
 
 export const showAborted = (isDealer, isAuthor) => {
@@ -43,7 +51,7 @@ export const showAborted = (isDealer, isAuthor) => {
 	} else if (isDealer) {
 		text = 'Не было получено подтверждение получения';
 	}
-	return statusWrapper(<InfoRow className="status-text">{text}</InfoRow>, COLOR_CANCEL);
+	return statusWrapper(textWrapper(text), COLOR_CANCEL);
 };
 
 export const showChosen = (isDealer, isAuthor, dealer, acceptClick, cancelClick, openUser) => {

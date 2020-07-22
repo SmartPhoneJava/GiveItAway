@@ -100,9 +100,11 @@ import { FORM_CREATE } from '../../components/categories/redux';
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { updateDealInfo, updateCost, updateSubs } from '../../store/detailed_ad/update';
 import { showStatus } from '../../components/detailed_ad/status';
-import { withLoading, withLoadingIf, animatedDiv } from '../../components/image/image_cache';
+import { withLoading, withLoadingIf, animatedDiv, ImageCache } from '../../components/image/image_cache';
 
 let current_i = 0;
+
+let uid = 1;
 
 const AddMore2r = (props) => {
 	const { myID, dispatch } = props;
@@ -145,6 +147,7 @@ const AddMore2r = (props) => {
 		hidden,
 		image,
 		photoIndex,
+		region,
 	} = AD;
 
 	const [isOpen, setIsOpen] = useState(false);
@@ -194,6 +197,130 @@ const AddMore2r = (props) => {
 			)
 		);
 	}, [status, isDealer, isAuthor, dealer]);
+
+	function tr(name, value) {
+		if (!value) {
+			return null;
+		}
+		return (
+			<tr>
+				<td className="first">{name}</td>
+				<td>{value}</td>
+			</tr>
+		);
+	}
+
+	const [componentItemTable, setComponentItemTable] = useState();
+	useEffect(() => {
+		const { category, subcat_list, subcat, views_count, subscribers_num, creation_date } = rAd;
+
+		setComponentItemTable(
+			<div style={{ display: 'block' }}>
+				<div className="CellLeft__head">{header}</div>
+				<div className="CellLeft__block">{text}</div>
+				<Separator />
+				<table>
+					<tbody>
+						{tr('Категория', category)}
+						{tr('Раздел', subcat_list)}
+						{tr('Подраздел', subcat)}
+						{tr('Просмотров', views_count)}
+						{!isFinished() ? tr('Откликнулось', subscribers_num) : null}
+						{tr('Размещено', time(creation_date))}
+					</tbody>
+				</table>
+			</div>
+		);
+	}, [rAd]);
+
+	const [componentPhotoSwipe, setComponentPhotoSwipe] = useState();
+	useEffect(() => {
+		setComponentPhotoSwipe(
+			<PhotoSwipe
+				style={{ marginTop: '50px' }}
+				isOpen={isOpen}
+				items={localPhotos}
+				options={options}
+				onClose={handleClose}
+			/>
+		);
+	}, [localPhotos, isOpen, options]);
+
+	const [componentImages, setComponentImages] = useState();
+	useEffect(() => {
+		const { image, photoIndex } = rAd;
+		const pathes_to_photo = rAd.pathes_to_photo || [];
+
+		setComponentImages(
+			<div style={{ display: 'block' }}>
+				<>
+					<div style={{ position: 'relative' }}>
+						<div style={{ right: '10px', position: 'absolute', top: '6px' }}>
+							<PanelHeaderButton
+								onClick={() => {
+									openImage(imgs);
+								}}
+								mode="secondary"
+								style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
+								size="m"
+							>
+								<Avatar style={{ background: 'rgba(0,0,0,0.7)' }} size={32}>
+									<Icon24Fullscreen fill="var(--white)" />
+								</Avatar>
+							</PanelHeaderButton>
+						</div>
+						{componentStatus}
+						<ImageCache
+							url={image}
+							className="details-main-image"
+							onClick={() => {
+								console.log('we work!!');
+								openImage(imgs);
+							}}
+						/>
+					</div>
+					{pathes_to_photo.length <= 1 ? null : (
+						<HorizontalScroll>
+							<div style={{ display: 'flex' }}>
+								{pathes_to_photo.map((img, i) => {
+									return (
+										<div
+											key={img.AdPhotoId}
+											style={{
+												borderRadius: '10px',
+												alignItems: 'center',
+												justifyContent: 'center',
+												padding: '1px',
+											}}
+										>
+											<Button
+												mode="tertiary"
+												style={{
+													padding: '0px',
+													borderRadius: '10px',
+												}}
+												onClick={() => {
+													setPhotoIndex(i);
+												}}
+											>
+												<img
+													style={{
+														filter: i == photoIndex ? 'brightness(40%)' : 'brightness(90%)',
+													}}
+													src={img.PhotoUrl}
+													className="small_img"
+												/>
+											</Button>
+										</div>
+									);
+								})}
+							</div>
+						</HorizontalScroll>
+					)}
+				</>
+			</div>
+		);
+	}, [rAd]);
 
 	const handleClose = () => {
 		setIsOpen(false);
@@ -264,33 +391,63 @@ const AddMore2r = (props) => {
 	}
 
 	useEffect(() => {
+		let cancelFunc = false;
 		const init = () => () => {
 			const id = AD.ad_id;
 
 			setDealRequestSuccess(false);
 			updateDealInfo(
-				() => setDealRequestSuccess(true),
-				() => setDealRequestSuccess(false)
+				() => {
+					if (cancelFunc) {
+						return;
+					}
+					setDealRequestSuccess(true);
+				},
+				() => {
+					if (cancelFunc) {
+						return;
+					}
+					setDealRequestSuccess(false);
+				}
 			);
 
 			setSubsRequestSuccess(false);
 			updateSubs(
-				() => setSubsRequestSuccess(true),
-				() => setSubsRequestSuccess(false)
+				() => {
+					if (cancelFunc) {
+						return;
+					}
+					setSubsRequestSuccess(true);
+				},
+				() => {
+					if (cancelFunc) {
+						return;
+					}
+					setSubsRequestSuccess(false);
+				}
 			);
 
 			setDetailsRequestSuccess(false);
 			getDetails(
 				id,
 				(details) => {
+					if (cancelFunc) {
+						return;
+					}
 					setExtraInfo(details, myID, true);
 					setCostRequestSuccess(false);
 					updateCost(
 						details.is_subscriber,
 						() => {
+							if (cancelFunc) {
+								return;
+							}
 							setCostRequestSuccess(true);
 						},
 						() => {
+							if (cancelFunc) {
+								return;
+							}
 							setCostRequestSuccess(false);
 						}
 					);
@@ -298,6 +455,9 @@ const AddMore2r = (props) => {
 					setrAd(details);
 				},
 				(e) => {
+					if (cancelFunc) {
+						return;
+					}
 					setIsAuthor(false);
 					setDetailsRequestSuccess(false);
 				}
@@ -314,6 +474,9 @@ const AddMore2r = (props) => {
 			setDetailsRequestSuccess(true);
 		}
 		setAdIn();
+		return () => {
+			cancelFunc = true;
+		};
 	}, []);
 
 	const openSubs = () => {
@@ -356,6 +519,7 @@ const AddMore2r = (props) => {
 	const [localPhotos, setLocalPhotos] = useState([]);
 
 	useEffect(() => {
+		let cancelFunc = false;
 		// setImgSpinner(true);
 		current_i++;
 		let this_i = current_i;
@@ -384,13 +548,20 @@ const AddMore2r = (props) => {
 				r.h = img.height;
 
 				if (photos_num == 0 && this_i == current_i) {
+					if (cancelFunc) {
+						return;
+					}
 					setLocalPhotos(photoSwipeImgs);
 					// setTimeout(() => setImgSpinner(false), 250);
 				}
 			};
 		});
+
 		setLocalPhotos(photoSwipeImgs);
 		setImgs(pathes_to_photo.map((v) => v.PhotoUrl));
+		return () => {
+			cancelFunc = true;
+		};
 	}, [pathes_to_photo]);
 
 	// useEffect(() => {
@@ -466,11 +637,12 @@ const AddMore2r = (props) => {
 				</Button>
 			);
 
+			console.log('costRequestSuccess', costRequestSuccess);
+
 			const color = isSub ? 'var(--destructive)' : 'var(--header_tint)';
 			setSubButton(
 				<div className="subscribe-withLoadingIf">
-					{withLoadingIf(
-						!(isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED),
+					{!(isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED) ? (
 						<AnimateOnChange animation="bounce">
 							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
 								<div className="subscribe-button">{mainButton}</div>
@@ -498,15 +670,18 @@ const AddMore2r = (props) => {
 					</div> */}
 							</div>
 						</AnimateOnChange>
-					)}
+					) : null}
 				</div>
 			);
 		}
 	}, [isDealer, status, isAuthor, isSub, cost, costRequestSuccess, detailsRequestSuccess]);
 
 	function actionGroup(els) {
+		console.log('looook at my uid', uid);
+		uid++;
 		return (
 			<div
+				key={uid}
 				style={{
 					display: 'flex',
 				}}
@@ -517,8 +692,9 @@ const AddMore2r = (props) => {
 	}
 
 	function actionDiv(onClick, before, text, mode) {
+		uid++;
 		return (
-			<div style={{ flex: 1, paddingLeft: paddingActions }}>
+			<div key={uid} style={{ flex: 1, paddingLeft: paddingActions }}>
 				<CellButton mode={mode} disabled={isFinished()} before={before} onClick={onClick}>
 					{text}
 				</CellButton>
@@ -626,136 +802,11 @@ const AddMore2r = (props) => {
 		<div>
 			<div style={{ display: width < 500 ? 'block' : 'flex' }}>
 				<div style={{ display: 'block' }}>
-					{!imgsSpinner ? (
-						<>
-							<PhotoSwipe
-								style={{ marginTop: '50px' }}
-								isOpen={isOpen}
-								items={localPhotos}
-								options={options}
-								onClose={handleClose}
-							/>
-
-							<div style={{ position: 'relative' }}>
-								<div style={{ right: '10px', position: 'absolute', top: '6px' }}>
-									<PanelHeaderButton
-										onClick={() => {
-											openImage(imgs);
-										}}
-										mode="secondary"
-										style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
-										size="m"
-									>
-										<Avatar style={{ background: 'rgba(0,0,0,0.7)' }} size={32}>
-											<Icon24Fullscreen fill="var(--white)" />
-										</Avatar>
-									</PanelHeaderButton>
-								</div>
-								{componentStatus}
-								<img
-									onClick={() => {
-										openImage(imgs);
-									}}
-									srcSet={image}
-									style={{
-										width: '100%',
-										objectFit: 'cover',
-										maxHeight: '250px',
-										margin: 'auto',
-									}}
-								/>
-							</div>
-							{pathes_to_photo.length <= 1 ? null : (
-								<HorizontalScroll>
-									<div style={{ display: 'flex' }}>
-										{pathes_to_photo.map((img, i) => {
-											return (
-												<div
-													key={img.AdPhotoId}
-													style={{
-														borderRadius: '10px',
-														alignItems: 'center',
-														justifyContent: 'center',
-														padding: '1px',
-													}}
-												>
-													<Button
-														mode="tertiary"
-														style={{
-															padding: '0px',
-															borderRadius: '10px',
-														}}
-														onClick={() => {
-															setPhotoIndex(i);
-														}}
-													>
-														<img
-															style={{
-																filter:
-																	i == photoIndex
-																		? 'brightness(40%)'
-																		: 'brightness(90%)',
-															}}
-															src={img.PhotoUrl}
-															className="small_img"
-														/>
-													</Button>
-												</div>
-											);
-										})}
-									</div>
-								</HorizontalScroll>
-							)}
-						</>
-					) : (
-						<Spinner size="large" />
-					)}
+					{componentPhotoSwipe}
+					{componentImages}
 				</div>
-
 				{subButton}
-
-				<div style={{ display: 'block' }}>
-					<div className="CellLeft__head">{header}</div>
-					<div className="CellLeft__block">{text}</div>
-					<Separator />
-					<table>
-						<tbody>
-							<tr>
-								<td className="first">Категория</td>
-								<td>{rAd.category}</td>
-							</tr>
-							{rAd.subcat_list ? (
-								<tr>
-									<td className="first">Раздел</td>
-									<td>{rAd.subcat_list}</td>
-								</tr>
-							) : null}
-
-							{rAd.subcat ? (
-								<tr>
-									<td className="first">Подраздел</td>
-									<td>{rAd.subcat}</td>
-								</tr>
-							) : null}
-
-							<tr>
-								<td className="first">Просмотров</td>
-								<td>{views_count}</td>
-							</tr>
-							{!isFinished() ? (
-								<tr>
-									<td className="first">Откликнулось</td>
-									<td>{subscribers_num}</td>
-								</tr>
-							) : null}
-
-							<tr>
-								<td className="first">Размещено</td>
-								<td>{time(creation_date)}</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+				{componentItemTable}
 			</div>
 
 			<Separator />

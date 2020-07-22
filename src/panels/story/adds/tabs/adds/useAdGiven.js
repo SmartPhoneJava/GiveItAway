@@ -23,6 +23,7 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 		setError(false);
 		setInited(false);
 		let cancel;
+		let clear = false;
 
 		let params = {
 			rows_per_page: rowsPerPage,
@@ -37,6 +38,9 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
 		})
 			.then((res) => {
+				if (clear) {
+					return
+				}
 				console.log('useAdGiven', res);
 				const newAds = res.data;
 				setAds((prev) => {
@@ -48,6 +52,9 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 				setInited(true);
 			})
 			.catch((e) => {
+				if (clear) {
+					return
+				}
 				console.log('fail', e);
 				if (axios.isCancel(e)) return;
 				if (('' + e).indexOf('404') == -1) {
@@ -56,7 +63,10 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 				setPopout(null);
 				setInited(true);
 			});
-		return () => cancel();
+		return () => {
+			clear = true
+			cancel();
+		}
 	}, [pageNumber, user_id]);
 
 	return { loading, ads, hasMore, newPage: pageNumber };

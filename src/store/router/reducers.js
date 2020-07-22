@@ -25,7 +25,6 @@ import { PANEL_ADS, PANEL_CREATE, PANEL_USER, PANEL_ONE } from './panelTypes';
 import { AdDefault, TAB_ADS } from '../../const/ads';
 import { NO_DIRECTION, DIRECTION_BACK, DIRECTION_FORWARD } from './directionTypes';
 
-
 const initialState = {
 	activeStory: STORY_ADS,
 	storiesHistory: [STORY_ADS],
@@ -68,13 +67,14 @@ const initialState = {
 
 	adOut: false,
 
-	scrollPosition: [],
+	scrollHistory: [],
+	scrollPosition: { x: 0, y: 0 },
 };
 
 export const routerReducer = (state = initialState, action) => {
 	switch (action.type) {
 		case SET_PAGE: {
-			
+			console.log('looooook',  window.pageYOffset);
 			window.history.pushState(null, null);
 			smoothScrollToTop();
 
@@ -85,6 +85,14 @@ export const routerReducer = (state = initialState, action) => {
 			Panels = [...Panels, panel];
 			console.log('page is here', Story, panel, Panels);
 			VK.swipeBackOn();
+
+			// window.pageYOffset
+			/**
+			 * 	x: window.pageXOffset,
+				y: window.pageYOffset,
+			 * 
+			 * 
+			 */
 
 			return {
 				...state,
@@ -99,7 +107,13 @@ export const routerReducer = (state = initialState, action) => {
 				},
 				direction: DIRECTION_FORWARD,
 
-				scrollPosition: [...state.scrollPosition, window.pageYOffset],
+				scrollHistory: [
+					...state.scrollHistory,
+					{
+						x: window.pageXOffset,
+						y: window.pageYOffset,
+					},
+				],
 			};
 		}
 
@@ -168,14 +182,21 @@ export const routerReducer = (state = initialState, action) => {
 
 				direction: DIRECTION_FORWARD,
 
-				scrollPosition: [...state.scrollPosition, window.pageYOffset],
+				scrollHistory: [
+					...state.scrollHistory,
+					{
+						x: window.pageXOffset,
+						y: window.pageYOffset,
+					},
+				],
 			};
 		}
 
 		case SET_AD: {
+			const pos = { x: window.pageXOffset, y: window.pageYOffset };
 			window.history.pushState(null, null);
 			smoothScrollToTop();
-	
+
 			let panel = action.payload.panel;
 			let ad = action.payload.ad;
 
@@ -187,6 +208,8 @@ export const routerReducer = (state = initialState, action) => {
 			Ads = state.activeAd ? [...Ads, state.activeAd] : Ads;
 
 			VK.swipeBackOn();
+
+			const scrollHistory = [...state.scrollHistory, pos];
 
 			return {
 				...state,
@@ -204,7 +227,7 @@ export const routerReducer = (state = initialState, action) => {
 				activeAd: ad,
 				adHistory: Ads,
 
-				scrollPosition: [...state.scrollPosition, window.pageYOffset],
+				scrollHistory,
 			};
 		}
 
@@ -222,9 +245,17 @@ export const routerReducer = (state = initialState, action) => {
 			} else {
 				VK.swipeBackOff();
 			}
-			console.log('looook', panel, save_to_history);
 
 			const newState = save_to_history ? state : initialState;
+			const scrollHistory = save_to_history
+				? [
+						...state.scrollHistory,
+						{
+							x: window.pageXOffset,
+							y: window.pageYOffset,
+						},
+				  ]
+				: [];
 
 			return {
 				...newState,
@@ -240,7 +271,7 @@ export const routerReducer = (state = initialState, action) => {
 				},
 
 				direction: DIRECTION_FORWARD,
-				scrollPosition: [window.pageYOffset],
+				scrollHistory,
 			};
 		}
 
@@ -248,7 +279,7 @@ export const routerReducer = (state = initialState, action) => {
 			let Story = state.activeStory;
 			let Popout = state.popouts[Story];
 			let Dummies = state.dummies[Story] || [];
-			
+
 			// если были открытые заглушки
 			if (Dummies.length > 0) {
 				Dummies.pop();
@@ -263,7 +294,6 @@ export const routerReducer = (state = initialState, action) => {
 				};
 			}
 
-			
 			// если были открытые попауты
 			if (Popout) {
 				return {
@@ -276,7 +306,6 @@ export const routerReducer = (state = initialState, action) => {
 				};
 			}
 
-			
 			let Modals = state.modalHistory[Story];
 			// если были открытые модальные окна
 			if (Modals && Modals.length > 0) {
@@ -300,14 +329,14 @@ export const routerReducer = (state = initialState, action) => {
 				};
 			}
 
-			console.log("GO_BACK ELSE")
+			console.log('GO_BACK ELSE');
 
 			let Panels = state.panelsHistory[Story] || [Story];
 			let Stories = state.storiesHistory;
 			Panels.pop();
 
 			let finish = false;
-			let Panel = state.activePanels[Story]
+			let Panel = state.activePanels[Story];
 			let storyChange = false;
 
 			if (Panels.length > 0) {
@@ -344,12 +373,13 @@ export const routerReducer = (state = initialState, action) => {
 			if (state.activePanels[Story] == PANEL_ONE && !storyChange) {
 				Ads.pop();
 				Ad = Ads[Ads.length - 1];
-				adOut = true
+				adOut = true;
 			}
 
-			const scrollPosition = state.scrollPosition || [];
-			scrollPosition.pop();
-			console.log("GO_BACK INFO", Story, Panel)
+			const scrollHistory = state.scrollHistory;
+			const scrollPosition = scrollHistory.length > 0 ? scrollHistory.pop() : state.scrollPosition;
+
+			console.log('GO_BACK history', scrollHistory, scrollPosition);
 			return {
 				...state,
 
@@ -370,6 +400,7 @@ export const routerReducer = (state = initialState, action) => {
 
 				profileHistory: Profiles,
 				adHistory: Ads,
+				scrollHistory,
 				scrollPosition,
 				adOut,
 			};
@@ -379,7 +410,7 @@ export const routerReducer = (state = initialState, action) => {
 			return {
 				...state,
 				adOut: false,
-			}
+			};
 		}
 
 		case SET_TAB: {

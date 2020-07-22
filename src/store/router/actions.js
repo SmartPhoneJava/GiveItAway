@@ -15,6 +15,7 @@ import {
 	CLOSE_ALL_MODALS,
 	SET_TAB,
 	AD_IN,
+	SET_SCROLL,
 } from './actionTypes';
 import { PANEL_USER, PANEL_ONE } from './panelTypes';
 
@@ -114,4 +115,12 @@ export const closeModal = () => ({
 
 export const closeAllModals = () => ({
 	type: CLOSE_ALL_MODALS,
+});
+
+export const setScroll = (x, y) => ({
+	type: SET_SCROLL,
+	payload: {
+		x,
+		y,
+	},
 });

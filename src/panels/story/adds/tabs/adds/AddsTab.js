@@ -9,6 +9,7 @@ import {
 	List,
 	PullToRefresh,
 	Spinner,
+	CellButton,
 } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
@@ -32,7 +33,7 @@ import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';
 import { bounce } from 'react-animations';
 import Radium, { StyleRoot } from 'radium';
 
-import { AnimateOnChange, AnimateGroup } from 'react-animation';
+import { AnimateGroup } from 'react-animation';
 
 const stylesAnimation = {
 	bounce: {
@@ -50,13 +51,15 @@ import {
 	MODE_WANTED,
 } from '../../../../../const/ads';
 import { ADS_FILTERS, GEO_DATA } from '../../../../../store/create_post/types';
-import { openPopout, closePopout } from '../../../../../store/router/actions';
+import { openPopout, closePopout, setStory } from '../../../../../store/router/actions';
 import AdNoWanted from '../../../../placeholders/adNoWanted';
 import { setFormData } from '../../../../../store/create_post/actions';
 import AdNoGiven from '../../../../placeholders/adNoGiven';
 import { NoRegion } from '../../../../../components/location/const';
 import { CategoryNo } from '../../../../../components/categories/const';
-import Columns, { ColumnsFunc } from '../../../../template/columns';
+import  { ColumnsFunc } from '../../../../template/columns';
+import { DIRECTION_BACK, NO_DIRECTION } from '../../../../../store/router/directionTypes';
+import {  pushToCache } from '../../../../../store/cache/actions';
 
 let i = 0;
 
@@ -93,7 +96,7 @@ const AddsTab = (props) => {
 
 	const [refreshMe, setRefreshMe] = useState(1);
 	const [pageNumber, setPageNumber] = useState(1);
-	const [ppageNumber, setPpageNumber] = useState(1);
+	// const [ppageNumber, setPpageNumber] = useState(1);
 
 	const [filtersOn, setFiltersOn] = useState(false);
 	useEffect(() => {
@@ -120,7 +123,9 @@ const AddsTab = (props) => {
 	const [pullLoading, setPullLoading] = useState(false);
 	const [ads, setAds] = useState([]);
 	const [rads, setRads] = useState([]);
-	const [hasMore, setHasMore] = useState(false);
+	const [hasMore, setHasMore] = useState(true);
+
+	const [cols, setCols] = useState([]);
 
 	useEffect(() => {
 		setPullLoading(!error404 && loading);
@@ -129,11 +134,9 @@ const AddsTab = (props) => {
 	useEffect(() => {
 		setAds([]);
 		setPageNumber(1);
-		setPpageNumber(1);
+		// setPpageNumber(1);
 		setCols([]);
 	}, [category, mode, searchR, city, country, sort, geodata, geoType, radius, refreshMe]);
-
-	const [cols, setCols] = useState([]);
 
 	useEffect(() => {
 		if (rads.length == 0) {
@@ -146,23 +149,23 @@ const AddsTab = (props) => {
 			2,
 			lastAdElementRef
 		);
-		setCols(c.map((s) => <div>{s}</div>));
+
+		setCols(c.map((s, i) => <div key={i}>{s}</div>));
 	}, [rads]);
 
 	useEffect(() => {
-		console.log('loading real is', loading, hasMore);
-	}, [loading, hasMore]);
-
-	useEffect(() => {
-		console.log('loading is', loading, ads);
+		let cleanupFunction = false;
 		if (rads.length == 0) {
 			setRads(ads);
 		} else if (!loading || error404) {
 			setTimeout(() => {
-				console.log('lallala', loading, ads);
+				if (cleanupFunction) {
+					return;
+				}
 				setRads(ads);
 			}, 50);
 		}
+		return () => (cleanupFunction = true);
 	}, [loading, error404]);
 
 	useEffect(() => {
@@ -182,6 +185,9 @@ const AddsTab = (props) => {
 	}, [props.deleteID]);
 
 	useEffect(() => {
+		if (!hasMore) {
+			return;
+		}
 		let cancel;
 		let cleanupFunction = false;
 		setLoading(true);
@@ -189,12 +195,25 @@ const AddsTab = (props) => {
 		setError404(false);
 		setInited(false);
 
+		console.log('BEFORE LOOK', props.direction, pageNumber, props.cache);
+
+		if (props.direction == DIRECTION_BACK && pageNumber <= props.cache.ads_page) {
+			setAds(props.cache.ads_list);
+			setRads(props.cache.ads_list);
+			setPageNumber(props.cache.ads_page);
+			setInited(true);
+			setLoading(false);
+			return;
+		}
+
+		console.log('GO GO GO', pageNumber, props.cache.ads_page);
+
 		async function f() {
 			if (rads.length == 0) {
 				openPopout(<Spinner size="large" />);
 			}
 
-			let rowsPerPage = 12;
+			let rowsPerPage = 3;
 			let query = searchR;
 			let params = {
 				rows_per_page: rowsPerPage,
@@ -250,9 +269,12 @@ const AddsTab = (props) => {
 					if (cleanupFunction || !isMounted) {
 						return;
 					}
-					setAds((prev) => {
-						return [...new Set([...prev, ...newAds])];
-					});
+					const nads = [...new Set([...ads, ...newAds])];
+					setAds(nads);
+
+					props.pushToCache(nads, 'ads_list');
+					props.pushToCache(pageNumber, 'ads_page');
+
 					setHasMore(newAds.length > 0);
 					setLoading(false);
 					closePopout();
@@ -263,11 +285,13 @@ const AddsTab = (props) => {
 					if (axios.isCancel(e)) return;
 					if (('' + e).indexOf('404') == -1) {
 						console.log('real err', e);
+
 						setError(true);
 					} else {
 						console.log('non real err', e);
 						setError404(true);
 						setHasMore(false);
+						setPageNumber((prev) => prev - 1);
 					}
 					setLoading(false);
 					closePopout();
@@ -287,10 +311,11 @@ const AddsTab = (props) => {
 			if (loading) return;
 			if (observer.current) observer.current.disconnect();
 			observer.current = new IntersectionObserver((entries) => {
-				console.log('sadsadsadsadsadsa', hasMore, pageNumber);
+				//!! ПОПРАВИТЬ ЭТОТ КОСТЫЛЬ
+
 				if (entries[0].isIntersecting && hasMore) {
-					setPageNumber(ppageNumber + 1);
-					setPpageNumber(pageNumber + 1);
+					setPageNumber((prev) => prev + 1);
+					// setPpageNumber(pageNumber + 1);
 				}
 			});
 			if (node) observer.current.observe(node);
@@ -308,12 +333,13 @@ const AddsTab = (props) => {
 	};
 
 	function Ad(ad) {
-		console.log('ad called', loading, ad.header);
 		return (
 			<Add7
 				vkPlatform={props.vkPlatform}
 				openUser={props.openUser}
-				openAd={() => props.openAd(ad)}
+				openAd={() => {
+					props.openAd(ad);
+				}}
 				ad={ad}
 				setPopout={openPopout}
 				refresh={props.refresh}
@@ -366,25 +392,21 @@ const AddsTab = (props) => {
 						) : null}
 					</div>
 
-					<Group>
-						<AnimateGroup animationIn="fadeInUp" animationOut="popOut" duration={500}>
-							{cols.map((s) => (
-								<div>{s}</div>
-							))}
-						</AnimateGroup>
+					<AnimateGroup animationIn="fadeInUp" animationOut="popOut" duration={500}>
+						{cols}
+					</AnimateGroup>
 
-						{rads.length > 0 ? null : error ? (
-							<Error />
-						) : !inited ? (
-							''
-						) : mode == MODE_ALL ? (
-							<AdNotFound dropFilters={props.dropFilters} />
-						) : mode == MODE_GIVEN ? (
-							<AdNoGiven setAllMode={setAllMode} />
-						) : (
-							<AdNoWanted setAllMode={setAllMode} />
-						)}
-					</Group>
+					{rads.length > 0 ? null : error ? (
+						<Error />
+					) : !inited ? (
+						''
+					) : mode == MODE_ALL ? (
+						<AdNotFound dropFilters={props.dropFilters} />
+					) : mode == MODE_GIVEN ? (
+						<AdNoGiven setAllMode={setAllMode} />
+					) : (
+						<AdNoWanted setAllMode={setAllMode} />
+					)}
 				</div>
 			</PullToRefresh>
 		</>
@@ -399,6 +421,8 @@ const mapStateToProps = (state) => {
 		platform: state.vkui.platform,
 
 		inputData: state.formData.forms,
+		direction: state.router.direction,
+		cache: state.cache,
 	};
 };
 
@@ -406,8 +430,10 @@ const mapDispatchToProps = {
 	openPopout,
 	closePopout,
 	setFormData,
+	setStory,
+	pushToCache,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddsTab);
 
-//283 -> 380 -> 418 -> 358 -> 406
+//283 -> 380 -> 418 -> 358 -> 406 -> 503

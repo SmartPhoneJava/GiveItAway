@@ -2,8 +2,6 @@ import {
     SET_COLOR_SCHEME,
     SET_ACCESS_TOKEN,
     SET_ACTIVE_TAB,
-    SET_SCROLL_POSITION,
-    SET_SCROLL_POSITION_BY_ID,
     SET_MY_ID,
     SET_APP_ID,
     SET_API_VERSION,
@@ -31,26 +29,6 @@ export const setActiveTab = (component, tab) => (
         payload: {
             component,
             tab
-        }
-    }
-);
-
-export const setScrollPosition = (component, x = 0, y = 0) => (
-    {
-        type: SET_SCROLL_POSITION,
-        payload: {
-            component,
-            x,
-            y
-        }
-    }
-);
-
-export const setScrollPositionByID = (component) => (
-    {
-        type: SET_SCROLL_POSITION_BY_ID,
-        payload: {
-            component
         }
     }
 );

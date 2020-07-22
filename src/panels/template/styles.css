@@ -91,3 +91,11 @@ td {
 .swipe {
 	display: flex;
 }
+
+/* details */
+.details-main-image {
+	width: 100%;
+	object-fit: cover;
+	max-height: 250px;
+	margin: auto;
+}

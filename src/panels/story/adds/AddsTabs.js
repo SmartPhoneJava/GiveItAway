@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import {
 	PanelHeader,
@@ -35,6 +35,41 @@ const AddsTabs = (props) => {
 	const mode = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].mode : null) || MODE_ALL;
 	const activeTab = activeTabs[activeStory] || TAB_ADS;
 	const [contextOpened, setContextOpened] = useState(false);
+
+	const [activeComponent, setActiveComponent] = useState(null);
+	useEffect(() => {
+		console.log('oNMECLICK', activeTab);
+		let v = null;
+		if (activeTab == TAB_NOTIFICATIONS) {
+			v = (
+				<Notifications
+					zeroNots={props.zeroNots}
+					openUser={props.openUser}
+					openAd={props.openAd}
+					goToAds={() => {
+						setTab(TAB_ADS);
+					}}
+				/>
+			);
+		} else {
+			v = (
+				<AddsTab
+					openAd={props.openAd}
+					dropFilters={props.dropFilters}
+					deleteID={props.deleteID}
+					openUser={props.openUser}
+					refresh={props.refresh}
+					onFiltersClick={() => {
+						openModal(MODAL_ADS_FILTERS);
+					}}
+					onCloseClick={() => {
+						openModal(MODAL_ADS_SUBS);
+					}}
+				/>
+			);
+		}
+		setActiveComponent(v);
+	}, []);
 
 	function select(e) {
 		props.dropFilters();
@@ -100,6 +135,7 @@ const AddsTabs = (props) => {
 						before={<Icon28LiveOutline />}
 						asideContent={mode === MODE_ALL ? <Icon24Done fill="var(--accent)" /> : null}
 						onClick={select}
+						key={MODE_ALL}
 						data-mode={MODE_ALL}
 					>
 						Все
@@ -108,6 +144,7 @@ const AddsTabs = (props) => {
 						before={<Icon28UserCircleOutline />}
 						asideContent={mode === MODE_GIVEN ? <Icon24Done fill="var(--accent)" /> : null}
 						onClick={select}
+						key={MODE_GIVEN}
 						data-mode={MODE_GIVEN}
 					>
 						Отдаю
@@ -116,36 +153,14 @@ const AddsTabs = (props) => {
 						before={<Icon28CubeBoxOutline />}
 						asideContent={mode === { MODE_WANTED } ? <Icon24Done fill="var(--accent)" /> : null}
 						onClick={select}
+						key={MODE_WANTED}
 						data-mode={MODE_WANTED}
 					>
 						Хочу забрать
 					</Cell>
 				</List>
 			</PanelHeaderContext>
-			{activeTab === TAB_NOTIFICATIONS ? (
-				<Notifications
-					zeroNots={props.zeroNots}
-					openUser={props.openUser}
-					openAd={props.openAd}
-					goToAds={() => {
-						setTab(TAB_ADS);
-					}}
-				/>
-			) : (
-				<AddsTab
-					openAd={props.openAd}
-					dropFilters={props.dropFilters}
-					deleteID={props.deleteID}
-					openUser={props.openUser}
-					refresh={props.refresh}
-					onFiltersClick={() => {
-						openModal(MODAL_ADS_FILTERS);
-					}}
-					onCloseClick={() => {
-						openModal(MODAL_ADS_SUBS);
-					}}
-				/>
-			)}
+			{activeComponent}
 		</React.Fragment>
 	);
 };

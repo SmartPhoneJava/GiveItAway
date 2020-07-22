@@ -2,8 +2,6 @@ import {
 	SET_ACCESS_TOKEN,
 	SET_ACTIVE_TAB,
 	SET_COLOR_SCHEME,
-	SET_SCROLL_POSITION,
-	SET_SCROLL_POSITION_BY_ID,
 	SET_MY_ID,
 	SET_APP_ID,
 	SET_API_VERSION,
@@ -48,39 +46,6 @@ export const vkuiReducer = (state = initialState, action) => {
 				activeTab: {
 					...state.activeTab,
 					[action.payload.component]: action.payload.tab,
-				},
-			};
-		}
-
-		case SET_SCROLL_POSITION: {
-			return {
-				...state,
-				componentScroll: {
-					...state.componentScroll,
-					[action.payload.component]: {
-						x: action.payload.x,
-						y: action.payload.y,
-					},
-				},
-			};
-		}
-
-		case SET_SCROLL_POSITION_BY_ID: {
-			let element = document
-				.getElementById(action.payload.component)
-				.getElementsByClassName('HorizontalScroll__in')[0];
-
-			let x = element.scrollLeft;
-			let y = element.scrollTop;
-
-			return {
-				...state,
-				componentScroll: {
-					...state.componentScroll,
-					[action.payload.component]: {
-						x: x,
-						y: y,
-					},
 				},
 			};
 		}

@@ -19,3 +19,6 @@ export const CLOSE_MODAL = 'CLOSE_MODAL';
 export const CLOSE_ALL_MODALS = 'CLOSE_ALL_MODALS';
 
 export const SET_DUMMY = 'SET_DUMMY';
+
+export const SET_SCROLL = 'SET_SCROLL';
+export const GET_SCROLL = 'GET_SCROLL';

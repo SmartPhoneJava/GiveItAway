@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { setFormData } from '../../store/create_post/actions';
 
+import { AnimateGroup, AnimateOnChange } from 'react-animation';
 import { connect } from 'react-redux';
 
 import {
@@ -23,9 +24,10 @@ import {
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 
 import Icon56InfoOutline from '@vkontakte/icons/dist/56/info_outline';
-import Columns from '../../panels/template/columns';
 
 export const CHOOSE_ANOTHER = 'another';
+
+const animationDuration = 100;
 
 const UserGroup = {
 	header: 'Пользовательское',
@@ -66,8 +68,6 @@ const GroupsPanel = (props) => {
 		return;
 	}
 
-	console.log('imageLeftimageLeft', imageLeft);
-
 	const [myVariant, setMyVariant] = useState('');
 	const [myVariantClicked, setMyVariantClicked] = useState(false);
 
@@ -89,7 +89,6 @@ const GroupsPanel = (props) => {
 	}
 
 	function onCellClick(group, value) {
-		console.log('we are set this', redux_form, field, value);
 		if (props.clear) {
 			props.setFormData(redux_form, {
 				...defaultInputData,
@@ -101,7 +100,6 @@ const GroupsPanel = (props) => {
 				[field]: value,
 			});
 		}
-		console.log('did this', props.inputData);
 		if (!afterClick) {
 			goBack();
 		} else {
@@ -170,6 +168,9 @@ const GroupsPanel = (props) => {
 		const img = <div style={{ marginRight: '10px' }}>{getImage(v)}</div>;
 		const description = darr.length == 0 ? null : darr.filter((v, i) => i < 6).join(', ') + addSymbol;
 
+		if (description && description.length == 0) {
+			console.log('help', text);
+		}
 		return (
 			<Cell
 				// expandable
@@ -232,7 +233,9 @@ const GroupsPanel = (props) => {
 			.filter((el) => el);
 
 		return cellArr.length > 0 ? (
-			<Group header={<Header mode="secondary">{gr.header}</Header>}>{cellArr}</Group>
+			<Group header={<Header mode="secondary">{gr.header}</Header>}>
+				<AnimateGroup duration={animationDuration}>{cellArr}</AnimateGroup>
+			</Group>
 		) : null;
 	};
 
@@ -276,7 +279,6 @@ const GroupsPanel = (props) => {
 			((arr, searchText) => {
 				return arr.filter((v) => v.toLowerCase().indexOf(searchText) != -1);
 			});
-		console.log('searchFuncsearchFunc', searchFunc);
 		const searched = searchFunc(choosenGroup.array, search);
 		if (searched == null) {
 			return null;
@@ -292,14 +294,16 @@ const GroupsPanel = (props) => {
 	};
 
 	const SearchEverywere = () => {
-		const foundCells = searchArr
-			.filter((g) => g.header != Groups.header)
-			.map((sGroup) => ShowGroup(sGroup))
-			.filter((v) => v);
+		const foundCells = searchArr.map((sGroup) => {
+			if (sGroup.header == Groups.header) {
+				return;
+			}
+			return ShowGroup(sGroup);
+		});
 		return foundCells.length > 0 ? (
 			<Group header={<Header mode="primary">Найдено в других категориях</Header>}>
 				<Separator />
-				{foundCells}
+				<AnimateGroup duration={animationDuration}>{foundCells}</AnimateGroup>
 			</Group>
 		) : null;
 	};
@@ -356,7 +360,7 @@ const GroupsPanel = (props) => {
 							</>
 						)
 					) : (
-						ShowList(Groups)
+						<AnimateGroup duration={animationDuration}>{ShowList(Groups)}</AnimateGroup>
 					)}
 				</>
 			)}
