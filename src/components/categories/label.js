@@ -27,6 +27,56 @@ const transitionStyles = {
 
 let i = 1;
 
+export const tag = (text, color, background, borderColor) => {
+	const c = color || 'var(--accent)'; //'#ffffff';
+	const b = background || null;
+	// randomColor({
+	// 	luminosity: 'dark',
+	// });
+	i++;
+	return {
+		id: i,
+		content: text,
+		color: c,
+		background: b,
+		borderColor: borderColor,
+	};
+};
+
+export const TagsLabel = (props) => {
+	const tagsUpdate = props.tagsUpdate || true;
+	return (
+		<div className="Simple">
+			<DraggableArea
+				tags={props.tags}
+				render={({ tag, index }) => (
+					<Transition in={tagsUpdate} timeout={duration}>
+						{(state) => {
+							const s = (
+								<div
+									className="row"
+									onClick={props.onClick}
+									style={{
+										...transitionStyles[state],
+										background: tag.background,
+										color: tag.color,
+										fontWeight: 600,
+										borderColor: tag.borderColor,
+									}}
+								>
+									{tag.content}
+								</div>
+							);
+							return s;
+						}}
+					</Transition>
+				)}
+				onChange={(tags) => console.log(tags)}
+			/>
+		</div>
+	);
+};
+
 const CategoriesLabel = (props) => {
 	const { redux_form, inputData } = props;
 
@@ -37,22 +87,6 @@ const CategoriesLabel = (props) => {
 	const [tags, setTags] = useState([notChoosenElement]);
 
 	const [tagsUpdate, setTagsUpdate] = useState(true);
-
-	const tag = (text, color, background, borderColor) => {
-		const c = color || 'var(--accent)'; //'#ffffff';
-		const b = background || null;
-		// randomColor({
-		// 	luminosity: 'dark',
-		// });
-		i++;
-		return {
-			id: i,
-			content: text,
-			color: c,
-			background: b,
-			borderColor: borderColor,
-		};
-	};
 
 	useEffect(() => {
 		let cancel = false;
@@ -88,46 +122,7 @@ const CategoriesLabel = (props) => {
 				</Header>
 			}
 		>
-			<div className="Simple">
-				<DraggableArea
-					tags={tags}
-					render={({ tag, index }) => (
-						<>
-							<Transition in={tagsUpdate} timeout={duration}>
-								{(state) => {
-									const s = (
-										<div
-											className="row"
-											onClick={props.open}
-											style={{
-												...transitionStyles[state],
-												background: tag.background,
-												color: tag.color,
-												fontWeight: 600,
-												borderColor: tag.borderColor,
-											}}
-										>
-											{/* <img
-							className="edit-tag"
-							src={ChangeIcon}
-							onClick={() => {
-								switch (index) {
-									case 0:
-										props.open();
-								}
-							}}
-						/> */}
-											{tag.content}
-										</div>
-									);
-									return s;
-								}}
-							</Transition>
-						</>
-					)}
-					onChange={(tags) => console.log(tags)}
-				/>
-			</div>
+			<TagsLabel tagsUpdate={tagsUpdate} tags={tags} onClick={props.open} />
 		</Group>
 	);
 };

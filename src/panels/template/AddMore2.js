@@ -13,6 +13,17 @@ import {
 	CellButton,
 	Placeholder,
 	Spinner,
+	Tabbar,
+	TabbarItem,
+	Caption,
+	Div,
+	CardScroll,
+	Card,
+	Gradient,
+	Link,
+	Tooltip,
+	RichCell,
+	Subhead,
 } from '@vkontakte/vkui';
 
 import { AnimateOnChange, AnimateGroup } from 'react-animation';
@@ -26,6 +37,8 @@ import 'react-photoswipe/lib/photoswipe.css';
 import { PhotoSwipe, PhotoSwipeGallery } from 'react-photoswipe';
 
 import Icon56WriteOutline from '@vkontakte/icons/dist/56/write_outline';
+
+import { randomColor } from 'randomcolor';
 
 import { GetCategoryText } from '../../components/categories/Categories';
 
@@ -79,7 +92,6 @@ import {
 	setIsHidden,
 	setExtraInfo,
 	setIsAuthor,
-	setPhotoIndex,
 	backToPrevAd,
 } from '../../store/detailed_ad/actions';
 import {
@@ -101,10 +113,14 @@ import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { updateDealInfo, updateCost, updateSubs } from '../../store/detailed_ad/update';
 import { showStatus } from '../../components/detailed_ad/status';
 import { withLoading, withLoadingIf, animatedDiv, ImageCache } from '../../components/image/image_cache';
+import { TagsLabel, tag } from '../../components/categories/label';
 
 let current_i = 0;
 
-let uid = 1;
+const col = '#00a550';
+// const col = randomColor({
+// 	luminosity: 'dark',
+// });
 
 const AddMore2r = (props) => {
 	const { myID, dispatch } = props;
@@ -118,35 +134,24 @@ const AddMore2r = (props) => {
 		openPopout,
 		setStory,
 		setFormData,
-		setPhotoIndex,
 		setAdIn,
 		backToPrevAd,
 	} = props;
 	const { setPage, openModal, setDummy, direction, AD } = props;
 	const {
-		isDealer,
 		isAuthor,
-		isSub,
 		status,
 		deal,
 		dealer,
 		pathes_to_photo,
-		photos,
 		header,
 		ad_id,
 		subscribers_num,
 		district,
-		text,
-		views_count,
-		creation_date,
 		author,
 		ad_type,
 		comments_enabled,
 		extra_field,
-		cost,
-		hidden,
-		image,
-		photoIndex,
 		region,
 	} = AD;
 
@@ -165,6 +170,7 @@ const AddMore2r = (props) => {
 
 	const [componentStatus, setComponentStatus] = useState();
 	useEffect(() => {
+		const { isAuthor, isDealer, dealer, status } = rAd;
 		setComponentStatus(
 			showStatus(
 				status,
@@ -196,7 +202,18 @@ const AddMore2r = (props) => {
 				props.openUser
 			)
 		);
-	}, [status, isDealer, isAuthor, dealer]);
+	}, [rAd]);
+
+	// const [componentItemHeader, setComponentItemHeader] = useState();
+	// useEffect(() => {
+	// 	const { header, text } = rAd;
+	// 	setComponentItemHeader(
+	// 		<div style={{ display: 'block' }}>
+	// 			<div className="details-ad-header">{header}</div>
+	// 			<div className="details-ad-description">{text}</div>
+	// 		</div>
+	// 	);
+	// }, [rAd]);
 
 	function tr(name, value) {
 		if (!value) {
@@ -210,26 +227,59 @@ const AddMore2r = (props) => {
 		);
 	}
 
+	const [componentCategories, setComponentCategories] = useState();
+	useEffect(() => {
+		const { category, subcat_list, subcat } = rAd;
+
+		setComponentCategories(
+			<TagsLabel
+				tags={[tag(category, col, null, col), tag(subcat_list, col, null, col), tag(subcat, col, null, col)]}
+			/>
+		);
+	}, [rAd]);
+
 	const [componentItemTable, setComponentItemTable] = useState();
 	useEffect(() => {
-		const { category, subcat_list, subcat, views_count, subscribers_num, creation_date } = rAd;
+		const { ad_type, views_count, status } = rAd;
+		let subscribers_num = rAd.subscribers_num || '0';
+
+		console.log('statusstatus', status, isFinished(status), subscribers_num);
 
 		setComponentItemTable(
-			<div style={{ display: 'block' }}>
-				<div className="CellLeft__head">{header}</div>
-				<div className="CellLeft__block">{text}</div>
-				<Separator />
-				<table>
-					<tbody>
-						{tr('Категория', category)}
-						{tr('Раздел', subcat_list)}
-						{tr('Подраздел', subcat)}
-						{tr('Просмотров', views_count)}
-						{!isFinished() ? tr('Откликнулось', subscribers_num) : null}
-						{tr('Размещено', time(creation_date))}
-					</tbody>
-				</table>
-			</div>
+			<table>
+				<tbody>
+					{tr('Просмотров', views_count)}
+					{!isFinished(status) ? tr('Откликнулось', subscribers_num) : null}
+					{tr(
+						'Вид объявления',
+						<div style={{ display: 'flex', alignItems: 'center' }}>
+							<div>
+								{ad_type == TYPE_CHOICE ? 'Сделка' : ad_type == TYPE_AUCTION ? 'Аукцион' : 'Лотерея'}
+							</div>
+							<div>
+								<PanelHeaderButton
+									style={{ margin: '0px', padding: '0px' }}
+									onClick={() => {}}
+								>
+									<Icon24Help fill="var(--text_subhead)" />
+								</PanelHeaderButton>
+								
+							</div>
+						</div>
+					)}
+					{tr(
+						'Где забрать',
+						<div style={{ display: 'flex', alignItems: 'center' }}>
+							<div onClick={openMap}>{getGeoPosition()}</div>
+							<div>
+								<PanelHeaderButton style={{ margin: '0px', padding: '0px' }} onClick={() => {}}>
+									<Icon24Chevron />
+								</PanelHeaderButton>
+							</div>
+						</div>
+					)}
+				</tbody>
+			</table>
 		);
 	}, [rAd]);
 
@@ -246,87 +296,96 @@ const AddMore2r = (props) => {
 		);
 	}, [localPhotos, isOpen, options]);
 
+	// const [componentMainImage, setComponentMainImage] = useState();
+	// useEffect(() => {
+	// 	const { image } = rAd;
+	// 	setComponentMainImage(
+	// 		<div style={{ position: 'relative' }}>
+	// 			<div style={{ right: '10px', position: 'absolute', top: '6px' }}>
+	// 				<PanelHeaderButton
+	// 					onClick={() => {
+	// 						openImage(imgs);
+	// 					}}
+	// 					mode="secondary"
+	// 					style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
+	// 					size="m"
+	// 				>
+	// 					<Avatar style={{ background: 'rgba(0,0,0,0.7)' }} size={32}>
+	// 						<Icon24Fullscreen fill="var(--white)" />
+	// 					</Avatar>
+	// 				</PanelHeaderButton>
+	// 			</div>
+	// 			{componentStatus}
+	// 			<ImageCache
+	// 				url={image}
+	// 				className="details-main-image"
+	// 				onClick={() => {
+	// 					openImage(imgs);
+	// 				}}
+	// 			/>
+	// 		</div>
+	// 	);
+	// }, [rAd]);
+
+	const [tooltip, setTooltip] = useState(false);
+
 	const [componentImages, setComponentImages] = useState();
 	useEffect(() => {
-		const { image, photoIndex } = rAd;
+		const { header, text } = rAd;
 		const pathes_to_photo = rAd.pathes_to_photo || [];
 
-		setComponentImages(
-			<div style={{ display: 'block' }}>
-				<>
-					<div style={{ position: 'relative' }}>
-						<div style={{ right: '10px', position: 'absolute', top: '6px' }}>
-							<PanelHeaderButton
-								onClick={() => {
-									openImage(imgs);
-								}}
-								mode="secondary"
-								style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
-								size="m"
-							>
-								<Avatar style={{ background: 'rgba(0,0,0,0.7)' }} size={32}>
-									<Icon24Fullscreen fill="var(--white)" />
-								</Avatar>
-							</PanelHeaderButton>
-						</div>
-						{componentStatus}
-						<ImageCache
-							url={image}
-							className="details-main-image"
-							onClick={() => {
-								console.log('we work!!');
-								openImage(imgs);
-							}}
-						/>
-					</div>
-					{pathes_to_photo.length <= 1 ? null : (
-						<HorizontalScroll>
-							<div style={{ display: 'flex' }}>
-								{pathes_to_photo.map((img, i) => {
-									return (
-										<div
-											key={img.AdPhotoId}
+		const imgDivs = (
+			<Group
+				header={
+					<>
+						<RichCell multiline={true} text={text} style={{ marginTop: '0px', paddingTop: '0px' }}>
+							<Subhead weight="bold">{header}</Subhead>
+						</RichCell>
+					</>
+				}
+				style={{ margin: '0px', padding: '0px' }}
+			>
+				<CardScroll>
+					<AnimateGroup animationIn="fadeInUp" animationOut="fadeOutDown" durationOut={500}>
+						<div style={{ display: 'flex' }}>
+							{pathes_to_photo.map((img, i) => (
+								<Card
+									size="s"
+									onClick={() => {
+										openImage(imgs, i);
+									}}
+								>
+									<ImageCache className="light-tiled" url={img.PhotoUrl} />
+									<div style={{ right: '7px', position: 'absolute', top: '3px' }}>
+										<Avatar
 											style={{
-												borderRadius: '10px',
-												alignItems: 'center',
-												justifyContent: 'center',
-												padding: '1px',
+												margin: '3px',
+												float: 'right',
+												marginLeft: 'auto',
+												top: '-3px',
+												background: 'rgba(0,0,0,0.8)',
 											}}
+											size={26}
 										>
-											<Button
-												mode="tertiary"
-												style={{
-													padding: '0px',
-													borderRadius: '10px',
-												}}
-												onClick={() => {
-													setPhotoIndex(i);
-												}}
-											>
-												<img
-													style={{
-														filter: i == photoIndex ? 'brightness(40%)' : 'brightness(90%)',
-													}}
-													src={img.PhotoUrl}
-													className="small_img"
-												/>
-											</Button>
-										</div>
-									);
-								})}
-							</div>
-						</HorizontalScroll>
-					)}
-				</>
-			</div>
+											<Icon24Fullscreen fill="var(--white)" />
+										</Avatar>
+									</div>
+								</Card>
+							))}
+						</div>
+					</AnimateGroup>
+				</CardScroll>
+			</Group>
 		);
+
+		setComponentImages(imgDivs);
 	}, [rAd]);
 
 	const handleClose = () => {
 		setIsOpen(false);
 	};
 
-	const openImage = (imgs) => {
+	const openImage = (imgs, photoIndex) => {
 		bridge
 			.send('VKWebAppShowImages', {
 				images: imgs,
@@ -351,7 +410,6 @@ const AddMore2r = (props) => {
 	}
 
 	const width = document.body.clientWidth;
-	const paddingActions = width < 500 ? 0 : width / 8;
 
 	// useEffect(() => {
 	// 	if (isNotValid() || (photos && photos.length != 0)) {
@@ -451,8 +509,10 @@ const AddMore2r = (props) => {
 							setCostRequestSuccess(false);
 						}
 					);
+					console.log('set details', details.author.vk_id == myID);
 					setDetailsRequestSuccess(true);
 					setrAd(details);
+					setIsAuthor(details.author.vk_id == myID);
 				},
 				(e) => {
 					if (cancelFunc) {
@@ -509,18 +569,17 @@ const AddMore2r = (props) => {
 		openModal(MODAL_ADS_FROZEN);
 	};
 
-	const isFinished = () => {
-		return status !== STATUS_OFFER && status !== STATUS_CHOSEN;
+	const isFinished = (st) => {
+		const ST = st || status;
+		return ST !== STATUS_OFFER && ST !== STATUS_CHOSEN;
 	};
 
 	const [imgs, setImgs] = useState([]);
-	const [imgsSpinner, setImgSpinner] = useState(false);
 
 	const [localPhotos, setLocalPhotos] = useState([]);
 
 	useEffect(() => {
 		let cancelFunc = false;
-		// setImgSpinner(true);
 		current_i++;
 		let this_i = current_i;
 
@@ -552,7 +611,6 @@ const AddMore2r = (props) => {
 						return;
 					}
 					setLocalPhotos(photoSwipeImgs);
-					// setTimeout(() => setImgSpinner(false), 250);
 				}
 			};
 		});
@@ -563,16 +621,6 @@ const AddMore2r = (props) => {
 			cancelFunc = true;
 		};
 	}, [pathes_to_photo]);
-
-	// useEffect(() => {
-	// 	console.log('i loooook at pathes_to_photo', pathes_to_photo);
-	// 	if (isNotValid(AD)) {
-	// 		return;
-	// 	}
-	// 	setImgSpinner(true);
-	// 	setInterval(() => setImgSpinner(false), 50);
-	// 	setImgs(pathes_to_photo.map((v) => v.PhotoUrl));
-	// }, [pathes_to_photo]);
 
 	function unsub(c) {
 		unsubscribe(
@@ -604,6 +652,7 @@ const AddMore2r = (props) => {
 
 	const [subButton, setSubButton] = useState(<></>);
 	useEffect(() => {
+		const { isDealer, status, isAuthor, isSub, cost } = rAd;
 		if (isAuthor || !detailsRequestSuccess || !costRequestSuccess) {
 			setSubButton(null);
 			// setSubButton(
@@ -637,112 +686,154 @@ const AddMore2r = (props) => {
 				</Button>
 			);
 
-			console.log('costRequestSuccess', costRequestSuccess);
-
 			const color = isSub ? 'var(--destructive)' : 'var(--header_tint)';
+			console.log('biiiig', !(isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED));
 			setSubButton(
-				<div className="subscribe-withLoadingIf">
-					{!(isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED) ? (
+				!(isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED) ? (
+					<>
 						<AnimateOnChange animation="bounce">
 							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-								<div className="subscribe-button">{mainButton}</div>
-								<div className="subscribe-num">
+								<div>
 									<Avatar style={{ background: 'rgba(255,255,255,0.8)' }} size={32}>
-										<PanelHeaderButton onClick={onCarmaClick}>
-											{withLoadingIf(
-												costRequestSuccess,
-												<div style={{ fontSize: '20px', color: color }}>
-													{cost}
-													{K}
-												</div>,
-												'small'
-											)}
-										</PanelHeaderButton>
+										{withLoadingIf(
+											costRequestSuccess,
+											<div style={{ fontSize: '20px', color: color }}>
+												{cost}
+												{K}
+											</div>,
+											'small'
+										)}
 									</Avatar>
 								</div>
-
-								{/* <div className="subscribe-question">
-						<Avatar style={{ background: 'rgba(255,255,255,0.8)' }} size={21}>
-							<PanelHeaderButton onClick={onFreezeClick}>
-								<Icon24Help fill={color} />
-							</PanelHeaderButton>
-						</Avatar>
-					</div> */}
 							</div>
 						</AnimateOnChange>
-					) : null}
-				</div>
+					</>
+				) : null
+
+				// setSubButton(
+				// 	<div className="subscribe-withLoadingIf">
+				// 		{!(isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED) ? (
+				// 			<AnimateOnChange animation="bounce">
+				// 				<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+				// 					<div className="subscribe-button">{mainButton}</div>
+				// 					<div className="subscribe-num">
+				// 						<Avatar style={{ background: 'rgba(255,255,255,0.8)' }} size={32}>
+				// 							<PanelHeaderButton onClick={onCarmaClick}>
+				// 								{withLoadingIf(
+				// 									costRequestSuccess,
+				// 									<div style={{ fontSize: '20px', color: color }}>
+				// 										{cost}
+				// 										{K}
+				// 									</div>,
+				// 									'small'
+				// 								)}
+				// 							</PanelHeaderButton>
+				// 						</Avatar>
+				// 					</div>
+				// 				</div>
+				// 			</AnimateOnChange>
+				// 		) : null}
+				// 	</div>
 			);
 		}
-	}, [isDealer, status, isAuthor, isSub, cost, costRequestSuccess, detailsRequestSuccess]);
+	}, [rAd, costRequestSuccess, detailsRequestSuccess]);
 
-	function actionGroup(els) {
-		console.log('looook at my uid', uid);
-		uid++;
+	function buttonAction(icon, text, onClick, destructive) {
+		const color = destructive ? 'var(--destructive)' : 'var(--accent)';
 		return (
-			<div
-				key={uid}
-				style={{
-					display: 'flex',
-				}}
+			<Button mode="tertiary" onClick={onClick} style={{ padding: '5px', margin: '0px', flex: 1 }}>
+				<div
+					style={{
+						alignItems: 'center',
+						color: color,
+						textAlign: 'center',
+					}}
+				>
+					<Button mode="tertiary">{icon}</Button>
+					<Caption level="1" weight="semibold">
+						{text}
+					</Caption>
+				</div>
+			</Button>
+		);
+	}
+
+	const [componentAuthor, setComponentAuthor] = useState();
+	useEffect(() => {
+		const { author, creation_date } = rAd;
+		setComponentAuthor(
+			<Cell
+				onClick={() => props.openUser(author.vk_id)}
+				before={<Avatar style={{ margin: '0px', padding: '0px' }} size={40} src={author.photo_url} />}
+				description={time(creation_date)}
+				style={{ marginBottom: '0px', paddingBottom: '0px' }}
 			>
-				{els}
-			</div>
+				<div style={{ display: 'flex', margin: '0px', padding: '0px' }}>
+					{author.name + ' ' + author.surname}{' '}
+				</div>
+			</Cell>
 		);
-	}
-
-	function actionDiv(onClick, before, text, mode) {
-		uid++;
-		return (
-			<div key={uid} style={{ flex: 1, paddingLeft: paddingActions }}>
-				<CellButton mode={mode} disabled={isFinished()} before={before} onClick={onClick}>
-					{text}
-				</CellButton>
-			</div>
-		);
-	}
+	}, [rAd]);
 
 	const [allActions, setAllActions] = useState();
+	useEffect(() => {
+		const { isAuthor, isDealer, isSub, status, cost, hidden } = rAd;
+		let buttons = [
+			buttonAction(<Icon24Write />, 'Изменить', onEditClick),
+			buttonAction(hidden ? <Icon24Globe /> : <Icon24Hide />, hidden ? 'Открыть' : 'Скрыть', () => {
+				hidden ? adVisible(ad_id, () => setIsHidden(false)) : adHide(ad_id, () => setIsHidden(true));
+			}),
+			buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK),
+			buttonAction(
+				<Icon24Delete style={{ color: 'var(--destructive)' }} />,
+				'Удалить',
+				() => deleteAd(ad_id, props.refresh),
+				true
+			),
+		];
+		if (!isAuthor) {
+			const color = isSub ? 'var(--destructive)' : 'var(--header_tint)';
+			const subBtn = buttonAction(
+				<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+					<Icon24MarketOutline style={{ color }} />
+					{subButton}
+				</div>,
+				isSub ? 'Перестать отслеживать' : 'Откликнуться',
+				() => (isSub ? unsub(cost) : sub(cost)),
+				isSub
+			);
 
-	useState(() => {
-		setAllActions(
-			<Group separator="show" header={null}>
-				<div style={{ display: 'block', alignItems: 'center' }}>
-					{isAuthor ? (
-						<div style={{ display: 'block' }}>
-							{actionGroup([
-								actionDiv(onEditClick, <Icon24Write />, 'Редактировать'),
-								actionDiv(() => deleteAd(ad_id, props.refresh), <Icon24Delete />, 'Удалить', 'danger'),
-							])}
-							{actionGroup([
-								actionDiv(
-									() => {
-										hidden
-											? adVisible(ad_id, () => setIsHidden(false))
-											: adHide(ad_id, () => setIsHidden(true));
-									},
-									hidden ? <Icon24Globe /> : <Icon24Hide />,
-									hidden ? 'Сделать видимым' : 'Сделать невидимым'
-								),
-								actionDiv(shareInVK, <Icon24ShareExternal />, 'Поделиться'),
-							])}
-						</div>
-					) : (
-						actionGroup([
-							actionDiv(shareInVK, <Icon24ShareExternal />, 'Поделиться'),
-							actionDiv(
-								() => {
-									window.open('https://vk.com/im?media=&sel=-194671970');
-								},
-								<Icon24Report />,
-								'Пожаловаться'
-							),
-						])
-					)}
-				</div>
-			</Group>
+			const helpBtn = !(isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED)
+				? buttonAction(<Icon24Help />, 'Как это работает?', onFreezeClick)
+				: null;
+
+			buttons = [
+				subBtn,
+				helpBtn,
+				buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK),
+
+				buttonAction(<Icon24Report />, 'Пожаловаться', () => {
+					window.open('https://vk.com/im?media=&sel=-194671970');
+				}),
+			];
+		}
+		buttons = (
+			<div
+				style={{
+					display: 'flex',
+					justifyContent: 'center',
+					alignItems: 'center',
+				}}
+			>
+				{buttons}
+			</div>
 		);
-	}, [isAuthor]);
+		setAllActions(
+			<Div style={{ paddingTop: '0px', marginTop: '0px', paddingBottom: '0px', marginBottom: '0px' }}>
+				{buttons}
+			</Div>
+		);
+	}, [rAd, subButton, costRequestSuccess]);
 
 	function onEditClick() {
 		setFormData(EDIT_MODE, {
@@ -802,117 +893,30 @@ const AddMore2r = (props) => {
 		<div>
 			<div style={{ display: width < 500 ? 'block' : 'flex' }}>
 				<div style={{ display: 'block' }}>
-					{componentPhotoSwipe}
-					{componentImages}
+					<Card mode="outline">
+						{componentStatus}
+						{componentAuthor}
+						{/* {componentItemHeader} */}
+						<div style={{ display: 'block' }}>
+							{componentPhotoSwipe}
+							{/* {componentMainImage} */}
+							{componentImages}
+						</div>
+						{/* {subButton} */}
+					</Card>
+					{width < 500 ? allActions : null}
 				</div>
-				{subButton}
+				{componentCategories}
 				{componentItemTable}
 			</div>
-
+			{width < 500 ? null : allActions}
 			<Separator />
-			<table>
-				{width < 500 ? (
-					<tbody>
-						<tr>
-							<td className="first">Вид объявления</td>
-							<td>
-								<div style={{ display: 'flex', alignItems: 'center' }}>
-									<div>
-										{ad_type == TYPE_CHOICE
-											? 'Сделка'
-											: ad_type == TYPE_AUCTION
-											? 'Аукцион'
-											: 'Лотерея'}
-									</div>
-									<div>
-										<PanelHeaderButton onClick={() => {}}>
-											<Icon24Help fill="var(--text_subhead)" />
-										</PanelHeaderButton>
-									</div>
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<td className="first">Где забрать</td>
-							<td>
-								<div style={{ display: 'flex', alignItems: 'center' }}>
-									<div onClick={openMap}>{getGeoPosition()}</div>
-									<div>
-										<PanelHeaderButton onClick={() => {}}>
-											<Icon24Chevron />
-										</PanelHeaderButton>
-									</div>
-								</div>
-							</td>
-						</tr>
-					</tbody>
-				) : (
-					<tbody>
-						{' '}
-						<tr>
-							<td className="first">Вид объявления</td>
-							<td>
-								<div style={{ display: 'flex', alignItems: 'center' }}>
-									<Cell
-										asideContent={
-											<PanelHeaderButton onClick={() => {}}>
-												<Icon24Help fill="var(--text_subhead)" />
-											</PanelHeaderButton>
-										}
-									>
-										{ad_type == TYPE_CHOICE
-											? 'Сделка'
-											: ad_type == TYPE_AUCTION
-											? 'Аукцион'
-											: 'Лотерея'}
-									</Cell>
-								</div>
-							</td>
-							<td className="first">Где забрать</td>
-							<td>
-								<div onClick={openMap}>
-									<Cell asideContent={<Icon24Chevron />}>{getGeoPosition()}</Cell>
-								</div>
-							</td>
-						</tr>
-					</tbody>
-				)}
-			</table>
-			<Separator />
-			<div style={{ display: width < 500 ? 'block' : 'flex' }}>
-				<div style={{ flex: 1 }}>
-					<Group header={<Header>Автор</Header>}>
-						<Cell
-							asideContent={<Icon24Chevron />}
-							onClick={() => props.openUser(author.vk_id)}
-							before={<Avatar size={36} src={author.photo_url} />}
-							description={extra_field ? extra_field : ''}
-						>
-							<div style={{ display: 'flex' }}>
-								{author.name + ' ' + author.surname}{' '}
-								{/* {ls_enabled ? (
-							<Link
-								style={{ marginLeft: '15px' }}
-								href={'https://vk.com/im?sel=' + author.vk_id}
-								target="_blank"
-							>
-								Написать
-							</Link>
-						) : (
-							''
-						)} */}
-							</div>
-						</Cell>
-					</Group>
-				</div>
-				<div style={{ flex: 1 }}>
-					<Given openSubs={openSubs} isAuthor={isAuthor} openUser={props.openUser} dealer={dealer} />
-				</div>
-				<Separator />
+			<div style={{ flex: 1 }}>
+				<Given openSubs={openSubs} isAuthor={isAuthor} openUser={props.openUser} dealer={dealer} />
 			</div>
 			<Separator />
 			<div style={{ display: width < 500 ? 'block' : 'flex' }}>
-				{isAuthor && isFinished ? (
+				{isAuthor && isFinished() ? (
 					<div style={{ flex: 1 }}>
 						<Subs openUser={props.openUser} amount={2} maxAmount={2} mini={true} />
 					</div>
@@ -926,7 +930,6 @@ const AddMore2r = (props) => {
 				</div>
 			</div>
 			<Separator />
-			{allActions}
 		</div>
 	);
 };
@@ -969,8 +972,6 @@ const mapDispatchToProps = (dispatch) => {
 				openPopout,
 				openSnackbar,
 
-				setPhotoIndex,
-
 				setAdIn,
 				backToPrevAd,
 			},
@@ -983,4 +984,4 @@ const AddMore2 = connect(mapStateToProps, mapDispatchToProps)(AddMore2r);
 
 export default AddMore2;
 
-// 857 -> 936 -> 838 -> 923 -> 1016 -> 935
+// 857 -> 936 -> 838 -> 923 -> 1016 -> 935 -> 987

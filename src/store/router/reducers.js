@@ -74,7 +74,6 @@ const initialState = {
 export const routerReducer = (state = initialState, action) => {
 	switch (action.type) {
 		case SET_PAGE: {
-			console.log('looooook',  window.pageYOffset);
 			window.history.pushState(null, null);
 			smoothScrollToTop();
 
@@ -83,16 +82,7 @@ export const routerReducer = (state = initialState, action) => {
 			let Story = state.activeStory;
 			let Panels = state.panelsHistory[Story] || [];
 			Panels = [...Panels, panel];
-			console.log('page is here', Story, panel, Panels);
 			VK.swipeBackOn();
-
-			// window.pageYOffset
-			/**
-			 * 	x: window.pageXOffset,
-				y: window.pageYOffset,
-			 * 
-			 * 
-			 */
 
 			return {
 				...state,

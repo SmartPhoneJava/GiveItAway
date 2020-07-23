@@ -1,29 +1,4 @@
-.CellLeft__head {
-	font-size: 24px;
-	color: var(--text_primary);
 
-	padding-top: 2px;
-	line-height: 22px;
-	margin: 4px;
-	text-align: center;
-	overflow: hidden;
-	-o-text-overflow: ellipsis;
-	text-overflow: ellipsis;
-}
-
-.CellLeft__block {
-	font-size: 14px;
-	color: var(--text_subhead);
-	line-height: 19px;
-	margin: 4px;
-	margin-top: 10px;
-	padding-left: 16px;
-	padding-right: 16px;
-	padding-bottom: 20px;
-	overflow: hidden;
-	-o-text-overflow: ellipsis;
-	text-overflow: ellipsis;
-}
 
 table {
 	padding-top: 12px;
@@ -44,44 +19,6 @@ td {
 	color: var(--text_secondary);
 }
 
-.small_img {
-	width: 80;
-	height: 80px;
-	object-fit: cover;
-	border-radius: '10px';
-}
-
-.big_img {
-	width: 80;
-	height: 80px;
-	object-fit: cover;
-	border-radius: '10px';
-}
-
-.imgblock3 {
-	position: relative;
-	display: inline-block;
-	width: '10px';
-}
-.imgblock3 img {
-	width: '10px';
-	object-fit: 'cover';
-}
-.imgblock3 span {
-	left: 10px;
-	position: absolute;
-	top: 10px;
-	width: 100%;
-}
-.imgblock3 span b {
-	background: #222;
-	color: #fff;
-	font: 16px/34px arial;
-	padding: 6px 10px;
-	white-space: nowrap;
-	border-radius: 3px;
-}
-
 .status-text {
 	padding: 10px;
 	color: rgb(240, 240, 240);
@@ -94,9 +31,42 @@ td {
 
 /* details */
 .details-main-image {
-	width: 100%;
 	max-width: 400px;
 	object-fit: cover;
-	max-height: 250px;
+	max-height: 200px;
 	margin: auto;
+}
+
+.details-small-img {
+	width: 80;
+	height: 50px;
+	object-fit: cover;
+	border-radius: '10px';
+}
+
+.details-ad-header {
+	font-size: 24px;
+	color: var(--text_primary);
+
+	padding-top: 2px;
+	line-height: 22px;
+	margin: 4px;
+	text-align: center;
+	overflow: hidden;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
+}
+
+.details-ad-description {
+	font-size: 14px;
+	color: var(--text_subhead);
+	line-height: 19px;
+	margin: 4px;
+	margin-top: 10px;
+	padding-left: 16px;
+	padding-right: 16px;
+	padding-bottom: 8px;
+	overflow: hidden;
+	-o-text-overflow: ellipsis;
+	text-overflow: ellipsis;
 }
