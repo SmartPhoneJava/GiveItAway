@@ -112,6 +112,9 @@ const AddsModal = (props) => {
 				return 'Не задано';
 			}
 			if (city.id != NoRegion.id) {
+				if (country.title == NoRegion.title) {
+					return city.title;
+				}
 				return country.title + ', ' + city.title;
 			}
 			return country.title;

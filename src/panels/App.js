@@ -156,7 +156,7 @@ const App = (props) => {
 	const historyLen = panelsHistory ? (panelsHistory[STORY_ADS] ? panelsHistory[STORY_ADS].length : 0) : 0;
 
 	function dropFilters() {
-		setFormData(ADS_FILTERS, null);
+		store.dispatch(setFormData(ADS_FILTERS, null))
 	}
 
 	useEffect(() => {

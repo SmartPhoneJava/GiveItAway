@@ -10,7 +10,7 @@ const AdNotFound = (props) => {
 			icon={<Icon56ErrorOutline />}
 			header="Упс &#128566;"
 			action={
-				<Button onClick={() => props.dropFilters()} size="l">
+				<Button onClick={props.dropFilters} size="l">
 					Сбросить фильтры
 				</Button>
 			}

@@ -10,7 +10,11 @@ import {
 	PullToRefresh,
 	Spinner,
 	CellButton,
+	Placeholder,
+	Button,
 } from '@vkontakte/vkui';
+
+import Icon56ErrorOutline from '@vkontakte/icons/dist/56/error_outline';
 
 import { connect } from 'react-redux';
 
@@ -57,18 +61,72 @@ import { setFormData } from '../../../../../store/create_post/actions';
 import AdNoGiven from '../../../../placeholders/adNoGiven';
 import { NoRegion } from '../../../../../components/location/const';
 import { CategoryNo } from '../../../../../components/categories/const';
-import  { ColumnsFunc } from '../../../../template/columns';
+import { ColumnsFunc } from '../../../../template/columns';
 import { DIRECTION_BACK, NO_DIRECTION } from '../../../../../store/router/directionTypes';
-import {  pushToCache } from '../../../../../store/cache/actions';
+import { pushToCache } from '../../../../../store/cache/actions';
+import { store } from '../../../../..';
 
 let i = 0;
 
 const SEARCH_WAIT = 650;
 
 const AddsTab = (props) => {
-	const [search, setSearch] = useState('');
-	const [searchR, setSearchR] = useState('');
+	const width = document.body.clientWidth;
+	const { inputData, openPopout, closePopout, setFormData, dropFilters } = props;
 
+	const [geoType, setGeoType] = useState(GEO_TYPE_FILTERS);
+	const [radius, setRadius] = useState(0);
+	const [geodata, setGeodata] = useState();
+	const [country, setCountry] = useState(NoRegion);
+	const [city, setCity] = useState(NoRegion);
+	const [category, setCategory] = useState(CategoryNo);
+	const [subcategory, setSubcategory] = useState(CategoryNo);
+	const [incategory, setIncategory] = useState(CategoryNo);
+	const [sort, setSort] = useState(SORT_TIME);
+	const [mode, setMode] = useState(MODE_ALL);
+	const [search, setSearch] = useState('');
+	useEffect(() => {
+		console.log('look at', inputData[ADS_FILTERS]);
+		const s = inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].search : null || '';
+		if (s == undefined) {
+			setSearch('');
+		} else {
+			setSearch(s);
+		}
+
+		const gt = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geotype : null) || GEO_TYPE_FILTERS;
+		setGeoType(gt);
+
+		const rad = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].radius : null) || 0;
+		setRadius(rad);
+
+		const geod = (inputData[GEO_DATA] ? inputData[GEO_DATA].geodata : null) || null;
+		setGeodata(geod);
+
+		const count = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].country : null) || NoRegion;
+		setCountry(count);
+
+		const cit = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].city : null) || NoRegion;
+		setCity(cit);
+		console.log('set city', cit);
+
+		const categor = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].category : null) || CategoryNo;
+		setCategory(categor);
+
+		const subcategor = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].subcategory : null) || CategoryNo;
+		setSubcategory(subcategor);
+
+		const incategor = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].incategory : null) || CategoryNo;
+		setIncategory(incategor);
+
+		const sor = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].sort : null) || SORT_TIME;
+		setSort(sor);
+
+		const mod = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].mode : null) || MODE_ALL;
+		setMode(mod);
+	}, [inputData[ADS_FILTERS]]);
+
+	const [searchR, setSearchR] = useState('');
 	useEffect(() => {
 		let cleanupFunction = false;
 		i++;
@@ -76,28 +134,14 @@ const AddsTab = (props) => {
 		setTimeout(() => {
 			if (j == i && !cleanupFunction) {
 				setSearchR(search);
+				setFormData(ADS_FILTERS, { ...inputData[ADS_FILTERS], search });
 			}
 		}, SEARCH_WAIT);
 		return () => (cleanupFunction = true);
 	}, [search]);
 
-	const { inputData, openPopout, closePopout, setFormData } = props;
-
-	const geoType = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geotype : null) || GEO_TYPE_FILTERS;
-	const radius = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].radius : null) || 0;
-	const geodata = (inputData[GEO_DATA] ? inputData[GEO_DATA].geodata : null) || null;
-	const country = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].country : null) || NoRegion;
-	const city = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].city : null) || NoRegion;
-	const category = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].category : null) || CategoryNo;
-	const subcategory = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].subcategory : null) || CategoryNo;
-	const incategory = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].incategory : null) || CategoryNo;
-	const sort = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].sort : null) || SORT_TIME;
-	const mode = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].mode : null) || MODE_ALL;
-
 	const [refreshMe, setRefreshMe] = useState(1);
 	const [pageNumber, setPageNumber] = useState(1);
-	// const [ppageNumber, setPpageNumber] = useState(1);
-
 	const [filtersOn, setFiltersOn] = useState(false);
 	useEffect(() => {
 		if (country == NoRegion && city == NoRegion && category == CategoryNo && radius == 0) {
@@ -114,34 +158,40 @@ const AddsTab = (props) => {
 			setIsMounted(false);
 		};
 	}, []);
-	const width = document.body.clientWidth;
 
 	const [inited, setInited] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
 	const [error404, setError404] = useState(false);
 	const [pullLoading, setPullLoading] = useState(false);
-	const [ads, setAds] = useState([]);
 	const [rads, setRads] = useState([]);
+	const [goBackDone, setGoBackDone] = useState(false);
 	const [hasMore, setHasMore] = useState(true);
 
 	const [cols, setCols] = useState([]);
 
 	useEffect(() => {
+		console.log('loading', loading);
 		setPullLoading(!error404 && loading);
 	}, [error404, loading]);
 
 	useEffect(() => {
-		setAds([]);
-		setPageNumber(1);
-		// setPpageNumber(1);
+		if (props.direction == DIRECTION_BACK && !goBackDone) {
+			return;
+		}
+		setRads([]);
 		setCols([]);
+		setPageNumber(-1);
+		setInited(false);
+		setHasMore(true);
+		console.log('refresh everything');
 	}, [category, mode, searchR, city, country, sort, geodata, geoType, radius, refreshMe]);
 
 	useEffect(() => {
-		if (rads.length == 0) {
-			return;
-		}
+		// if (rads.length == 0) {
+		// 	return;
+		// }
+		// console.log('update all');
 		const c = ColumnsFunc(
 			!width || width < 500,
 			rads.map((ad) => Ad(ad)),
@@ -150,42 +200,36 @@ const AddsTab = (props) => {
 			lastAdElementRef
 		);
 
-		setCols(c.map((s, i) => <div key={i}>{s}</div>));
+		console.log("rads", rads)
+		setCols(
+			c.map((s, i) => (
+				<div ref={lastAdElementRef} key={i}>
+					{s}
+				</div>
+			))
+		);
+		// setCols(rads.map((ad) => <div ref={lastAdElementRef}>{Ad(ad)}</div>));
 	}, [rads]);
-
-	useEffect(() => {
-		let cleanupFunction = false;
-		if (rads.length == 0) {
-			setRads(ads);
-		} else if (!loading || error404) {
-			setTimeout(() => {
-				if (cleanupFunction) {
-					return;
-				}
-				setRads(ads);
-			}, 50);
-		}
-		return () => (cleanupFunction = true);
-	}, [loading, error404]);
 
 	useEffect(() => {
 		console.log('props.deleteID', props.deleteID);
 		if (props.deleteID > 0) {
-			setRads((rads) =>
-				rads.filter((x) => {
-					return x.ad_id != props.deleteID;
-				})
-			);
-			setAds((ads) =>
-				ads.filter((x) => {
-					return x.ad_id != props.deleteID;
-				})
+			setRads(
+				(rads) =>
+					rads.filter((x) => {
+						return x.ad_id != props.deleteID;
+					}) || []
 			);
 		}
 	}, [props.deleteID]);
 
 	useEffect(() => {
+		console.log('BEFORE LOOK hasMore', hasMore, pageNumber);
 		if (!hasMore) {
+			return;
+		}
+		if (pageNumber < 0) {
+			setPageNumber(1);
 			return;
 		}
 		let cancel;
@@ -195,25 +239,26 @@ const AddsTab = (props) => {
 		setError404(false);
 		setInited(false);
 
-		console.log('BEFORE LOOK', props.direction, pageNumber, props.cache);
+		console.log('BEFORE LOOK', goBackDone);
 
-		if (props.direction == DIRECTION_BACK && pageNumber <= props.cache.ads_page) {
-			setAds(props.cache.ads_list);
-			setRads(props.cache.ads_list);
+		if (props.direction == DIRECTION_BACK && !goBackDone) {
+			// setAds(props.cache.ads_list);
+			setRads(props.cache.ads_list || []);
 			setPageNumber(props.cache.ads_page);
 			setInited(true);
 			setLoading(false);
+			setGoBackDone(true);
 			return;
 		}
 
-		console.log('GO GO GO', pageNumber, props.cache.ads_page);
+		console.log('GO GO GO', refreshMe, props.cache.refreshMe);
 
 		async function f() {
 			if (rads.length == 0) {
 				openPopout(<Spinner size="large" />);
 			}
 
-			let rowsPerPage = 3;
+			let rowsPerPage = 4;
 			let query = searchR;
 			let params = {
 				rows_per_page: rowsPerPage,
@@ -269,10 +314,11 @@ const AddsTab = (props) => {
 					if (cleanupFunction || !isMounted) {
 						return;
 					}
-					const nads = [...new Set([...ads, ...newAds])];
-					setAds(nads);
+					setRads((prev) => [...prev, ...newAds]);
+					// const nads = [...new Set([...ads, ...newAds])];
+					// setAds(nads);
 
-					props.pushToCache(nads, 'ads_list');
+					props.pushToCache([...rads, ...newAds], 'ads_list');
 					props.pushToCache(pageNumber, 'ads_page');
 
 					setHasMore(newAds.length > 0);
@@ -303,19 +349,17 @@ const AddsTab = (props) => {
 			cancel();
 			cleanupFunction = true;
 		};
-	}, [category, mode, searchR, pageNumber, city, country, sort, geoType, geodata, radius, refreshMe]);
+	}, [pageNumber]);
 
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
 		(node) => {
-			if (loading) return;
+			// if (loading) return;
 			if (observer.current) observer.current.disconnect();
 			observer.current = new IntersectionObserver((entries) => {
-				//!! ПОПРАВИТЬ ЭТОТ КОСТЫЛЬ
-
 				if (entries[0].isIntersecting && hasMore) {
+					console.log('yes intersection');
 					setPageNumber((prev) => prev + 1);
-					// setPpageNumber(pageNumber + 1);
 				}
 			});
 			if (node) observer.current.observe(node);
@@ -331,6 +375,10 @@ const AddsTab = (props) => {
 	const setAllMode = () => {
 		setFormData(ADS_FILTERS, { ...inputData, mode: MODE_ALL });
 	};
+
+	useEffect(() => {
+		console.log('rads.length', rads.length);
+	}, [rads]);
 
 	function Ad(ad) {
 		return (
@@ -365,43 +413,42 @@ const AddsTab = (props) => {
 						flexDirection: 'column',
 						overflow: 'hidden',
 						textOverflow: 'ellipsis',
-						whiteSpace: ads.length > 0 ? 'nowrap' : 'normal',
+						whiteSpace: rads.length > 0 ? 'nowrap' : 'normal',
 					}}
 				>
-					<div style={{ display: 'flex', background: 'var(--background_content)' }}>
-						<Search
-							value={search}
-							onChange={handleSearch}
-							icon={<Icon24Filter />}
-							onIconClick={props.onFiltersClick}
-						/>
-						{filtersOn ? (
-							<PanelHeaderButton
-								mode="secondary"
-								size="m"
-								onClick={() => {
-									props.dropFilters();
-								}}
-							>
-								<div style={{ paddingRight: '10px' }}>
-									<Avatar size={24}>
-										<Icon24Dismiss />
-									</Avatar>
-								</div>
-							</PanelHeaderButton>
-						) : null}
-					</div>
+					{mode != MODE_WANTED ? (
+						<div style={{ display: 'flex', background: 'var(--background_content)' }}>
+							<Search
+								key="search"
+								autoFocus={true}
+								// onBlur={() => searchRef.current.focus }
+								value={search}
+								onChange={handleSearch}
+								icon={<Icon24Filter />}
+								onIconClick={props.onFiltersClick}
+							/>
+							{filtersOn ? (
+								<PanelHeaderButton mode="secondary" size="m" onClick={dropFilters}>
+									<div style={{ paddingRight: '10px' }}>
+										<Avatar size={24}>
+											<Icon24Dismiss />
+										</Avatar>
+									</div>
+								</PanelHeaderButton>
+							) : null}
+						</div>
+					) : null}
 
-					<AnimateGroup animationIn="fadeInUp" animationOut="popOut" duration={500}>
-						{cols}
-					</AnimateGroup>
+					{/* <AnimateGroup animationIn="fadeInUp" animationOut="popOut" duration={500}> */}
+					{cols}
+					{/* </AnimateGroup> */}
 
 					{rads.length > 0 ? null : error ? (
 						<Error />
 					) : !inited ? (
-						''
+						<></>
 					) : mode == MODE_ALL ? (
-						<AdNotFound dropFilters={props.dropFilters} />
+						<AdNotFound dropFilters={dropFilters} />
 					) : mode == MODE_GIVEN ? (
 						<AdNoGiven setAllMode={setAllMode} />
 					) : (

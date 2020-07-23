@@ -13,6 +13,11 @@ export const ColumnsFunc = (needOneColumn, array, refreshIndex, columnsAmount, r
 		return array.length === index + 1;
 	};
 
+	const needRef1 = (index) => {
+		const a = needRef(index);
+		console.log('needRef', a);
+	};
+
 	const needRef = (index) => {
 		if (array.length - refreshIndex > 0) {
 			return array.length - refreshIndex === index + 1;
@@ -25,7 +30,7 @@ export const ColumnsFunc = (needOneColumn, array, refreshIndex, columnsAmount, r
 		let c = component;
 		if (needOneColumn) {
 			return (
-				<div key={keyI} ref={needRef(index) ? ref : null}>
+				<div key={keyI} ref={needRef1(index) ? ref : null}>
 					{c}
 				</div>
 			);

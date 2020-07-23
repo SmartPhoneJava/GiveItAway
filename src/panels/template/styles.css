@@ -95,6 +95,7 @@ td {
 /* details */
 .details-main-image {
 	width: 100%;
+	max-width: 400px;
 	object-fit: cover;
 	max-height: 250px;
 	margin: auto;

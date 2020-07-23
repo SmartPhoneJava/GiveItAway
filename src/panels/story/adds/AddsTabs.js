@@ -69,7 +69,7 @@ const AddsTabs = (props) => {
 			);
 		}
 		setActiveComponent(v);
-	}, []);
+	}, [activeTabs]);
 
 	function select(e) {
 		props.dropFilters();
@@ -151,7 +151,7 @@ const AddsTabs = (props) => {
 					</Cell>
 					<Cell
 						before={<Icon28CubeBoxOutline />}
-						asideContent={mode === { MODE_WANTED } ? <Icon24Done fill="var(--accent)" /> : null}
+						asideContent={mode === MODE_WANTED ? <Icon24Done fill="var(--accent)" /> : null}
 						onClick={select}
 						key={MODE_WANTED}
 						data-mode={MODE_WANTED}
