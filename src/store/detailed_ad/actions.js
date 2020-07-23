@@ -18,7 +18,6 @@ import {
 	CLEAR,
 	SET_DEALER,
 	AD_BACK,
-	SET_PHOTO_INDEX,
 	SET_TO_HISTORY,
 } from './actionTypes';
 
@@ -156,13 +155,6 @@ export const setPhotos = (photos) => ({
 	type: SET_SWIPE_IMAGES,
 	payload: {
 		photos,
-	},
-});
-
-export const setPhotoIndex = (photoIndex) => ({
-	type: SET_PHOTO_INDEX,
-	payload: {
-		photoIndex,
 	},
 });
 

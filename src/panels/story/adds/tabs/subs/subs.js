@@ -42,15 +42,13 @@ import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED, TYPE_CHOICE } from '../../
 import { updateDealInfo } from '../../../../../store/detailed_ad/update';
 
 export const Given = (props) => {
-	const dealer = props.dealer;
-	const isAuthor = props.isAuthor;
-	const openSubs = props.openSubs;
+	const { dealer, isAuthor, openSubs, finished } = props;
 	return (
 		<Group
 			header={
 				<Header
 					aside={
-						isAuthor ? (
+						isAuthor && !finished ? (
 							dealer ? (
 								<Link onClick={openSubs}>Изменить</Link>
 							) : (
@@ -109,7 +107,6 @@ const Subs = (props) => {
 			openPopout(
 				<ActionSheet onClose={closePopout}>
 					{!dealer || v.vk_id != dealer.vk_id ? (
-						
 						<ActionSheetItem autoclose onClick={() => close(v)}>
 							Отдать
 						</ActionSheetItem>

@@ -86,14 +86,7 @@ import { time } from './../../utils/time';
 import { setDummy, openModal, setPage, openSnackbar, openPopout, setStory, setAdIn } from '../../store/router/actions';
 import { PANEL_SUBS, PANEL_MAP } from './../../store/router/panelTypes';
 import { MODAL_ADS_COST, MODAL_ADS_FROZEN } from '../../store/router/modalTypes';
-import {
-	setIsSub,
-	setPhotos,
-	setIsHidden,
-	setExtraInfo,
-	setIsAuthor,
-	backToPrevAd,
-} from '../../store/detailed_ad/actions';
+import { setIsSub, setIsHidden, setExtraInfo, setIsAuthor, backToPrevAd } from '../../store/detailed_ad/actions';
 import {
 	AdDefault,
 	AD_LOADING,
@@ -117,6 +110,8 @@ import { TagsLabel, tag } from '../../components/categories/label';
 
 let current_i = 0;
 
+let uid = 0;
+
 const col = '#00a550';
 // const col = randomColor({
 // 	luminosity: 'dark',
@@ -127,7 +122,6 @@ const AddMore2r = (props) => {
 	const {
 		setIsSub,
 		setIsAuthor,
-		setPhotos,
 		setIsHidden,
 		setExtraInfo,
 		openSnackbar,
@@ -148,10 +142,8 @@ const AddMore2r = (props) => {
 		ad_id,
 		subscribers_num,
 		district,
-		author,
 		ad_type,
 		comments_enabled,
-		extra_field,
 		region,
 	} = AD;
 
@@ -165,6 +157,9 @@ const AddMore2r = (props) => {
 	const [detailsRequestSuccess, setDetailsRequestSuccess] = useState(false);
 
 	useEffect(() => {
+		if (AD.isAuthor == undefined) {
+			return;
+		}
 		setrAd(AD);
 	}, [AD]);
 
@@ -257,13 +252,9 @@ const AddMore2r = (props) => {
 								{ad_type == TYPE_CHOICE ? 'Сделка' : ad_type == TYPE_AUCTION ? 'Аукцион' : 'Лотерея'}
 							</div>
 							<div>
-								<PanelHeaderButton
-									style={{ margin: '0px', padding: '0px' }}
-									onClick={() => {}}
-								>
+								<PanelHeaderButton style={{ margin: '0px', padding: '0px' }} onClick={() => {}}>
 									<Icon24Help fill="var(--text_subhead)" />
 								</PanelHeaderButton>
-								
 							</div>
 						</div>
 					)}
@@ -333,6 +324,9 @@ const AddMore2r = (props) => {
 	useEffect(() => {
 		const { header, text } = rAd;
 		const pathes_to_photo = rAd.pathes_to_photo || [];
+		if (pathes_to_photo.length == 0) {
+			return;
+		}
 
 		const imgDivs = (
 			<Group
@@ -343,13 +337,13 @@ const AddMore2r = (props) => {
 						</RichCell>
 					</>
 				}
-				style={{ margin: '0px', padding: '0px' }}
 			>
 				<CardScroll>
 					<AnimateGroup animationIn="fadeInUp" animationOut="fadeOutDown" durationOut={500}>
 						<div style={{ display: 'flex' }}>
 							{pathes_to_photo.map((img, i) => (
 								<Card
+									key={i}
 									size="s"
 									onClick={() => {
 										openImage(imgs, i);
@@ -432,6 +426,11 @@ const AddMore2r = (props) => {
 	// 	setPhotos(photoSwipeImgs);
 	// }, [photos]);
 
+	useEffect(() => {
+		console.log('IS_AUTHOR', rAd.isAuthor);
+		console.log('IS_AUTHOR ada', rAd);
+	}, [rAd]);
+
 	function changeIsSub(isSubs, c) {
 		if (isNotValid()) {
 			return;
@@ -452,7 +451,7 @@ const AddMore2r = (props) => {
 		let cancelFunc = false;
 		const init = () => () => {
 			const id = AD.ad_id;
-
+			setIsAuthor(AD.author.vk_id == myID);
 			setDealRequestSuccess(false);
 			updateDealInfo(
 				() => {
@@ -511,8 +510,8 @@ const AddMore2r = (props) => {
 					);
 					console.log('set details', details.author.vk_id == myID);
 					setDetailsRequestSuccess(true);
+					details.isAuthor = details.author.vk_id == myID;
 					setrAd(details);
-					setIsAuthor(details.author.vk_id == myID);
 				},
 				(e) => {
 					if (cancelFunc) {
@@ -738,18 +737,29 @@ const AddMore2r = (props) => {
 		}
 	}, [rAd, costRequestSuccess, detailsRequestSuccess]);
 
-	function buttonAction(icon, text, onClick, destructive) {
+	function buttonAction(icon, text, onClick, destructive, disabled) {
 		const color = destructive ? 'var(--destructive)' : 'var(--accent)';
+		uid++;
 		return (
-			<Button mode="tertiary" onClick={onClick} style={{ padding: '5px', margin: '0px', flex: 1 }}>
+			<Button
+				disabled={disabled}
+				key={uid}
+				mode="tertiary"
+				onClick={onClick}
+				style={{ padding: '5px', margin: '0px', flex: 1 }}
+			>
 				<div
 					style={{
 						alignItems: 'center',
 						color: color,
 						textAlign: 'center',
+						margin: 'auto',
+						display: 'block',
 					}}
 				>
-					<Button mode="tertiary">{icon}</Button>
+					{/* <Button mode="tertiary">{icon}</Button> */}
+
+					<div style={{ display: 'inline-block' }}>{icon}</div>
 					<Caption level="1" weight="semibold">
 						{text}
 					</Caption>
@@ -757,6 +767,44 @@ const AddMore2r = (props) => {
 			</Button>
 		);
 	}
+
+	const [componentComments, setComponentComments] = useState();
+	useEffect(() => {
+		const { comments_enabled } = rAd;
+		let v = <Placeholder icon={<Icon56WriteOutline />} header="Комментарии закрыты"></Placeholder>;
+		if (comments_enabled) {
+			v = <Comments mini={true} amount={1} maxAmount={1} openUser={props.openUser} />;
+		}
+		setComponentComments(v);
+	}, [rAd]);
+
+	const [componentSubs, setComponentSubs] = useState();
+	useEffect(() => {
+		const { status } = rAd;
+		const finished = isFinished(status);
+		let v = null;
+		if (isAuthor && !finished) {
+			v = <Subs openUser={props.openUser} amount={2} maxAmount={2} mini={true} />;
+		}
+		setComponentSubs(v);
+	}, [rAd]);
+
+	const [componentChosenSub, setComponentChosenSub] = useState();
+	useEffect(() => {
+		const { isAuthor, dealer, status } = rAd;
+		const finished = isFinished(status);
+		setComponentChosenSub(
+			<div style={{ flex: 1 }}>
+				<Given
+					openSubs={openSubs}
+					isAuthor={isAuthor}
+					openUser={props.openUser}
+					dealer={dealer}
+					finished={finished}
+				/>
+			</div>
+		);
+	}, [rAd]);
 
 	const [componentAuthor, setComponentAuthor] = useState();
 	useEffect(() => {
@@ -778,17 +826,25 @@ const AddMore2r = (props) => {
 	const [allActions, setAllActions] = useState();
 	useEffect(() => {
 		const { isAuthor, isDealer, isSub, status, cost, hidden } = rAd;
+		const disabled = isFinished(status);
 		let buttons = [
-			buttonAction(<Icon24Write />, 'Изменить', onEditClick),
-			buttonAction(hidden ? <Icon24Globe /> : <Icon24Hide />, hidden ? 'Открыть' : 'Скрыть', () => {
-				hidden ? adVisible(ad_id, () => setIsHidden(false)) : adHide(ad_id, () => setIsHidden(true));
-			}),
+			buttonAction(<Icon24Write />, 'Изменить', onEditClick, null, disabled),
+			buttonAction(
+				hidden ? <Icon24Globe /> : <Icon24Hide />,
+				hidden ? 'Открыть' : 'Скрыть',
+				() => {
+					hidden ? adVisible(ad_id, () => setIsHidden(false)) : adHide(ad_id, () => setIsHidden(true));
+				},
+				null,
+				disabled
+			),
 			buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK),
 			buttonAction(
 				<Icon24Delete style={{ color: 'var(--destructive)' }} />,
 				'Удалить',
 				() => deleteAd(ad_id, props.refresh),
-				true
+				true,
+				disabled
 			),
 		];
 		if (!isAuthor) {
@@ -803,35 +859,30 @@ const AddMore2r = (props) => {
 				isSub
 			);
 
-			const helpBtn = !(isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED)
-				? buttonAction(<Icon24Help />, 'Как это работает?', onFreezeClick)
-				: null;
+			const helpBtn = buttonAction(<Icon24Help />, 'Как это работает?', onFreezeClick);
 
 			buttons = [
-				subBtn,
-				helpBtn,
+				isFinished(status) ? null : subBtn,
+				!(isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED) ? helpBtn : null,
 				buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK),
-
 				buttonAction(<Icon24Report />, 'Пожаловаться', () => {
 					window.open('https://vk.com/im?media=&sel=-194671970');
 				}),
 			];
 		}
-		buttons = (
-			<div
-				style={{
-					display: 'flex',
-					justifyContent: 'center',
-					alignItems: 'center',
-				}}
-			>
-				{buttons}
-			</div>
-		);
+
 		setAllActions(
-			<Div style={{ paddingTop: '0px', marginTop: '0px', paddingBottom: '0px', marginBottom: '0px' }}>
-				{buttons}
-			</Div>
+			<Card mode="outline" style={{ margin: '5px' }}>
+				<div
+					style={{
+						display: 'flex',
+						justifyContent: 'center',
+						alignItems: 'center',
+					}}
+				>
+					{buttons}
+				</div>
+			</Card>
 		);
 	}, [rAd, subButton, costRequestSuccess]);
 
@@ -891,45 +942,39 @@ const AddMore2r = (props) => {
 	// слишком много вызовов надо все переносить в UseState
 	return (
 		<div>
+			{componentStatus}
+			{componentAuthor}
+			{componentPhotoSwipe}
 			<div style={{ display: width < 500 ? 'block' : 'flex' }}>
-				<div style={{ display: 'block' }}>
+				{/* {componentItemHeader} */}
+				<div
+					style={{
+						display: 'block',
+						flex: 1,
+						maxWidth: width < 500 ? null : '' + width / 2 + 'px',
+						padding: '5px',
+					}}
+				>
 					<Card mode="outline">
-						{componentStatus}
-						{componentAuthor}
-						{/* {componentItemHeader} */}
-						<div style={{ display: 'block' }}>
-							{componentPhotoSwipe}
-							{/* {componentMainImage} */}
-							{componentImages}
-						</div>
-						{/* {subButton} */}
+						{/* {componentMainImage} */}
+						<div style={{ paddingBottom: '12px', paddingRight: '12px' }}>{componentImages}</div>
 					</Card>
-					{width < 500 ? allActions : null}
 				</div>
-				{componentCategories}
-				{componentItemTable}
+				{/* {subButton} */}
+
+				{width < 500 ? allActions : null}
+
+				<div style={{ display: 'block', flex: 1, padding: '5px' }}>
+					<Card mode="outline">{componentItemTable}</Card>
+				</div>
 			</div>
 			{width < 500 ? null : allActions}
 			<Separator />
-			<div style={{ flex: 1 }}>
-				<Given openSubs={openSubs} isAuthor={isAuthor} openUser={props.openUser} dealer={dealer} />
-			</div>
-			<Separator />
 			<div style={{ display: width < 500 ? 'block' : 'flex' }}>
-				{isAuthor && isFinished() ? (
-					<div style={{ flex: 1 }}>
-						<Subs openUser={props.openUser} amount={2} maxAmount={2} mini={true} />
-					</div>
-				) : null}
-				<div style={{ flex: 1 }}>
-					{comments_enabled ? (
-						<Comments mini={true} amount={1} maxAmount={1} openUser={props.openUser} />
-					) : (
-						<Placeholder icon={<Icon56WriteOutline />} header="Комментарии закрыты"></Placeholder>
-					)}
-				</div>
+				<div style={{ flex: 1 }}>{componentChosenSub}</div>
+				<div style={{ flex: 1 }}>{componentSubs}</div>
+				<div style={{ flex: 1 }}>{componentComments}</div>
 			</div>
-			<Separator />
 		</div>
 	);
 };
@@ -961,7 +1006,6 @@ const mapDispatchToProps = (dispatch) => {
 
 				setIsSub,
 
-				setPhotos,
 				setIsHidden,
 				setIsAuthor,
 				setExtraInfo,

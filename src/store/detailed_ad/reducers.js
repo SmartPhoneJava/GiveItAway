@@ -18,7 +18,6 @@ import {
 	SET_DEALER,
 	SET_EXTRA_INFO,
 	AD_BACK,
-	SET_PHOTO_INDEX,
 	SET_TO_HISTORY,
 } from './actionTypes';
 import Icon from './../../img/icon278.png';
@@ -375,21 +374,6 @@ export const adReducer = (state = initialState, action) => {
 			return {
 				...state,
 				photos,
-			};
-		}
-
-		case SET_PHOTO_INDEX: {
-			const photoIndex = action.payload.photoIndex;
-			const Photos = state.pathes_to_photo;
-			const image = (photoIndex < Photos.length ? Photos[photoIndex].PhotoUrl : null) || '';
-			console.log('seeet photoIndex', Photos, photoIndex, image);
-			if (image == '') {
-				return state;
-			}
-			return {
-				...state,
-				photoIndex,
-				image,
 			};
 		}
 
