@@ -32,6 +32,7 @@ export async function updateDealInfo(successCallback, failCallback) {
 			store.dispatch(setDeal(null));
 			store.dispatch(setIsDealer(false));
 			store.dispatch(setDealer(null));
+			failC()
 		}
 	);
 }

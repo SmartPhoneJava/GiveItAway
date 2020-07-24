@@ -14,7 +14,10 @@ import { ImageCache } from '../../components/image/image_cache';
 
 export const AdLight = (props) => {
 	const { ad, imageURL, openAd } = props;
-	const [image] = useState(<ImageCache className="light-tiled" url={imageURL} />);
+	const [image, setImage] = useState(<ImageCache className="light-tiled" url={imageURL} />);
+	useEffect(() => {
+		return () => setImage(null);
+	}, []);
 
 	return (
 		<div onClick={openAd}>

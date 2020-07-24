@@ -83,7 +83,14 @@ import { time } from './../../utils/time';
 import { setDummy, openModal, setPage, openSnackbar, openPopout, setStory, setAdIn } from '../../store/router/actions';
 import { PANEL_SUBS, PANEL_MAP } from './../../store/router/panelTypes';
 import { MODAL_ADS_COST, MODAL_ADS_FROZEN } from '../../store/router/modalTypes';
-import { setIsSub, setIsHidden, setExtraInfo, setIsAuthor, backToPrevAd } from '../../store/detailed_ad/actions';
+import {
+	setIsSub,
+	setIsHidden,
+	setExtraInfo,
+	setIsAuthor,
+	backToPrevAd,
+	setToHistory,
+} from '../../store/detailed_ad/actions';
 import {
 	AdDefault,
 	AD_LOADING,
@@ -226,8 +233,10 @@ const AddMore2r = (props) => {
 
 		setComponentItemTable(
 			<div className="details-table-outter">
-				{tableElement(Icon24View, 'Просмотров', views_count)}
-				{!isFinished(status) ? tableElement(Icon24Similar, 'Откликнулось', subscribers_num) : null}
+				{tableElement(Icon24View, 'Просмотров', <AnimateOnChange>{views_count}</AnimateOnChange>)}
+				{!isFinished(status)
+					? tableElement(Icon24Similar, 'Откликнулось', <AnimateOnChange>{subscribers_num}</AnimateOnChange>)
+					: null}
 				{tableElement(
 					Icon24UserOutgoing,
 					'Вид объявления',
@@ -260,7 +269,11 @@ const AddMore2r = (props) => {
 		const imgDivs = (
 			<Group
 				header={
-					<RichCell multiline={true} text={text} style={{ marginTop: '0px' }}>
+					<RichCell
+						multiline={true}
+						text={<AnimateOnChange>{text}</AnimateOnChange>}
+						style={{ marginTop: '0px' }}
+					>
 						<Subhead weight="bold">{header}</Subhead>
 					</RichCell>
 				}
@@ -291,6 +304,7 @@ const AddMore2r = (props) => {
 		);
 
 		setComponentImages(imgDivs);
+		return () => setComponentImages(null);
 	}, [rAd]);
 
 	const handleClose = () => {
@@ -341,22 +355,27 @@ const AddMore2r = (props) => {
 
 	useEffect(() => {
 		let cancelFunc = false;
+		const myPlace = props.AD.history.length;
 		const init = () => () => {
 			const id = AD.ad_id;
 			setIsAuthor(AD.author.vk_id == myID);
 			setDealRequestSuccess(false);
+			console.log('setDealRequestSuccess init');
 			updateDealInfo(
 				() => {
+					console.log('setDealRequestSuccess success');
+					if (cancelFunc) {
+						return;
+					}
+
+					setDealRequestSuccess(true);
+				},
+				() => {
+					console.log('setDealRequestSuccess failed');
 					if (cancelFunc) {
 						return;
 					}
 					setDealRequestSuccess(true);
-				},
-				() => {
-					if (cancelFunc) {
-						return;
-					}
-					setDealRequestSuccess(false);
 				}
 			);
 
@@ -372,7 +391,7 @@ const AddMore2r = (props) => {
 					if (cancelFunc) {
 						return;
 					}
-					setSubsRequestSuccess(false);
+					setSubsRequestSuccess(true);
 				}
 			);
 
@@ -409,23 +428,25 @@ const AddMore2r = (props) => {
 						return;
 					}
 					setIsAuthor(false);
-					setDetailsRequestSuccess(false);
+					setDetailsRequestSuccess(true);
 				}
 			);
 		};
 		if (direction == DIRECTION_FORWARD) {
 			dispatch(init());
-		} else if (props.adOut) {
-			backToPrevAd();
+			console.log('need recover register', props.AD.ad_id);
 		} else {
+			// backToPrevAd();
 			setCostRequestSuccess(true);
 			setDealRequestSuccess(true);
 			setSubsRequestSuccess(true);
 			setDetailsRequestSuccess(true);
 		}
+
 		setAdIn();
 		return () => {
 			cancelFunc = true;
+			// props.setToHistory(myPlace);
 		};
 	}, []);
 
@@ -541,43 +562,7 @@ const AddMore2r = (props) => {
 		const { isDealer, status, isAuthor, isSub, cost, ad_id } = rAd;
 		if (isAuthor || !detailsRequestSuccess || !costRequestSuccess) {
 			setSubButton(null);
-			// setSubButton(
-			// 	<div className="subscribe-button">
-			// 		<div style={{ display: 'block', alignItems: 'center' }}>
-			// 			<Button
-			// 				disabled={isFinished() || (ad_type != TYPE_CHOICE && status != STATUS_OFFER)}
-			// 				mode="commerce"
-			// 				size="xl"
-			// 				onClick={openSubs}
-			// 			>
-			// 				{status == STATUS_OFFER ? 'Выбрать получателя' : 'Изменить получателя'}
-			// 			</Button>
-			// 		</div>
-			// 	</div>
-			// );
 		} else {
-			const mainButton = isSub ? (
-				<Button
-					stretched
-					size="m"
-					mode="destructive"
-					onClick={() => unsub(cost, ad_id)}
-					before={<Icon24MarketOutline />}
-				>
-					Отказаться
-				</Button>
-			) : (
-				<Button
-					stretched
-					size="m"
-					mode="primary"
-					onClick={() => sub(cost, ad_id)}
-					before={<Icon24MarketOutline />}
-				>
-					Хочу забрать!
-				</Button>
-			);
-
 			const color = isSub ? 'var(--destructive)' : 'var(--header_tint)';
 			setSubButton(
 				!(isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED) ? (
@@ -594,31 +579,6 @@ const AddMore2r = (props) => {
 						</Avatar>
 					</div>
 				) : null
-
-				// setSubButton(
-				// 	<div className="subscribe-withLoadingIf">
-				// 		{!(isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED) ? (
-				// 			<AnimateOnChange animation="bounce">
-				// 				<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-				// 					<div className="subscribe-button">{mainButton}</div>
-				// 					<div className="subscribe-num">
-				// 						<Avatar style={{ background: 'rgba(255,255,255,0.8)' }} size={32}>
-				// 							<PanelHeaderButton onClick={onCarmaClick}>
-				// 								{withLoadingIf(
-				// 									costRequestSuccess,
-				// 									<div style={{ fontSize: '20px', color: color }}>
-				// 										{cost}
-				// 										{K}
-				// 									</div>,
-				// 									'small'
-				// 								)}
-				// 							</PanelHeaderButton>
-				// 						</Avatar>
-				// 					</div>
-				// 				</div>
-				// 			</AnimateOnChange>
-				// 		) : null}
-				// 	</div>
 			);
 		}
 	}, [rAd, costRequestSuccess, detailsRequestSuccess]);
@@ -674,18 +634,25 @@ const AddMore2r = (props) => {
 	useEffect(() => {
 		const { isAuthor, dealer, status, ad_type, subscribers_num, ad_id } = rAd;
 		const finished = isFinished(status);
+		console.log('loooook at deal', dealRequestSuccess);
 		setComponentChosenSub(
 			<div style={{ flex: 1 }}>
-				<Given
-					openSubs={() => openSubs(ad_type, subscribers_num, ad_id)}
-					isAuthor={isAuthor}
-					openUser={props.openUser}
-					dealer={dealer}
-					finished={finished}
-				/>
+				{withLoadingIf(
+					dealRequestSuccess,
+					<Given
+						openSubs={() => openSubs(ad_type, subscribers_num, ad_id)}
+						isAuthor={isAuthor}
+						openUser={props.openUser}
+						dealer={dealer}
+						finished={finished}
+					/>,
+					'middle',
+					null,
+					{ marginTop: '20px' }
+				)}
 			</div>
 		);
-	}, [rAd]);
+	}, [rAd, dealRequestSuccess]);
 
 	const [componentAuthor, setComponentAuthor] = useState();
 	useEffect(() => {
@@ -835,11 +802,23 @@ const AddMore2r = (props) => {
 				</div>
 			</div>
 			{width < 500 ? null : allActions}
-			<Separator />
-			<div style={{ display: width < 500 ? 'block' : 'flex' }}>
-				<div style={{ flex: 1 }}>{componentChosenSub}</div>
-				<div style={{ flex: 1 }}>{componentSubs}</div>
-				<div style={{ flex: 1 }}>{componentComments}</div>
+
+			<div
+				style={{
+					display: width < 500 ? 'block' : 'flex',
+				}}
+			>
+				<div style={{ flex: 1, padding: '5px' }}>
+					<Card mode="outline">{componentChosenSub}</Card>
+				</div>
+				{componentSubs ? (
+					<div style={{ flex: 1, padding: '5px' }}>
+						<Card mode="outline">{componentSubs}</Card>
+					</div>
+				) : null}
+				<div style={{ flex: 1, padding: '5px' }}>
+					<Card mode="outline">{componentComments}</Card>
+				</div>
 			</div>
 		</div>
 	);
@@ -849,7 +828,7 @@ const mapStateToProps = (state) => {
 	return {
 		AD: state.ad,
 		direction: state.router.direction,
-		adOut: state.router.adOut,
+		adOut: state.router.adOut, //!! разобраться что это
 		myID: state.vkui.myID,
 	};
 };
@@ -884,6 +863,7 @@ const mapDispatchToProps = (dispatch) => {
 
 				setAdIn,
 				backToPrevAd,
+				setToHistory,
 			},
 			dispatch
 		),

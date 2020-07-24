@@ -130,10 +130,12 @@ export const backToPrevAd = () => ({
 	type: AD_BACK,
 });
 
-export const setToHistory = () => ({
+export const setToHistory = (place) => ({
 	type: SET_TO_HISTORY,
+	payload: {
+		place,
+	},
 });
-
 
 export const clearAds = (ad_id) => ({
 	type: CLEAR,

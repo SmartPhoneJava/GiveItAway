@@ -334,8 +334,7 @@ export const adReducer = (state = initialState, action) => {
 		}
 
 		case SET_TO_HISTORY: {
-			const history = [...state.history, state]
-			console.log("SET_TO_HISTORY", history)
+			const history = [...state.history, state];
 			return {
 				...state,
 				history,
@@ -344,14 +343,12 @@ export const adReducer = (state = initialState, action) => {
 
 		case AD_BACK: {
 			const history = state.history || [];
-			console.log('reducers AD_BACK history', history);
 			let newState = state;
 			if (history.length > 0) {
 				newState = history[history.length - 1];
 			}
 			history.pop();
-			console.log('reducers AD_BACK', newState);
-			
+
 			newState.history = history;
 
 			return {
@@ -360,7 +357,6 @@ export const adReducer = (state = initialState, action) => {
 		}
 
 		case CLEAR: {
-			console.log('CLEARCLEAR ad_id', action.payload.ad_id);
 			const ad_id = action.payload.ad_id || initialState.ad_id;
 			return {
 				...initialState,

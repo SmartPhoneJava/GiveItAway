@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, Button, InfoRow } from '@vkontakte/vkui';
+import { Avatar, Button, InfoRow, Spinner } from '@vkontakte/vkui';
 
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
@@ -8,16 +8,10 @@ import { AnimateOnChange } from 'react-animation';
 import { STATUS_CHOSEN, STATUS_CLOSED, STATUS_ABORTED, COLOR_DEFAULT, COLOR_DONE, COLOR_CANCEL } from '../../const/ads';
 
 export const statusWrapper = (block, color) => {
-	color = color || COLOR_DEFAULT;
+	const background = color || COLOR_DEFAULT;
 	return (
-		<div
-			style={{
-				background: color,
-				padding: '8px',
-				widht: '100%',
-			}}
-		>
-			{block}
+		<div style={{ background }}>
+			<div className="status-text">{block}</div>
 		</div>
 	);
 };
@@ -55,79 +49,69 @@ export const showChosen = (isDealer, isAuthor, dealer, acceptClick, cancelClick,
 	if (isDealer && !isAuthor) {
 		return statusWrapper(
 			<>
-				<InfoRow style={{ padding: '10px', color: 'rgb(200,200,200)', textAlign: 'center' }}>
-					Автор решил отдать вещь вам. Подтвердите получение вещи после получения:
-				</InfoRow>
-				<div
-					style={{ display: width < 500 ? 'flex' : 'block', alignItems: 'center', justifyContent: 'center' }}
-				>
-					<div style={{ padding: '4px' }}>
-						<Button
-							stretched
-							size="l"
-							mode="commerce"
-							onClick={acceptClick}
-							style={{ marginRight: 8 }}
-							before={<Icon24Done />}
-						>
-							Подтвердить
-						</Button>
+				<AnimateOnChange animation="bounce">
+					<InfoRow>Автор решил отдать вещь вам. Подтвердите получение вещи после получения:</InfoRow>
+					<div style={{ display: 'flex' }}>
+						<div style={{ padding: '8px', flex: 1 }}>
+							<Button stretched size="l" mode="commerce" onClick={acceptClick} before={<Icon24Done />}>
+								Подтвердить
+							</Button>
+						</div>
+						<div style={{ padding: '8px', flex: 1 }}>
+							<Button
+								stretched
+								size="l"
+								mode="destructive"
+								onClick={cancelClick}
+								before={<Icon24Cancel />}
+							>
+								Отклонить
+							</Button>
+						</div>
 					</div>
-					<div style={{ padding: '4px' }}>
-						<Button
-							stretched
-							size="l"
-							mode="destructive"
-							onClick={cancelClick}
-							style={{ marginRight: 8 }}
-							before={<Icon24Cancel />}
-						>
-							Отклонить
-						</Button>
-					</div>
-				</div>
+				</AnimateOnChange>
 			</>,
 			COLOR_DEFAULT
 		);
 	}
 	if (!isAuthor) {
+		return statusWrapper(<InfoRow>Автор выбрал, кому передать вещь</InfoRow>, COLOR_DEFAULT);
+	} else {
 		return statusWrapper(
-			<InfoRow
+			<div
 				style={{
-					padding: '10px',
-					color: 'rgb(200,200,200)',
+					display: width > 500 ? 'flex' : 'block',
+					alignItems: 'center',
+					justifyContent: 'center',
 					textAlign: 'center',
 				}}
 			>
-				Автор назначил человека для передачи вещи
-			</InfoRow>,
-			COLOR_DEFAULT
-		);
-	} else {
-		return statusWrapper(
-			<div style={{ width: '100%', color: 'rgb(220,220,220)', fontSize: '13px', padding: '2px' }}>
-				<div style={{ display: width < 500 ? 'flex' : 'block' }}>
-					Ожидание подтверждения от
-					<div style={{ display: 'flex' }} onClick={() => openUser(dealer.vk_id)}>
-						<Avatar
-							style={{
-								marginLeft: '15px',
-								marginRight: '4px',
-							}}
-							size={16}
-							src={dealer ? dealer.photo_url : ''}
-						/>
-						{dealer ? dealer.name + ' ' + dealer.surname + '  ' : ''}
-					</div>
+				<>Ожидание подтверждения получения вещи от</>
+				<div style={{ padding: width > 500 && dealer ? null : '5px' }}>
+					{dealer ? (
+						<div className="status-waiting-panel" onClick={() => openUser(dealer.vk_id)}>
+							<Avatar
+								style={{
+									marginLeft: '12px',
+									marginRight: '4px',
+								}}
+								size={20}
+								src={dealer ? dealer.photo_url : ''}
+							/>
+							{dealer ? dealer.name + ' ' + dealer.surname + '  ' : ''}
+						</div>
+					) : (
+						<Spinner size="small" />
+					)}
 				</div>
 			</div>,
+
 			COLOR_DEFAULT
 		);
 	}
 };
 
 export const showStatus = (status, isDealer, isAuthor, dealer, acceptClick, cancelClick, openUser) => {
-	console.log('showStatus call me once pls', status, isDealer, isAuthor);
 	switch (status) {
 		case STATUS_CHOSEN:
 			return showChosen(isDealer, isAuthor, dealer, acceptClick, cancelClick, openUser);

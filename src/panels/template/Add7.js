@@ -34,6 +34,9 @@ const Add7 = (props) => {
 			<ImageCache url={url} className="atiled" spinnerStyle={{ paddingLeft: '60px', paddingTop: '100px' }} />
 		);
 		setImage(im);
+		return () => {
+			setImage(null);
+		};
 	}, [ad.pathes_to_photo]);
 
 	useEffect(() => {

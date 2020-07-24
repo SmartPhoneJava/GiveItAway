@@ -19,7 +19,7 @@ import { CategoryNo, CategoryOnline } from '../../components/categories/const';
 
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { FORM_CREATE } from '../../components/categories/redux';
-import { setExtraInfo, clearAds } from '../../store/detailed_ad/actions';
+import { setExtraInfo } from '../../store/detailed_ad/actions';
 import { STORY_ADS } from '../../store/router/storyTypes';
 import { store } from '../..';
 import { defaultInputData } from '../../components/create/default';

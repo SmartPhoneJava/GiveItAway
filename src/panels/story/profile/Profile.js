@@ -56,8 +56,6 @@ const Profile = (props) => {
 	const { setFormData, setStory } = props;
 	const profileID = props.activeProfile || -1;
 
-	const [cleanupFunction, setcleanup] = useState(false);
-
 	const [userRequestSucess, setUserRequestSucess] = useState(false);
 
 	const [backuser, setBackUser] = useState(NO_USER);
@@ -158,7 +156,7 @@ const Profile = (props) => {
 			backuser.null || backuser.total_given_ads > 0 ? (
 				<GivenPanel
 					profileID={profileID}
-					openAd={props.openAd}
+					openAd={props.setReduxAd}
 					amount={withLoadingIf(userRequestSucess, backuser.total_given_ads, 'small')}
 				/>
 			) : backuser && myID == backuser.vk_id ? (
@@ -187,7 +185,7 @@ const Profile = (props) => {
 			backuser.null || backuser.total_received_ads > 0 ? (
 				<ReceivedPanel
 					profileID={profileID}
-					openAd={props.openAd}
+					openAd={props.setReduxAd}
 					amount={withLoadingIf(userRequestSucess, backuser.total_received_ads, 'small')}
 				/>
 			) : backuser && myID == backuser.vk_id ? (
@@ -211,50 +209,10 @@ const Profile = (props) => {
 	}, [backuser, profileID, userRequestSucess]);
 
 	useEffect(() => {
-		setcleanup(false);
 		if (profileID == -1) {
 			return;
 		}
-		doGetUser();
-		getUserVK(
-			profileID,
-			props.appID,
-			props.apiVersion,
-			(r) => {
-				if (cleanupFunction) {
-					return;
-				}
-				setVkUser(r);
-			},
-			(e) => {
-				setVkUser(NO_VK_USER);
-			}
-		);
-		return () => setcleanup(true);
-	}, [profileID]);
-
-	function openFreeze() {
-		if (profileID == myID) {
-			setFormData(ADS_FILTERS, {
-				...inputData[ADS_FILTERS],
-				mode: MODE_WANTED,
-			});
-			setStory(STORY_ADS);
-		}
-	}
-
-	function openCreateStory() {
-		setStory(STORY_CREATE);
-	}
-
-	function openAdsStory() {
-		setStory(STORY_ADS);
-	}
-
-	function doGetUser() {
-		if (profileID == -1) {
-			return;
-		}
+		let cleanupFunction = false;
 		setUserRequestSucess(false);
 		getUser(
 			profileID,
@@ -276,10 +234,43 @@ const Profile = (props) => {
 					return;
 				}
 				setFailed(true);
-				setUserRequestSucess(false);
+				setUserRequestSucess(true);
 			},
 			false
 		);
+		getUserVK(
+			profileID,
+			props.appID,
+			props.apiVersion,
+			(r) => {
+				if (cleanupFunction) {
+					return;
+				}
+				setVkUser(r);
+			},
+			(e) => {
+				setVkUser(NO_VK_USER);
+			}
+		);
+		return () => (cleanupFunction = true);
+	}, [profileID]);
+
+	function openFreeze() {
+		if (profileID == myID) {
+			setFormData(ADS_FILTERS, {
+				...inputData[ADS_FILTERS],
+				mode: MODE_WANTED,
+			});
+			setStory(STORY_ADS);
+		}
+	}
+
+	function openCreateStory() {
+		setStory(STORY_CREATE);
+	}
+
+	function openAdsStory() {
+		setStory(STORY_ADS);
 	}
 
 	function contentWriteToUser() {
@@ -333,7 +324,7 @@ const Profile = (props) => {
 	}, [profileID]);
 
 	if (failed) {
-		return <Error action={doGetUser} />;
+		return <Error />;
 	}
 	return (
 		<>

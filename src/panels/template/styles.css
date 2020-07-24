@@ -17,12 +17,6 @@ td {
 	color: var(--text_secondary);
 }
 
-.status-text {
-	padding: 10px;
-	color: rgb(240, 240, 240);
-	text-align: center;
-}
-
 .swipe {
 	display: flex;
 }
@@ -117,4 +111,19 @@ img.details-card-img {
 	margin-left: auto;
 	top: -3px;
 	background: rgba(0, 0, 0, 0.8);
+}
+
+/* status */
+.status-text {
+	padding: 10px;
+	color: rgb(240, 240, 240);
+	text-align: center;
+}
+
+.status-waiting-panel {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	font-weight: 600;
 }

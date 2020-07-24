@@ -40,12 +40,14 @@ export const ImageCache = (props) => {
 	return image;
 };
 
-export function withLoading(elem, size, animationIn) {
+export function withLoading(elem, size, animationIn, spinStyle) {
 	const aIn = animationIn || 'bounceIn';
 	const s = size || 'small';
+	const spStyle = spinStyle || {};
 	const spin = (
 		<div
 			style={{
+				...spStyle,
 				height: '100%',
 				width: '100%',
 				justifyContent: 'center',
@@ -65,10 +67,10 @@ export function withLoading(elem, size, animationIn) {
 	);
 }
 
-export function withLoadingIf(condition, elem, size, animationIn) {
+export function withLoadingIf(condition, elem, size, animationIn, spinStyle) {
 	if (condition) {
-		return withLoading(elem, size, animationIn);
+		return withLoading(elem, size, animationIn, spinStyle);
 	} else {
-		return withLoading(null, size, animationIn);
+		return withLoading(null, size, animationIn, spinStyle);
 	}
 }

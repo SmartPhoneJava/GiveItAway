@@ -53,7 +53,15 @@ import {
 import * as VK from '../services/VK';
 import { setAppID, setPlatform } from '../store/vk/actions';
 
-import { addComment, addSub, setStatus, setExtraInfo, setToHistory, clearAds } from '../store/detailed_ad/actions';
+import {
+	addComment,
+	addSub,
+	setStatus,
+	setExtraInfo,
+	setToHistory,
+	clearAds,
+	backToPrevAd,
+} from '../store/detailed_ad/actions';
 
 import CategoriesPanel from './../components/categories/panel';
 import Countries from './../components/location/countries';
@@ -156,7 +164,7 @@ const App = (props) => {
 	const historyLen = panelsHistory ? (panelsHistory[STORY_ADS] ? panelsHistory[STORY_ADS].length : 0) : 0;
 
 	function dropFilters() {
-		store.dispatch(setFormData(ADS_FILTERS, null))
+		store.dispatch(setFormData(ADS_FILTERS, null));
 	}
 
 	useEffect(() => {
@@ -200,9 +208,13 @@ const App = (props) => {
 		if (scrolledSoFar == scrollEnd) {
 			return;
 		}
+		console.log('scroll start', scrollEnd);
 		var timerID = setInterval(function () {
 			window.scrollTo(0, scrollEnd);
-			if (scrolledSoFar != window.scrollY) clearInterval(timerID);
+			if (scrolledSoFar != window.scrollY && scrollEnd <= window.scrollY) {
+				console.log('scroll end', scrollEnd, window.scrollY, window.pageYOffset);
+				clearInterval(timerID);
+			}
 		}, 10);
 	}
 	useEffect(() => {
@@ -211,7 +223,17 @@ const App = (props) => {
 		} else {
 			scrollWindow(0);
 		}
-	}, [props.direction]);
+	}, [scrollPosition]);
+
+	useEffect(() => {
+		if (props.from == PANEL_ONE || props.to == PANEL_ONE) {
+			if (props.direction == DIRECTION_BACK) {
+				props.backToPrevAd();
+			} else {
+				store.dispatch(setToHistory());
+			}
+		}
+	}, [props.from]);
 
 	console.log('APP CALLED');
 	const [addsTabs, setAddsTabs] = useState(<></>);
@@ -362,8 +384,9 @@ const App = (props) => {
 	}, []);
 
 	function setReduxAd(ad) {
-		store.dispatch(setToHistory());
+		// store.dispatch(setToHistory());
 		store.dispatch(setExtraInfo(ad));
+		console.log('setReduxAd');
 		setAd(ad);
 	}
 
@@ -432,14 +455,6 @@ const App = (props) => {
 				}
 			>
 				<View
-					// onTransition={(struct) => {
-					// 	console.log('looog', struct, scrollPosition.y);
-					// 	if (struct.isBack) {
-					// 		scrollWindow(scrollPosition.y);
-					// 	} else {
-					// 		scrollWindow(0);
-					// 	}
-					// }}
 					popout={adPopout}
 					id={STORY_ADS}
 					activePanel={adActivePanel}
@@ -475,7 +490,7 @@ const App = (props) => {
 						{snackbars[PANEL_ONE]}
 					</Panel>
 					<Panel id={PANEL_USER}>
-						<ProfilePanel openAd={setReduxAd} />
+						<ProfilePanel setReduxAd={setReduxAd} />
 					</Panel>
 					<Panel id={PANEL_ABOUT}>
 						<AboutPanel />
@@ -547,13 +562,6 @@ const App = (props) => {
 
 				<View
 					id={STORY_CREATE}
-					// onTransition={(struct) => {
-					// 	if (struct.isBack) {
-					// 		scrollWindow(scrollPosition.y);
-					// 	} else {
-					// 		scrollWindow(0);
-					// 	}
-					// }}
 					activePanel={createActivePanel}
 					popout={createPopout}
 					onSwipeBack={goBack}
@@ -614,6 +622,7 @@ const mapStateToProps = (state) => {
 		activeAd: state.router.activeAd,
 		popouts: state.router.popouts,
 		scrollPosition: state.router.scrollPosition,
+		scrollHistory: state.router.scrollHistory,
 
 		profileHistory: state.router.profileHistory,
 		activeProfile: state.router.activeProfile,
@@ -626,6 +635,8 @@ const mapStateToProps = (state) => {
 		myID: state.vkui.myID,
 		myUser: state.vkui.myUser,
 		direction: state.router.direction,
+		from: state.router.from,
+		to: state.router.to,
 	};
 };
 
@@ -648,6 +659,9 @@ function mapDispatchToProps(dispatch) {
 				setStatus,
 				clearAds,
 				setPage,
+
+				setToHistory,
+				backToPrevAd,
 			},
 			dispatch
 		),
@@ -657,4 +671,4 @@ function mapDispatchToProps(dispatch) {
 export default connect(mapStateToProps, mapDispatchToProps)(App);
 
 // 477 -> 516 -> 674 -> 703 -> 795 -> 749 -> 587 -> 524 -> 583
-// 722
+// 722 -> 645

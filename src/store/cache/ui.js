@@ -1,1 +1,0 @@
-const CACHE_ADS_ID = "ads"

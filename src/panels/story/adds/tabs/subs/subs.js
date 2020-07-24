@@ -17,6 +17,8 @@ import {
 	Link,
 } from '@vkontakte/vkui';
 
+import { AnimateOnChange } from 'react-animation';
+
 import Icon56Users3Outline from '@vkontakte/icons/dist/56/users_outline';
 
 import Icon24Chevron from '@vkontakte/icons/dist/24/chevron';
@@ -63,8 +65,6 @@ export const Given = (props) => {
 		>
 			<Cell
 				onClick={() => {
-					if (isAuthor) {
-					}
 					if (dealer) {
 						props.openUser(dealer.vk_id);
 					}

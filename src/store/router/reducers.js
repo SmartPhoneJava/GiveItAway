@@ -29,6 +29,8 @@ const initialState = {
 	activeStory: STORY_ADS,
 	storiesHistory: [STORY_ADS],
 	direction: NO_DIRECTION,
+	from: '',
+	to: '',
 
 	activePanels: {
 		[STORY_ADS]: PANEL_ADS,
@@ -74,6 +76,7 @@ const initialState = {
 export const routerReducer = (state = initialState, action) => {
 	switch (action.type) {
 		case SET_PAGE: {
+			const pos = { x: window.pageXOffset, y: window.pageYOffset };
 			window.history.pushState(null, null);
 			smoothScrollToTop();
 
@@ -96,18 +99,16 @@ export const routerReducer = (state = initialState, action) => {
 					[Story]: Panels,
 				},
 				direction: DIRECTION_FORWARD,
+				from: state.activePanels[Story],
+				to: panel,
 
-				scrollHistory: [
-					...state.scrollHistory,
-					{
-						x: window.pageXOffset,
-						y: window.pageYOffset,
-					},
-				],
+				scrollHistory: [...state.scrollHistory, pos],
+				scrollPosition: { x: 0, y: 0 },
 			};
 		}
 
 		case SET_DUMMY: {
+			const pos = { x: window.pageXOffset, y: window.pageYOffset };
 			let dummy = action.payload.dummy;
 
 			let Story = state.activeStory;
@@ -119,6 +120,8 @@ export const routerReducer = (state = initialState, action) => {
 					...state.dummies,
 					[Story]: [...dummies, dummy],
 				},
+				scrollHistory: [...state.scrollHistory, pos],
+				scrollPosition: { x: 0, y: 0 },
 			};
 		}
 
@@ -138,6 +141,7 @@ export const routerReducer = (state = initialState, action) => {
 		}
 
 		case SET_PROFILE: {
+			const pos = { x: window.pageXOffset, y: window.pageYOffset };
 			window.history.pushState(null, null);
 			smoothScrollToTop();
 
@@ -171,14 +175,11 @@ export const routerReducer = (state = initialState, action) => {
 				profileHistory: Profiles,
 
 				direction: DIRECTION_FORWARD,
+				from: state.activePanels[Story],
+				to: panel,
 
-				scrollHistory: [
-					...state.scrollHistory,
-					{
-						x: window.pageXOffset,
-						y: window.pageYOffset,
-					},
-				],
+				scrollHistory: [...state.scrollHistory, pos],
+				scrollPosition: { x: 0, y: 0 },
 			};
 		}
 
@@ -214,10 +215,14 @@ export const routerReducer = (state = initialState, action) => {
 				},
 
 				direction: DIRECTION_FORWARD,
+				from: state.activePanels[Story],
+				to: panel,
+
 				activeAd: ad,
 				adHistory: Ads,
 
 				scrollHistory,
+				scrollPosition: { x: 0, y: 0 },
 			};
 		}
 
@@ -261,7 +266,11 @@ export const routerReducer = (state = initialState, action) => {
 				},
 
 				direction: DIRECTION_FORWARD,
+				from: state.activePanels[state.activeStory],
+				to: panel,
+
 				scrollHistory,
+				scrollPosition: { x: 0, y: 0 },
 			};
 		}
 
@@ -273,14 +282,22 @@ export const routerReducer = (state = initialState, action) => {
 			// если были открытые заглушки
 			if (Dummies.length > 0) {
 				Dummies.pop();
+				const scrollHistory = state.scrollHistory;
+				const scrollPosition = scrollHistory.length > 0 ? scrollHistory.pop() : state.scrollPosition;
+
 				return {
 					...state,
 
 					direction: DIRECTION_BACK,
+					from: '',
+					to: '',
+
 					dummies: {
 						...state.dummies,
 						[Story]: Dummies,
 					},
+					scrollHistory,
+					scrollPosition,
 				};
 			}
 
@@ -289,6 +306,8 @@ export const routerReducer = (state = initialState, action) => {
 				return {
 					...state,
 					direction: DIRECTION_BACK,
+					from: '',
+					to: '',
 					popouts: {
 						...state.popouts,
 						[state.activeStory]: null,
@@ -308,6 +327,8 @@ export const routerReducer = (state = initialState, action) => {
 				return {
 					...state,
 					direction: DIRECTION_BACK,
+					from: '',
+					to: '',
 					activeModals: {
 						...state.activeModal,
 						[Story]: activeModal,
@@ -385,6 +406,9 @@ export const routerReducer = (state = initialState, action) => {
 				activeStory: Story,
 
 				direction: DIRECTION_BACK,
+				from: state.activePanels[Story],
+				to: Panel,
+
 				activeAd: Ad,
 				activeProfile: Profile,
 
@@ -412,6 +436,8 @@ export const routerReducer = (state = initialState, action) => {
 			return {
 				...state,
 				direction: DIRECTION_FORWARD,
+				from: '',
+				to: '',
 				activeTabs: {
 					...state.activeTabs,
 					[Story]: tab,
@@ -484,6 +510,8 @@ export const routerReducer = (state = initialState, action) => {
 			return {
 				...state,
 				direction: DIRECTION_FORWARD,
+				from: '',
+				to: '',
 				activeModals: {
 					...state.activeModals,
 					[Story]: modal,
@@ -508,6 +536,8 @@ export const routerReducer = (state = initialState, action) => {
 			return {
 				...state,
 				direction: DIRECTION_BACK,
+				from: '',
+				to: '',
 				activeModals: {
 					...state.activeModals,
 					[Story]: modal,
@@ -525,6 +555,8 @@ export const routerReducer = (state = initialState, action) => {
 			return {
 				...state,
 				direction: DIRECTION_BACK,
+				from: '',
+				to: '',
 				activeModals: {
 					...state.activeModals,
 					[Story]: null,

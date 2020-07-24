@@ -200,7 +200,7 @@ const AddsTab = (props) => {
 			lastAdElementRef
 		);
 
-		console.log("rads", rads)
+		console.log('rads', rads);
 		setCols(
 			c.map((s, i) => (
 				<div ref={lastAdElementRef} key={i}>
@@ -243,12 +243,18 @@ const AddsTab = (props) => {
 
 		if (props.direction == DIRECTION_BACK && !goBackDone) {
 			// setAds(props.cache.ads_list);
-			setRads(props.cache.ads_list || []);
-			setPageNumber(props.cache.ads_page);
-			setInited(true);
-			setLoading(false);
-			setGoBackDone(true);
-			return;
+			if (pageNumber < props.cache.ads_page) {
+				setRads(props.cache.ads_list || []);
+				setPageNumber(props.cache.ads_page);
+				setInited(true);
+				setLoading(false);
+				return;
+			} else if (pageNumber == props.cache.ads_page) {
+				setInited(true);
+				setLoading(false);
+				setGoBackDone(true);
+				return;
+			}
 		}
 
 		console.log('GO GO GO', refreshMe, props.cache.refreshMe);
