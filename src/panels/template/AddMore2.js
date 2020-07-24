@@ -5,25 +5,18 @@ import {
 	PanelHeaderButton,
 	Button,
 	Group,
-	Header,
-	HorizontalScroll,
 	Cell,
 	Separator,
 	ScreenSpinner,
-	CellButton,
 	Placeholder,
-	Spinner,
-	Tabbar,
-	TabbarItem,
 	Caption,
-	Div,
 	CardScroll,
 	Card,
-	Gradient,
-	Link,
 	Tooltip,
 	RichCell,
 	Subhead,
+	CellButton,
+	Title,
 } from '@vkontakte/vkui';
 
 import { AnimateOnChange, AnimateGroup } from 'react-animation';
@@ -37,6 +30,11 @@ import 'react-photoswipe/lib/photoswipe.css';
 import { PhotoSwipe, PhotoSwipeGallery } from 'react-photoswipe';
 
 import Icon56WriteOutline from '@vkontakte/icons/dist/56/write_outline';
+
+import Icon24View from '@vkontakte/icons/dist/24/view';
+import Icon24Similar from '@vkontakte/icons/dist/24/similar';
+import Icon24Place from '@vkontakte/icons/dist/24/place';
+import Icon24UserOutgoing from '@vkontakte/icons/dist/24/user_outgoing';
 
 import { randomColor } from 'randomcolor';
 
@@ -54,7 +52,6 @@ import Icon24Delete from '@vkontakte/icons/dist/24/delete';
 import Icon24Chevron from '@vkontakte/icons/dist/24/chevron';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
 import Icon24ShareExternal from '@vkontakte/icons/dist/24/share_external';
-import Icon24Place from '@vkontakte/icons/dist/24/place';
 
 import Subs, { Given } from './../story/adds/tabs/subs/subs';
 import { subscribe, unsubscribe } from './../story/adds/tabs/subs/requests';
@@ -132,20 +129,6 @@ const AddMore2r = (props) => {
 		backToPrevAd,
 	} = props;
 	const { setPage, openModal, setDummy, direction, AD } = props;
-	const {
-		isAuthor,
-		status,
-		deal,
-		dealer,
-		pathes_to_photo,
-		header,
-		ad_id,
-		subscribers_num,
-		district,
-		ad_type,
-		comments_enabled,
-		region,
-	} = AD;
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [options, setOptions] = useState({});
@@ -157,15 +140,12 @@ const AddMore2r = (props) => {
 	const [detailsRequestSuccess, setDetailsRequestSuccess] = useState(false);
 
 	useEffect(() => {
-		if (AD.isAuthor == undefined) {
-			return;
-		}
 		setrAd(AD);
 	}, [AD]);
 
 	const [componentStatus, setComponentStatus] = useState();
 	useEffect(() => {
-		const { isAuthor, isDealer, dealer, status } = rAd;
+		const { isAuthor, isDealer, dealer, deal, status } = rAd;
 		setComponentStatus(
 			showStatus(
 				status,
@@ -199,29 +179,6 @@ const AddMore2r = (props) => {
 		);
 	}, [rAd]);
 
-	// const [componentItemHeader, setComponentItemHeader] = useState();
-	// useEffect(() => {
-	// 	const { header, text } = rAd;
-	// 	setComponentItemHeader(
-	// 		<div style={{ display: 'block' }}>
-	// 			<div className="details-ad-header">{header}</div>
-	// 			<div className="details-ad-description">{text}</div>
-	// 		</div>
-	// 	);
-	// }, [rAd]);
-
-	function tr(name, value) {
-		if (!value) {
-			return null;
-		}
-		return (
-			<tr>
-				<td className="first">{name}</td>
-				<td>{value}</td>
-			</tr>
-		);
-	}
-
 	const [componentCategories, setComponentCategories] = useState();
 	useEffect(() => {
 		const { category, subcat_list, subcat } = rAd;
@@ -233,90 +190,62 @@ const AddMore2r = (props) => {
 		);
 	}, [rAd]);
 
+	function tableElement(Icon, text, value, After, onClick) {
+		return (
+			<div className="details-table-info" onClick={onClick}>
+				<Icon
+					width={22}
+					height={22}
+					className="details-table-element"
+					style={{ color: onClick ? 'var(--accent)' : 'var(--text_secondary)' }}
+				/>
+				<div
+					className="details-table-element"
+					style={{ color: onClick ? 'var(--accent)' : 'var(--text_secondary)' }}
+				>
+					{text}
+					{':'}&nbsp;
+					{value}
+					{After ? (
+						<After
+							width={22}
+							height={22}
+							className="details-table-element"
+							style={{ color: onClick ? 'var(--accent)' : 'var(--text_secondary)' }}
+						/>
+					) : null}
+				</div>
+			</div>
+		);
+	}
+
 	const [componentItemTable, setComponentItemTable] = useState();
 	useEffect(() => {
-		const { ad_type, views_count, status } = rAd;
+		const { ad_type, views_count, status, region, district } = rAd;
 		let subscribers_num = rAd.subscribers_num || '0';
 
-		console.log('statusstatus', status, isFinished(status), subscribers_num);
-
 		setComponentItemTable(
-			<table>
-				<tbody>
-					{tr('Просмотров', views_count)}
-					{!isFinished(status) ? tr('Откликнулось', subscribers_num) : null}
-					{tr(
-						'Вид объявления',
-						<div style={{ display: 'flex', alignItems: 'center' }}>
-							<div>
-								{ad_type == TYPE_CHOICE ? 'Сделка' : ad_type == TYPE_AUCTION ? 'Аукцион' : 'Лотерея'}
-							</div>
-							<div>
-								<PanelHeaderButton style={{ margin: '0px', padding: '0px' }} onClick={() => {}}>
-									<Icon24Help fill="var(--text_subhead)" />
-								</PanelHeaderButton>
-							</div>
-						</div>
-					)}
-					{tr(
-						'Где забрать',
-						<div style={{ display: 'flex', alignItems: 'center' }}>
-							<div onClick={openMap}>{getGeoPosition()}</div>
-							<div>
-								<PanelHeaderButton style={{ margin: '0px', padding: '0px' }} onClick={() => {}}>
-									<Icon24Chevron />
-								</PanelHeaderButton>
-							</div>
-						</div>
-					)}
-				</tbody>
-			</table>
+			<div className="details-table-outter">
+				{tableElement(Icon24View, 'Просмотров', views_count)}
+				{!isFinished(status) ? tableElement(Icon24Similar, 'Откликнулось', subscribers_num) : null}
+				{tableElement(
+					Icon24UserOutgoing,
+					'Вид объявления',
+					ad_type == TYPE_CHOICE ? 'сделка' : ad_type == TYPE_AUCTION ? 'аукцион' : 'лотерея',
+					Icon24Help,
+					() => {}
+				)}
+				{tableElement(Icon24Place, 'Где забрать', getGeoPosition(region, district), Icon24Chevron, openMap)}
+			</div>
 		);
 	}, [rAd]);
 
 	const [componentPhotoSwipe, setComponentPhotoSwipe] = useState();
 	useEffect(() => {
 		setComponentPhotoSwipe(
-			<PhotoSwipe
-				style={{ marginTop: '50px' }}
-				isOpen={isOpen}
-				items={localPhotos}
-				options={options}
-				onClose={handleClose}
-			/>
+			<PhotoSwipe isOpen={isOpen} items={localPhotos} options={options} onClose={handleClose} />
 		);
 	}, [localPhotos, isOpen, options]);
-
-	// const [componentMainImage, setComponentMainImage] = useState();
-	// useEffect(() => {
-	// 	const { image } = rAd;
-	// 	setComponentMainImage(
-	// 		<div style={{ position: 'relative' }}>
-	// 			<div style={{ right: '10px', position: 'absolute', top: '6px' }}>
-	// 				<PanelHeaderButton
-	// 					onClick={() => {
-	// 						openImage(imgs);
-	// 					}}
-	// 					mode="secondary"
-	// 					style={{ margin: '5px', float: 'right', marginLeft: 'auto' }}
-	// 					size="m"
-	// 				>
-	// 					<Avatar style={{ background: 'rgba(0,0,0,0.7)' }} size={32}>
-	// 						<Icon24Fullscreen fill="var(--white)" />
-	// 					</Avatar>
-	// 				</PanelHeaderButton>
-	// 			</div>
-	// 			{componentStatus}
-	// 			<ImageCache
-	// 				url={image}
-	// 				className="details-main-image"
-	// 				onClick={() => {
-	// 					openImage(imgs);
-	// 				}}
-	// 			/>
-	// 		</div>
-	// 	);
-	// }, [rAd]);
 
 	const [tooltip, setTooltip] = useState(false);
 
@@ -331,11 +260,9 @@ const AddMore2r = (props) => {
 		const imgDivs = (
 			<Group
 				header={
-					<>
-						<RichCell multiline={true} text={text} style={{ marginTop: '0px', paddingTop: '0px' }}>
-							<Subhead weight="bold">{header}</Subhead>
-						</RichCell>
-					</>
+					<RichCell multiline={true} text={text} style={{ marginTop: '0px' }}>
+						<Subhead weight="bold">{header}</Subhead>
+					</RichCell>
 				}
 			>
 				<CardScroll>
@@ -349,18 +276,9 @@ const AddMore2r = (props) => {
 										openImage(imgs, i);
 									}}
 								>
-									<ImageCache className="light-tiled" url={img.PhotoUrl} />
-									<div style={{ right: '7px', position: 'absolute', top: '3px' }}>
-										<Avatar
-											style={{
-												margin: '3px',
-												float: 'right',
-												marginLeft: 'auto',
-												top: '-3px',
-												background: 'rgba(0,0,0,0.8)',
-											}}
-											size={26}
-										>
+									<ImageCache className="details-card-img" url={img.PhotoUrl} />
+									<div className="details-card-btn-outter">
+										<Avatar className="details-card-btn-inner" size={26}>
 											<Icon24Fullscreen fill="var(--white)" />
 										</Avatar>
 									</div>
@@ -404,32 +322,6 @@ const AddMore2r = (props) => {
 	}
 
 	const width = document.body.clientWidth;
-
-	// useEffect(() => {
-	// 	if (isNotValid() || (photos && photos.length != 0)) {
-	// 		return;
-	// 	}
-	// 	const photoSwipeImgs = pathes_to_photo.map((v) => {
-	// 		let img = new Image();
-	// 		img.src = v.PhotoUrl;
-	// 		let width = img.width;
-	// 		let hight = img.height;
-	// 		return {
-	// 			src: v.PhotoUrl,
-	// 			msrc: v.PhotoUrl,
-	// 			w: width,
-	// 			h: hight,
-	// 			title: header,
-	// 			thumbnail: v.PhotoUrl,
-	// 		};
-	// 	});
-	// 	setPhotos(photoSwipeImgs);
-	// }, [photos]);
-
-	useEffect(() => {
-		console.log('IS_AUTHOR', rAd.isAuthor);
-		console.log('IS_AUTHOR ada', rAd);
-	}, [rAd]);
 
 	function changeIsSub(isSubs, c) {
 		if (isNotValid()) {
@@ -508,7 +400,6 @@ const AddMore2r = (props) => {
 							setCostRequestSuccess(false);
 						}
 					);
-					console.log('set details', details.author.vk_id == myID);
 					setDetailsRequestSuccess(true);
 					details.isAuthor = details.author.vk_id == myID;
 					setrAd(details);
@@ -538,7 +429,7 @@ const AddMore2r = (props) => {
 		};
 	}, []);
 
-	const openSubs = () => {
+	const openSubs = (ad_type, subscribers_num, ad_id) => {
 		if (ad_type == TYPE_CHOICE) {
 			setPage(PANEL_SUBS);
 		} else {
@@ -560,18 +451,11 @@ const AddMore2r = (props) => {
 		}
 	};
 
-	const onCarmaClick = () => {
-		openModal(MODAL_ADS_COST);
-	};
+	const onCarmaClick = () => openModal(MODAL_ADS_COST);
 
-	const onFreezeClick = () => {
-		openModal(MODAL_ADS_FROZEN);
-	};
+	const onFreezeClick = () => openModal(MODAL_ADS_FROZEN);
 
-	const isFinished = (st) => {
-		const ST = st || status;
-		return ST !== STATUS_OFFER && ST !== STATUS_CHOSEN;
-	};
+	const isFinished = (st) => st !== STATUS_OFFER && st !== STATUS_CHOSEN;
 
 	const [imgs, setImgs] = useState([]);
 
@@ -581,6 +465,9 @@ const AddMore2r = (props) => {
 		let cancelFunc = false;
 		current_i++;
 		let this_i = current_i;
+
+		const { header } = rAd;
+		const pathes_to_photo = rAd.pathes_to_photo || [];
 
 		const photoSwipeImgs = pathes_to_photo.map((v) => {
 			let img = new Image();
@@ -619,14 +506,14 @@ const AddMore2r = (props) => {
 		return () => {
 			cancelFunc = true;
 		};
-	}, [pathes_to_photo]);
+	}, [rAd]);
 
-	function unsub(c) {
+	function unsub(c, ad_id) {
 		unsubscribe(
 			openPopout,
 			openSnackbar,
 			ad_id,
-			() => sub(c - 1),
+			() => sub(c - 1, ad_id),
 			(v) => {
 				changeIsSub(false, c);
 			},
@@ -635,12 +522,12 @@ const AddMore2r = (props) => {
 		);
 	}
 
-	function sub(c) {
+	function sub(c, ad_id) {
 		subscribe(
 			openPopout,
 			openSnackbar,
 			ad_id,
-			() => unsub(c + 1),
+			() => unsub(c + 1, ad_id),
 			(v) => {
 				changeIsSub(true, c);
 			},
@@ -651,7 +538,7 @@ const AddMore2r = (props) => {
 
 	const [subButton, setSubButton] = useState(<></>);
 	useEffect(() => {
-		const { isDealer, status, isAuthor, isSub, cost } = rAd;
+		const { isDealer, status, isAuthor, isSub, cost, ad_id } = rAd;
 		if (isAuthor || !detailsRequestSuccess || !costRequestSuccess) {
 			setSubButton(null);
 			// setSubButton(
@@ -674,39 +561,38 @@ const AddMore2r = (props) => {
 					stretched
 					size="m"
 					mode="destructive"
-					onClick={() => unsub(cost)}
+					onClick={() => unsub(cost, ad_id)}
 					before={<Icon24MarketOutline />}
 				>
 					Отказаться
 				</Button>
 			) : (
-				<Button stretched size="m" mode="primary" onClick={() => sub(cost)} before={<Icon24MarketOutline />}>
+				<Button
+					stretched
+					size="m"
+					mode="primary"
+					onClick={() => sub(cost, ad_id)}
+					before={<Icon24MarketOutline />}
+				>
 					Хочу забрать!
 				</Button>
 			);
 
 			const color = isSub ? 'var(--destructive)' : 'var(--header_tint)';
-			console.log('biiiig', !(isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED));
 			setSubButton(
 				!(isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED) ? (
-					<>
-						<AnimateOnChange animation="bounce">
-							<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-								<div>
-									<Avatar style={{ background: 'rgba(255,255,255,0.8)' }} size={32}>
-										{withLoadingIf(
-											costRequestSuccess,
-											<div style={{ fontSize: '20px', color: color }}>
-												{cost}
-												{K}
-											</div>,
-											'small'
-										)}
-									</Avatar>
-								</div>
-							</div>
-						</AnimateOnChange>
-					</>
+					<div className="flex-center">
+						<Avatar style={{ background: 'rgba(255,255,255,0.8)' }} size={32}>
+							{withLoadingIf(
+								costRequestSuccess,
+								<div style={{ fontSize: '20px', color: color }}>
+									{cost}
+									{K}
+								</div>,
+								'small'
+							)}
+						</Avatar>
+					</div>
 				) : null
 
 				// setSubButton(
@@ -750,15 +636,10 @@ const AddMore2r = (props) => {
 			>
 				<div
 					style={{
-						alignItems: 'center',
 						color: color,
-						textAlign: 'center',
 						margin: 'auto',
-						display: 'block',
 					}}
 				>
-					{/* <Button mode="tertiary">{icon}</Button> */}
-
 					<div style={{ display: 'inline-block' }}>{icon}</div>
 					<Caption level="1" weight="semibold">
 						{text}
@@ -780,7 +661,7 @@ const AddMore2r = (props) => {
 
 	const [componentSubs, setComponentSubs] = useState();
 	useEffect(() => {
-		const { status } = rAd;
+		const { status, isAuthor } = rAd;
 		const finished = isFinished(status);
 		let v = null;
 		if (isAuthor && !finished) {
@@ -791,12 +672,12 @@ const AddMore2r = (props) => {
 
 	const [componentChosenSub, setComponentChosenSub] = useState();
 	useEffect(() => {
-		const { isAuthor, dealer, status } = rAd;
+		const { isAuthor, dealer, status, ad_type, subscribers_num, ad_id } = rAd;
 		const finished = isFinished(status);
 		setComponentChosenSub(
 			<div style={{ flex: 1 }}>
 				<Given
-					openSubs={openSubs}
+					openSubs={() => openSubs(ad_type, subscribers_num, ad_id)}
 					isAuthor={isAuthor}
 					openUser={props.openUser}
 					dealer={dealer}
@@ -825,7 +706,7 @@ const AddMore2r = (props) => {
 
 	const [allActions, setAllActions] = useState();
 	useEffect(() => {
-		const { isAuthor, isDealer, isSub, status, cost, hidden } = rAd;
+		const { isAuthor, isDealer, isSub, status, cost, hidden, ad_id } = rAd;
 		const disabled = isFinished(status);
 		let buttons = [
 			buttonAction(<Icon24Write />, 'Изменить', onEditClick, null, disabled),
@@ -855,7 +736,7 @@ const AddMore2r = (props) => {
 					{subButton}
 				</div>,
 				isSub ? 'Перестать отслеживать' : 'Откликнуться',
-				() => (isSub ? unsub(cost) : sub(cost)),
+				() => (isSub ? unsub(cost, ad_id) : sub(cost, ad_id)),
 				isSub
 			);
 
@@ -873,15 +754,7 @@ const AddMore2r = (props) => {
 
 		setAllActions(
 			<Card mode="outline" style={{ margin: '5px' }}>
-				<div
-					style={{
-						display: 'flex',
-						justifyContent: 'center',
-						alignItems: 'center',
-					}}
-				>
-					{buttons}
-				</div>
+				<div className="flex-center">{buttons}</div>
 			</Card>
 		);
 	}, [rAd, subButton, costRequestSuccess]);
@@ -919,15 +792,9 @@ const AddMore2r = (props) => {
 		setPage(PANEL_MAP);
 	}
 
-	function getGeoPosition() {
-		let r = region || '';
-		let d = district || '';
-		if (r == undefined) {
-			r = '';
-		}
-		if (d == undefined) {
-			d = '';
-		}
+	function getGeoPosition(region, district) {
+		let r = region != undefined ? region : null || '';
+		let d = district != undefined ? district : null || '';
 		return r && d ? r + ', ' + d : r + d;
 	}
 
@@ -939,14 +806,12 @@ const AddMore2r = (props) => {
 		);
 	}
 
-	// слишком много вызовов надо все переносить в UseState
 	return (
 		<div>
 			{componentStatus}
 			{componentAuthor}
 			{componentPhotoSwipe}
 			<div style={{ display: width < 500 ? 'block' : 'flex' }}>
-				{/* {componentItemHeader} */}
 				<div
 					style={{
 						display: 'block',
@@ -956,16 +821,17 @@ const AddMore2r = (props) => {
 					}}
 				>
 					<Card mode="outline">
-						{/* {componentMainImage} */}
 						<div style={{ paddingBottom: '12px', paddingRight: '12px' }}>{componentImages}</div>
 					</Card>
 				</div>
-				{/* {subButton} */}
 
 				{width < 500 ? allActions : null}
 
 				<div style={{ display: 'block', flex: 1, padding: '5px' }}>
-					<Card mode="outline">{componentItemTable}</Card>
+					<Card mode="outline">
+						{componentCategories}
+						{componentItemTable}
+					</Card>
 				</div>
 			</div>
 			{width < 500 ? null : allActions}
@@ -1028,4 +894,4 @@ const AddMore2 = connect(mapStateToProps, mapDispatchToProps)(AddMore2r);
 
 export default AddMore2;
 
-// 857 -> 936 -> 838 -> 923 -> 1016 -> 935 -> 987
+// 857 -> 936 -> 838 -> 923 -> 1016 -> 935 -> 987 -> 897

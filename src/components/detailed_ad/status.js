@@ -14,11 +14,7 @@ export const statusWrapper = (block, color) => {
 			style={{
 				background: color,
 				padding: '8px',
-				// position: 'absolute',
 				widht: '100%',
-				// left: 0,
-				// right: 0,
-				// top: '0px',
 			}}
 		>
 			{block}
