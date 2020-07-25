@@ -547,6 +547,27 @@ export async function Auth(user, successCallback, failCallback) {
 export async function CreateImages(photos, id, goToAds) {
 	let err = false;
 	let s = 0;
+	const snackbar = (
+		<Snackbar
+			duration={SNACKBAR_DURATION_DEFAULT}
+			onClose={() => {
+				store.dispatch(closeSnackbar());
+			}}
+			action="Отменить"
+			onActionClick={() => deleteAd(id, refresh)}
+			before={
+				<Avatar size={24} style={{ background: 'green' }}>
+					<Icon24DoneOutline fill="#fff" width={14} height={14} />
+				</Avatar>
+			}
+		>
+			Объявление создано! Спасибо, что делаете мир лучше :)
+		</Snackbar>
+	);
+	if (!photos) {
+		goToAds(snackbar);
+		return;
+	}
 	photos.forEach((photo, i) => {
 		const data = new FormData();
 		data.append('file', photo.origin);
@@ -563,23 +584,7 @@ export async function CreateImages(photos, id, goToAds) {
 				console.log('success uploaded', s, photos.length - 1);
 				s++;
 				if (s == photos.length) {
-					goToAds(
-						<Snackbar
-							duration={SNACKBAR_DURATION_DEFAULT}
-							onClose={() => {
-								store.dispatch(closeSnackbar());
-							}}
-							action="Отменить"
-							onActionClick={() => deleteAd(id, refresh)}
-							before={
-								<Avatar size={24} style={{ background: 'green' }}>
-									<Icon24DoneOutline fill="#fff" width={14} height={14} />
-								</Avatar>
-							}
-						>
-							Объявление создано! Спасибо, что делаете мир лучше :)
-						</Snackbar>
-					);
+					goToAds(snackbar);
 				}
 			})
 			.catch(function (error) {
@@ -628,7 +633,7 @@ export function CreateAd(ad, obj, photos, openAd, loadAd, successcallback) {
 		.catch(function (error) {
 			store.dispatch(closePopout());
 			console.log('Request failed', error);
-			
+
 			fail('Нет соединения с сервером', () => createAd(ad, obj, photos, openAd, loadAd, successcallback));
 		});
 	return;

@@ -6,7 +6,6 @@ export const ADD_PROFILE = 'ADD_PROFILE';
 export const SET_TAB = 'SET_TAB';
 export const SET_STORY = 'SET_STORY';
 export const GO_BACK = 'GO_BACK';
-export const AD_IN = 'AD_IN';
 
 export const OPEN_POPOUT = 'OPEN_POPOUT';
 export const CLOSE_POPOUT = 'CLOSE_POPOUT';

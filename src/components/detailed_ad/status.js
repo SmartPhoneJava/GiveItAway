@@ -92,13 +92,18 @@ export const showChosen = (isDealer, isAuthor, dealer, acceptClick, cancelClick,
 						<div className="status-waiting-panel" onClick={() => openUser(dealer.vk_id)}>
 							<Avatar
 								style={{
-									marginLeft: '12px',
-									marginRight: '4px',
+									marginLeft: '16px',
 								}}
 								size={20}
 								src={dealer ? dealer.photo_url : ''}
 							/>
-							{dealer ? dealer.name + ' ' + dealer.surname + '  ' : ''}
+							<div
+								style={{
+									marginLeft: '18px',
+								}}
+							>
+								{dealer ? dealer.name + ' ' + dealer.surname + '  ' : ''}
+							</div>
 						</div>
 					) : (
 						<Spinner size="small" />

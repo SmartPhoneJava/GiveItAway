@@ -17,6 +17,8 @@ import {
 	Subhead,
 	CellButton,
 	Title,
+	MiniInfoCell,
+	Alert,
 } from '@vkontakte/vkui';
 
 import { AnimateOnChange, AnimateGroup } from 'react-animation';
@@ -80,17 +82,18 @@ import './styles.css';
 import Comments from './../story/adds/tabs/comments/comments';
 
 import { time } from './../../utils/time';
-import { setDummy, openModal, setPage, openSnackbar, openPopout, setStory, setAdIn } from '../../store/router/actions';
-import { PANEL_SUBS, PANEL_MAP } from './../../store/router/panelTypes';
-import { MODAL_ADS_COST, MODAL_ADS_FROZEN } from '../../store/router/modalTypes';
 import {
-	setIsSub,
-	setIsHidden,
-	setExtraInfo,
-	setIsAuthor,
-	backToPrevAd,
-	setToHistory,
-} from '../../store/detailed_ad/actions';
+	setDummy,
+	openModal,
+	setPage,
+	openSnackbar,
+	openPopout,
+	setStory,
+	closePopout,
+} from '../../store/router/actions';
+import { PANEL_SUBS, PANEL_MAP } from './../../store/router/panelTypes';
+import { MODAL_ADS_COST, MODAL_ADS_FROZEN, MODAL_ADS_TYPES } from '../../store/router/modalTypes';
+import { setIsSub, setIsHidden, setExtraInfo, setIsAuthor } from '../../store/detailed_ad/actions';
 import {
 	AdDefault,
 	AD_LOADING,
@@ -121,6 +124,27 @@ const col = '#00a550';
 // 	luminosity: 'dark',
 // });
 
+export function getAdTypeDescription(ad_type) {
+	return ad_type == TYPE_CHOICE
+		? 'Владелец вещи выбирает, кому он хочет передать вещь. После передачи, ' +
+				'он получит столько кармы, сколько человек откликнулось на объявление. С получателя ' +
+				'спишется столько кармы, сколько было указано рядом с его кнопкой "Откликнуться". ' +
+				'Отдающий может изменить получателя в любой момент времени, пока сделка не подтверждена'
+		: ad_type == TYPE_AUCTION
+		? 'Каждый пользователь, откликаясь на объявление, делает' +
+		  ' ставку, большую максимальной на 1 Карму. Владелец вещи ' +
+		  'определяет, когда аукцион завершится. Получателем будет ' +
+		  ' выбран тот, кто предложит наибольшую ставку на момент окончания аукциона' +
+		  ' После передачи вещи с получающего будет списана сумма, ' +
+		  'соответствующая его ставке. Она будет зачислена автору объявления. '
+		: 'Получатель определяется случайным образом из списка откликнувшихся' +
+		  'Запустить лотерею может только владелец вещи. Перезапустить ее невозможно.' +
+		  'Получатель, определенный лотереей, сразу получит уведомление о победе';
+}
+
+export const getAdType = (ad_type) =>
+	ad_type == TYPE_CHOICE ? 'Сделка' : ad_type == TYPE_AUCTION ? 'Аукцион' : 'Лотерея';
+
 const AddMore2r = (props) => {
 	const { myID, dispatch } = props;
 	const {
@@ -132,8 +156,7 @@ const AddMore2r = (props) => {
 		openPopout,
 		setStory,
 		setFormData,
-		setAdIn,
-		backToPrevAd,
+		closePopout,
 	} = props;
 	const { setPage, openModal, setDummy, direction, AD } = props;
 
@@ -159,28 +182,22 @@ const AddMore2r = (props) => {
 				isDealer,
 				isAuthor,
 				dealer,
-				() => {
+				() =>
 					acceptDeal(
 						deal.deal_id,
-						(v) => {
-							setStory(STORY_ADS);
-						},
+						(v) => setStory(STORY_ADS),
 						(e) => {
 							console.log('acceptDeal err', e);
 						}
-					);
-				},
-				() => {
+					),
+				() =>
 					denyDeal(
 						deal.deal_id,
-						(v) => {
-							setStory(STORY_ADS);
-						},
+						(v) => setStory(STORY_ADS),
 						(e) => {
 							console.log('denyDeal error', e);
 						}
-					);
-				},
+					),
 				props.openUser
 			)
 		);
@@ -199,36 +216,31 @@ const AddMore2r = (props) => {
 
 	function tableElement(Icon, text, value, After, onClick) {
 		return (
-			<div className="details-table-info" onClick={onClick}>
-				<Icon
-					width={22}
-					height={22}
-					className="details-table-element"
-					style={{ color: onClick ? 'var(--accent)' : 'var(--text_secondary)' }}
-				/>
-				<div
-					className="details-table-element"
-					style={{ color: onClick ? 'var(--accent)' : 'var(--text_secondary)' }}
-				>
-					{text}
-					{':'}&nbsp;
-					{value}
-					{After ? (
+			<MiniInfoCell
+				onClick={onClick}
+				mode={onClick ? 'more' : null}
+				before={<Icon width={20} height={20} />}
+				after={
+					After ? (
 						<After
 							width={22}
 							height={22}
 							className="details-table-element"
 							style={{ color: onClick ? 'var(--accent)' : 'var(--text_secondary)' }}
 						/>
-					) : null}
-				</div>
-			</div>
+					) : null
+				}
+			>
+				{text}
+				{':'}&nbsp;
+				{value}
+			</MiniInfoCell>
 		);
 	}
 
 	const [componentItemTable, setComponentItemTable] = useState();
 	useEffect(() => {
-		const { ad_type, views_count, status, region, district } = rAd;
+		const { views_count, status, region, district } = rAd;
 		let subscribers_num = rAd.subscribers_num || '0';
 
 		setComponentItemTable(
@@ -240,9 +252,9 @@ const AddMore2r = (props) => {
 				{tableElement(
 					Icon24UserOutgoing,
 					'Вид объявления',
-					ad_type == TYPE_CHOICE ? 'сделка' : ad_type == TYPE_AUCTION ? 'аукцион' : 'лотерея',
+					getAdType(rAd.ad_type).toLowerCase(),
 					Icon24Help,
-					() => {}
+					onTypesClick
 				)}
 				{tableElement(Icon24Place, 'Где забрать', getGeoPosition(region, district), Icon24Chevron, openMap)}
 			</div>
@@ -258,6 +270,42 @@ const AddMore2r = (props) => {
 
 	const [tooltip, setTooltip] = useState(false);
 
+	const [photoSet, setPhotoSet] = useState(false);
+	const [componentPhotos, setComponentPhotos] = useState(null);
+	useEffect(() => {
+		const pathes_to_photo = rAd.pathes_to_photo || [];
+		console.log('try me', pathes_to_photo, componentPhotos != null);
+		// if (pathes_to_photo.length == 0 || photoSet) {
+		// 	return;
+		// }
+
+		// setPhotoSet(true);
+		setComponentPhotos(
+			<CardScroll>
+				<div style={{ display: 'flex' }}>
+					{pathes_to_photo.map((img, i) => (
+						<Card
+							key={i}
+							size="s"
+							key={i}
+							onClick={() => {
+								openImage(imgs, i);
+							}}
+						>
+							<ImageCache className="details-card-img" url={img.PhotoUrl} />
+							<div className="details-card-btn-outter">
+								<Avatar className="details-card-btn-inner" size={26}>
+									<Icon24Fullscreen fill="var(--white)" />
+								</Avatar>
+							</div>
+						</Card>
+					))}
+				</div>
+			</CardScroll>
+		);
+		return () => setComponentPhotos(null);
+	}, [rAd]);
+
 	const [componentImages, setComponentImages] = useState();
 	useEffect(() => {
 		const { header, text } = rAd;
@@ -265,6 +313,9 @@ const AddMore2r = (props) => {
 		if (pathes_to_photo.length == 0) {
 			return;
 		}
+
+		console.log('seeeet', header, text);
+		// setPhotoSet(true);
 
 		const imgDivs = (
 			<Group
@@ -279,32 +330,31 @@ const AddMore2r = (props) => {
 				}
 			>
 				<CardScroll>
-					<AnimateGroup animationIn="fadeInUp" animationOut="fadeOutDown" durationOut={500}>
-						<div style={{ display: 'flex' }}>
-							{pathes_to_photo.map((img, i) => (
-								<Card
-									key={i}
-									size="s"
-									onClick={() => {
-										openImage(imgs, i);
-									}}
-								>
-									<ImageCache className="details-card-img" url={img.PhotoUrl} />
-									<div className="details-card-btn-outter">
-										<Avatar className="details-card-btn-inner" size={26}>
-											<Icon24Fullscreen fill="var(--white)" />
-										</Avatar>
-									</div>
-								</Card>
-							))}
-						</div>
-					</AnimateGroup>
+					<div style={{ display: 'flex' }}>
+						{pathes_to_photo.map((img, i) => (
+							<Card
+								key={i}
+								size="s"
+								key={i}
+								onClick={() => {
+									openImage(imgs, i);
+								}}
+							>
+								<ImageCache className="details-card-img" url={img.PhotoUrl} />
+								<div className="details-card-btn-outter">
+									<Avatar className="details-card-btn-inner" size={26}>
+										<Icon24Fullscreen fill="var(--white)" />
+									</Avatar>
+								</div>
+							</Card>
+						))}
+					</div>
 				</CardScroll>
 			</Group>
 		);
 
 		setComponentImages(imgDivs);
-		return () => setComponentImages(null);
+		// return () => setComponentImages(null);
 	}, [rAd]);
 
 	const handleClose = () => {
@@ -436,17 +486,14 @@ const AddMore2r = (props) => {
 			dispatch(init());
 			console.log('need recover register', props.AD.ad_id);
 		} else {
-			// backToPrevAd();
 			setCostRequestSuccess(true);
 			setDealRequestSuccess(true);
 			setSubsRequestSuccess(true);
 			setDetailsRequestSuccess(true);
 		}
 
-		setAdIn();
 		return () => {
 			cancelFunc = true;
-			// props.setToHistory(myPlace);
 		};
 	}, []);
 
@@ -473,6 +520,8 @@ const AddMore2r = (props) => {
 	};
 
 	const onCarmaClick = () => openModal(MODAL_ADS_COST);
+
+	const onTypesClick = () => openModal(MODAL_ADS_TYPES);
 
 	const onFreezeClick = () => openModal(MODAL_ADS_FROZEN);
 
@@ -637,19 +686,14 @@ const AddMore2r = (props) => {
 		console.log('loooook at deal', dealRequestSuccess);
 		setComponentChosenSub(
 			<div style={{ flex: 1 }}>
-				{withLoadingIf(
-					dealRequestSuccess,
-					<Given
-						openSubs={() => openSubs(ad_type, subscribers_num, ad_id)}
-						isAuthor={isAuthor}
-						openUser={props.openUser}
-						dealer={dealer}
-						finished={finished}
-					/>,
-					'middle',
-					null,
-					{ marginTop: '20px' }
-				)}
+				<Given
+					openSubs={() => openSubs(ad_type, subscribers_num, ad_id)}
+					isAuthor={isAuthor}
+					openUser={props.openUser}
+					dealer={dealer}
+					finished={finished}
+					dealRequestSuccess={dealRequestSuccess}
+				/>
 			</div>
 		);
 	}, [rAd, dealRequestSuccess]);
@@ -675,8 +719,30 @@ const AddMore2r = (props) => {
 	useEffect(() => {
 		const { isAuthor, isDealer, isSub, status, cost, hidden, ad_id } = rAd;
 		const disabled = isFinished(status);
+		const alert = (
+			<Alert
+				actions={[
+					{
+						title: 'Отмена',
+						autoclose: true,
+						mode: 'cancel',
+					},
+					{
+						title: 'Удалить',
+						autoclose: true,
+						mode: 'destructive',
+						action: () => deleteAd(ad_id, props.refresh),
+					},
+				]}
+				onClose={closePopout}
+			>
+				<h2>Вы действительно хотите удалить объявление?</h2>
+				<p>Отменить данное действие будет невозможно</p>
+			</Alert>
+		);
 		let buttons = [
 			buttonAction(<Icon24Write />, 'Изменить', onEditClick, null, disabled),
+			// <AnimateOnChange>
 			buttonAction(
 				hidden ? <Icon24Globe /> : <Icon24Hide />,
 				hidden ? 'Открыть' : 'Скрыть',
@@ -686,11 +752,12 @@ const AddMore2r = (props) => {
 				null,
 				disabled
 			),
+			// </AnimateOnChange>,
 			buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK),
 			buttonAction(
 				<Icon24Delete style={{ color: 'var(--destructive)' }} />,
 				'Удалить',
-				() => deleteAd(ad_id, props.refresh),
+				() => openPopout(alert),
 				true,
 				disabled
 			),
@@ -704,14 +771,21 @@ const AddMore2r = (props) => {
 				</div>,
 				isSub ? 'Перестать отслеживать' : 'Откликнуться',
 				() => (isSub ? unsub(cost, ad_id) : sub(cost, ad_id)),
-				isSub
+				isSub,
+				isFinished(status) || isDealer
 			);
 
-			const helpBtn = buttonAction(<Icon24Help />, 'Как это работает?', onFreezeClick);
+			const helpBtn = buttonAction(
+				<Icon24Help />,
+				'Как это работает?',
+				onFreezeClick,
+				null,
+				isFinished(status) || isDealer
+			);
 
 			buttons = [
-				isFinished(status) ? null : subBtn,
-				!(isDealer || status == STATUS_CLOSED || status == STATUS_ABORTED) ? helpBtn : null,
+				subBtn,
+				helpBtn,
 				buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK),
 				buttonAction(<Icon24Report />, 'Пожаловаться', () => {
 					window.open('https://vk.com/im?media=&sel=-194671970');
@@ -721,7 +795,14 @@ const AddMore2r = (props) => {
 
 		setAllActions(
 			<Card mode="outline" style={{ margin: '5px' }}>
-				<div className="flex-center">{buttons}</div>
+				<div className="flex-center">
+					{/* {buttons.map((v) => (
+						<div style={{ flex: 1, margin: '0', width: '100%' }}>
+							<AnimateOnChange>{v}</AnimateOnChange>
+						</div>
+					))} */}
+					{buttons}
+				</div>
 			</Card>
 		);
 	}, [rAd, subButton, costRequestSuccess]);
@@ -828,7 +909,6 @@ const mapStateToProps = (state) => {
 	return {
 		AD: state.ad,
 		direction: state.router.direction,
-		adOut: state.router.adOut, //!! разобраться что это
 		myID: state.vkui.myID,
 	};
 };
@@ -861,9 +941,7 @@ const mapDispatchToProps = (dispatch) => {
 				openPopout,
 				openSnackbar,
 
-				setAdIn,
-				backToPrevAd,
-				setToHistory,
+				closePopout,
 			},
 			dispatch
 		),

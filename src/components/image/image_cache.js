@@ -35,6 +35,9 @@ export const ImageCache = (props) => {
 				</HideUntilLoaded>
 			)
 		);
+		return () => {
+			setImage(null);
+		};
 	}, [props.url]);
 
 	return image;

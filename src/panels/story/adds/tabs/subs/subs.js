@@ -42,40 +42,45 @@ import { setDealer } from '../../../../../store/detailed_ad/actions';
 import { PANEL_SUBS } from '../../../../../store/router/panelTypes';
 import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED, TYPE_CHOICE } from '../../../../../const/ads';
 import { updateDealInfo } from '../../../../../store/detailed_ad/update';
+import { withLoadingIf } from '../../../../../components/image/image_cache';
 
 export const Given = (props) => {
-	const { dealer, isAuthor, openSubs, finished } = props;
+	const { dealer, isAuthor, openSubs, finished, dealRequestSuccess } = props;
+	const aside = withLoadingIf(
+		dealRequestSuccess,
+		isAuthor && !finished ? (
+			dealer ? (
+				<Link onClick={openSubs}>Изменить</Link>
+			) : (
+				<Link onClick={openSubs}>Выбрать</Link>
+			)
+		) : (
+			<></>
+		),
+		'small',
+		null
+	);
 	return (
-		<Group
-			header={
-				<Header
-					aside={
-						isAuthor && !finished ? (
-							dealer ? (
-								<Link onClick={openSubs}>Изменить</Link>
-							) : (
-								<Link onClick={openSubs}>Выбрать</Link>
-							)
-						) : null
-					}
+		<Group header={<Header aside={aside}>Получатель</Header>}>
+			{withLoadingIf(
+				dealRequestSuccess,
+				<Cell
+					onClick={() => {
+						if (dealer) {
+							props.openUser(dealer.vk_id);
+						}
+					}}
+					multiline={true}
+					key={dealer ? dealer.vk_id : ''}
+					before={dealer ? <Avatar size={36} src={dealer.photo_url} /> : <Icon24User />}
+					asideContent={dealer ? <Icon24Chevron /> : ''}
 				>
-					Получатель
-				</Header>
-			}
-		>
-			<Cell
-				onClick={() => {
-					if (dealer) {
-						props.openUser(dealer.vk_id);
-					}
-				}}
-				multiline={true}
-				key={dealer ? dealer.vk_id : ''}
-				before={dealer ? <Avatar size={36} src={dealer.photo_url} /> : <Icon24User />}
-				asideContent={dealer ? <Icon24Chevron /> : ''}
-			>
-				<div>{dealer ? dealer.name + ' ' + dealer.surname : 'Никто не выбран'}</div>
-			</Cell>
+					<div>{dealer ? dealer.name + ' ' + dealer.surname : 'Никто не выбран'}</div>
+				</Cell>,
+				'middle',
+				null,
+				{ marginTop: '20px' }
+			)}
 		</Group>
 	);
 };

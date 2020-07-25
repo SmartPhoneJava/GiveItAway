@@ -15,7 +15,6 @@ import {
 	SET_AD,
 	SET_DUMMY,
 	SET_TAB,
-	AD_IN,
 } from './actionTypes';
 
 import * as VK from '../../services/VK';
@@ -66,8 +65,6 @@ const initialState = {
 	snackbars: {},
 
 	dummies: {},
-
-	adOut: false,
 
 	scrollHistory: [],
 	scrollPosition: { x: 0, y: 0 },
@@ -378,13 +375,11 @@ export const routerReducer = (state = initialState, action) => {
 				Profile = Profiles[Profiles.length - 1];
 			}
 
-			let adOut = state.adOut;
 			let Ad = state.activeAd;
 			let Ads = state.adHistory;
 			if (state.activePanels[Story] == PANEL_ONE && !storyChange) {
 				Ads.pop();
 				Ad = Ads[Ads.length - 1];
-				adOut = true;
 			}
 
 			const scrollHistory = state.scrollHistory;
@@ -416,14 +411,6 @@ export const routerReducer = (state = initialState, action) => {
 				adHistory: Ads,
 				scrollHistory,
 				scrollPosition,
-				adOut,
-			};
-		}
-
-		case AD_IN: {
-			return {
-				...state,
-				adOut: false,
 			};
 		}
 

@@ -15,8 +15,12 @@ import {
 	Radio,
 	ModalCard,
 	FormStatus,
+	Button,
 } from '@vkontakte/vkui';
 
+import { AnimateOnChange, AnimateGroup } from 'react-animation';
+
+import Icon24BrowserBack from '@vkontakte/icons/dist/24/browser_back';
 import Icon24BrowserForward from '@vkontakte/icons/dist/24/browser_forward';
 
 import Freeze100 from './../../../img/100/freeze.png';
@@ -38,14 +42,24 @@ import {
 	MODAL_ADS_SUBS,
 	MODAL_ADS_COST,
 	MODAL_ADS_FROZEN,
+	MODAL_ADS_TYPES,
 } from './../../../store/router/modalTypes';
 
 import { ADS_FILTERS } from './../../../store/create_post/types';
 import { STORY_ADS } from '../../../store/router/storyTypes';
 
-import { GEO_TYPE_FILTERS, GEO_TYPE_NEAR, SORT_TIME, SORT_GEO } from './../../../const/ads';
+import {
+	GEO_TYPE_FILTERS,
+	GEO_TYPE_NEAR,
+	SORT_TIME,
+	SORT_GEO,
+	TYPE_CHOICE,
+	TYPE_RANDOM,
+	TYPE_AUCTION,
+} from './../../../const/ads';
 import { useEffect } from 'react';
 import { getUser } from '../profile/requests';
+import { getAdType, getAdTypeDescription } from '../../template/AddMore2';
 
 const AddsModal = (props) => {
 	const { closeModal, inputData } = props;
@@ -131,6 +145,31 @@ const AddsModal = (props) => {
 		const v = backUser.carma - backUser.frozen_carma + c;
 		return v + '' + K;
 	}
+
+	const [moveAdType, setMoveAdType] = useState(0);
+	const [currentAdType, setCurrentAdType] = useState('');
+	const [adTypeDescription, setAdTypeDescription] = useState('');
+	useEffect(() => {
+		setAdTypeDescription(getAdTypeDescription(props.ad.ad_type));
+		setCurrentAdType(props.ad.ad_type);
+	}, [props.ad]);
+	useEffect(() => {
+		if (moveAdType == 0) {
+			return
+		}
+		const arr = [TYPE_CHOICE, TYPE_AUCTION, TYPE_RANDOM];
+		let ind = arr.indexOf(currentAdType) + moveAdType;
+		if (ind < 0) {
+			ind = 2;
+		}
+		if (ind > 2) {
+			ind = 0;
+		}
+		const newType = arr[ind];
+		setAdTypeDescription(getAdTypeDescription(newType));
+		setCurrentAdType(newType);
+		setMoveAdType(0)
+	}, [moveAdType]);
 
 	return (
 		<ModalRoot activeModal={activeModal}>
@@ -318,10 +357,78 @@ const AddsModal = (props) => {
 				]}
 				actionsLayout="vertical"
 			/>
+			<ModalCard
+				id={MODAL_ADS_TYPES}
+				onClose={() => {
+					setAdTypeDescription(getAdTypeDescription(props.ad.ad_type));
+					setCurrentAdType(props.ad.ad_type);
+					closeModal();
+				}}
+				header={getAdType(currentAdType)}
+				caption={
+					<>
+						<div className="flex-center">
+							<div style={{ paddingRight: '8px' }} onClick={() => setMoveAdType(-1)}>
+								<Icon24BrowserBack />
+							</div>
+							{adTypeDescription}
+							<div style={{ paddingLeft: '8px' }} onClick={() => setMoveAdType(1)}>
+								<Icon24BrowserForward />
+							</div>
+						</div>
+						<Group header={<Header mode="secondary">Другие виды объявлений</Header>}>
+							<div style={{ display: 'flex' }}>
+								{currentAdType != TYPE_CHOICE && (
+									<div style={{ padding: '3px', flex: 1 }}>
+										<Button
+											mode="secondary"
+											size="xl"
+											onClick={() => {
+												setCurrentAdType(TYPE_CHOICE);
+												setAdTypeDescription(getAdTypeDescription(TYPE_CHOICE));
+											}}
+										>
+											Сделка
+										</Button>
+									</div>
+								)}
+								{currentAdType != TYPE_AUCTION && (
+									<div style={{ padding: '3px', flex: 1 }}>
+										<Button
+											mode="secondary"
+											size="xl"
+											onClick={() => {
+												setCurrentAdType(TYPE_AUCTION);
+												setAdTypeDescription(getAdTypeDescription(TYPE_AUCTION));
+											}}
+										>
+											Аукцион
+										</Button>
+									</div>
+								)}
+								{currentAdType != TYPE_RANDOM && (
+									<div style={{ padding: '3px', flex: 1 }}>
+										<Button
+											mode="secondary"
+											size="xl"
+											onClick={() => {
+												setCurrentAdType(TYPE_RANDOM);
+												setAdTypeDescription(getAdTypeDescription(TYPE_RANDOM));
+											}}
+										>
+											Лотерея
+										</Button>
+									</div>
+								)}
+							</div>
+						</Group>
+					</>
+				}
+			/>
 		</ModalRoot>
 	);
 };
 
 export default AddsModal;
 
-// 373 -> 273
+// 373 -> 273 -> 406

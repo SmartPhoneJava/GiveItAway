@@ -14,7 +14,6 @@ import {
 	SET_DUMMY,
 	CLOSE_ALL_MODALS,
 	SET_TAB,
-	AD_IN,
 	SET_SCROLL,
 } from './actionTypes';
 import { PANEL_USER, PANEL_ONE } from './panelTypes';
@@ -26,10 +25,6 @@ export const setStory = (story, panel, save_to_history) => ({
 		panel,
 		save_to_history,
 	},
-});
-
-export const setAdIn = () => ({
-	type: AD_IN,
 });
 
 export const setDummy = (dummy) => ({
