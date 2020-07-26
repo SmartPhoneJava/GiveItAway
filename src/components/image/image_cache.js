@@ -43,8 +43,7 @@ export const ImageCache = (props) => {
 	return image;
 };
 
-export function withLoading(elem, size, animationIn, spinStyle) {
-	const aIn = animationIn || 'bounceIn';
+export function withSpinner(wrapper, elem, size, spinStyle) {
 	const s = size || 'small';
 	const spStyle = spinStyle || {};
 	const spin = (
@@ -63,10 +62,20 @@ export function withLoading(elem, size, animationIn, spinStyle) {
 	if (!elem) {
 		return spin;
 	}
-	return (
-		<HideUntilLoaded animationIn={aIn} imageToLoad={null} Spinner={() => spin}>
-			{elem}
-		</HideUntilLoaded>
+	return wrapper(spin);
+}
+
+export function withLoading(elem, size, animationIn, spinStyle) {
+	const aIn = animationIn || 'bounceIn';
+	return withSpinner(
+		(spin) => (
+			<HideUntilLoaded animationIn={aIn} imageToLoad={null} Spinner={() => spin}>
+				{elem}
+			</HideUntilLoaded>
+		),
+		elem,
+		size,
+		spinStyle
 	);
 }
 
@@ -75,5 +84,27 @@ export function withLoadingIf(condition, elem, size, animationIn, spinStyle) {
 		return withLoading(elem, size, animationIn, spinStyle);
 	} else {
 		return withLoading(null, size, animationIn, spinStyle);
+	}
+}
+
+export function animateOnChange(elem, size, animation, spinStyle) {
+	const anim = animation || 'bounce';
+	return withSpinner(
+		(spin) => (
+			<AnimateOnChange style={{ width: '100%' }} animation={anim}>
+				{elem}
+			</AnimateOnChange>
+		),
+		elem,
+		size,
+		spinStyle
+	);
+}
+
+export function animateOnChangeIf(condition, elem, size, animation, spinStyle) {
+	if (condition) {
+		return animateOnChange(elem, size, animation, spinStyle);
+	} else {
+		return animateOnChange(null, size, animation, spinStyle);
 	}
 }

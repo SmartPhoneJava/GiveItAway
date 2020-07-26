@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import bridge from '@vkontakte/vk-bridge';
 import {
 	Avatar,
-	PanelHeaderButton,
 	Button,
 	Group,
 	Cell,
-	Separator,
 	ScreenSpinner,
 	Placeholder,
 	Caption,
@@ -15,8 +13,6 @@ import {
 	Tooltip,
 	RichCell,
 	Subhead,
-	CellButton,
-	Title,
 	MiniInfoCell,
 	Alert,
 } from '@vkontakte/vkui';
@@ -90,6 +86,7 @@ import {
 	openPopout,
 	setStory,
 	closePopout,
+	setProfile,
 } from '../../store/router/actions';
 import { PANEL_SUBS, PANEL_MAP } from './../../store/router/panelTypes';
 import { MODAL_ADS_COST, MODAL_ADS_FROZEN, MODAL_ADS_TYPES } from '../../store/router/modalTypes';
@@ -114,6 +111,7 @@ import { updateDealInfo, updateCost, updateSubs } from '../../store/detailed_ad/
 import { showStatus } from '../../components/detailed_ad/status';
 import { withLoading, withLoadingIf, animatedDiv, ImageCache } from '../../components/image/image_cache';
 import { TagsLabel, tag } from '../../components/categories/label';
+import { AuctionLabel } from '../../components/detailed_ad/auction';
 
 let current_i = 0;
 
@@ -198,7 +196,7 @@ const AddMore2r = (props) => {
 							console.log('denyDeal error', e);
 						}
 					),
-				props.openUser
+				props.setProfile
 			)
 		);
 	}, [rAd]);
@@ -270,16 +268,10 @@ const AddMore2r = (props) => {
 
 	const [tooltip, setTooltip] = useState(false);
 
-	const [photoSet, setPhotoSet] = useState(false);
 	const [componentPhotos, setComponentPhotos] = useState(null);
 	useEffect(() => {
 		const pathes_to_photo = rAd.pathes_to_photo || [];
-		console.log('try me', pathes_to_photo, componentPhotos != null);
-		// if (pathes_to_photo.length == 0 || photoSet) {
-		// 	return;
-		// }
 
-		// setPhotoSet(true);
 		setComponentPhotos(
 			<CardScroll>
 				<div style={{ display: 'flex' }}>
@@ -313,9 +305,6 @@ const AddMore2r = (props) => {
 		if (pathes_to_photo.length == 0) {
 			return;
 		}
-
-		console.log('seeeet', header, text);
-		// setPhotoSet(true);
 
 		const imgDivs = (
 			<Group
@@ -387,7 +376,7 @@ const AddMore2r = (props) => {
 
 	const width = document.body.clientWidth;
 
-	function changeIsSub(isSubs, c) {
+	function changeIsSub(isSubs) {
 		if (isNotValid()) {
 			return;
 		}
@@ -578,28 +567,28 @@ const AddMore2r = (props) => {
 		};
 	}, [rAd]);
 
-	function unsub(c, ad_id) {
+	function unsub(ad_id) {
 		unsubscribe(
 			openPopout,
 			openSnackbar,
 			ad_id,
-			() => sub(c - 1, ad_id),
+			() => sub(ad_id),
 			(v) => {
-				changeIsSub(false, c);
+				changeIsSub(false);
 			},
 			(e) => {},
 			() => {}
 		);
 	}
 
-	function sub(c, ad_id) {
+	function sub(ad_id) {
 		subscribe(
 			openPopout,
 			openSnackbar,
 			ad_id,
-			() => unsub(c + 1, ad_id),
+			() => unsub(ad_id),
 			(v) => {
-				changeIsSub(true, c);
+				changeIsSub(true);
 			},
 			(e) => {},
 			() => {}
@@ -663,7 +652,7 @@ const AddMore2r = (props) => {
 		const { comments_enabled } = rAd;
 		let v = <Placeholder icon={<Icon56WriteOutline />} header="Комментарии закрыты"></Placeholder>;
 		if (comments_enabled) {
-			v = <Comments mini={true} amount={1} maxAmount={1} openUser={props.openUser} />;
+			v = <Comments mini={true} amount={1} maxAmount={1} openUser={props.setProfile} />;
 		}
 		setComponentComments(v);
 	}, [rAd]);
@@ -674,26 +663,37 @@ const AddMore2r = (props) => {
 		const finished = isFinished(status);
 		let v = null;
 		if (isAuthor && !finished) {
-			v = <Subs openUser={props.openUser} amount={2} maxAmount={2} mini={true} />;
+			v = <Subs openUser={props.setProfile} amount={2} maxAmount={2} mini={true} />;
 		}
 		setComponentSubs(v);
 	}, [rAd]);
 
 	const [componentChosenSub, setComponentChosenSub] = useState();
 	useEffect(() => {
-		const { isAuthor, dealer, status, ad_type, subscribers_num, ad_id } = rAd;
+		const { isAuthor, dealer, status, ad_type, subscribers_num, ad_id, isSub } = rAd;
 		const finished = isFinished(status);
-		console.log('loooook at deal', dealRequestSuccess);
+		console.log("we wanna update", isSub)
 		setComponentChosenSub(
 			<div style={{ flex: 1 }}>
-				<Given
-					openSubs={() => openSubs(ad_type, subscribers_num, ad_id)}
-					isAuthor={isAuthor}
-					openUser={props.openUser}
-					dealer={dealer}
-					finished={finished}
-					dealRequestSuccess={dealRequestSuccess}
-				/>
+				{ad_type == TYPE_AUCTION ? (
+					<AuctionLabel
+						ad_id={ad_id}
+						dealer={dealer}
+						isAuthor={isAuthor}
+						isSub={isSub}
+						unsub={() => unsub(ad_id)}
+						sub={() => sub(ad_id)}
+					/>
+				) : (
+					<Given
+						openSubs={() => openSubs(ad_type, subscribers_num, ad_id)}
+						isAuthor={isAuthor}
+						openUser={props.setProfile}
+						dealer={dealer}
+						finished={finished}
+						dealRequestSuccess={dealRequestSuccess}
+					/>
+				)}
 			</div>
 		);
 	}, [rAd, dealRequestSuccess]);
@@ -703,7 +703,7 @@ const AddMore2r = (props) => {
 		const { author, creation_date } = rAd;
 		setComponentAuthor(
 			<Cell
-				onClick={() => props.openUser(author.vk_id)}
+				onClick={() => props.setProfile(author.vk_id)}
 				before={<Avatar style={{ margin: '0px', padding: '0px' }} size={40} src={author.photo_url} />}
 				description={time(creation_date)}
 				style={{ marginBottom: '0px', paddingBottom: '0px' }}
@@ -717,7 +717,7 @@ const AddMore2r = (props) => {
 
 	const [allActions, setAllActions] = useState();
 	useEffect(() => {
-		const { isAuthor, isDealer, isSub, status, cost, hidden, ad_id } = rAd;
+		const { isAuthor, isDealer, isSub, status, hidden, ad_id } = rAd;
 		const disabled = isFinished(status);
 		const alert = (
 			<Alert
@@ -770,7 +770,7 @@ const AddMore2r = (props) => {
 					{subButton}
 				</div>,
 				isSub ? 'Перестать отслеживать' : 'Откликнуться',
-				() => (isSub ? unsub(cost, ad_id) : sub(cost, ad_id)),
+				() => (isSub ? unsub(ad_id) : sub(ad_id)),
 				isSub,
 				isFinished(status) || isDealer
 			);
@@ -795,14 +795,7 @@ const AddMore2r = (props) => {
 
 		setAllActions(
 			<Card mode="outline" style={{ margin: '5px' }}>
-				<div className="flex-center">
-					{/* {buttons.map((v) => (
-						<div style={{ flex: 1, margin: '0', width: '100%' }}>
-							<AnimateOnChange>{v}</AnimateOnChange>
-						</div>
-					))} */}
-					{buttons}
-				</div>
+				<div className="flex-center">{buttons}</div>
 			</Card>
 		);
 	}, [rAd, subButton, costRequestSuccess]);
@@ -921,6 +914,7 @@ const mapDispatchToProps = (dispatch) => {
 				setDummy,
 				openModal,
 				setPage,
+				setProfile,
 				adVisible,
 				adHide,
 				deleteAd,
@@ -952,4 +946,4 @@ const AddMore2 = connect(mapStateToProps, mapDispatchToProps)(AddMore2r);
 
 export default AddMore2;
 
-// 857 -> 936 -> 838 -> 923 -> 1016 -> 935 -> 987 -> 897
+// 857 -> 936 -> 838 -> 923 -> 1016 -> 935 -> 987 -> 897 -> 953

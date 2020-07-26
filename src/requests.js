@@ -13,6 +13,7 @@ import { AD_LOADING } from './const/ads';
 import { SNACKBAR_DURATION_DEFAULT } from './store/const';
 import { store } from '.';
 import { openPopout, closePopout, openSnackbar, closeSnackbar } from './store/router/actions';
+import { setCost } from './store/detailed_ad/actions';
 
 let request_id = 0;
 
@@ -43,7 +44,7 @@ export function success(text, cancelMe, end) {
 	store.dispatch(openSnackbar(snack));
 }
 
-export function sendSnack(text, setSnackbar) {
+export function sendSnack(text) {
 	store.dispatch(
 		openSnackbar(
 			<Snackbar
@@ -143,7 +144,7 @@ export async function adHide(ad_id, callback) {
 		.catch(function (error) {
 			store.dispatch(closePopout());
 			err = true;
-			fail('Нет соединения с сервером', adHide(ad_id, callback));
+			fail('Нет соединения с сервером', () => adHide(ad_id, callback));
 		});
 	return err;
 }
@@ -172,7 +173,7 @@ export async function adVisible(ad_id, callback) {
 		.catch(function (error) {
 			store.dispatch(closePopout());
 			err = true;
-			fail('Нет соединения с сервером', adVisible(ad_id, callback));
+			fail('Нет соединения с сервером', ()=>adVisible(ad_id, callback));
 		});
 	return err;
 }
@@ -231,6 +232,58 @@ export async function getCost(ad_id, successCallback, failCallback) {
 		});
 }
 
+export async function getAuctionMaxUser(ad_id, successCallback, failCallback) {
+	let cancel;
+	axios({
+		method: 'get',
+		withCredentials: true,
+		url: Addr.getState() + BASE_AD + ad_id + '/max_bid_user',
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(function (response) {
+			console.log('getAuctionMaxUser response:', response);
+			return response.data;
+		})
+		.then(function (response) {
+			if (successCallback) {
+				successCallback(response);
+			}
+			return response;
+		})
+		.catch(function (error) {
+			console.log('getAuctionMaxUser getCashback:', error);
+			if (failCallback) {
+				failCallback(error);
+			}
+		});
+}
+
+export async function increaseAuctionRate(ad_id, successCallback, failCallback) {
+	let cancel;
+	axios({
+		method: 'put',
+		withCredentials: true,
+		url: Addr.getState() + BASE_AD + ad_id + '/increase_bid',
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(function (response) {
+			console.log('increaseAuctionRate response:', response);
+			return response.data;
+		})
+		.then(function (response) {
+			if (successCallback) {
+				successCallback(response);
+			}
+			return response;
+		})
+		.catch(function (error) {
+			console.log('increaseAuctionRate fail:', error);
+			if (failCallback) {
+				failCallback(error);
+			}
+		});
+}
+
 export async function getCashback(ad_id, successCallback, failCallback) {
 	let cancel;
 	axios({
@@ -247,6 +300,7 @@ export async function getCashback(ad_id, successCallback, failCallback) {
 			if (successCallback) {
 				successCallback(response);
 			}
+			store.dispatch(setCost(response.bid))
 			return response;
 		})
 		.catch(function (error) {

@@ -150,12 +150,14 @@ const AddsModal = (props) => {
 	const [currentAdType, setCurrentAdType] = useState('');
 	const [adTypeDescription, setAdTypeDescription] = useState('');
 	useEffect(() => {
-		setAdTypeDescription(getAdTypeDescription(props.ad.ad_type));
-		setCurrentAdType(props.ad.ad_type);
-	}, [props.ad]);
+		if (!activeModal) {
+			setAdTypeDescription(getAdTypeDescription(props.ad.ad_type));
+			setCurrentAdType(props.ad.ad_type);
+		}
+	}, [props.ad, activeModal]);
 	useEffect(() => {
 		if (moveAdType == 0) {
-			return
+			return;
 		}
 		const arr = [TYPE_CHOICE, TYPE_AUCTION, TYPE_RANDOM];
 		let ind = arr.indexOf(currentAdType) + moveAdType;
@@ -168,8 +170,64 @@ const AddsModal = (props) => {
 		const newType = arr[ind];
 		setAdTypeDescription(getAdTypeDescription(newType));
 		setCurrentAdType(newType);
-		setMoveAdType(0)
+		setMoveAdType(0);
 	}, [moveAdType]);
+
+	const [componentTypesArr, setComponentTypesArr] = useState([]);
+	useEffect(() => {
+		console.log('currentAdType', currentAdType, arr);
+		let arr = [];
+		if (currentAdType != TYPE_CHOICE) {
+			arr.push(
+				<div style={{ padding: '3px', flex: 1 }}>
+					<Button
+						mode="secondary"
+						size="xl"
+						onClick={() => {
+							setCurrentAdType(TYPE_CHOICE);
+							setAdTypeDescription(getAdTypeDescription(TYPE_CHOICE));
+						}}
+					>
+						Сделка
+					</Button>
+				</div>
+			);
+		}
+		if (currentAdType != TYPE_AUCTION) {
+			arr.push(
+				<div style={{ padding: '3px', flex: 1 }}>
+					<Button
+						mode="secondary"
+						size="xl"
+						onClick={() => {
+							setCurrentAdType(TYPE_AUCTION);
+							setAdTypeDescription(getAdTypeDescription(TYPE_AUCTION));
+						}}
+					>
+						Аукцион
+					</Button>
+				</div>
+			);
+		}
+		if (currentAdType != TYPE_RANDOM) {
+			arr.push(
+				<div style={{ padding: '3px', flex: 1 }}>
+					<Button
+						mode="secondary"
+						size="xl"
+						onClick={() => {
+							setCurrentAdType(TYPE_RANDOM);
+							setAdTypeDescription(getAdTypeDescription(TYPE_RANDOM));
+						}}
+					>
+						Лотерея
+					</Button>
+				</div>
+			);
+		}
+
+		setComponentTypesArr(arr);
+	}, [currentAdType]);
 
 	return (
 		<ModalRoot activeModal={activeModal}>
@@ -371,56 +429,16 @@ const AddsModal = (props) => {
 							<div style={{ paddingRight: '8px' }} onClick={() => setMoveAdType(-1)}>
 								<Icon24BrowserBack />
 							</div>
-							{adTypeDescription}
+							<AnimateOnChange duration="50" animation="slide">
+								{adTypeDescription}
+							</AnimateOnChange>
+
 							<div style={{ paddingLeft: '8px' }} onClick={() => setMoveAdType(1)}>
 								<Icon24BrowserForward />
 							</div>
 						</div>
 						<Group header={<Header mode="secondary">Другие виды объявлений</Header>}>
-							<div style={{ display: 'flex' }}>
-								{currentAdType != TYPE_CHOICE && (
-									<div style={{ padding: '3px', flex: 1 }}>
-										<Button
-											mode="secondary"
-											size="xl"
-											onClick={() => {
-												setCurrentAdType(TYPE_CHOICE);
-												setAdTypeDescription(getAdTypeDescription(TYPE_CHOICE));
-											}}
-										>
-											Сделка
-										</Button>
-									</div>
-								)}
-								{currentAdType != TYPE_AUCTION && (
-									<div style={{ padding: '3px', flex: 1 }}>
-										<Button
-											mode="secondary"
-											size="xl"
-											onClick={() => {
-												setCurrentAdType(TYPE_AUCTION);
-												setAdTypeDescription(getAdTypeDescription(TYPE_AUCTION));
-											}}
-										>
-											Аукцион
-										</Button>
-									</div>
-								)}
-								{currentAdType != TYPE_RANDOM && (
-									<div style={{ padding: '3px', flex: 1 }}>
-										<Button
-											mode="secondary"
-											size="xl"
-											onClick={() => {
-												setCurrentAdType(TYPE_RANDOM);
-												setAdTypeDescription(getAdTypeDescription(TYPE_RANDOM));
-											}}
-										>
-											Лотерея
-										</Button>
-									</div>
-								)}
-							</div>
+							<div style={{ display: 'flex' }}>{componentTypesArr}</div>
 						</Group>
 					</>
 				}

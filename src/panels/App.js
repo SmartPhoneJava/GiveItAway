@@ -9,10 +9,8 @@ import {
 	TabbarItem,
 	ScreenSpinner,
 	ConfigProvider,
-	Group,
-	CellButton,
 } from '@vkontakte/vkui';
-import bridge from '@vkontakte/vk-bridge';
+
 import { STORY_ADS, STORY_CREATE } from './../store/router/storyTypes';
 import {
 	PANEL_ADS,
@@ -46,7 +44,6 @@ import {
 	setProfile,
 	setAd,
 	addProfile,
-	openSnackbar,
 	openPopout,
 	setPage,
 } from '../store/router/actions';
@@ -76,8 +73,6 @@ import Create from './../containers/create/create';
 import Icon28User from '@vkontakte/icons/dist/28/user';
 import Icon28NewsfeedOutline from '@vkontakte/icons/dist/28/newsfeed_outline';
 import Icon28Add from '@vkontakte/icons/dist/28/add_outline';
-
-import { VkUser } from '../store/vkUser';
 
 import {
 	handleNotifications,
@@ -142,7 +137,6 @@ const App = (props) => {
 		openModal,
 		addProfile,
 		setFormData,
-		openSnackbar,
 		openPopout,
 		addComment,
 		addSub,
@@ -166,10 +160,6 @@ const App = (props) => {
 	function dropFilters() {
 		store.dispatch(setFormData(ADS_FILTERS, null));
 	}
-
-	useEffect(() => {
-		console.log('panelsHistory ', panelsHistory);
-	}, [panelsHistory]);
 
 	const onStoryChange = (e) => {
 		const isProfile = e.currentTarget.dataset.text == profileText;
@@ -203,16 +193,13 @@ const App = (props) => {
 
 	function scrollWindow(to) {
 		var scrolledSoFar = window.scrollY;
-
 		var scrollEnd = to;
 		if (scrolledSoFar == scrollEnd) {
 			return;
 		}
-		console.log('scroll start', scrollEnd);
 		var timerID = setInterval(function () {
 			window.scrollTo(0, scrollEnd);
 			if (scrolledSoFar != window.scrollY && scrollEnd <= window.scrollY) {
-				console.log('scroll end', scrollEnd, window.scrollY, window.pageYOffset);
 				clearInterval(timerID);
 			}
 		}, 10);
@@ -235,7 +222,6 @@ const App = (props) => {
 		}
 	}, [props.from]);
 
-	console.log('APP CALLED');
 	const [addsTabs, setAddsTabs] = useState(<></>);
 	useEffect(() => {
 		const v = (
@@ -279,8 +265,7 @@ const App = (props) => {
 					}
 				}
 			}
-
-			handleNotifications(note, openSnackbar);
+			handleNotifications(note);
 		});
 	}
 
@@ -384,9 +369,7 @@ const App = (props) => {
 	}, []);
 
 	function setReduxAd(ad) {
-		// store.dispatch(setToHistory());
 		store.dispatch(setExtraInfo(ad));
-		console.log('setReduxAd');
 		setAd(ad);
 	}
 
@@ -475,14 +458,9 @@ const App = (props) => {
 						{choosen ? (
 							<AddMore2
 								refresh={(id) => {
-									console.log('here we go');
-
 									setStory(STORY_ADS, PANEL_ADS);
 									SetDeleteID(id);
 								}}
-								back={goBack}
-								openUser={setProfile}
-								VkUser={VkUser}
 							/>
 						) : (
 							Error
@@ -545,7 +523,6 @@ const App = (props) => {
 							redux_main_form={ADS_FILTERS}
 						/>
 					</Panel>
-
 					<Panel id={PANEL_COUNTRIES}>
 						<PanelHeader left={<PanelHeaderBack onClick={backToGeoFilters} />}>Выберите страну</PanelHeader>
 						<Countries goBack={backToGeoFilters} redux_form={ADS_FILTERS} />
@@ -571,7 +548,6 @@ const App = (props) => {
 						<PanelHeader left={historyLen <= 1 ? null : <PanelHeaderBack onClick={goBack} />}>
 							{needEdit ? 'Редактировать' : addText}
 						</PanelHeader>
-
 						<Create />
 						{snackbars[PANEL_CREATE]}
 					</Panel>
@@ -652,7 +628,6 @@ function mapDispatchToProps(dispatch) {
 				openModal,
 				addProfile,
 				setFormData,
-				openSnackbar,
 				openPopout,
 				addComment,
 				addSub,

@@ -37,41 +37,30 @@ export const NT_COMMENT_DELETED = 'delete_comment'; // приходит всем
 
 export const NT_AD_STATUS = 'status_changed';
 
-export function handleNotifications(note, setSnackbar) {
+export function handleNotifications(note) {
 	switch (note.data.notification_type) {
 		case NT_STATISTICS:
-			sendSnack('Прилетела новая статистика', setSnackbar);
+			sendSnack('Прилетела новая статистика');
 			return;
 		case NT_STATUS:
-			sendSnack('Статус объявления изменен', setSnackbar);
+			sendSnack('Статус объявления изменен');
 			return;
 		case NT_CLOSE:
-			sendSnack('Объявление закрыто', setSnackbar);
+			sendSnack('Объявление закрыто');
 			return;
 		case NT_DELETED:
-			sendSnack('Объявление удалено', setSnackbar);
+			sendSnack('Объявление удалено');
 			return;
 		case NT_RESPOND:
-			sendSnack('Кто то откикнулся на объявление', setSnackbar);
+			sendSnack('Кто то откикнулся на объявление');
 			return;
 		case NT_FULFILL:
-			sendSnack('Объявление завершено', setSnackbar);
+			sendSnack('Объявление завершено');
 			return;
 		case NT_COMMENT:
-			sendSnack('Обьявление прокомментировано', setSnackbar);
+			sendSnack('Обьявление прокомментировано');
 			return;
 	}
-	// setSnackbar(
-	// 	<Snackbar
-	// 		style={{zIndex:"120"}}
-	// 		duration="1500"
-	// 		onClose={() => {
-	// 			setSnackbar(null);
-	// 		}}
-	// 	>
-	// 		asdadasdsa
-	// 	</Snackbar>
-	// );
 }
 
 const arr = [
