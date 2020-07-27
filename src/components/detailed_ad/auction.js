@@ -43,11 +43,12 @@ const AuctionLabelInner = (props) => {
 			setMrDone(true);
 			return;
 		}
+		setMrDone(false);
 		getCashback(
 			props.ad_id,
 			(v) => {
-				setMyRate(v.bid);
 				setMrDone(true);
+				setMyRate(v.bid);
 			},
 			(e) => {
 				setMrDone(true);
@@ -95,69 +96,77 @@ const AuctionLabelInner = (props) => {
 					{actionMaxUser ? actionMaxUser.name + ' ' + actionMaxUser.surname : 'Никто еще откликнулся'}
 				</Cell>
 			) : (
-				<Cell before={<Icon24User />}>Никто еще не откликнулся</Cell>
+				<Cell multiline before={<Icon24User />}>
+					Никто еще не откликнулся
+				</Cell>
 			)
 		);
 	}, [actionMaxUser]);
 
 	const [componentMyRate, setComponentMyRate] = useState(<></>);
 	useEffect(() => {
+		console.log('what is iit');
 		setComponentMyRate(
 			props.isAuthor ? (
-				<CellButton before={<Icon24Done />}>Завершить</CellButton>
+				<CellButton disabled={!actionMaxUser} before={<Icon24Done />}>
+					Завершить
+				</CellButton>
+			) : props.isSub ? (
+				actionMaxUser && (
+					<RichCell
+						before={<Avatar size={48} src={props.myUser.photo_100} />}
+						after={
+							<Counter mode={myRate == actionMaxUser.cost ? 'secondary' : 'prominent'}>
+								{myRate + ' K'}
+							</Counter>
+						}
+						caption={
+							<div>
+								{myRate == actionMaxUser.cost
+									? 'Максимальная 😎'
+									: 'Отстаёт от максимальной на ' + (actionMaxUser.cost - myRate)}
+								&nbsp;
+							</div>
+						}
+						actions={
+							<React.Fragment>
+								<Button
+									onClick={() => {
+										increaseAuctionRate(
+											props.ad_id,
+											(v) => {
+												setAmuUpdate((prev) => !prev);
+												setMrUpdate((prev) => !prev);
+												success('Ставка успешно повышена');
+											},
+											(e) => {
+												fail('Не удалось повысить ставку, попробуйте позже');
+											}
+										);
+									}}
+								>
+									Повысить
+								</Button>
+								<Button mode="secondary" onClick={() => props.unsub()}>
+									Отменить ставку
+								</Button>
+							</React.Fragment>
+						}
+					>
+						Моя ставка
+					</RichCell>
+				)
 			) : (
-				actionMaxUser &&
-					(props.isSub ? (
-						<RichCell
-							before={<Avatar size={48} src={props.myUser.photo_100} />}
-							after={myRate + ' K'}
-							caption={
-								<div>
-									{myRate == actionMaxUser.cost
-										? 'Максимальная 😎'
-										: 'Отстаёт от максимальной на ' + (actionMaxUser.cost - myRate)}
-									&nbsp;
-								</div>
-							}
-							actions={
-								<React.Fragment>
-									<Button
-										onClick={() => {
-											increaseAuctionRate(
-												props.ad_id,
-												(v) => {
-													setAmuUpdate((prev) => !prev);
-													setMrUpdate((prev) => !prev);
-													success('Ставка успешно повышена');
-												},
-												(e) => {
-													fail('Не удалось повысить ставку, попробуйте позже');
-												}
-											);
-										}}
-									>
-										Повысить
-									</Button>
-									<Button mode="secondary" onClick={() => props.unsub()}>
-										Отменить ставку
-									</Button>
-								</React.Fragment>
-							}
-						>
-							Моя ставка
-						</RichCell>
-					) : (
-						<RichCell
-							before={<Avatar size={48} src={props.myUser.photo_100} />}
-							actions={
-								<React.Fragment>
-									<Button onClick={() => props.sub()}>Принять участие в аукционе</Button>
-								</React.Fragment>
-							}
-						>
-							Вы не делали ставок
-						</RichCell>
-					))
+				<RichCell
+					before={<Avatar size={48} src={props.myUser.photo_100} />}
+					actions={
+						<React.Fragment>
+							<Button onClick={() => props.sub()}>Принять участие в аукционе</Button>
+						</React.Fragment>
+					}
+				>
+					Вы не делали ставок
+				</RichCell>
 			)
 		);
 	}, [props.isAuthor, actionMaxUser, myRate]);
@@ -166,14 +175,21 @@ const AuctionLabelInner = (props) => {
 
 	return (
 		<Group header={<Header aside={<Link onClick={onTypesClick}>Подробнее</Link>}> Аукцион </Header>}>
-			<div style={{ display: 'block' }}>
-				<div style={{ display: 'flex' }}>
+			<div style={{ display: 'block', width: '100%' }}>
+				<div style={{ display: 'flex', width: '100%' }}>
 					<SimpleCell>
-						<AnimateOnChange animation="bounce">{componentStatus}</AnimateOnChange>
+						<AnimateOnChange style={{ width: '100%' }} animation="bounce">
+							{componentStatus}
+						</AnimateOnChange>
 					</SimpleCell>
-					<SimpleCell>{animateOnChangeIf(amuDone, componentMaxUser)}</SimpleCell>
+
+					<AnimateOnChange style={{ width: '100%' }} animation="bounce">
+						{componentMaxUser}
+					</AnimateOnChange>
 				</div>
-				{animateOnChangeIf(mrDone, componentMyRate)}
+				<AnimateOnChange style={{ width: '100%' }} animation="bounce">
+					{componentMyRate}
+				</AnimateOnChange>
 			</div>
 		</Group>
 	);

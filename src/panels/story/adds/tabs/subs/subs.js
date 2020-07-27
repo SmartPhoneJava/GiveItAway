@@ -15,6 +15,7 @@ import {
 	ActionSheet,
 	ActionSheetItem,
 	Link,
+	SimpleCell,
 } from '@vkontakte/vkui';
 
 import { AnimateOnChange } from 'react-animation';
@@ -28,6 +29,7 @@ import Icon24Message from '@vkontakte/icons/dist/24/message';
 import Icon24Gift from '@vkontakte/icons/dist/24/gift';
 import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';
 
+import Icon24Users from '@vkontakte/icons/dist/24/users';
 import Icon24User from '@vkontakte/icons/dist/24/user';
 import Icon36Done from '@vkontakte/icons/dist/36/done';
 import Icon36Cancel from '@vkontakte/icons/dist/36/cancel';
@@ -37,57 +39,16 @@ import useSubsGet from './useSubsGet';
 import { Close, CancelClose } from './../../../../../requests';
 
 import Icon44SmileOutline from '@vkontakte/icons/dist/44/smile_outline';
-import { openPopout, closePopout, setPage } from '../../../../../store/router/actions';
+import { openPopout, closePopout, setPage, setProfile } from '../../../../../store/router/actions';
 import { setDealer } from '../../../../../store/detailed_ad/actions';
 import { PANEL_SUBS } from '../../../../../store/router/panelTypes';
 import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED, TYPE_CHOICE } from '../../../../../const/ads';
 import { updateDealInfo } from '../../../../../store/detailed_ad/update';
 import { withLoadingIf } from '../../../../../components/image/image_cache';
 
-export const Given = (props) => {
-	const { dealer, isAuthor, openSubs, finished, dealRequestSuccess } = props;
-	const aside = withLoadingIf(
-		dealRequestSuccess,
-		isAuthor && !finished ? (
-			dealer ? (
-				<Link onClick={openSubs}>Изменить</Link>
-			) : (
-				<Link onClick={openSubs}>Выбрать</Link>
-			)
-		) : (
-			<></>
-		),
-		'small',
-		null
-	);
-	return (
-		<Group header={<Header aside={aside}>Получатель</Header>}>
-			{withLoadingIf(
-				dealRequestSuccess,
-				<Cell
-					onClick={() => {
-						if (dealer) {
-							props.openUser(dealer.vk_id);
-						}
-					}}
-					multiline={true}
-					key={dealer ? dealer.vk_id : ''}
-					before={dealer ? <Avatar size={36} src={dealer.photo_url} /> : <Icon24User />}
-					asideContent={dealer ? <Icon24Chevron /> : ''}
-				>
-					<div>{dealer ? dealer.name + ' ' + dealer.surname : 'Никто не выбран'}</div>
-				</Cell>,
-				'middle',
-				null,
-				{ marginTop: '20px' }
-			)}
-		</Group>
-	);
-};
-
 const Subs = (props) => {
 	const osname = usePlatform();
-	const { openPopout, closePopout, setDealer, openUser, setPage, AD } = props;
+	const { openPopout, closePopout, setDealer, setProfile, setPage, AD } = props;
 	const { dealer, subs, ad_id, ad_type, subscribers_num } = AD;
 	const status = AD.status || STATUS_OFFER;
 
@@ -97,7 +58,7 @@ const Subs = (props) => {
 
 	function onClickOpen() {
 		if (dealer) {
-			openUser(dealer.vk_id);
+			setProfile(dealer.vk_id);
 		}
 	}
 
@@ -262,42 +223,41 @@ const Subs = (props) => {
 	if (status == STATUS_ABORTED) {
 		return <Placeholder icon={<Icon36Cancel />} header="Передача вещи отменена" />;
 	}
-	if (subs.length == 0) {
-		return (
-			<Placeholder icon={<Icon56Users3Outline />} header="Откливнувшихся нет">
-				Никто еще не захотел забрать
-			</Placeholder>
-		);
-	}
+	// if (subs.length == 0) {
+	// 	return (
+	// 		<Placeholder icon={<Icon56Users3Outline />} header="Откливнувшихся нет">
+	// 			Никто еще не захотел забрать
+	// 		</Placeholder>
+	// 	);
+	// }
 
 	return props.mini ? (
-		<Group header={<Header aside={<Link onClick={openSubs}>Показать всех</Link>}>Откликнулись</Header>}>
-			{subs.length == 1 ? (
-				<Cell
-					onClick={openSubs}
-					multiline={true}
-					key={subs[0].vk_id}
-					before={<Avatar size={36} src={subs[0].photo_url} />}
-				>
-					<div>{subs[0].name + ' ' + subs[0].surname}</div>
-				</Cell>
-			) : (
-				<UsersStack onClick={openSubs} photos={photos} size="m">
-					{subs.length == 2
-						? subs[0].name + ' и ' + subs[1].name
-						: subs.length == 3
-						? subs[0].name + ', ' + subs[1].name + ', ' + subs[2].name
-						: subs[0].name +
-						  ', ' +
-						  subs[1].name +
-						  ', ' +
-						  subs[2].name +
-						  'и еще ' +
-						  (subscribers_num - 3) +
-						  ' человек откликнулись'}
-				</UsersStack>
-			)}
-		</Group>
+		subs.length == 0 ? (
+			<Cell multiline={true} before={<Icon24Users />}>
+				Никто еще не откликнулся
+			</Cell>
+		) : (
+			<SimpleCell>
+				<InfoRow header="Отликнулись">
+					<UsersStack onClick={openSubs} visibleCount={3} photos={photos} size="m">
+						{subs.length == 1
+							? subs[0].name + ' ' + subs[0].surname
+							: subs.length == 2
+							? subs[0].name + ' и ' + subs[1].name
+							: subs.length == 3
+							? subs[0].name + ', ' + subs[1].name + ' и ' + subs[2].name
+							: subs[0].name +
+							  ', ' +
+							  subs[1].name +
+							  ', ' +
+							  subs[2].name +
+							  'и еще ' +
+							  (subscribers_num - 3) +
+							  ' человек'}
+					</UsersStack>
+				</InfoRow>
+			</SimpleCell>
+		)
 	) : (
 		<div>
 			{!openFAQ ? (
@@ -365,6 +325,9 @@ const mapDispatchToProps = {
 	closePopout,
 	setDealer,
 	setPage,
+	setProfile,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Subs);
+
+// 332

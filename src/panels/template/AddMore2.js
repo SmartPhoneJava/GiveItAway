@@ -51,7 +51,7 @@ import Icon24Chevron from '@vkontakte/icons/dist/24/chevron';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
 import Icon24ShareExternal from '@vkontakte/icons/dist/24/share_external';
 
-import Subs, { Given } from './../story/adds/tabs/subs/subs';
+import Subs from './../story/adds/tabs/subs/subs';
 import { subscribe, unsubscribe } from './../story/adds/tabs/subs/requests';
 
 import { K } from './../story/profile/const';
@@ -112,6 +112,7 @@ import { showStatus } from '../../components/detailed_ad/status';
 import { withLoading, withLoadingIf, animatedDiv, ImageCache } from '../../components/image/image_cache';
 import { TagsLabel, tag } from '../../components/categories/label';
 import { AuctionLabel } from '../../components/detailed_ad/auction';
+import { DealLabel } from '../../components/detailed_ad/deal';
 
 let current_i = 0;
 
@@ -597,7 +598,7 @@ const AddMore2r = (props) => {
 
 	const [subButton, setSubButton] = useState(<></>);
 	useEffect(() => {
-		const { isDealer, status, isAuthor, isSub, cost, ad_id } = rAd;
+		const { isDealer, status, isAuthor, isSub, cost } = rAd;
 		if (isAuthor || !detailsRequestSuccess || !costRequestSuccess) {
 			setSubButton(null);
 		} else {
@@ -663,16 +664,16 @@ const AddMore2r = (props) => {
 		const finished = isFinished(status);
 		let v = null;
 		if (isAuthor && !finished) {
-			v = <Subs openUser={props.setProfile} amount={2} maxAmount={2} mini={true} />;
+			v = <Subs amount={2} maxAmount={2} mini={true} />;
 		}
 		setComponentSubs(v);
 	}, [rAd]);
 
 	const [componentChosenSub, setComponentChosenSub] = useState();
 	useEffect(() => {
-		const { isAuthor, dealer, status, ad_type, subscribers_num, ad_id, isSub } = rAd;
+		const { isAuthor, dealer, status, cost, ad_type, subscribers_num, ad_id, isSub } = rAd;
 		const finished = isFinished(status);
-		console.log("we wanna update", isSub)
+		console.log('we wanna update', cost);
 		setComponentChosenSub(
 			<div style={{ flex: 1 }}>
 				{ad_type == TYPE_AUCTION ? (
@@ -685,18 +686,26 @@ const AddMore2r = (props) => {
 						sub={() => sub(ad_id)}
 					/>
 				) : (
-					<Given
+					<DealLabel
 						openSubs={() => openSubs(ad_type, subscribers_num, ad_id)}
 						isAuthor={isAuthor}
 						openUser={props.setProfile}
 						dealer={dealer}
 						finished={finished}
 						dealRequestSuccess={dealRequestSuccess}
+						dealer={dealer}
+						ad_id={ad_id}
+						isSub={isSub}
+						cost={cost}
+						status={status}
+						unsub={() => unsub(ad_id)}
+						sub={() => sub(ad_id)}
+						helpcost={<Icon24Help onClick={onFreezeClick} />}
 					/>
 				)}
 			</div>
 		);
-	}, [rAd, dealRequestSuccess]);
+	}, [rAd, dealRequestSuccess, costRequestSuccess]);
 
 	const [componentAuthor, setComponentAuthor] = useState();
 	useEffect(() => {
