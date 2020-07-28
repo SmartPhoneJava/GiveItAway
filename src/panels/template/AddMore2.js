@@ -43,15 +43,12 @@ import Icon24Hide from '@vkontakte/icons/dist/24/hide';
 import Icon24Globe from '@vkontakte/icons/dist/24/globe';
 import Icon24Fullscreen from '@vkontakte/icons/dist/24/fullscreen';
 
-import Icon24VideoFill from '@vkontakte/icons/dist/24/video_fill';
-
 import Icon24Delete from '@vkontakte/icons/dist/24/delete';
 
 import Icon24Chevron from '@vkontakte/icons/dist/24/chevron';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
 import Icon24ShareExternal from '@vkontakte/icons/dist/24/share_external';
 
-import Subs from './../story/adds/tabs/subs/subs';
 import { subscribe, unsubscribe } from './../story/adds/tabs/subs/requests';
 
 import { K } from './../story/profile/const';
@@ -82,7 +79,6 @@ import {
 	setDummy,
 	openModal,
 	setPage,
-	openSnackbar,
 	openPopout,
 	setStory,
 	closePopout,
@@ -113,6 +109,7 @@ import { withLoading, withLoadingIf, animatedDiv, ImageCache } from '../../compo
 import { TagsLabel, tag } from '../../components/categories/label';
 import { AuctionLabel } from '../../components/detailed_ad/auction';
 import { DealLabel } from '../../components/detailed_ad/deal';
+import { getAdType } from '../../components/detailed_ad/faq';
 
 let current_i = 0;
 
@@ -123,40 +120,9 @@ const col = '#00a550';
 // 	luminosity: 'dark',
 // });
 
-export function getAdTypeDescription(ad_type) {
-	return ad_type == TYPE_CHOICE
-		? 'Владелец вещи выбирает, кому он хочет передать вещь. После передачи, ' +
-				'он получит столько кармы, сколько человек откликнулось на объявление. С получателя ' +
-				'спишется столько кармы, сколько было указано рядом с его кнопкой "Откликнуться". ' +
-				'Отдающий может изменить получателя в любой момент времени, пока сделка не подтверждена'
-		: ad_type == TYPE_AUCTION
-		? 'Каждый пользователь, откликаясь на объявление, делает' +
-		  ' ставку, большую максимальной на 1 Карму. Владелец вещи ' +
-		  'определяет, когда аукцион завершится. Получателем будет ' +
-		  ' выбран тот, кто предложит наибольшую ставку на момент окончания аукциона' +
-		  ' После передачи вещи с получающего будет списана сумма, ' +
-		  'соответствующая его ставке. Она будет зачислена автору объявления. '
-		: 'Получатель определяется случайным образом из списка откликнувшихся' +
-		  'Запустить лотерею может только владелец вещи. Перезапустить ее невозможно.' +
-		  'Получатель, определенный лотереей, сразу получит уведомление о победе';
-}
-
-export const getAdType = (ad_type) =>
-	ad_type == TYPE_CHOICE ? 'Сделка' : ad_type == TYPE_AUCTION ? 'Аукцион' : 'Лотерея';
-
 const AddMore2r = (props) => {
 	const { myID, dispatch } = props;
-	const {
-		setIsSub,
-		setIsAuthor,
-		setIsHidden,
-		setExtraInfo,
-		openSnackbar,
-		openPopout,
-		setStory,
-		setFormData,
-		closePopout,
-	} = props;
+	const { setIsSub, setIsAuthor, setIsHidden, setExtraInfo, openPopout, setStory, setFormData, closePopout } = props;
 	const { setPage, openModal, setDummy, direction, AD } = props;
 
 	const [isOpen, setIsOpen] = useState(false);
@@ -570,29 +536,17 @@ const AddMore2r = (props) => {
 
 	function unsub(ad_id) {
 		unsubscribe(
-			openPopout,
-			openSnackbar,
 			ad_id,
 			() => sub(ad_id),
-			(v) => {
-				changeIsSub(false);
-			},
-			(e) => {},
-			() => {}
+			(v) => changeIsSub(false)
 		);
 	}
 
 	function sub(ad_id) {
 		subscribe(
-			openPopout,
-			openSnackbar,
 			ad_id,
 			() => unsub(ad_id),
-			(v) => {
-				changeIsSub(true);
-			},
-			(e) => {},
-			() => {}
+			(v) => changeIsSub(true)
 		);
 	}
 
@@ -659,48 +613,31 @@ const AddMore2r = (props) => {
 	}, [rAd]);
 
 	const [componentSubs, setComponentSubs] = useState();
-	useEffect(() => {
-		const { status, isAuthor } = rAd;
-		const finished = isFinished(status);
-		let v = null;
-		if (isAuthor && !finished) {
-			v = <Subs amount={2} maxAmount={2} mini={true} />;
-		}
-		setComponentSubs(v);
-	}, [rAd]);
+	// useEffect(() => {
+	// 	const { status, isAuthor } = rAd;
+	// 	const finished = isFinished(status);
+	// 	let v = null;
+	// 	if (isAuthor && !finished) {
+	// 		v = <Subs amount={2} maxAmount={2} mini={true} />;
+	// 	}
+	// 	setComponentSubs(v);
+	// }, [rAd]);
 
 	const [componentChosenSub, setComponentChosenSub] = useState();
 	useEffect(() => {
-		const { isAuthor, dealer, status, cost, ad_type, subscribers_num, ad_id, isSub } = rAd;
+		const { isAuthor, dealer, cost, ad_type, subscribers_num, ad_id, isSub, status } = rAd;
 		const finished = isFinished(status);
-		console.log('we wanna update', cost);
 		setComponentChosenSub(
 			<div style={{ flex: 1 }}>
 				{ad_type == TYPE_AUCTION ? (
-					<AuctionLabel
-						ad_id={ad_id}
-						dealer={dealer}
-						isAuthor={isAuthor}
-						isSub={isSub}
-						unsub={() => unsub(ad_id)}
-						sub={() => sub(ad_id)}
-					/>
+					<AuctionLabel unsub={() => unsub(ad_id)} sub={() => sub(ad_id)} />
 				) : (
 					<DealLabel
 						openSubs={() => openSubs(ad_type, subscribers_num, ad_id)}
-						isAuthor={isAuthor}
-						openUser={props.setProfile}
-						dealer={dealer}
 						finished={finished}
 						dealRequestSuccess={dealRequestSuccess}
-						dealer={dealer}
-						ad_id={ad_id}
-						isSub={isSub}
-						cost={cost}
-						status={status}
 						unsub={() => unsub(ad_id)}
 						sub={() => sub(ad_id)}
-						helpcost={<Icon24Help onClick={onFreezeClick} />}
 					/>
 				)}
 			</div>
@@ -894,11 +831,11 @@ const AddMore2r = (props) => {
 				<div style={{ flex: 1, padding: '5px' }}>
 					<Card mode="outline">{componentChosenSub}</Card>
 				</div>
-				{componentSubs ? (
+				{/* {componentSubs ? (
 					<div style={{ flex: 1, padding: '5px' }}>
 						<Card mode="outline">{componentSubs}</Card>
 					</div>
-				) : null}
+				) : null} */}
 				<div style={{ flex: 1, padding: '5px' }}>
 					<Card mode="outline">{componentComments}</Card>
 				</div>
@@ -942,7 +879,6 @@ const mapDispatchToProps = (dispatch) => {
 				setFormData,
 
 				openPopout,
-				openSnackbar,
 
 				closePopout,
 			},

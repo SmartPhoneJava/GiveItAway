@@ -17,7 +17,9 @@ import { connect } from 'react-redux';
 
 import Subs from './../../panels/story/adds/tabs/subs/subs';
 
+import Icon24Repost from '@vkontakte/icons/dist/24/repost';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
+
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 import { AnimateOnChange } from 'react-animation';
 // import AnimateOnChange from 'react-animate-on-change';
@@ -27,38 +29,44 @@ import Icon24Help from '@vkontakte/icons/dist/24/help';
 import Icon24MarketOutline from '@vkontakte/icons/dist/24/market_outline';
 
 import { STATUS_CHOSEN, STATUS_CLOSED, STATUS_ABORTED, TYPE_CHOICE, STATUS_OFFER } from '../../const/ads';
-import { getAuctionMaxUser, getCashback, increaseAuctionRate, fail, success } from '../../requests';
+import { getAuctionMaxUser, getCashback, increaseAuctionRate, fail, success, CancelClose } from '../../requests';
 import { withLoadingIf, animateOnChangeIf } from '../image/image_cache';
 import { openModal, setProfile } from '../../store/router/actions';
 import { MODAL_ADS_TYPES, MODAL_ADS_FROZEN, MODAL_ADS_COST } from '../../store/router/modalTypes';
+import { SubsLabel } from './subs';
+import { K } from '../../panels/story/profile/const';
+import { getAdType } from './faq';
 
 const DealLabelInner = (props) => {
 	const [componentStatus, setComponentStatus] = useState(<></>);
 	useEffect(() => {
+		const { status, ad_type } = props.ad;
 		setComponentStatus(
 			<InfoRow header="Статус">
-				{props.status == STATUS_OFFER
-					? 'Активна'
-					: props.status != STATUS_CHOSEN
-					? 'Завершена'
-					: props.ad_type == TYPE_CHOICE
-					? 'Получатель выбран'
-					: 'Завершена'}
+				{
+					status == STATUS_OFFER ? 'Активна' : 'Завершена'
+					// : status != STATUS_CHOSEN
+					// ? 'Завершена'
+					// : ad_type == TYPE_CHOICE
+					// ? 'Активна'
+					// : 'Завершена'
+				}
 			</InfoRow>
 		);
-	}, [props.dealer]);
+	}, [props.ad.status]);
 
 	const [myRate, setMyRate] = useState(0);
 	const [mrDone, setMrDone] = useState(false);
 	const [mrUpdate, setMrUpdate] = useState(false);
 	useEffect(() => {
-		if (props.isAuthor) {
+		const { isAuthor, ad_id } = props.ad;
+		if (isAuthor) {
 			setMrDone(true);
 			return;
 		}
 		setMrDone(false);
 		getCashback(
-			props.ad_id,
+			ad_id,
 			(v) => {
 				setMrDone(true);
 				setMyRate(v.bid);
@@ -68,52 +76,47 @@ const DealLabelInner = (props) => {
 				setMyRate(0);
 			}
 		);
-	}, [props.ad_id, props.isSub, props.isAuthor, mrUpdate]);
+	}, [props.ad.isSub, props.ad.isAuthor, mrUpdate]);
 
 	const [componentChosen, setComponentChosen] = useState(<></>);
 	useEffect(() => {
-		const { dealer, isAuthor, openSubs, finished, dealRequestSuccess } = props;
-		const aside = withLoadingIf(
-			dealRequestSuccess,
-			isAuthor && !finished ? (
-				dealer ? (
-					<Link onClick={openSubs}>Изменить</Link>
-				) : (
-					<Link onClick={openSubs}>Выбрать</Link>
-				)
-			) : (
-				<></>
-			),
-			'small',
-			null
-		);
-		if (!isAuthor) {
-			setComponentChosen(<>Принять участие</>);
-		}
+		const { dealer, isAuthor } = props.ad;
+		const { openSubs, finished, dealRequestSuccess } = props;
+		// const aside = withLoadingIf(
+		// 	dealRequestSuccess,
+		// 	isAuthor && !finished ? (
+		// 		dealer ? (
+		// 			<Link onClick={openSubs}>Изменить</Link>
+		// 		) : (
+		// 			<Link onClick={openSubs}>Выбрать</Link>
+		// 		)
+		// 	) : (
+		// 		<></>
+		// 	),
+		// 	'small',
+		// 	null
+		// );
 		setComponentChosen(
 			withLoadingIf(
-				dealRequestSuccess,
+				props.dealRequestSuccess,
 				<Cell
 					onClick={() => {
 						if (dealer) {
 							props.setProfile(dealer.vk_id);
 						}
 					}}
-					asideContent={aside}
 					multiline={true}
 					key={dealer ? dealer.vk_id : ''}
 					before={dealer ? <Avatar size={36} src={dealer.photo_url} /> : <Icon24User />}
 				>
-					<InfoRow header="Получатель">
-						{dealer ? dealer.name + ' ' + dealer.surname : 'Не выбран'}
-					</InfoRow>
+					<InfoRow header="Получатель">{dealer ? dealer.name + ' ' + dealer.surname : 'Не выбран'}</InfoRow>
 				</Cell>,
 				'middle',
 				null,
 				{ marginTop: '20px' }
 			)
 		);
-	}, [props.dealer]);
+	}, [props.ad.dealer, props.dealRequestSuccess]);
 
 	const onTypesClick = () => props.openModal(MODAL_ADS_TYPES);
 	const onFreezeClick = () => props.openModal(MODAL_ADS_FROZEN);
@@ -121,50 +124,85 @@ const DealLabelInner = (props) => {
 
 	const [componentSub, setComponentSub] = useState(<></>);
 	useEffect(() => {
+		const { openSubs, sub, unsub } = props;
+		const { cost, subs, isAuthor, isSub, dealer, ad_id } = props.ad;
+		const disable = props.finished || subs.length == 0;
 		setComponentSub(
-			props.isAuthor ? null : (
-				<div style={{ display: 'flex' }}>
-					{' '}
-					{!props.isSub ? (
-						<>
-							<CellButton onClick={props.sub} before={<Icon24MarketOutline />}>
-								Откликнуться
-							</CellButton>{' '}
-							<Cell asideContent={<Icon24Help onClick={onFreezeClick} />}>
-								<InfoRow onClick={onCarmaClick} header="Стоимость">
-									{props.cost}
-								</InfoRow>
-							</Cell>
-						</>
+			<div style={{ display: 'flex' }}>
+				{isAuthor ? (
+					dealer ? (
+						<Group header={<Header mode="secondary">Вы выбрали получателя</Header>}>
+							<div style={{ display: 'flex' }}>
+								<CellButton
+									mode="danger"
+									onClick={() => {
+										CancelClose(ad_id);
+									}}
+									disabled={disable}
+									before={<Icon24Cancel />}
+								>
+									Отменить
+								</CellButton>
+								<CellButton onClick={openSubs} disabled={disable} before={<Icon24Repost />}>
+									Изменить
+								</CellButton>
+							</div>
+						</Group>
 					) : (
-						<>
-							<CellButton onClick={props.unsub} mode="danger" before={<Icon24MarketOutline />}>
-								Отказаться
-							</CellButton>
-							<Cell asideContent={<Icon24Help onClick={onFreezeClick} />}>
-								<InfoRow onClick={onCarmaClick} header="Будет возвращено">
-									{props.cost}
-								</InfoRow>
-							</Cell>
-						</>
-					)}
-				</div>
-			)
+						<CellButton onClick={openSubs} disabled={disable} before={<Icon24Done />}>
+							Выбрать получателя
+						</CellButton>
+					)
+				) : !isSub ? (
+					<>
+						<CellButton onClick={sub} before={<Icon24MarketOutline />}>
+							Откликнуться
+						</CellButton>{' '}
+						<Cell
+							indicator={
+								<Counter mode="prominent" onClick={onCarmaClick} style={{ fontWeight: 600 }}>
+									{cost + ' ' + K}
+								</Counter>
+							}
+						>
+							Стоимость
+						</Cell>
+						<Cell onClick={onFreezeClick}>
+							<Icon24Help fill={'var(--counter_secondary_background)'} />
+						</Cell>
+					</>
+				) : (
+					<>
+						<CellButton onClick={unsub} mode="danger" before={<Icon24MarketOutline />}>
+							Отказаться
+						</CellButton>
+						<Cell
+							indicator={
+								<Counter mode="primary" onClick={onCarmaClick} style={{ fontWeight: 600 }}>
+									{cost + ' ' + K}
+								</Counter>
+							}
+						>
+							Вам вернётся
+						</Cell>
+						<Cell onClick={onFreezeClick}>
+							<Icon24Help fill={'var(--counter_secondary_background)'} />
+						</Cell>
+					</>
+				)}
+			</div>
 		);
-	}, [props.isAuthor, props.isSub, props.cost]);
+	}, [props.ad.isAuthor, props.ad.isSub, props.ad.cost, props.ad.dealer]);
 
 	const [componentSubs, setComponentSubs] = useState(<></>);
 	useEffect(() => {
-		setComponentSubs(<Subs amount={50} maxAmount={-1} mini={true} />);
-	}, [props.isSub]);
+		setComponentSubs(<SubsLabel />);
+	}, [props.ad.isSub]);
 
 	return (
 		<Group
 			header={
-				<Header aside={<Link onClick={onTypesClick}>Подробнее</Link>}>
-					{' '}
-					{props.ad_type == TYPE_CHOICE ? 'Сделка' : 'Лотерея'}{' '}
-				</Header>
+				<Header aside={<Link onClick={onTypesClick}>Подробнее</Link>}>{getAdType(props.ad.ad_type)}</Header>
 			}
 		>
 			<div style={{ display: 'block', width: '100%' }}>
@@ -179,6 +217,7 @@ const DealLabelInner = (props) => {
 						{componentChosen}
 					</AnimateOnChange>
 				</div>
+				{/* {componentAuthor} */}
 
 				<AnimateOnChange style={{ width: '100%' }} animation="bounce">
 					{componentSubs}
@@ -194,6 +233,7 @@ const DealLabelInner = (props) => {
 const mapStateToProps = (state) => {
 	return {
 		myUser: state.vkui.myUser,
+		ad: state.ad,
 	};
 };
 

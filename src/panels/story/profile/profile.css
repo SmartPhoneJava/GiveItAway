@@ -4,6 +4,10 @@
 	
 }
 
+.ReactCollapse--collapse {
+	transition: height 500ms;
+  }
+
 .profile-main-left {
 	position: relative;
 	display: inline-block;

@@ -6,9 +6,24 @@ import axios from 'axios';
 import { Addr, BASE_AD } from '../../../../../store/addr';
 
 import { fail, success } from '../../../../../requests';
+import { store } from '../../../../..';
+import { deleteSub, addSub } from '../../../../../store/detailed_ad/actions';
 
-export function subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallback, failCallback, end) {
+export function getMyUser() {
+	const vkUser = store.getState().vkui.myUser;
+	return {
+		vk_id: vkUser.id,
+		name: vkUser.first_name,
+		surname: vkUser.last_name,
+		photo_url: vkUser.photo_100,
+	};
+}
+
+export function subscribe(ad_id, clCancel, s, f, e) {
 	// setPopout(<ScreenSpinner size="large" />);
+	const end = e || (() => {});
+	const successCallback = s || ((v) => {});
+	const failCallback = f || ((v) => {});
 	let err = false;
 	let cancel;
 	axios({
@@ -23,6 +38,8 @@ export function subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallba
 		.then(function (response) {
 			// setPopout(null);
 			successCallback(response);
+
+			store.dispatch(addSub(getMyUser()));
 			success('Теперь вы будете получать уведомления, связанные с этим постом', clCancel, end);
 			return response;
 		})
@@ -36,7 +53,7 @@ export function subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallba
 				fail(
 					'Нет соединения с сервером',
 					() => {
-						subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallback, failCallback, end);
+						subscribe(ad_id, clCancel, successCallback, failCallback, end);
 					},
 					end
 				);
@@ -46,8 +63,11 @@ export function subscribe(setPopout, setSnackbar, ad_id, clCancel, successCallba
 	return err;
 }
 
-export function unsubscribe(setPopout, setSnackbar, ad_id, clCancel, successCallback, failCallback, end) {
+export function unsubscribe(ad_id, clCancel, s, f, e) {
 	// setPopout(<ScreenSpinner size="large" />);
+	const end = e || (() => {});
+	const successCallback = s || ((v) => {});
+	const failCallback = f || ((v) => {});
 	let err = false;
 	let cancel;
 	axios({
@@ -62,6 +82,7 @@ export function unsubscribe(setPopout, setSnackbar, ad_id, clCancel, successCall
 		.then(function (response) {
 			// setPopout(null);
 			successCallback(response);
+			store.dispatch(deleteSub(getMyUser().vk_id));
 			success('Больше вы не будете получать связанные с этим постом уведомления', clCancel, end);
 			return response;
 		})
@@ -71,9 +92,8 @@ export function unsubscribe(setPopout, setSnackbar, ad_id, clCancel, successCall
 			fail(
 				'Нет соединения с сервером',
 				() => {
-					unsubscribe(setPopout, setSnackbar, ad_id, clCancel);
+					unsubscribe(ad_id, clCancel);
 				},
-				setSnackbar,
 				end
 			);
 			// setPopout(null);

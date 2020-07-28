@@ -13,7 +13,7 @@ import { AD_LOADING } from './const/ads';
 import { SNACKBAR_DURATION_DEFAULT } from './store/const';
 import { store } from '.';
 import { openPopout, closePopout, openSnackbar, closeSnackbar } from './store/router/actions';
-import { setCost } from './store/detailed_ad/actions';
+import { setCost, setDealer, setDeal } from './store/detailed_ad/actions';
 
 let request_id = 0;
 
@@ -173,7 +173,7 @@ export async function adVisible(ad_id, callback) {
 		.catch(function (error) {
 			store.dispatch(closePopout());
 			err = true;
-			fail('Нет соединения с сервером', ()=>adVisible(ad_id, callback));
+			fail('Нет соединения с сервером', () => adVisible(ad_id, callback));
 		});
 	return err;
 }
@@ -300,7 +300,7 @@ export async function getCashback(ad_id, successCallback, failCallback) {
 			if (successCallback) {
 				successCallback(response);
 			}
-			store.dispatch(setCost(response.bid))
+			store.dispatch(setCost(response.bid));
 			return response;
 		})
 		.catch(function (error) {
@@ -385,7 +385,9 @@ export function acceptDeal(deal_id, successCallback, failCallback, end) {
 		});
 }
 
-export async function CancelClose(ad_id, successCallback, failCallback, blockSnackbar) {
+export async function CancelClose(ad_id, s, f, blockSnackbar) {
+	const successCallback = s || ((v) => {});
+	const failCallback = f || ((v) => {});
 	getDeal(
 		ad_id,
 		(deal) => {
@@ -394,16 +396,12 @@ export async function CancelClose(ad_id, successCallback, failCallback, blockSna
 				(v) => {
 					if (!blockSnackbar) {
 						success('Запрос успешно отменен!');
+						store.dispatch(setDealer(null));
+						store.dispatch(setDeal(null));
 					}
-					if (successCallback) {
-						successCallback(v);
-					}
+					successCallback(v);
 				},
-				(e) => {
-					if (failCallback) {
-						failCallback(e);
-					}
-				},
+				(e) => failCallback(e),
 				null,
 				'Предложение о передаче вещи отменено'
 			);
@@ -414,14 +412,21 @@ export async function CancelClose(ad_id, successCallback, failCallback, blockSna
 	);
 }
 
-export function Close(ad_id, ad_type, subscriber_id, successCallback, failCallback) {
+export function Close(ad_id, ad_type, subscriber_id, s, f) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
+	const successCallback = s || ((v) => {});
+	const failCallback = f || ((e) => {});
 	let err = false;
 	let cancel;
+	let params = { type: ad_type }
+	if (subscriber_id > 0) {
+		params.subscriber_id = subscriber_id
+	}
+	console.log("loooook at ad_type", ad_type)
 	axios({
 		method: 'put',
 		withCredentials: true,
-		params: { subscriber_id, type: ad_type },
+		params,
 		url: Addr.getState() + BASE_AD + ad_id + '/make_deal',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
@@ -434,16 +439,12 @@ export function Close(ad_id, ad_type, subscriber_id, successCallback, failCallba
 			return response.data;
 		})
 		.then(function (data) {
-			if (successCallback) {
-				successCallback(data);
-			}
+			successCallback(data);
 			return data;
 		})
 		.catch(function (error) {
 			err = true;
-			if (error) {
-				failCallback(error);
-			}
+			failCallback(error);
 			fail('Нет соединения с сервером');
 			store.dispatch(closePopout());
 		});

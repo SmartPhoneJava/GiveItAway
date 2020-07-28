@@ -16,6 +16,8 @@ import {
 	ModalCard,
 	FormStatus,
 	Button,
+	SimpleCell,
+	Link,
 } from '@vkontakte/vkui';
 
 import { AnimateOnChange, AnimateGroup } from 'react-animation';
@@ -59,7 +61,16 @@ import {
 } from './../../../const/ads';
 import { useEffect } from 'react';
 import { getUser } from '../profile/requests';
-import { getAdType, getAdTypeDescription } from '../../template/AddMore2';
+import {
+	getAdType,
+	getAdTypeAuthor,
+	getAdTypeEnd,
+	getAdTypeCarmaAuthor,
+	getAdTypeCarmaEnd,
+	getAdTypeCarmaSub,
+	getAdTypeDescription,
+} from '../../../components/detailed_ad/faq';
+import { Collapse } from 'react-collapse';
 
 const AddsModal = (props) => {
 	const { closeModal, inputData } = props;
@@ -146,12 +157,31 @@ const AddsModal = (props) => {
 		return v + '' + K;
 	}
 
+	const width = document.body.clientWidth;
+
+	const [openAdTypeDetails, setOpenAdTypeDetails] = useState(false);
 	const [moveAdType, setMoveAdType] = useState(0);
 	const [currentAdType, setCurrentAdType] = useState('');
+	const [adTypeAuthor, setAdTypeAuthor] = useState('');
+	const [adTypeEnd, setAdTypeEnd] = useState('');
+	const [adTypeCarmaAuthor, setAdTypeCarmaAuthor] = useState('');
+	const [adTypeCarmaSub, setAdTypeCarmaSub] = useState('');
+	const [adTypeCarmaEnd, setAdTypeCarmaEnd] = useState('');
 	const [adTypeDescription, setAdTypeDescription] = useState('');
+	function setInfo(ad_type) {
+		setAdTypeDescription(getAdTypeDescription(ad_type));
+		setAdTypeAuthor(getAdTypeAuthor(ad_type));
+		setAdTypeEnd(getAdTypeEnd(ad_type));
+		setAdTypeCarmaAuthor(getAdTypeCarmaAuthor(ad_type));
+		setAdTypeCarmaEnd(getAdTypeCarmaEnd(ad_type));
+		setAdTypeCarmaSub(getAdTypeCarmaSub(ad_type));
+		setOpenAdTypeDetails(false);
+	}
+
 	useEffect(() => {
 		if (!activeModal) {
-			setAdTypeDescription(getAdTypeDescription(props.ad.ad_type));
+			setInfo(props.ad.ad_type);
+
 			setCurrentAdType(props.ad.ad_type);
 		}
 	}, [props.ad, activeModal]);
@@ -168,7 +198,7 @@ const AddsModal = (props) => {
 			ind = 0;
 		}
 		const newType = arr[ind];
-		setAdTypeDescription(getAdTypeDescription(newType));
+		setInfo(newType);
 		setCurrentAdType(newType);
 		setMoveAdType(0);
 	}, [moveAdType]);
@@ -185,7 +215,7 @@ const AddsModal = (props) => {
 						size="xl"
 						onClick={() => {
 							setCurrentAdType(TYPE_CHOICE);
-							setAdTypeDescription(getAdTypeDescription(TYPE_CHOICE));
+							setInfo(TYPE_CHOICE);
 						}}
 					>
 						Сделка
@@ -201,7 +231,7 @@ const AddsModal = (props) => {
 						size="xl"
 						onClick={() => {
 							setCurrentAdType(TYPE_AUCTION);
-							setAdTypeDescription(getAdTypeDescription(TYPE_AUCTION));
+							setInfo(TYPE_AUCTION);
 						}}
 					>
 						Аукцион
@@ -217,7 +247,7 @@ const AddsModal = (props) => {
 						size="xl"
 						onClick={() => {
 							setCurrentAdType(TYPE_RANDOM);
-							setAdTypeDescription(getAdTypeDescription(TYPE_RANDOM));
+							setInfo(TYPE_RANDOM);
 						}}
 					>
 						Лотерея
@@ -419,7 +449,7 @@ const AddsModal = (props) => {
 			<ModalCard
 				id={MODAL_ADS_TYPES}
 				onClose={() => {
-					setAdTypeDescription(getAdTypeDescription(props.ad.ad_type));
+					setInfo(props.ad.ad_type);
 					setCurrentAdType(props.ad.ad_type);
 					closeModal();
 				}}
@@ -430,10 +460,40 @@ const AddsModal = (props) => {
 							<div style={{ paddingRight: '8px' }} onClick={() => setMoveAdType(-1)}>
 								<Icon24BrowserBack />
 							</div>
-							<AnimateOnChange duration="50" animation="slide">
-								{adTypeDescription}
-							</AnimateOnChange>
+							<div style={{ display: 'block' }}>
+								<Collapse isOpened={!openAdTypeDetails}>
+									<AnimateOnChange duration="50" animation="slide">
+										{adTypeDescription}
+									</AnimateOnChange>
+								</Collapse>
 
+								<Link onClick={() => setOpenAdTypeDetails((prev) => !prev)}>
+									{openAdTypeDetails ? 'Скрыть подробности' : 'Подробнее'}
+								</Link>
+								<Collapse isOpened={openAdTypeDetails}>
+									<SimpleCell multiline={true}>
+										<InfoRow header="Определение получателя">{adTypeAuthor}</InfoRow>
+									</SimpleCell>
+									{adTypeEnd && (
+										<SimpleCell multiline={true}>
+											<InfoRow header="Когда происходит выбор получателя">{adTypeEnd}</InfoRow>
+										</SimpleCell>
+									)}
+									<SimpleCell multiline={true}>
+										<InfoRow header="Сколько кармы получит автор">{adTypeCarmaAuthor}</InfoRow>
+									</SimpleCell>
+									<SimpleCell multiline={true}>
+										<InfoRow header="Сколько кармы потратит откливнушийся">
+											{adTypeCarmaSub}
+										</InfoRow>
+									</SimpleCell>
+									{/* <SimpleCell multiline={true}>
+										<InfoRow header="Как вернуть карму">
+											{adTypeCarmaEnd}
+										</InfoRow>
+									</SimpleCell> */}
+								</Collapse>
+							</div>
 							<div style={{ paddingLeft: '8px' }} onClick={() => setMoveAdType(1)}>
 								<Icon24BrowserForward />
 							</div>

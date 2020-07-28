@@ -16,6 +16,7 @@ import {
 	ActionSheetItem,
 	Link,
 	SimpleCell,
+	Div,
 } from '@vkontakte/vkui';
 
 import { AnimateOnChange } from 'react-animation';
@@ -45,6 +46,7 @@ import { PANEL_SUBS } from '../../../../../store/router/panelTypes';
 import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED, TYPE_CHOICE } from '../../../../../const/ads';
 import { updateDealInfo } from '../../../../../store/detailed_ad/update';
 import { withLoadingIf } from '../../../../../components/image/image_cache';
+import { Collapse } from 'react-collapse';
 
 const Subs = (props) => {
 	const osname = usePlatform();
@@ -108,7 +110,7 @@ const Subs = (props) => {
 					cancel_ad(dealer, false);
 				}}
 				multiline={true}
-				description={dealer ? <>Ждём подтверждение получения вещи</> : ''}
+				description={dealer ? 'Ждём подтверждение получения вещи' : ''}
 				key={dealer ? dealer.vk_id : ''}
 				before={dealer ? <Avatar size={36} src={dealer.photo_url} /> : <Icon24User />}
 				asideContent={dealer ? <Icon24Dismiss /> : ''}
@@ -231,83 +233,38 @@ const Subs = (props) => {
 	// 	);
 	// }
 
-	return props.mini ? (
-		subs.length == 0 ? (
-			<Cell multiline={true} before={<Icon24Users />}>
-				Никто еще не откликнулся
-			</Cell>
-		) : (
-			<SimpleCell>
-				<InfoRow header="Отликнулись">
-					<UsersStack onClick={openSubs} visibleCount={3} photos={photos} size="m">
-						{subs.length == 1
-							? subs[0].name + ' ' + subs[0].surname
-							: subs.length == 2
-							? subs[0].name + ' и ' + subs[1].name
-							: subs.length == 3
-							? subs[0].name + ', ' + subs[1].name + ' и ' + subs[2].name
-							: subs[0].name +
-							  ', ' +
-							  subs[1].name +
-							  ', ' +
-							  subs[2].name +
-							  'и еще ' +
-							  (subscribers_num - 3) +
-							  ' человек'}
-					</UsersStack>
-				</InfoRow>
-			</SimpleCell>
-		)
-	) : (
+	return (
 		<div>
-			{!openFAQ ? (
-				<>
-					<CellButton
-						onClick={() => {
-							setOpenFAQ(true);
-						}}
-						before={<Icon24Help />}
-					>
-						Как отдать вещь?
-					</CellButton>
-					{showSubs(
-						lastAdElementRef,
-						(subscriber) => {
-							if (dealer) {
-								cancel_ad(subscriber, true);
-								return;
-							}
-							close_ad(subscriber);
-						},
-						(subscriber) => {
-							cancel_ad(subscriber, false);
-						}
-					)}
-				</>
-			) : (
-				<>
-					<Placeholder
-						action={
-							<Button
-								onClick={() => {
-									setOpenFAQ(false);
-								}}
-								size="l"
-							>
-								Понятно
-							</Button>
-						}
-						icon={<Icon44SmileOutline />}
-						header="Как отдать вещь?"
-					>
-						Кликните по пользователю в списке откливнушихся, чтобы связаться с ним или отдать ему вещь.
-						Выбранный пользователь получит уведомление о том, что он был выбран получателем вещи. Свяжитесь
-						с ним для обсуждения деталей. Также потенциальный получатель получит уведомление, нажав на
-						которое, он подвтердит, что передача состоялась, напомните ему нажать на него после того как
-						отдадите вещь. После этого обьявление автоматически закроется. Вы в любой момент можете отозвать
-						предложение или изменить получателя.
-					</Placeholder>
-				</>
+			<CellButton
+				onClick={() => {
+					setOpenFAQ((prev) => !prev);
+				}}
+				before={<Icon24Help />}
+			>
+				Как отдать вещь?
+			</CellButton>
+			<Collapse isOpened={openFAQ}>
+				<Div>
+					Кликните по пользователю в списке откливнушихся, чтобы связаться с ним или отдать ему вещь.
+					Выбранный пользователь получит уведомление о том, что он был выбран получателем вещи. Свяжитесь с
+					ним для обсуждения деталей. Также потенциальный получатель получит уведомление, нажав на которое, он
+					подвтердит, что передача состоялась, напомните ему нажать на него после того как отдадите вещь.
+					После этого обьявление автоматически закроется. Вы в любой момент можете отозвать предложение или
+					изменить получателя.
+				</Div>
+			</Collapse>
+			{showSubs(
+				lastAdElementRef,
+				(subscriber) => {
+					if (dealer) {
+						cancel_ad(subscriber, true);
+						return;
+					}
+					close_ad(subscriber);
+				},
+				(subscriber) => {
+					cancel_ad(subscriber, false);
+				}
 			)}
 		</div>
 	);

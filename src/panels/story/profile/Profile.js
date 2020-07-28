@@ -12,6 +12,7 @@ import Error from './../../placeholders/error';
 import { old, fromSeconds } from './../../../utils/time';
 
 import Icon24Chevron from '@vkontakte/icons/dist/24/chevron';
+import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 
 import './profile.css';
 import { setFormData } from '../../../store/create_post/actions';
@@ -25,6 +26,7 @@ import ReceivedPanel from './received';
 import { NO_USER, NO_VK_USER } from './const';
 import { Statistics } from '../../../components/profile/statistics';
 import { withLoading, withLoadingIf } from '../../../components/image/image_cache';
+import { Collapse } from 'react-collapse';
 
 function getImage(backuser) {
 	if (!backuser || !backuser.photo_url) {
@@ -134,21 +136,50 @@ const Profile = (props) => {
 	}
 
 	const [carmaPanel, setCarmaPanel] = useState();
+	const [collapseOpen, setCollapseOpen] = useState(false);
 	useEffect(() => {
+		const v = (
+			<Collapse isOpened={collapseOpen}>
+				<div style={{ display: width < 500 ? 'block' : 'flex' }}>
+					{carmaDiv(openFreeze, -backuser.frozen_carma, 'Заморожено')}
+					{carmaDiv(null, backuser.total_earned_carma, 'Получено')}
+					{carmaDiv(null, backuser.total_spent_carma, 'Потрачено')}
+				</div>
+			</Collapse>
+		);
 		setCarmaPanel(
 			<Card mode="shadow">
-				<Group separator="hide" header={<Header mode="primary">Карма - {backuser.carma} Ҝ</Header>}>
-					{profileID == myID ? (
-						<div style={{ display: width < 450 ? 'block' : 'flex' }}>
-							{carmaDiv(openFreeze, backuser.frozen_carma, 'Заморожено')}
-							{carmaDiv(null, backuser.total_earned_carma, 'Получено')}
-							{carmaDiv(null, backuser.total_spent_carma, 'Потрачено')}
-						</div>
-					) : null}
+				<Group
+					separator="hide"
+					header={
+						<Header
+							onClick={() => {
+								console.log('clickkkked', collapseOpen);
+								setCollapseOpen((prev) => !prev);
+							}}
+							mode="primary"
+							aside={
+								profileID == myID && (
+									<Icon16Dropdown
+										fill="var(--accent)"
+										style={{
+											marginLeft: '15px',
+											transition: '0.3s',
+											transform: `rotate(${collapseOpen ? '180deg' : '0'})`,
+										}}
+									/>
+								)
+							}
+						>
+							Карма - {backuser.carma} Ҝ
+						</Header>
+					}
+				>
+					{profileID == myID && v}
 				</Group>
 			</Card>
 		);
-	}, [profileID, myID, backuser, userRequestSucess]);
+	}, [profileID, myID, backuser, userRequestSucess, collapseOpen]);
 
 	const [givenPanel, setGivenPanel] = useState();
 	useEffect(() => {

@@ -63,10 +63,10 @@ export const addSub = (sub) => ({
 	},
 });
 
-export const deleteSub = (sub) => ({
+export const deleteSub = (id) => ({
 	type: DEL_SUB,
 	payload: {
-		sub,
+		id,
 	},
 });
 
