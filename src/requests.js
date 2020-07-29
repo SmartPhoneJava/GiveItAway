@@ -9,11 +9,12 @@ import { User } from './store/user';
 
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
-import { AD_LOADING } from './const/ads';
+import { AD_LOADING, STATUS_OFFER, STATUS_CHOSEN } from './const/ads';
 import { SNACKBAR_DURATION_DEFAULT } from './store/const';
 import { store } from '.';
 import { openPopout, closePopout, openSnackbar, closeSnackbar } from './store/router/actions';
-import { setCost, setDealer, setDeal } from './store/detailed_ad/actions';
+import { setCost, setDealer, setDeal, setStatus } from './store/detailed_ad/actions';
+import { updateDealInfo } from './store/detailed_ad/update';
 
 let request_id = 0;
 
@@ -398,6 +399,7 @@ export async function CancelClose(ad_id, s, f, blockSnackbar) {
 						success('Запрос успешно отменен!');
 						store.dispatch(setDealer(null));
 						store.dispatch(setDeal(null));
+						store.dispatch(setStatus(STATUS_OFFER));
 					}
 					successCallback(v);
 				},
@@ -432,6 +434,8 @@ export function Close(ad_id, ad_type, subscriber_id, s, f) {
 	})
 		.then(function (response) {
 			store.dispatch(closePopout());
+			store.dispatch(setStatus(STATUS_CHOSEN));
+			updateDealInfo()
 			console.log('response from Close:', response);
 			success('Спасибо, что делаете других людей счастливыми :) Ждем подтверждения от второй стороны!', () => {
 				CancelClose(ad_id);

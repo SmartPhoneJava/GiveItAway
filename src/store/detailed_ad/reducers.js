@@ -215,7 +215,6 @@ export const adReducer = (state = initialState, action) => {
 
 		case SET_DEALER: {
 			const dealer = action.payload.dealer;
-
 			return {
 				...state,
 				dealer,
@@ -224,8 +223,6 @@ export const adReducer = (state = initialState, action) => {
 
 		case SET_EXTRA_INFO: {
 			const ad = action.payload.ad;
-
-			console.log('SET_EXTRA_INFO ad', ad);
 
 			const ad_id = ad.ad_id;
 			const status = ad.status;

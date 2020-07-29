@@ -15,9 +15,6 @@ import {
 	Radio,
 	ModalCard,
 	FormStatus,
-	Button,
-	SimpleCell,
-	Link,
 } from '@vkontakte/vkui';
 
 import { AnimateOnChange, AnimateGroup } from 'react-animation';
@@ -50,27 +47,11 @@ import {
 import { ADS_FILTERS } from './../../../store/create_post/types';
 import { STORY_ADS } from '../../../store/router/storyTypes';
 
-import {
-	GEO_TYPE_FILTERS,
-	GEO_TYPE_NEAR,
-	SORT_TIME,
-	SORT_GEO,
-	TYPE_CHOICE,
-	TYPE_RANDOM,
-	TYPE_AUCTION,
-} from './../../../const/ads';
+import { GEO_TYPE_FILTERS, GEO_TYPE_NEAR, SORT_TIME, SORT_GEO } from './../../../const/ads';
 import { useEffect } from 'react';
 import { getUser } from '../profile/requests';
-import {
-	getAdType,
-	getAdTypeAuthor,
-	getAdTypeEnd,
-	getAdTypeCarmaAuthor,
-	getAdTypeCarmaEnd,
-	getAdTypeCarmaSub,
-	getAdTypeDescription,
-} from '../../../components/detailed_ad/faq';
-import { Collapse } from 'react-collapse';
+import { getAdType } from '../../../components/detailed_ad/faq';
+import { ModalCardCaptionAdsType } from '../../../components/modal/ad_type';
 
 const AddsModal = (props) => {
 	const { closeModal, inputData } = props;
@@ -157,107 +138,7 @@ const AddsModal = (props) => {
 		return v + '' + K;
 	}
 
-	const width = document.body.clientWidth;
-
-	const [openAdTypeDetails, setOpenAdTypeDetails] = useState(false);
-	const [moveAdType, setMoveAdType] = useState(0);
 	const [currentAdType, setCurrentAdType] = useState('');
-	const [adTypeAuthor, setAdTypeAuthor] = useState('');
-	const [adTypeEnd, setAdTypeEnd] = useState('');
-	const [adTypeCarmaAuthor, setAdTypeCarmaAuthor] = useState('');
-	const [adTypeCarmaSub, setAdTypeCarmaSub] = useState('');
-	const [adTypeCarmaEnd, setAdTypeCarmaEnd] = useState('');
-	const [adTypeDescription, setAdTypeDescription] = useState('');
-	function setInfo(ad_type) {
-		setAdTypeDescription(getAdTypeDescription(ad_type));
-		setAdTypeAuthor(getAdTypeAuthor(ad_type));
-		setAdTypeEnd(getAdTypeEnd(ad_type));
-		setAdTypeCarmaAuthor(getAdTypeCarmaAuthor(ad_type));
-		setAdTypeCarmaEnd(getAdTypeCarmaEnd(ad_type));
-		setAdTypeCarmaSub(getAdTypeCarmaSub(ad_type));
-		setOpenAdTypeDetails(false);
-	}
-
-	useEffect(() => {
-		if (!activeModal) {
-			setInfo(props.ad.ad_type);
-
-			setCurrentAdType(props.ad.ad_type);
-		}
-	}, [props.ad, activeModal]);
-	useEffect(() => {
-		if (moveAdType == 0) {
-			return;
-		}
-		const arr = [TYPE_CHOICE, TYPE_AUCTION, TYPE_RANDOM];
-		let ind = arr.indexOf(currentAdType) + moveAdType;
-		if (ind < 0) {
-			ind = 2;
-		}
-		if (ind > 2) {
-			ind = 0;
-		}
-		const newType = arr[ind];
-		setInfo(newType);
-		setCurrentAdType(newType);
-		setMoveAdType(0);
-	}, [moveAdType]);
-
-	const [componentTypesArr, setComponentTypesArr] = useState([]);
-	useEffect(() => {
-		console.log('currentAdType', currentAdType, arr);
-		let arr = [];
-		if (currentAdType != TYPE_CHOICE) {
-			arr.push(
-				<div style={{ padding: '3px', flex: 1 }}>
-					<Button
-						mode="secondary"
-						size="xl"
-						onClick={() => {
-							setCurrentAdType(TYPE_CHOICE);
-							setInfo(TYPE_CHOICE);
-						}}
-					>
-						Сделка
-					</Button>
-				</div>
-			);
-		}
-		if (currentAdType != TYPE_AUCTION) {
-			arr.push(
-				<div style={{ padding: '3px', flex: 1 }}>
-					<Button
-						mode="secondary"
-						size="xl"
-						onClick={() => {
-							setCurrentAdType(TYPE_AUCTION);
-							setInfo(TYPE_AUCTION);
-						}}
-					>
-						Аукцион
-					</Button>
-				</div>
-			);
-		}
-		if (currentAdType != TYPE_RANDOM) {
-			arr.push(
-				<div style={{ padding: '3px', flex: 1 }}>
-					<Button
-						mode="secondary"
-						size="xl"
-						onClick={() => {
-							setCurrentAdType(TYPE_RANDOM);
-							setInfo(TYPE_RANDOM);
-						}}
-					>
-						Лотерея
-					</Button>
-				</div>
-			);
-		}
-
-		setComponentTypesArr(arr);
-	}, [currentAdType]);
 
 	return (
 		<ModalRoot activeModal={activeModal}>
@@ -446,63 +327,12 @@ const AddsModal = (props) => {
 				]}
 				actionsLayout="vertical"
 			/>
+			<ModalCardCaptionAdsType />
 			<ModalCard
 				id={MODAL_ADS_TYPES}
-				onClose={() => {
-					setInfo(props.ad.ad_type);
-					setCurrentAdType(props.ad.ad_type);
-					closeModal();
-				}}
+				onClose={closeModal}
 				header={getAdType(currentAdType)}
-				caption={
-					<>
-						<div className="flex-center">
-							<div style={{ paddingRight: '8px' }} onClick={() => setMoveAdType(-1)}>
-								<Icon24BrowserBack />
-							</div>
-							<div style={{ display: 'block' }}>
-								<Collapse isOpened={!openAdTypeDetails}>
-									<AnimateOnChange duration="50" animation="slide">
-										{adTypeDescription}
-									</AnimateOnChange>
-								</Collapse>
-
-								<Link onClick={() => setOpenAdTypeDetails((prev) => !prev)}>
-									{openAdTypeDetails ? 'Скрыть подробности' : 'Подробнее'}
-								</Link>
-								<Collapse isOpened={openAdTypeDetails}>
-									<SimpleCell multiline={true}>
-										<InfoRow header="Определение получателя">{adTypeAuthor}</InfoRow>
-									</SimpleCell>
-									{adTypeEnd && (
-										<SimpleCell multiline={true}>
-											<InfoRow header="Когда происходит выбор получателя">{adTypeEnd}</InfoRow>
-										</SimpleCell>
-									)}
-									<SimpleCell multiline={true}>
-										<InfoRow header="Сколько кармы получит автор">{adTypeCarmaAuthor}</InfoRow>
-									</SimpleCell>
-									<SimpleCell multiline={true}>
-										<InfoRow header="Сколько кармы потратит откливнушийся">
-											{adTypeCarmaSub}
-										</InfoRow>
-									</SimpleCell>
-									{/* <SimpleCell multiline={true}>
-										<InfoRow header="Как вернуть карму">
-											{adTypeCarmaEnd}
-										</InfoRow>
-									</SimpleCell> */}
-								</Collapse>
-							</div>
-							<div style={{ paddingLeft: '8px' }} onClick={() => setMoveAdType(1)}>
-								<Icon24BrowserForward />
-							</div>
-						</div>
-						<Group header={<Header mode="secondary">Другие виды объявлений</Header>}>
-							<div style={{ display: 'flex' }}>{componentTypesArr}</div>
-						</Group>
-					</>
-				}
+				caption={<ModalCardCaptionAdsType updateType={setCurrentAdType} />}
 			/>
 		</ModalRoot>
 	);
@@ -510,4 +340,4 @@ const AddsModal = (props) => {
 
 export default AddsModal;
 
-// 373 -> 273 -> 406
+// 373 -> 273 -> 406 -> 517 -> 343

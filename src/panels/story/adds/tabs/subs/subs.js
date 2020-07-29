@@ -41,7 +41,6 @@ import { Close, CancelClose } from './../../../../../requests';
 
 import Icon44SmileOutline from '@vkontakte/icons/dist/44/smile_outline';
 import { openPopout, closePopout, setPage, setProfile } from '../../../../../store/router/actions';
-import { setDealer } from '../../../../../store/detailed_ad/actions';
 import { PANEL_SUBS } from '../../../../../store/router/panelTypes';
 import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED, TYPE_CHOICE } from '../../../../../const/ads';
 import { updateDealInfo } from '../../../../../store/detailed_ad/update';
@@ -50,7 +49,7 @@ import { Collapse } from 'react-collapse';
 
 const Subs = (props) => {
 	const osname = usePlatform();
-	const { openPopout, closePopout, setDealer, setProfile, setPage, AD } = props;
+	const { openPopout, closePopout, setProfile, setPage, AD } = props;
 	const { dealer, subs, ad_id, ad_type, subscribers_num } = AD;
 	const status = AD.status || STATUS_OFFER;
 
@@ -123,7 +122,7 @@ const Subs = (props) => {
 	function showSubs(lastAdElementRef, close, cancel) {
 		return (
 			<>
-				{given}
+				<AnimateOnChange animation="bounce">{given}</AnimateOnChange>
 
 				<Group header={<Header mode="secondary">Откликнулись</Header>}>
 					<CellButton onClick={() => close(subs[getRandomInt(subscribers_num)])} before={<Icon24Shuffle />}>
@@ -138,11 +137,11 @@ const Subs = (props) => {
 									}}
 									before={<Avatar size={36} src={v.photo_url} />}
 									asideContent={
-										!dealer || v.vk_id != dealer.vk_id ? (
-											<Icon24Gift />
-										) : (
-											<Icon24Gift style={{ color: 'var(--header_tint)' }} />
-										)
+										<AnimateOnChange animation="bounce">
+											{dealer && v.vk_id == dealer.vk_id && (
+												<Icon24Gift style={{ color: 'var(--header_tint)' }} />
+											)}
+										</AnimateOnChange>
 									}
 								>
 									<div>{v.name + ' ' + v.surname}</div>
@@ -164,7 +163,6 @@ const Subs = (props) => {
 			subscriber.vk_id,
 			(data) => {
 				console.log('what i have done?', data);
-				setDealer(subscriber);
 			},
 			(e) => {
 				console.log('Close error', e);
@@ -176,11 +174,8 @@ const Subs = (props) => {
 		CancelClose(
 			ad_id,
 			(data) => {
-				console.log('we are stopping', need_close);
 				if (need_close) {
 					close_ad(subscriber);
-				} else {
-					setDealer(null);
 				}
 			},
 			(e) => {},
@@ -280,7 +275,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
 	openPopout,
 	closePopout,
-	setDealer,
 	setPage,
 	setProfile,
 };

@@ -1,6 +1,12 @@
-import { TYPE_CHOICE, TYPE_AUCTION } from "../../const/ads";
+import React from 'react';
+import { TYPE_CHOICE, TYPE_AUCTION, STATUS_OFFER, STATUS_CHOSEN } from '../../const/ads';
+
+import Deal200 from './../../img/ad_types/deal200.png';
+import Lottery200 from './../../img/ad_types/lottery200.png';
+import Auction200 from './../../img/ad_types/auction200.png';
 
 import { K } from '../../panels/story/profile/const';
+import { Cell, Link, Title } from '@vkontakte/vkui';
 
 export function getAdTypeDescription(ad_type) {
 	return ad_type == TYPE_CHOICE
@@ -28,7 +34,6 @@ export function getAdTypeAuthor(ad_type) {
 		? 'Вещь достанется тому, кто предложит за нее наибольшую ставку.'
 		: 'Получатель определяется среди откливнувшихся случайным образом.';
 }
-
 
 // Когда происходит выбор получателя
 export function getAdTypeEnd(ad_type) {
@@ -60,7 +65,7 @@ export function getAdTypeCarmaSub(ad_type) {
 		  ' или повышать до тех пор, пока аукцион не завершится.'
 		: 'Стоимость получения вещи для каждого пользователя индивидуальна.' +
 		  ' Чем больше вещей ты получаешь, тем больше кармы необходимо' +
-		  ' отдать. Раз в месяц счетчик полученных вещей сбрасывается.' 
+		  ' отдать. Раз в месяц счетчик полученных вещей сбрасывается.';
 }
 
 // Что будет с кармой, если я не стану получателем?
@@ -74,3 +79,26 @@ export function getAdTypeCarmaEnd(ad_type) {
 
 export const getAdType = (ad_type) =>
 	ad_type == TYPE_CHOICE ? 'Сделка' : ad_type == TYPE_AUCTION ? 'Аукцион' : 'Лотерея';
+
+export const getAdTypePhoto = (ad_type) =>
+	ad_type == TYPE_CHOICE ? Deal200 : ad_type == TYPE_AUCTION ? Auction200 : Lottery200;
+
+export const AdHeader = (props) => {
+	return (
+		<Cell
+			before={
+				<img
+					src={getAdTypePhoto(props.ad_type)}
+					style={{ paddingTop: '4px', paddingRight: '8px', width: '32px', height: '32px' }}
+				/>
+			}
+			asideContent={<Link onClick={props.onTypesClick}>Подробнее</Link>}
+		>
+			<Title level="2" weight="heavy">
+				{getAdType(props.ad_type)}
+			</Title>
+		</Cell>
+	);
+};
+
+export const isFinished = (st) => st !== STATUS_OFFER && st !== STATUS_CHOSEN;

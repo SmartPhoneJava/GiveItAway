@@ -10,32 +10,30 @@ import {
 	SimpleCell,
 	Button,
 	CellButton,
-	RichCell,
+	Title,
 } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
-
-import Subs from './../../panels/story/adds/tabs/subs/subs';
 
 import Icon24Repost from '@vkontakte/icons/dist/24/repost';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 import { AnimateOnChange } from 'react-animation';
-// import AnimateOnChange from 'react-animate-on-change';
 
 import Icon24User from '@vkontakte/icons/dist/24/user';
 import Icon24Help from '@vkontakte/icons/dist/24/help';
 import Icon24MarketOutline from '@vkontakte/icons/dist/24/market_outline';
 
-import { STATUS_CHOSEN, STATUS_CLOSED, STATUS_ABORTED, TYPE_CHOICE, STATUS_OFFER } from '../../const/ads';
-import { getAuctionMaxUser, getCashback, increaseAuctionRate, fail, success, CancelClose } from '../../requests';
-import { withLoadingIf, animateOnChangeIf } from '../image/image_cache';
-import { openModal, setProfile } from '../../store/router/actions';
+import { TYPE_CHOICE, STATUS_OFFER, TYPE_RANDOM } from '../../const/ads';
+import { getAuctionMaxUser, getCashback, CancelClose } from '../../requests';
+import { withLoadingIf } from '../image/image_cache';
+import { openModal, setProfile, setPage } from '../../store/router/actions';
 import { MODAL_ADS_TYPES, MODAL_ADS_FROZEN, MODAL_ADS_COST } from '../../store/router/modalTypes';
 import { SubsLabel } from './subs';
 import { K } from '../../panels/story/profile/const';
-import { getAdType } from './faq';
+import { getAdType, getAdTypePhoto, AdHeader, isFinished } from './faq';
+import { PANEL_SUBS } from '../../store/router/panelTypes';
 
 const DealLabelInner = (props) => {
 	const [componentStatus, setComponentStatus] = useState(<></>);
@@ -80,22 +78,7 @@ const DealLabelInner = (props) => {
 
 	const [componentChosen, setComponentChosen] = useState(<></>);
 	useEffect(() => {
-		const { dealer, isAuthor } = props.ad;
-		const { openSubs, finished, dealRequestSuccess } = props;
-		// const aside = withLoadingIf(
-		// 	dealRequestSuccess,
-		// 	isAuthor && !finished ? (
-		// 		dealer ? (
-		// 			<Link onClick={openSubs}>Изменить</Link>
-		// 		) : (
-		// 			<Link onClick={openSubs}>Выбрать</Link>
-		// 		)
-		// 	) : (
-		// 		<></>
-		// 	),
-		// 	'small',
-		// 	null
-		// );
+		const { dealer } = props.ad;
 		setComponentChosen(
 			withLoadingIf(
 				props.dealRequestSuccess,
@@ -121,17 +104,27 @@ const DealLabelInner = (props) => {
 	const onTypesClick = () => props.openModal(MODAL_ADS_TYPES);
 	const onFreezeClick = () => props.openModal(MODAL_ADS_FROZEN);
 	const onCarmaClick = () => props.openModal(MODAL_ADS_COST);
+	const openSubs = () => props.setPage(PANEL_SUBS);
 
 	const [componentSub, setComponentSub] = useState(<></>);
 	useEffect(() => {
-		const { openSubs, sub, unsub } = props;
-		const { cost, subs, isAuthor, isSub, dealer, ad_id } = props.ad;
-		const disable = props.finished || subs.length == 0;
+		const {  sub, unsub } = props;
+		const { cost, subs, status, isAuthor, isDealer, isSub, dealer, ad_id, ad_type } = props.ad;
+		const disable = isFinished(status)  || isAuthor
+				? subs.length == 0 // автор не может выбрать получателя, если нет подписчиков
+				: status != STATUS_OFFER && (!isSub || isDealer); // если ты не подписан, то уже не сможешь подписаться. Если ты получатель, отписываться нельзя
+
 		setComponentSub(
 			<div style={{ display: 'flex' }}>
 				{isAuthor ? (
 					dealer ? (
-						<Group header={<Header mode="secondary">Вы выбрали получателя</Header>}>
+						<Group
+							header={
+								<Header mode="secondary">
+									{ad_type == TYPE_CHOICE ? 'Вы выбрали получателя' : 'Получатель выбран'}
+								</Header>
+							}
+						>
 							<div style={{ display: 'flex' }}>
 								<CellButton
 									mode="danger"
@@ -150,12 +143,12 @@ const DealLabelInner = (props) => {
 						</Group>
 					) : (
 						<CellButton onClick={openSubs} disabled={disable} before={<Icon24Done />}>
-							Выбрать получателя
+							{ad_type == TYPE_RANDOM ? 'Запустить' : 'Выбрать получателя'}
 						</CellButton>
 					)
 				) : !isSub ? (
 					<>
-						<CellButton onClick={sub} before={<Icon24MarketOutline />}>
+						<CellButton onClick={sub} disabled={disable} before={<Icon24MarketOutline />}>
 							Откликнуться
 						</CellButton>{' '}
 						<Cell
@@ -173,21 +166,36 @@ const DealLabelInner = (props) => {
 					</>
 				) : (
 					<>
-						<CellButton onClick={unsub} mode="danger" before={<Icon24MarketOutline />}>
-							Отказаться
-						</CellButton>
-						<Cell
-							indicator={
-								<Counter mode="primary" onClick={onCarmaClick} style={{ fontWeight: 600 }}>
-									{cost + ' ' + K}
-								</Counter>
+						<Group
+							header={
+								<Header mode="secondary">
+									{ad_type == TYPE_RANDOM ? 'Вы участвуете' : 'Вы отклинулись'}
+								</Header>
 							}
 						>
-							Вам вернётся
-						</Cell>
-						<Cell onClick={onFreezeClick}>
-							<Icon24Help fill={'var(--counter_secondary_background)'} />
-						</Cell>
+							<div style={{ display: 'flex' }}>
+								<CellButton
+									disabled={disable}
+									onClick={unsub}
+									mode="danger"
+									before={<Icon24MarketOutline />}
+								>
+									Отказаться
+								</CellButton>
+								<Cell
+									indicator={
+										<Counter mode="primary" onClick={onCarmaClick} style={{ fontWeight: 600 }}>
+											{cost + ' ' + K}
+										</Counter>
+									}
+								>
+									Вам вернётся
+								</Cell>
+								<Cell onClick={onFreezeClick}>
+									<Icon24Help fill={'var(--counter_secondary_background)'} />
+								</Cell>
+							</div>
+						</Group>
 					</>
 				)}
 			</div>
@@ -200,20 +208,16 @@ const DealLabelInner = (props) => {
 	}, [props.ad.isSub]);
 
 	return (
-		<Group
-			header={
-				<Header aside={<Link onClick={onTypesClick}>Подробнее</Link>}>{getAdType(props.ad.ad_type)}</Header>
-			}
-		>
-			<div style={{ display: 'block', width: '100%' }}>
-				<div style={{ display: 'flex', width: '100%' }}>
+		<Group header={<AdHeader onTypesClick={onTypesClick} ad_type={props.ad.ad_type} />}>
+			<div style={{ display: 'block' }}>
+				<div style={{ display: 'flex' }}>
 					<SimpleCell>
-						<AnimateOnChange style={{ width: '100%' }} animation="bounce">
+						<AnimateOnChange style={{}} animation="bounce">
 							{componentStatus}
 						</AnimateOnChange>
 					</SimpleCell>
 
-					<AnimateOnChange style={{ width: '100%' }} animation="bounce">
+					<AnimateOnChange style={{ marginLeft: 'auto' }} animation="bounce">
 						{componentChosen}
 					</AnimateOnChange>
 				</div>
@@ -240,8 +244,9 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
 	openModal,
 	setProfile,
+	setPage,
 };
 
 export const DealLabel = connect(mapStateToProps, mapDispatchToProps)(DealLabelInner);
 
-// 202
+// 202 -> 247

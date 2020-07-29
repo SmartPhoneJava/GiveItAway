@@ -18,10 +18,12 @@ export async function updateDealInfo(successCallback, failCallback) {
 			getUser(
 				d.subscriber_id,
 				(user) => {
+					console.log('really1 setDealer', user);
 					store.dispatch(setDealer(user));
 					successC()
 				},
 				(e) => {
+					console.log('really1 error', user);
 					store.dispatch(setDealer(null));
 					failC()
 				}

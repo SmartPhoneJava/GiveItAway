@@ -213,6 +213,9 @@ const App = (props) => {
 	}, [scrollPosition]);
 
 	useEffect(() => {
+		if (props.from == PANEL_SUBS || props.to == PANEL_SUBS) {
+			return
+		} 
 		if (props.from == PANEL_ONE || props.to == PANEL_ONE) {
 			if (props.direction == DIRECTION_BACK) {
 				props.backToPrevAd();

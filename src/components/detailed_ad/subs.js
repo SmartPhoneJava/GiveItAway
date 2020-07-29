@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { InfoRow, Header, Cell, SimpleCell, UsersStack, Group, Link } from '@vkontakte/vkui';
+import { InfoRow, Header, Cell, SimpleCell, UsersStack, Group, Link, Text } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
@@ -12,7 +12,9 @@ const SubsLabelInner = (props) => {
 	const [componentSubs, setComponentSubs] = useState(<></>);
 
 	function openSubs() {
-		props.setPage(PANEL_SUBS);
+		if (props.ad.isAuthor) {
+			props.setPage(PANEL_SUBS);
+		}
 	}
 
 	useEffect(() => {
@@ -27,26 +29,31 @@ const SubsLabelInner = (props) => {
 			) : (
 				<Group
 					header={
-						<Header mode="secondary" aside={<Link onClick={openSubs}>Показать всех</Link>}>
+						<Header
+							mode="secondary"
+							aside={props.ad.isAuthor && <Link onClick={openSubs}>Показать всех</Link>}
+						>
 							Отликнулись
 						</Header>
 					}
 				>
 					<UsersStack onClick={openSubs} visibleCount={3} photos={photos} size="m">
-						{subs.length == 1
-							? subs[0].name + ' ' + subs[0].surname
-							: subs.length == 2
-							? subs[0].name + ' и ' + subs[1].name
-							: subs.length == 3
-							? subs[0].name + ', ' + subs[1].name + ' и ' + subs[2].name
-							: subs[0].name +
-							  ', ' +
-							  subs[1].name +
-							  ', ' +
-							  subs[2].name +
-							  'и еще ' +
-							  (subscribers_num - 3) +
-							  ' человек'}
+						<Text>
+							{subs.length == 1
+								? subs[0].name + ' ' + subs[0].surname
+								: subs.length == 2
+								? subs[0].name + ' и ' + subs[1].name
+								: subs.length == 3
+								? subs[0].name + ', ' + subs[1].name + ' и ' + subs[2].name
+								: subs[0].name +
+								  ', ' +
+								  subs[1].name +
+								  ', ' +
+								  subs[2].name +
+								  'и еще ' +
+								  (subscribers_num - 3) +
+								  ' человек'}
+						</Text>
 					</UsersStack>
 				</Group>
 			)

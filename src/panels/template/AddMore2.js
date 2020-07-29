@@ -29,14 +29,9 @@ import { PhotoSwipe, PhotoSwipeGallery } from 'react-photoswipe';
 
 import Icon56WriteOutline from '@vkontakte/icons/dist/56/write_outline';
 
-import Icon24View from '@vkontakte/icons/dist/24/view';
-import Icon24Similar from '@vkontakte/icons/dist/24/similar';
-import Icon24Place from '@vkontakte/icons/dist/24/place';
-import Icon24UserOutgoing from '@vkontakte/icons/dist/24/user_outgoing';
+import Icon28Messages from '@vkontakte/icons/dist/28/messages';
 
 import { randomColor } from 'randomcolor';
-
-import { GetCategoryText } from '../../components/categories/Categories';
 
 import Icon24Report from '@vkontakte/icons/dist/24/report';
 import Icon24Hide from '@vkontakte/icons/dist/24/hide';
@@ -45,7 +40,6 @@ import Icon24Fullscreen from '@vkontakte/icons/dist/24/fullscreen';
 
 import Icon24Delete from '@vkontakte/icons/dist/24/delete';
 
-import Icon24Chevron from '@vkontakte/icons/dist/24/chevron';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
 import Icon24ShareExternal from '@vkontakte/icons/dist/24/share_external';
 
@@ -53,8 +47,6 @@ import { subscribe, unsubscribe } from './../story/adds/tabs/subs/requests';
 
 import { K } from './../story/profile/const';
 
-import Icon24Coins from '@vkontakte/icons/dist/24/coins';
-import Icon24Help from '@vkontakte/icons/dist/24/help';
 import Icon24MarketOutline from '@vkontakte/icons/dist/24/market_outline';
 
 import {
@@ -84,19 +76,8 @@ import {
 	closePopout,
 	setProfile,
 } from '../../store/router/actions';
-import { PANEL_SUBS, PANEL_MAP } from './../../store/router/panelTypes';
-import { MODAL_ADS_COST, MODAL_ADS_FROZEN, MODAL_ADS_TYPES } from '../../store/router/modalTypes';
 import { setIsSub, setIsHidden, setExtraInfo, setIsAuthor } from '../../store/detailed_ad/actions';
-import {
-	AdDefault,
-	AD_LOADING,
-	STATUS_OFFER,
-	STATUS_CHOSEN,
-	STATUS_CLOSED,
-	STATUS_ABORTED,
-	TYPE_CHOICE,
-	TYPE_AUCTION,
-} from '../../const/ads';
+import { AdDefault, AD_LOADING, STATUS_CLOSED, STATUS_ABORTED, TYPE_CHOICE, TYPE_AUCTION } from '../../const/ads';
 import { shareInVK } from '../../services/VK';
 import { STORY_CREATE, STORY_ADS } from '../../store/router/storyTypes';
 import { EDIT_MODE, CREATE_AD_MAIN, CREATE_AD_ITEM } from '../../store/create_post/types';
@@ -109,7 +90,9 @@ import { withLoading, withLoadingIf, animatedDiv, ImageCache } from '../../compo
 import { TagsLabel, tag } from '../../components/categories/label';
 import { AuctionLabel } from '../../components/detailed_ad/auction';
 import { DealLabel } from '../../components/detailed_ad/deal';
-import { getAdType } from '../../components/detailed_ad/faq';
+import { isFinished } from '../../components/detailed_ad/faq';
+import { Collapse } from 'react-collapse';
+import { AdMainInfo } from '../../components/detailed_ad/table';
 
 let current_i = 0;
 
@@ -141,6 +124,7 @@ const AddMore2r = (props) => {
 	const [componentStatus, setComponentStatus] = useState();
 	useEffect(() => {
 		const { isAuthor, isDealer, dealer, deal, status } = rAd;
+		console.log('');
 		setComponentStatus(
 			showStatus(
 				status,
@@ -176,53 +160,6 @@ const AddMore2r = (props) => {
 			<TagsLabel
 				tags={[tag(category, col, null, col), tag(subcat_list, col, null, col), tag(subcat, col, null, col)]}
 			/>
-		);
-	}, [rAd]);
-
-	function tableElement(Icon, text, value, After, onClick) {
-		return (
-			<MiniInfoCell
-				onClick={onClick}
-				mode={onClick ? 'more' : null}
-				before={<Icon width={20} height={20} />}
-				after={
-					After ? (
-						<After
-							width={22}
-							height={22}
-							className="details-table-element"
-							style={{ color: onClick ? 'var(--accent)' : 'var(--text_secondary)' }}
-						/>
-					) : null
-				}
-			>
-				{text}
-				{':'}&nbsp;
-				{value}
-			</MiniInfoCell>
-		);
-	}
-
-	const [componentItemTable, setComponentItemTable] = useState();
-	useEffect(() => {
-		const { views_count, status, region, district } = rAd;
-		let subscribers_num = rAd.subscribers_num || '0';
-
-		setComponentItemTable(
-			<div className="details-table-outter">
-				{tableElement(Icon24View, 'Просмотров', <AnimateOnChange>{views_count}</AnimateOnChange>)}
-				{!isFinished(status)
-					? tableElement(Icon24Similar, 'Откликнулось', <AnimateOnChange>{subscribers_num}</AnimateOnChange>)
-					: null}
-				{tableElement(
-					Icon24UserOutgoing,
-					'Вид объявления',
-					getAdType(rAd.ad_type).toLowerCase(),
-					Icon24Help,
-					onTypesClick
-				)}
-				{tableElement(Icon24Place, 'Где забрать', getGeoPosition(region, district), Icon24Chevron, openMap)}
-			</div>
 		);
 	}, [rAd]);
 
@@ -440,7 +377,6 @@ const AddMore2r = (props) => {
 		};
 		if (direction == DIRECTION_FORWARD) {
 			dispatch(init());
-			console.log('need recover register', props.AD.ad_id);
 		} else {
 			setCostRequestSuccess(true);
 			setDealRequestSuccess(true);
@@ -452,36 +388,6 @@ const AddMore2r = (props) => {
 			cancelFunc = true;
 		};
 	}, []);
-
-	const openSubs = (ad_type, subscribers_num, ad_id) => {
-		if (ad_type == TYPE_CHOICE) {
-			setPage(PANEL_SUBS);
-		} else {
-			if (subscribers_num == 0) {
-				fail('Никто еще не откликнулся на ваше объявление');
-			} else {
-				Close(
-					ad_id,
-					ad_type,
-					0,
-					(e) => {
-						console.log('success close ad');
-					},
-					(e) => {
-						console.log('failed close ad', e);
-					}
-				);
-			}
-		}
-	};
-
-	const onCarmaClick = () => openModal(MODAL_ADS_COST);
-
-	const onTypesClick = () => openModal(MODAL_ADS_TYPES);
-
-	const onFreezeClick = () => openModal(MODAL_ADS_FROZEN);
-
-	const isFinished = (st) => st !== STATUS_OFFER && st !== STATUS_CHOSEN;
 
 	const [imgs, setImgs] = useState([]);
 
@@ -623,18 +529,22 @@ const AddMore2r = (props) => {
 	// 	setComponentSubs(v);
 	// }, [rAd]);
 
+	useEffect(() => {
+		console.log("KIROVA", props.AD)
+		
+	}, [props.AD]);
+
 	const [componentChosenSub, setComponentChosenSub] = useState();
 	useEffect(() => {
-		const { isAuthor, dealer, cost, ad_type, subscribers_num, ad_id, isSub, status } = rAd;
-		const finished = isFinished(status);
+		console.log("update me please", props.AD)
+		const { ad_type, subscribers_num, ad_id, isSub, status } = props.AD;
+
 		setComponentChosenSub(
 			<div style={{ flex: 1 }}>
 				{ad_type == TYPE_AUCTION ? (
 					<AuctionLabel unsub={() => unsub(ad_id)} sub={() => sub(ad_id)} />
 				) : (
 					<DealLabel
-						openSubs={() => openSubs(ad_type, subscribers_num, ad_id)}
-						finished={finished}
 						dealRequestSuccess={dealRequestSuccess}
 						unsub={() => unsub(ad_id)}
 						sub={() => sub(ad_id)}
@@ -642,7 +552,7 @@ const AddMore2r = (props) => {
 				)}
 			</div>
 		);
-	}, [rAd, dealRequestSuccess, costRequestSuccess]);
+	}, [props.AD, dealRequestSuccess, costRequestSuccess]);
 
 	const [componentAuthor, setComponentAuthor] = useState();
 	useEffect(() => {
@@ -663,7 +573,7 @@ const AddMore2r = (props) => {
 
 	const [allActions, setAllActions] = useState();
 	useEffect(() => {
-		const { isAuthor, isDealer, isSub, status, hidden, ad_id } = rAd;
+		const { isAuthor, author, isDealer, isSub, status, hidden, ad_id } = rAd;
 		const disabled = isFinished(status);
 		const alert = (
 			<Alert
@@ -722,11 +632,12 @@ const AddMore2r = (props) => {
 			);
 
 			const helpBtn = buttonAction(
-				<Icon24Help />,
-				'Как это работает?',
-				onFreezeClick,
-				null,
-				isFinished(status) || isDealer
+				<Icon28Messages />,
+				'Связаться с автором',
+				() => {
+					window.open('https://vk.com/im?sel=' + author.vk_id, '_blank');
+				},
+				null
 			);
 
 			buttons = [
@@ -775,16 +686,6 @@ const AddMore2r = (props) => {
 		setStory(STORY_CREATE, null, true);
 	}
 
-	function openMap() {
-		setPage(PANEL_MAP);
-	}
-
-	function getGeoPosition(region, district) {
-		let r = region != undefined ? region : null || '';
-		let d = district != undefined ? district : null || '';
-		return r && d ? r + ', ' + d : r + d;
-	}
-
 	if (isNotValid(AD)) {
 		return (
 			<Placeholder stretched header="Загрузка объявления">
@@ -795,7 +696,7 @@ const AddMore2r = (props) => {
 
 	return (
 		<div>
-			{componentStatus}
+			<Collapse isOpened={componentStatus}>{componentStatus}</Collapse>
 			{componentAuthor}
 			{componentPhotoSwipe}
 			<div style={{ display: width < 500 ? 'block' : 'flex' }}>
@@ -817,7 +718,7 @@ const AddMore2r = (props) => {
 				<div style={{ display: 'block', flex: 1, padding: '5px' }}>
 					<Card mode="outline">
 						{componentCategories}
-						{componentItemTable}
+						<AdMainInfo />
 					</Card>
 				</div>
 			</div>
@@ -891,4 +792,5 @@ const AddMore2 = connect(mapStateToProps, mapDispatchToProps)(AddMore2r);
 
 export default AddMore2;
 
-// 857 -> 936 -> 838 -> 923 -> 1016 -> 935 -> 987 -> 897 -> 953
+// 857 -> 936 -> 838 -> 923 -> 1016 -> 935 -> 987 -> 897 -> 953 -> 899
+// 830

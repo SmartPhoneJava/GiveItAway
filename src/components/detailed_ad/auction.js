@@ -36,7 +36,8 @@ import {
 import { getAuctionMaxUser, getCashback, increaseAuctionRate, fail, success, CancelClose, Close } from '../../requests';
 import { withLoadingIf, animateOnChangeIf } from '../image/image_cache';
 import { openModal, setProfile } from '../../store/router/actions';
-import { MODAL_ADS_TYPES } from '../../store/router/modalTypes';
+import { MODAL_ADS_TYPES, MODAL_ADS_FROZEN, MODAL_ADS_COST } from '../../store/router/modalTypes';
+import { AdHeader } from './faq';
 
 const AuctionLabelInner = (props) => {
 	const [componentStatus, setComponentStatus] = useState(<></>);
@@ -117,7 +118,7 @@ const AuctionLabelInner = (props) => {
 
 	const [componentMyRate, setComponentMyRate] = useState(<></>);
 	useEffect(() => {
-		const { isAuthor, dealer, ad_id, ad_type, isSub } = props.ad;
+		const { isAuthor, dealer, ad_id, ad_type, isSub, cost } = props.ad;
 		setComponentMyRate(
 			isAuthor ? (
 				!dealer ? (
@@ -143,7 +144,10 @@ const AuctionLabelInner = (props) => {
 					<RichCell
 						before={<Avatar size={48} src={props.myUser.photo_100} />}
 						after={
-							<Counter mode={myRate == actionMaxUser.cost ? 'secondary' : 'prominent'}>
+							<Counter
+								onClick={onFreezeClick}
+								mode={myRate == actionMaxUser.cost ? 'secondary' : 'prominent'}
+							>
 								{myRate + ' K'}
 							</Counter>
 						}
@@ -189,6 +193,9 @@ const AuctionLabelInner = (props) => {
 					actions={
 						<React.Fragment>
 							<Button onClick={() => props.sub()}>Принять участие в аукционе</Button>
+							<Counter onClick={onCarmaClick} mode="primary">
+								{cost + ' K'}
+							</Counter>
 						</React.Fragment>
 					}
 				>
@@ -196,12 +203,14 @@ const AuctionLabelInner = (props) => {
 				</RichCell>
 			)
 		);
-	}, [props.ad.isSub, props.ad.dealer, actionMaxUser, myRate]);
+	}, [props.ad.isSub, props.ad.dealer, props.ad.cost, actionMaxUser, myRate]);
 
 	const onTypesClick = () => props.openModal(MODAL_ADS_TYPES);
+	const onFreezeClick = () => props.openModal(MODAL_ADS_FROZEN);
+	const onCarmaClick = () => props.openModal(MODAL_ADS_COST);
 
 	return (
-		<Group header={<Header aside={<Link onClick={onTypesClick}>Подробнее</Link>}> Аукцион </Header>}>
+		<Group header={<AdHeader onTypesClick={onTypesClick} ad_type={props.ad.ad_type} />}>
 			<div style={{ display: 'block', width: '100%' }}>
 				<div style={{ display: 'flex', width: '100%' }}>
 					<SimpleCell>
