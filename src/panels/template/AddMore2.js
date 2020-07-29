@@ -49,17 +49,7 @@ import { K } from './../story/profile/const';
 
 import Icon24MarketOutline from '@vkontakte/icons/dist/24/market_outline';
 
-import {
-	adVisible,
-	adHide,
-	deleteAd,
-	getSubscribers,
-	getDetails,
-	acceptDeal,
-	denyDeal,
-	Close,
-	fail,
-} from './../../requests';
+import { adVisible, adHide, deleteAd, getSubscribers, getDetails, acceptDeal, denyDeal } from './../../requests';
 
 import './addsTab.css';
 import './styles.css';
@@ -106,7 +96,7 @@ const col = '#00a550';
 const AddMore2r = (props) => {
 	const { myID, dispatch } = props;
 	const { setIsSub, setIsAuthor, setIsHidden, setExtraInfo, openPopout, setStory, setFormData, closePopout } = props;
-	const { setPage, openModal, setDummy, direction, AD } = props;
+	const { setDummy, direction, AD } = props;
 
 	const [isOpen, setIsOpen] = useState(false);
 	const [options, setOptions] = useState({});
@@ -530,13 +520,12 @@ const AddMore2r = (props) => {
 	// }, [rAd]);
 
 	useEffect(() => {
-		console.log("KIROVA", props.AD)
-		
+		console.log('KIROVA', props.AD);
 	}, [props.AD]);
 
 	const [componentChosenSub, setComponentChosenSub] = useState();
 	useEffect(() => {
-		console.log("update me please", props.AD)
+		console.log('update me please', props.AD);
 		const { ad_type, subscribers_num, ad_id, isSub, status } = props.AD;
 
 		setComponentChosenSub(

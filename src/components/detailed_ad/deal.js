@@ -108,80 +108,69 @@ const DealLabelInner = (props) => {
 
 	const [componentSub, setComponentSub] = useState(<></>);
 	useEffect(() => {
-		const {  sub, unsub } = props;
+		const { sub, unsub } = props;
 		const { cost, subs, status, isAuthor, isDealer, isSub, dealer, ad_id, ad_type } = props.ad;
-		const disable = isFinished(status)  || isAuthor
+		const disable =
+			isFinished(status) || isAuthor
 				? subs.length == 0 // автор не может выбрать получателя, если нет подписчиков
 				: status != STATUS_OFFER && (!isSub || isDealer); // если ты не подписан, то уже не сможешь подписаться. Если ты получатель, отписываться нельзя
 
-		setComponentSub(
-			<div style={{ display: 'flex' }}>
-				{isAuthor ? (
-					dealer ? (
-						<Group
-							header={
-								<Header mode="secondary">
-									{ad_type == TYPE_CHOICE ? 'Вы выбрали получателя' : 'Получатель выбран'}
-								</Header>
-							}
-						>
-							<div style={{ display: 'flex' }}>
-								<CellButton
-									mode="danger"
-									onClick={() => {
-										CancelClose(ad_id);
-									}}
-									disabled={disable}
-									before={<Icon24Cancel />}
-								>
-									Отменить
-								</CellButton>
-								<CellButton onClick={openSubs} disabled={disable} before={<Icon24Repost />}>
-									Изменить
-								</CellButton>
-							</div>
-						</Group>
-					) : (
-						<CellButton onClick={openSubs} disabled={disable} before={<Icon24Done />}>
-							{ad_type == TYPE_RANDOM ? 'Запустить' : 'Выбрать получателя'}
-						</CellButton>
-					)
-				) : !isSub ? (
-					<>
-						<CellButton onClick={sub} disabled={disable} before={<Icon24MarketOutline />}>
-							Откликнуться
-						</CellButton>{' '}
-						<Cell
-							indicator={
-								<Counter mode="prominent" onClick={onCarmaClick} style={{ fontWeight: 600 }}>
-									{cost + ' ' + K}
-								</Counter>
-							}
-						>
-							Стоимость
-						</Cell>
-						<Cell onClick={onFreezeClick}>
-							<Icon24Help fill={'var(--counter_secondary_background)'} />
-						</Cell>
-					</>
-				) : (
-					<>
-						<Group
-							header={
-								<Header mode="secondary">
-									{ad_type == TYPE_RANDOM ? 'Вы участвуете' : 'Вы отклинулись'}
-								</Header>
-							}
-						>
-							<div style={{ display: 'flex' }}>
-								<CellButton
-									disabled={disable}
-									onClick={unsub}
-									mode="danger"
-									before={<Icon24MarketOutline />}
-								>
-									Отказаться
-								</CellButton>
+		let button = <></>;
+
+		if (isAuthor) {
+			if (dealer) {
+				button = (
+					<Group
+						header={
+							<Header mode="secondary">
+								{ad_type == TYPE_CHOICE ? 'Вы выбрали получателя' : 'Получатель выбран'}
+							</Header>
+						}
+					>
+						<div style={{ display: 'flex' }}>
+							<CellButton
+								mode="danger"
+								onClick={() => {
+									CancelClose(ad_id);
+								}}
+								disabled={disable}
+								before={<Icon24Cancel />}
+							>
+								Отменить
+							</CellButton>
+							<CellButton onClick={openSubs} disabled={disable} before={<Icon24Repost />}>
+								Изменить
+							</CellButton>
+						</div>
+					</Group>
+				);
+			} else {
+				button = (
+					<CellButton onClick={openSubs} disabled={disable} before={<Icon24Done />}>
+						{ad_type == TYPE_RANDOM ? 'Запустить' : 'Выбрать получателя'}
+					</CellButton>
+				);
+			}
+		} else {
+			if (isSub) {
+				button = (
+					<Group
+						header={
+							<Header mode="secondary">
+								{ad_type == TYPE_RANDOM ? 'Вы участвуете' : 'Вы отклинулись'}
+							</Header>
+						}
+					>
+						<div style={{ display: 'flex' }}>
+							<CellButton
+								disabled={disable}
+								onClick={unsub}
+								mode="danger"
+								before={<Icon24MarketOutline />}
+							>
+								Отказаться
+							</CellButton>
+							<div style={{ display: 'flex', flex: 1 }}>
 								<Cell
 									indicator={
 										<Counter mode="primary" onClick={onCarmaClick} style={{ fontWeight: 600 }}>
@@ -195,11 +184,35 @@ const DealLabelInner = (props) => {
 									<Icon24Help fill={'var(--counter_secondary_background)'} />
 								</Cell>
 							</div>
-						</Group>
-					</>
-				)}
-			</div>
-		);
+						</div>
+					</Group>
+				);
+			} else {
+				button = (
+					<div style={{ display: 'flex' }}>
+						<CellButton onClick={sub} disabled={disable} before={<Icon24MarketOutline />}>
+							Откликнуться
+						</CellButton>{' '}
+						<div style={{ display: 'flex', flex: 1 }}>
+							<Cell
+								indicator={
+									<Counter mode="prominent" onClick={onCarmaClick} style={{ fontWeight: 600 }}>
+										{cost + ' ' + K}
+									</Counter>
+								}
+							>
+								Стоимость
+							</Cell>
+							<Cell onClick={onFreezeClick}>
+								<Icon24Help fill={'var(--counter_secondary_background)'} />
+							</Cell>
+						</div>
+					</div>
+				);
+			}
+		}
+
+		setComponentSub(button);
 	}, [props.ad.isAuthor, props.ad.isSub, props.ad.cost, props.ad.dealer]);
 
 	const [componentSubs, setComponentSubs] = useState(<></>);

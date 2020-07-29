@@ -39,13 +39,6 @@ import Radium, { StyleRoot } from 'radium';
 
 import { AnimateGroup } from 'react-animation';
 
-const stylesAnimation = {
-	bounce: {
-		animation: 'x 5s',
-		animationName: Radium.keyframes(bounce, 'bounce'),
-	},
-};
-
 import {
 	SORT_TIME,
 	GEO_TYPE_FILTERS,
@@ -64,7 +57,7 @@ import { CategoryNo } from '../../../../../components/categories/const';
 import { ColumnsFunc } from '../../../../template/columns';
 import { DIRECTION_BACK, NO_DIRECTION } from '../../../../../store/router/directionTypes';
 import { pushToCache } from '../../../../../store/cache/actions';
-import { store } from '../../../../..';
+import { STORY_ADS } from '../../../../../store/router/storyTypes';
 
 let i = 0;
 
@@ -73,6 +66,8 @@ const SEARCH_WAIT = 650;
 const AddsTab = (props) => {
 	const width = document.body.clientWidth;
 	const { inputData, openPopout, closePopout, setFormData, dropFilters } = props;
+
+	const activeModal = props.activeModals[STORY_ADS];
 
 	const [geoType, setGeoType] = useState(GEO_TYPE_FILTERS);
 	const [radius, setRadius] = useState(0);
@@ -85,7 +80,11 @@ const AddsTab = (props) => {
 	const [sort, setSort] = useState(SORT_TIME);
 	const [mode, setMode] = useState(MODE_ALL);
 	const [search, setSearch] = useState('');
+	const [prevInputData, setPrevInputData] = useState();
 	useEffect(() => {
+		if (activeModal) {
+			return;
+		}
 		console.log('look at', inputData[ADS_FILTERS]);
 		const s = inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].search : null || '';
 		if (s == undefined) {
@@ -108,7 +107,8 @@ const AddsTab = (props) => {
 
 		const cit = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].city : null) || NoRegion;
 		setCity(cit);
-		console.log('set city', cit);
+
+		console.log('set city', cit, activeModal);
 
 		const categor = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].category : null) || CategoryNo;
 		setCategory(categor);
@@ -124,10 +124,13 @@ const AddsTab = (props) => {
 
 		const mod = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].mode : null) || MODE_ALL;
 		setMode(mod);
-	}, [inputData[ADS_FILTERS]]);
+	}, [props.inputData[ADS_FILTERS]]);
 
 	const [searchR, setSearchR] = useState('');
 	useEffect(() => {
+		if (activeModal) {
+			return;
+		}
 		let cleanupFunction = false;
 		i++;
 		let j = i;
@@ -144,6 +147,9 @@ const AddsTab = (props) => {
 	const [pageNumber, setPageNumber] = useState(1);
 	const [filtersOn, setFiltersOn] = useState(false);
 	useEffect(() => {
+		if (activeModal) {
+			return;
+		}
 		if (country == NoRegion && city == NoRegion && category == CategoryNo && radius == 0) {
 			setFiltersOn(false);
 			return;
@@ -171,27 +177,29 @@ const AddsTab = (props) => {
 	const [cols, setCols] = useState([]);
 
 	useEffect(() => {
-		console.log('loading', loading);
 		setPullLoading(!error404 && loading);
 	}, [error404, loading]);
 
 	useEffect(() => {
-		if (props.direction == DIRECTION_BACK && !goBackDone) {
+		if (activeModal) {
 			return;
+		}
+		if (props.cache.ignore_cache) {
+			props.pushToCache(false, 'ignore_cache');
+			setGoBackDone(true);
+		} else {
+			if (props.direction == DIRECTION_BACK && !goBackDone) {
+				return;
+			}
 		}
 		setRads([]);
 		setCols([]);
 		setPageNumber(-1);
 		setInited(false);
 		setHasMore(true);
-		console.log('refresh everything');
 	}, [category, mode, searchR, city, country, sort, geodata, geoType, radius, refreshMe]);
 
 	useEffect(() => {
-		// if (rads.length == 0) {
-		// 	return;
-		// }
-		// console.log('update all');
 		const c = ColumnsFunc(
 			!width || width < 500,
 			rads.map((ad) => Ad(ad)),
@@ -200,7 +208,6 @@ const AddsTab = (props) => {
 			lastAdElementRef
 		);
 
-		console.log('rads', rads);
 		setCols(
 			c.map((s, i) => (
 				<div ref={lastAdElementRef} key={i}>
@@ -208,10 +215,12 @@ const AddsTab = (props) => {
 				</div>
 			))
 		);
-		// setCols(rads.map((ad) => <div ref={lastAdElementRef}>{Ad(ad)}</div>));
 	}, [rads]);
 
 	useEffect(() => {
+		if (activeModal) {
+			return;
+		}
 		console.log('props.deleteID', props.deleteID);
 		if (props.deleteID > 0) {
 			setRads(
@@ -224,6 +233,14 @@ const AddsTab = (props) => {
 	}, [props.deleteID]);
 
 	useEffect(() => {
+		if (activeModal) {
+			console.log('i will set these', props.cache.ads_list);
+			setRads(props.cache.ads_list || []);
+			setPageNumber(props.cache.ads_page);
+			setInited(true);
+			setLoading(false);
+			return;
+		}
 		console.log('BEFORE LOOK hasMore', hasMore, pageNumber);
 		if (!hasMore) {
 			return;
@@ -256,8 +273,6 @@ const AddsTab = (props) => {
 				return;
 			}
 		}
-
-		console.log('GO GO GO', refreshMe, props.cache.refreshMe);
 
 		async function f() {
 			if (rads.length == 0) {
@@ -321,8 +336,6 @@ const AddsTab = (props) => {
 						return;
 					}
 					setRads((prev) => [...prev, ...newAds]);
-					// const nads = [...new Set([...ads, ...newAds])];
-					// setAds(nads);
 
 					props.pushToCache([...rads, ...newAds], 'ads_list');
 					props.pushToCache(pageNumber, 'ads_page');
@@ -334,6 +347,9 @@ const AddsTab = (props) => {
 				})
 				.catch((e) => {
 					console.log('fail', e);
+					props.pushToCache([...rads], 'ads_list');
+					props.pushToCache(pageNumber, 'ads_page');
+
 					if (axios.isCancel(e)) return;
 					if (('' + e).indexOf('404') == -1) {
 						console.log('real err', e);
@@ -364,7 +380,6 @@ const AddsTab = (props) => {
 			if (observer.current) observer.current.disconnect();
 			observer.current = new IntersectionObserver((entries) => {
 				if (entries[0].isIntersecting && hasMore) {
-					console.log('yes intersection');
 					setPageNumber((prev) => prev + 1);
 				}
 			});
@@ -381,10 +396,6 @@ const AddsTab = (props) => {
 	const setAllMode = () => {
 		setFormData(ADS_FILTERS, { ...inputData, mode: MODE_ALL });
 	};
-
-	useEffect(() => {
-		console.log('rads.length', rads.length);
-	}, [rads]);
 
 	function Ad(ad) {
 		return (
@@ -404,65 +415,63 @@ const AddsTab = (props) => {
 	}
 
 	return (
-		<>
-			<PullToRefresh
-				onRefresh={() => {
-					setRefreshMe((prev) => prev + 1);
+		<PullToRefresh
+			onRefresh={() => {
+				setRefreshMe((prev) => prev + 1);
+			}}
+			isFetching={pullLoading}
+		>
+			<div
+				style={{
+					height: 'auto',
+					display: 'flex',
+					// background: 'var(--background_page)',
+					flexDirection: 'column',
+					overflow: 'hidden',
+					textOverflow: 'ellipsis',
+					whiteSpace: rads.length > 0 ? 'nowrap' : 'normal',
 				}}
-				isFetching={pullLoading}
 			>
-				<div
-					style={{
-						height: 'auto',
-						display: 'flex',
-						// background: 'var(--background_page)',
-						flexDirection: 'column',
-						overflow: 'hidden',
-						textOverflow: 'ellipsis',
-						whiteSpace: rads.length > 0 ? 'nowrap' : 'normal',
-					}}
-				>
-					{mode != MODE_WANTED ? (
-						<div style={{ display: 'flex', background: 'var(--background_content)' }}>
-							<Search
-								key="search"
-								autoFocus={true}
-								// onBlur={() => searchRef.current.focus }
-								value={search}
-								onChange={handleSearch}
-								icon={<Icon24Filter />}
-								onIconClick={props.onFiltersClick}
-							/>
-							{filtersOn ? (
-								<PanelHeaderButton mode="secondary" size="m" onClick={dropFilters}>
-									<div style={{ paddingRight: '10px' }}>
-										<Avatar size={24}>
-											<Icon24Dismiss />
-										</Avatar>
-									</div>
-								</PanelHeaderButton>
-							) : null}
-						</div>
-					) : null}
+				{mode != MODE_WANTED ? (
+					<div style={{ display: 'flex', background: 'var(--background_content)' }}>
+						<Search
+							key="search"
+							autoFocus={true}
+							// onBlur={() => searchRef.current.focus }
+							value={search}
+							onChange={handleSearch}
+							icon={<Icon24Filter />}
+							onIconClick={props.onFiltersClick}
+						/>
+						{filtersOn ? (
+							<PanelHeaderButton mode="secondary" size="m" onClick={dropFilters}>
+								<div style={{ paddingRight: '10px' }}>
+									<Avatar size={24}>
+										<Icon24Dismiss />
+									</Avatar>
+								</div>
+							</PanelHeaderButton>
+						) : null}
+					</div>
+				) : null}
 
-					{/* <AnimateGroup animationIn="fadeInUp" animationOut="popOut" duration={500}> */}
-					{cols}
-					{/* </AnimateGroup> */}
+				{/* <AnimateGroup animationIn="fadeInUp" animationOut="popOut" duration={500}> */}
+				{cols}
+				{/* </AnimateGroup> */}
 
-					{rads.length > 0 ? null : error ? (
-						<Error />
-					) : !inited ? (
-						<></>
-					) : mode == MODE_ALL ? (
-						<AdNotFound dropFilters={dropFilters} />
-					) : mode == MODE_GIVEN ? (
-						<AdNoGiven setAllMode={setAllMode} />
-					) : (
-						<AdNoWanted setAllMode={setAllMode} />
-					)}
-				</div>
-			</PullToRefresh>
-		</>
+				{rads.length > 0 ? null : error ? (
+					<Error />
+				) : !inited ? (
+					<></>
+				) : mode == MODE_ALL ? (
+					<AdNotFound dropFilters={dropFilters} />
+				) : mode == MODE_GIVEN ? (
+					<AdNoGiven setAllMode={setAllMode} />
+				) : (
+					<AdNoWanted setAllMode={setAllMode} />
+				)}
+			</div>
+		</PullToRefresh>
 	);
 };
 
@@ -476,6 +485,8 @@ const mapStateToProps = (state) => {
 		inputData: state.formData.forms,
 		direction: state.router.direction,
 		cache: state.cache,
+
+		activeModals: state.router.activeModals,
 	};
 };
 

@@ -491,12 +491,13 @@ export const routerReducer = (state = initialState, action) => {
 			let Story = state.activeStory;
 			let modal = action.payload.modal;
 			let Modals = state.modalHistory[Story] || [];
+			const direction = action.payload.direction ? action.payload.direction : DIRECTION_FORWARD;
 
 			// console.log("OPEN_MODAL ", Story, activeModals, modalHistory)
 
 			return {
 				...state,
-				direction: DIRECTION_FORWARD,
+				direction,
 				from: '',
 				to: '',
 				activeModals: {

@@ -33,7 +33,7 @@ const SubsLabelInner = (props) => {
 							mode="secondary"
 							aside={props.ad.isAuthor && <Link onClick={openSubs}>Показать всех</Link>}
 						>
-							Отликнулись
+							Откликнулись
 						</Header>
 					}
 				>

@@ -193,3 +193,5 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {};
 
 export const ModalCardCaptionAdsType = connect(mapStateToProps, mapDispatchToProps)(ModalCardCaptionAdsTypeInner);
+
+// 197

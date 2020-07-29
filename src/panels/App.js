@@ -383,7 +383,7 @@ const App = (props) => {
 
 	function backToGeoFilters() {
 		backToAdsFilters();
-		openModal(MODAL_ADS_GEO);
+		openModal(MODAL_ADS_GEO, DIRECTION_BACK);
 	}
 
 	let adPanels = panelsHistory[STORY_ADS];
@@ -495,7 +495,7 @@ const App = (props) => {
 					</Panel>
 					<Panel id={PANEL_SUBS}>
 						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
-							<p className="panel-header">Отликнувшиеся</p>
+							<p className="panel-header">Откликнувшиеся</p>
 							{/* {choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошибка'} */}
 						</PanelHeader>
 						{choosen ? <Subs openUser={setProfile} amount={5} maxAmount={-1} /> : Error}
@@ -528,11 +528,11 @@ const App = (props) => {
 					</Panel>
 					<Panel id={PANEL_COUNTRIES}>
 						<PanelHeader left={<PanelHeaderBack onClick={backToGeoFilters} />}>Выберите страну</PanelHeader>
-						<Countries goBack={backToGeoFilters} redux_form={ADS_FILTERS} />
+						<Countries goBack={backToGeoFilters} redux_form={ADS_FILTERS_B} />
 					</Panel>
 					<Panel id={PANEL_CITIES}>
 						<PanelHeader left={<PanelHeaderBack onClick={backToGeoFilters} />}>Выберите город</PanelHeader>
-						<Cities goBack={backToGeoFilters} redux_form={ADS_FILTERS} />
+						<Cities goBack={backToGeoFilters} redux_form={ADS_FILTERS_B} />
 					</Panel>
 					<Panel id={PANEL_MAP}>
 						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>Местоположение</PanelHeader>

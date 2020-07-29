@@ -205,7 +205,7 @@ export const postStoryApp = () => {
 					},
 				},
 				{
-					sticker_type: "renderable",
+					sticker_type: 'renderable',
 					sticker: {
 						can_delete: 0,
 						content_type: 'image',
@@ -218,7 +218,7 @@ export const postStoryApp = () => {
 									tooltip_text_key: 'tooltip_open_post',
 									transform: {
 										relation_width: 0.15,
-									}
+									},
 								},
 								clickable_area: [
 									{
@@ -256,21 +256,19 @@ export const postStoryApp = () => {
 
 export const getGeodata = (successCallback, failCallback) => {
 	let cleanupFunction = false;
+	const s = successCallback || (() => {});
+	const f = failCallback || (() => {});
 	bridge
 		.send('VKWebAppGetGeodata')
 		.then((geodata) => {
-			if (successCallback) {
-				successCallback(geodata);
-			}
+			s(geodata);
 			if (!cleanupFunction) {
 				store.dispatch(setGeoData(geodata));
 			}
 		})
 		.catch((error) => {
 			console.log('VKWebAppGetGeodata error', error);
-			if (failCallback) {
-				failCallback(error);
-			}
+			f(error);
 			fail('Не удалось получить местоположение. Проверьте, включен ли GPS');
 		});
 	return () => (cleanupFunction = true);

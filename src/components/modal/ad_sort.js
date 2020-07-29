@@ -1,0 +1,112 @@
+import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
+
+import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
+import Icon24Done from '@vkontakte/icons/dist/24/done';
+
+import { setFormData } from '../../store/create_post/actions';
+import { ADS_FILTERS } from '../../store/create_post/types';
+import { closeAllModals } from '../../store/router/actions';
+
+import bridge from '@vkontakte/vk-bridge';
+
+import { Radio, Header, CellButton, Button, Group } from '@vkontakte/vkui';
+import { getGeodata } from '../../services/VK';
+import { pushToCache } from '../../store/cache/actions';
+
+const { SORT_TIME, SORT_GEO } = require('../../const/ads');
+
+const ModalPageAdsSortInner = (props) => {
+	const { setFormData, closeAllModals, inputData, pushToCache } = props;
+
+	const [isTimeSort, setIsTimeSort] = useState(true);
+	const [sort, setSort] = useState(SORT_TIME);
+	const [geodata, setGeodata] = useState();
+	useEffect(() => {
+		if (!inputData[ADS_FILTERS] || inputData[ADS_FILTERS].sort == undefined) {
+			return;
+		}
+		console.log('sooooome', inputData[ADS_FILTERS]);
+		setSort(inputData[ADS_FILTERS].sort);
+		setIsTimeSort(inputData[ADS_FILTERS].sort == SORT_TIME);
+	}, []);
+	function applyTimeSort() {
+		setIsTimeSort(true);
+		setSort(SORT_TIME);
+	}
+
+	function applyGeoSort() {
+		setIsTimeSort(false);
+		setSort(SORT_GEO);
+
+		bridge.send('VKWebAppGetGeodata').then((value) => {
+			setGeodata(value);
+
+			console.log('VKWebAppGetGeodata', value);
+		});
+	}
+
+	useEffect(() => {
+		getGeodata();
+	}, []);
+
+	function save() {
+		setFormData(ADS_FILTERS, {
+			...inputData[ADS_FILTERS],
+			sort,
+			geodata,
+		});
+		pushToCache(true, 'ignore_cache');
+		closeAllModals();
+	}
+
+	return (
+		<>
+			<Group separator="show" header={<Header mode="secondary">Отсортировать по</Header>}>
+				<Radio checked={isTimeSort} key={SORT_TIME} value={SORT_TIME} name="sort" onChange={applyTimeSort}>
+					По времени
+				</Radio>
+				<Radio checked={!isTimeSort} key={SORT_GEO} value={SORT_GEO} name="sort" onChange={applyGeoSort}>
+					По близости
+				</Radio>
+			</Group>
+			<div className="flex-center">
+				<div style={{ display: 'flex' }}>
+					<div style={{ padding: '8px', flex: 1 }}>
+						<Button
+							stretched
+							size="l"
+							mode="destructive"
+							onClick={closeAllModals}
+							before={<Icon24Cancel />}
+						>
+							Отменить
+						</Button>
+					</div>
+					<div style={{ padding: '8px', flex: 1 }}>
+						<Button stretched size="l" mode="primary" onClick={save} before={<Icon24Done />}>
+							Сохранить
+						</Button>
+					</div>
+				</div>
+			</div>
+		</>
+	);
+};
+
+const mapStateToProps = (state) => {
+	return {
+		inputData: state.formData.forms,
+		direction: state.router.direction,
+	};
+};
+
+const mapDispatchToProps = {
+	setFormData,
+	closeAllModals,
+	pushToCache,
+};
+
+export const ModalPageAdsSort = connect(mapStateToProps, mapDispatchToProps)(ModalPageAdsSortInner);
+
+// 112

@@ -97,10 +97,11 @@ export const closeSnackbar = () => ({
 	type: CLOSE_SNACKBAR,
 });
 
-export const openModal = (modal) => ({
+export const openModal = (modal, direction) => ({
 	type: OPEN_MODAL,
 	payload: {
 		modal,
+		direction,
 	},
 });
 

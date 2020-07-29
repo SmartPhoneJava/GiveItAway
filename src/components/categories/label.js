@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FormLayout, SelectMimicry, Group, Header, Link, Div } from '@vkontakte/vkui';
+import { FormLayout, SelectMimicry, Group, Header, Link, Div, withModalRootContext } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
@@ -109,10 +109,15 @@ const CategoriesLabel = (props) => {
 			setTagsUpdate(true);
 		}, 500);
 		setTagsUpdate(false);
+
 		return () => {
 			cancel = true;
 		};
 	}, [inputData[redux_form]]);
+
+	useEffect(() => {
+		props.updateModalHeight();
+	});
 
 	return (
 		<Group
@@ -135,4 +140,4 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {};
 
-export default connect(mapStateToProps, mapDispatchToProps)(CategoriesLabel);
+export default withModalRootContext(connect(mapStateToProps, mapDispatchToProps)(CategoriesLabel));

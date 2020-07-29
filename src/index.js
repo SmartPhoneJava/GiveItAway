@@ -2,7 +2,6 @@ import 'core-js/features/map';
 import 'core-js/features/set';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import bridge from '@vkontakte/vk-bridge';
 import App from './panels/App';
 import * as eruda from 'eruda';
 import * as erudaCode from 'eruda-code';
@@ -13,8 +12,6 @@ import thunk from 'redux-thunk';
 import { Provider } from 'react-redux';
 import rootReducer from './store/reducers';
 import { composeWithDevTools } from 'redux-devtools-extension';
-
-import { setStory } from './store/router/actions';
 
 import '@vkontakte/vkui/dist/vkui.css';
 
