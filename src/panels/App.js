@@ -11,7 +11,7 @@ import {
 	ConfigProvider,
 } from '@vkontakte/vkui';
 
-import { STORY_ADS, STORY_CREATE } from './../store/router/storyTypes';
+import { STORY_ADS, STORY_CREATE, STORY_NOTIFICATIONS } from './../store/router/storyTypes';
 import {
 	PANEL_ADS,
 	PANEL_ONE,
@@ -29,6 +29,7 @@ import {
 	PANEL_FAQ,
 	PANEL_ADVICES,
 	PANEL_LICENCE,
+	PANEL_NOTIFICATIONS,
 } from './../store/router/panelTypes';
 
 import { MODAL_ADS_FILTERS, MODAL_ADS_GEO } from './../store/router/modalTypes';
@@ -73,6 +74,7 @@ import Create from './../containers/create/create';
 import Icon28User from '@vkontakte/icons/dist/28/user';
 import Icon28NewsfeedOutline from '@vkontakte/icons/dist/28/newsfeed_outline';
 import Icon28Add from '@vkontakte/icons/dist/28/add_outline';
+import Icon24Notification from '@vkontakte/icons/dist/24/notification';
 
 import {
 	handleNotifications,
@@ -84,6 +86,8 @@ import {
 } from './story/adds/tabs/notifications/notifications';
 
 import AddMore2 from './template/AddMore2';
+
+import Notifications from './story/adds/tabs/notifications/notifications';
 
 import { GEO_TYPE_FILTERS, AdDefault, STATUS_OFFER, STATUS_CHOSEN } from './../const/ads';
 
@@ -118,7 +122,8 @@ import { DIRECTION_BACK, DIRECTION_FORWARD } from '../store/router/directionType
 import { pushToCache } from '../store/cache/actions';
 
 const adsText = 'Объявления';
-const addText = 'Создать обьявление';
+const notText = 'Уведомления';
+const addText = 'Создать';
 const profileText = 'Профиль';
 
 const addr = AddrWS.getState() + '/connection/websocket';
@@ -225,24 +230,6 @@ const App = (props) => {
 			}
 		}
 	}, [props.from]);
-
-	const [addsTabs, setAddsTabs] = useState(<></>);
-	useEffect(() => {
-		const v = (
-			<AddsTabs
-				notsCounter={notsCounterrr}
-				zeroNots={() => {
-					notsCounterrr = 0;
-				}}
-				refresh={SetDeleteID}
-				deleteID={deleteID}
-				openUser={setProfile}
-				dropFilters={dropFilters}
-				openAd={setReduxAd}
-			/>
-		);
-		setAddsTabs(v);
-	}, []);
 
 	const [notHere, setNotHere] = useState(false);
 	const [subscription, setSubscription] = useState(null);
@@ -395,7 +382,7 @@ const App = (props) => {
 	let choosen = activeAd;
 
 	if (!inited) {
-		console.log("lock lock lock3")
+		console.log('lock lock lock3');
 		return <ScreenSpinner size="large" />;
 	}
 
@@ -415,8 +402,6 @@ const App = (props) => {
 							data-story={STORY_ADS}
 							data-text={adsText}
 							text={adsText}
-							label={notsCounterrr == 0 ? null : notsCounterrr}
-							// after={notsCounter == 0 ? '' : <Counter>notsCounter</Counter>}
 						>
 							<Icon28NewsfeedOutline onClick={onStoryChange} />
 						</TabbarItem>
@@ -429,6 +414,16 @@ const App = (props) => {
 							text={addText}
 						>
 							<Icon28Add onClick={onStoryChange} />
+						</TabbarItem>
+						<TabbarItem
+							onClick={onStoryChange}
+							data-text={notText}
+							selected={activeStory === STORY_NOTIFICATIONS}
+							data-story={STORY_NOTIFICATIONS}
+							label={notsCounterrr == 0 ? null : notsCounterrr}
+							text={notText}
+						>
+							<Icon24Notification onClick={onStoryChange} />
 						</TabbarItem>
 						<TabbarItem
 							onClick={onStoryChange}
@@ -452,7 +447,17 @@ const App = (props) => {
 					header={false}
 				>
 					<Panel id={PANEL_ADS} separator={false}>
-						{addsTabs}
+						<AddsTabs
+							notsCounter={notsCounterrr}
+							zeroNots={() => {
+								notsCounterrr = 0;
+							}}
+							refresh={SetDeleteID}
+							deleteID={deleteID}
+							openUser={setProfile}
+							dropFilters={dropFilters}
+							openAd={setReduxAd}
+						/>
 						{snackbars[PANEL_ADS]}
 					</Panel>
 					<Panel id={PANEL_ONE}>
@@ -588,6 +593,25 @@ const App = (props) => {
 					<Panel id={PANEL_CITIES}>
 						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>Выберите город</PanelHeader>
 						<Cities redux_form={FORM_LOCATION_CREATE} goBack={goBack} />
+					</Panel>
+				</View>
+				<View
+					id={STORY_NOTIFICATIONS}
+					activePanel={PANEL_NOTIFICATIONS}
+					// popout={createPopout}
+					// history={createPanels}
+				>
+					<Panel id={PANEL_NOTIFICATIONS}>
+						<PanelHeader>Уведомления</PanelHeader>
+						<Notifications
+							zeroNots={() => {
+								notsCounterrr = 0;
+							}}
+							openUser={setProfile}
+							openAd={setReduxAd}
+							goToAds={() => {}}
+						/>
+						{snackbars[PANEL_NOTIFICATIONS]}
 					</Panel>
 				</View>
 			</Epic>

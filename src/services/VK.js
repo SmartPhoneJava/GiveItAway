@@ -163,86 +163,124 @@ export const postApp = () => {
 };
 
 export const postStoryApp = () => {
+	const stickers1 = [
+		{
+			sticker_type: 'renderable',
+			sticker: {
+				can_delete: 0,
+				content_type: 'image',
+				url: 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Dialog.png',
+				clickable_zones: [
+					{
+						action_type: 'link',
+						action: {
+							link: 'https://vk.com/wall-166562603_1192',
+							tooltip_text_key: 'tooltip_open_post',
+						},
+						clickable_area: [
+							{
+								x: 17,
+								y: 110,
+							},
+							{
+								x: 97,
+								y: 110,
+							},
+							{
+								x: 97,
+								y: 132,
+							},
+							{
+								x: 17,
+								y: 132,
+							},
+						],
+					},
+				],
+			},
+		},
+	];
+	const stickers = [
+		{
+			sticker_type: 'native',
+			sticker: {
+				action_type: 'text',
+				action: {
+					text: 'Отдать даром',
+					style: 'marker',
+					selection_color: '#33CCFF',
+					background_style: 'sticker',
+				},
+				transform: {
+					gravity: 'center_top',
+					translation_y: 0.1,
+					rotation: 10,
+					relation_width: 0.8,
+				},
+			},
+		},
+		{
+			sticker_type: 'native',
+			sticker: {
+				action_type: 'text',
+				action: {
+					text: 'отдавай ненужное,\n получай необходимое',
+					style: 'marker',
+					selection_color: '#99CCFF',
+					background_style: 'solid',
+				},
+				transform: {
+					translation_y: -0.1,
+					relation_width: 0.99,
+					gravity: 'center_bottom',
+				},
+			},
+		},
+		{
+			sticker_type: 'renderable',
+			sticker: {
+				can_delete: 0,
+				content_type: 'image',
+				url: 'https://i.imgur.com/igRw4Dl.png',
+				clickable_zones: [
+					{
+						action_type: 'link',
+						action: {
+							link: 'https://vk.com/app7360033',
+							tooltip_text_key: 'tooltip_open_post',
+							transform: {
+								relation_width: 0.15,
+							},
+						},
+						clickable_area: [
+							{
+								x: 17,
+								y: 110,
+							},
+							{
+								x: 97,
+								y: 110,
+							},
+							{
+								x: 97,
+								y: 132,
+							},
+							{
+								x: 17,
+								y: 132,
+							},
+						],
+					},
+				],
+			},
+		},
+	];
 	return bridge
 		.send('VKWebAppShowStoryBox', {
 			background_type: 'image',
 			url: 'https://sun1-83.userapi.com/0QRpYvldpBt6X45omFT937P7JGluqtOT9IHK2Q/cIgz-evmWyw.jpg',
 
-			stickers: [
-				{
-					sticker_type: 'native',
-					sticker: {
-						action_type: 'text',
-						action: {
-							text: 'Отдать даром',
-							style: 'marker',
-							selection_color: '#33CCFF',
-							background_style: 'sticker',
-						},
-						transform: {
-							gravity: 'center_top',
-							translation_y: 0.1,
-							rotation: 10,
-							relation_width: 0.8,
-						},
-					},
-				},
-				{
-					sticker_type: 'native',
-					sticker: {
-						action_type: 'text',
-						action: {
-							text: 'отдавай ненужное,\n получай необходимое',
-							style: 'marker',
-							selection_color: '#99CCFF',
-							background_style: 'solid',
-						},
-						transform: {
-							translation_y: -0.1,
-							relation_width: 0.99,
-							gravity: 'center_bottom',
-						},
-					},
-				},
-				{
-					sticker_type: 'renderable',
-					sticker: {
-						can_delete: 0,
-						content_type: 'image',
-						url: 'https://i.imgur.com/igRw4Dl.png',
-						clickable_zones: [
-							{
-								action_type: 'link',
-								action: {
-									link: 'https://vk.com/app7360033',
-									tooltip_text_key: 'tooltip_open_post',
-									transform: {
-										relation_width: 0.15,
-									},
-								},
-								clickable_area: [
-									{
-										x: 17,
-										y: 110,
-									},
-									{
-										x: 97,
-										y: 110,
-									},
-									{
-										x: 97,
-										y: 132,
-									},
-									{
-										x: 17,
-										y: 132,
-									},
-								],
-							},
-						],
-					},
-				},
-			],
+			stickers,
 		})
 		.then((data) => {
 			success('Вы успешно поделились объявлением');

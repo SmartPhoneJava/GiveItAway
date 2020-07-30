@@ -207,17 +207,17 @@ const isValid = (inputData) => {
 				};
 			}
 		}
-		const mainInfo = getMainInfo(inputData);
-		if (mainInfo) {
-			const { ls_enabled, comments_enabled } = mainInfo;
-			if (!ls_enabled && !comments_enabled) {
-				return {
-					v: false,
-					header: 'Обратная связь',
-					text: 'Разрешите доступ к ЛС или включите комментарии',
-				};
-			}
-		}
+		//const mainInfo = getMainInfo(inputData);
+		// if (mainInfo) {
+		// 	const { ls_enabled, comments_enabled } = mainInfo;
+		// 	if (!ls_enabled && !comments_enabled) {
+		// 		return {
+		// 			v: false,
+		// 			header: 'Обратная связь',
+		// 			text: 'Разрешите доступ к ЛС или включите комментарии',
+		// 		};
+		// 	}
+		// }
 	} else {
 		return {
 			v: false,

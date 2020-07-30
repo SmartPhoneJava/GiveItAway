@@ -36,41 +36,6 @@ const AddsTabs = (props) => {
 	const activeTab = activeTabs[activeStory] || TAB_ADS;
 	const [contextOpened, setContextOpened] = useState(false);
 
-	const [activeComponent, setActiveComponent] = useState(null);
-	useEffect(() => {
-		console.log('oNMECLICK', activeTab);
-		let v = null;
-		if (activeTab == TAB_NOTIFICATIONS) {
-			v = (
-				<Notifications
-					zeroNots={props.zeroNots}
-					openUser={props.openUser}
-					openAd={props.openAd}
-					goToAds={() => {
-						setTab(TAB_ADS);
-					}}
-				/>
-			);
-		} else {
-			v = (
-				<AddsTab
-					openAd={props.openAd}
-					dropFilters={props.dropFilters}
-					deleteID={props.deleteID}
-					openUser={props.openUser}
-					refresh={props.refresh}
-					onFiltersClick={() => {
-						openModal(MODAL_ADS_FILTERS);
-					}}
-					onCloseClick={() => {
-						openModal(MODAL_ADS_SUBS);
-					}}
-				/>
-			);
-		}
-		setActiveComponent(v);
-	}, [activeTabs]);
-
 	function select(e) {
 		props.dropFilters();
 		setFormData(ADS_FILTERS, {
@@ -85,12 +50,6 @@ const AddsTabs = (props) => {
 			setContextOpened(!contextOpened);
 		}
 		setTab(TAB_ADS);
-	}
-
-	function onTabNotsClick() {
-		setTab(TAB_NOTIFICATIONS);
-		console.log('onTabNotsClick');
-		setContextOpened(false);
 	}
 
 	return (
@@ -112,15 +71,6 @@ const AddsTabs = (props) => {
 						}
 					>
 						{mode == MODE_ALL ? 'Все' : mode == MODE_WANTED ? 'Хочу забрать' : 'Отдаю'}
-					</TabsItem>
-					<TabsItem
-						// label={props.notsCounter == 0 ? null : props.notsCounter}
-						onClick={onTabNotsClick}
-						selected={activeTab === TAB_NOTIFICATIONS}
-					>
-						<TabbarItem label={props.notsCounter == 0 ? null : props.notsCounter}>
-							<Icon28Notifications />
-						</TabbarItem>
 					</TabsItem>
 				</Tabs>
 			</PanelHeader>
@@ -160,7 +110,19 @@ const AddsTabs = (props) => {
 					</Cell>
 				</List>
 			</PanelHeaderContext>
-			{activeComponent}
+			<AddsTab
+				openAd={props.openAd}
+				dropFilters={props.dropFilters}
+				deleteID={props.deleteID}
+				openUser={props.openUser}
+				refresh={props.refresh}
+				onFiltersClick={() => {
+					openModal(MODAL_ADS_FILTERS);
+				}}
+				onCloseClick={() => {
+					openModal(MODAL_ADS_SUBS);
+				}}
+			/>
 		</React.Fragment>
 	);
 };

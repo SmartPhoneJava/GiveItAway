@@ -56,7 +56,7 @@ const ChooseFeedback = (props) => {
 				</Cell>
 			}
 		>
-			<Cell
+			{/* <Cell
 				before={<Icon24Message fill="var(--header_tab_inactive_text)" />}
 				multiline
 				disabled={!props.pmOpen}
@@ -76,7 +76,7 @@ const ChooseFeedback = (props) => {
 				description="Любой желающий может написать вам в ЛС"
 			>
 				Личные сообщения
-			</Cell>
+			</Cell> */}
 			<Cell
 				before={<Icon24Comment fill="var(--header_tab_inactive_text)" />}
 				multiline

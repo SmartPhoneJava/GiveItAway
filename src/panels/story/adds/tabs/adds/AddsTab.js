@@ -35,22 +35,11 @@ import AdNoGiven from '../../../../placeholders/adNoGiven';
 import { NoRegion } from '../../../../../components/location/const';
 import { CategoryNo } from '../../../../../components/categories/const';
 import { ColumnsFunc } from '../../../../template/columns';
-import { DIRECTION_BACK, NO_DIRECTION } from '../../../../../store/router/directionTypes';
+import { DIRECTION_BACK } from '../../../../../store/router/directionTypes';
 import { pushToCache } from '../../../../../store/cache/actions';
 import { STORY_ADS } from '../../../../../store/router/storyTypes';
 
-import { Transition } from 'react-transition-group';
-
 let i = 0;
-
-const duration = 300;
-
-const transitionStyles = {
-	entering: { opacity: 1, transition: `opacity ${duration}ms ease-in-out` },
-	entered: { opacity: 1, transition: `opacity ${duration}ms ease-in-out` },
-	exiting: { opacity: 0, transition: `opacity ${duration}ms ease-in-out` },
-	exited: { opacity: 0, transition: `opacity ${duration}ms ease-in-out` },
-};
 
 const SEARCH_WAIT = 650;
 
@@ -157,8 +146,12 @@ const AddsTab = (props) => {
 	const [cols, setCols] = useState([]);
 
 	useEffect(() => {
-		setPullLoading(!error404 && loading);
-	}, [error404, loading]);
+		console.log('pullLoading', pullLoading);
+	}, [pullLoading]);
+
+	// useEffect(() => {
+	// 	setPullLoading(true);
+	// }, [refreshMe]);
 
 	useEffect(() => {
 		if (activeModal) {
@@ -381,7 +374,6 @@ const AddsTab = (props) => {
 		return (
 			<Add7
 				vkPlatform={props.vkPlatform}
-				openUser={props.openUser}
 				openAd={() => {
 					props.openAd(ad);
 				}}
@@ -394,18 +386,14 @@ const AddsTab = (props) => {
 		);
 	}
 
-	return (
-		<PullToRefresh
-			onRefresh={() => {
-				setRefreshMe((prev) => prev + 1);
-			}}
-			isFetching={pullLoading}
-		>
+	const [body, setBody] = useState(<></>);
+	useEffect(() => {
+		setBody(
 			<div
 				style={{
 					height: 'auto',
 					display: 'flex',
-					// background: 'var(--background_page)',
+
 					flexDirection: 'column',
 					overflow: 'hidden',
 					textOverflow: 'ellipsis',
@@ -449,9 +437,19 @@ const AddsTab = (props) => {
 					</div>
 				) : null}
 
-				{/* <AnimateGroup animationIn="fadeInUp" animationOut="popOut" duration={500}> */}
-				{cols}
-				{/* </AnimateGroup> */}
+				<PullToRefresh
+					onRefresh={() => {
+						setPullLoading(true);
+
+						setTimeout(() => {
+							setPullLoading(false);
+							setRefreshMe((prev) => prev + 1);
+						}, 150);
+					}}
+					isFetching={pullLoading}
+				>
+					{cols}
+				</PullToRefresh>
 
 				{rads.length > 0 ? null : error ? (
 					<Error />
@@ -465,8 +463,10 @@ const AddsTab = (props) => {
 					<AdNoWanted setAllMode={setAllMode} />
 				)}
 			</div>
-		</PullToRefresh>
-	);
+		);
+	}, [mode, pullLoading, search, props.inputData, props.activeModals, cols]);
+
+	return body;
 };
 
 const mapStateToProps = (state) => {

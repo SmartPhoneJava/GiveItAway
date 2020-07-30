@@ -15,3 +15,4 @@ export const PANEL_ABOUT = 'about';
 export const PANEL_FAQ = 'faq';
 export const PANEL_ADVICES = 'advice';
 export const PANEL_LICENCE = 'licence';
+export const PANEL_NOTIFICATIONS = 'notifications';

@@ -93,11 +93,7 @@ const Add7 = (props) => {
 
 	function authorPanel() {
 		return (
-			<InfoRow
-			// onClick={() => {
-			// 	props.openUser(ad.author.vk_id);
-			// }}
-			>
+			<InfoRow>
 				<div className="aauthor">
 					<div style={{ marginRight: '5px', minWidth: '20px' }}>
 						<Avatar size={20} src={ad.author.photo_url} />
