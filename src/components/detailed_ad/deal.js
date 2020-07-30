@@ -26,7 +26,7 @@ import Icon24Help from '@vkontakte/icons/dist/24/help';
 import Icon24MarketOutline from '@vkontakte/icons/dist/24/market_outline';
 
 import { TYPE_CHOICE, STATUS_OFFER, TYPE_RANDOM } from '../../const/ads';
-import { getAuctionMaxUser, getCashback, CancelClose } from '../../requests';
+import { getAuctionMaxUser, getCashback, CancelClose, Close } from '../../requests';
 import { withLoadingIf } from '../image/image_cache';
 import { openModal, setProfile, setPage } from '../../store/router/actions';
 import { MODAL_ADS_TYPES, MODAL_ADS_FROZEN, MODAL_ADS_COST } from '../../store/router/modalTypes';
@@ -138,15 +138,27 @@ const DealLabelInner = (props) => {
 							>
 								Отменить
 							</CellButton>
-							<CellButton onClick={openSubs} disabled={disable} before={<Icon24Repost />}>
-								Изменить
-							</CellButton>
+							{ad_type == TYPE_CHOICE && (
+								<CellButton onClick={openSubs} disabled={disable} before={<Icon24Repost />}>
+									Изменить
+								</CellButton>
+							)}
 						</div>
 					</Group>
 				);
 			} else {
 				button = (
-					<CellButton onClick={openSubs} disabled={disable} before={<Icon24Done />}>
+					<CellButton
+						onClick={
+							ad_type == TYPE_RANDOM
+								? () => {
+										Close(ad_id, ad_type, 0);
+								  }
+								: openSubs
+						}
+						disabled={disable}
+						before={<Icon24Done />}
+					>
 						{ad_type == TYPE_RANDOM ? 'Запустить' : 'Выбрать получателя'}
 					</CellButton>
 				);

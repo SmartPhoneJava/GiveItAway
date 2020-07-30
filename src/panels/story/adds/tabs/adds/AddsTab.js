@@ -1,20 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import {
-	Search,
-	Group,
-	ScreenSpinner,
-	PanelHeaderButton,
-	Avatar,
-	Banner,
-	List,
-	PullToRefresh,
-	Spinner,
-	CellButton,
-	Placeholder,
-	Button,
-} from '@vkontakte/vkui';
-
-import Icon56ErrorOutline from '@vkontakte/icons/dist/56/error_outline';
+import { Search, PullToRefresh, Spinner, SimpleCell } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
@@ -33,11 +18,6 @@ import { Addr, BASE_AD } from './../../../../../store/addr';
 import { User } from './AddsTab/../../../../../../store/user';
 
 import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';
-
-import { bounce } from 'react-animations';
-import Radium, { StyleRoot } from 'radium';
-
-import { AnimateGroup } from 'react-animation';
 
 import {
 	SORT_TIME,
@@ -59,7 +39,18 @@ import { DIRECTION_BACK, NO_DIRECTION } from '../../../../../store/router/direct
 import { pushToCache } from '../../../../../store/cache/actions';
 import { STORY_ADS } from '../../../../../store/router/storyTypes';
 
+import { Transition } from 'react-transition-group';
+
 let i = 0;
+
+const duration = 300;
+
+const transitionStyles = {
+	entering: { opacity: 1, transition: `opacity ${duration}ms ease-in-out` },
+	entered: { opacity: 1, transition: `opacity ${duration}ms ease-in-out` },
+	exiting: { opacity: 0, transition: `opacity ${duration}ms ease-in-out` },
+	exited: { opacity: 0, transition: `opacity ${duration}ms ease-in-out` },
+};
 
 const SEARCH_WAIT = 650;
 
@@ -80,12 +71,11 @@ const AddsTab = (props) => {
 	const [sort, setSort] = useState(SORT_TIME);
 	const [mode, setMode] = useState(MODE_ALL);
 	const [search, setSearch] = useState('');
-	const [prevInputData, setPrevInputData] = useState();
+	const [filtersOn, setFiltersOn] = useState(false);
 	useEffect(() => {
 		if (activeModal) {
 			return;
 		}
-		console.log('look at', inputData[ADS_FILTERS]);
 		const s = inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].search : null || '';
 		if (s == undefined) {
 			setSearch('');
@@ -108,8 +98,6 @@ const AddsTab = (props) => {
 		const cit = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].city : null) || NoRegion;
 		setCity(cit);
 
-		console.log('set city', cit, activeModal);
-
 		const categor = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].category : null) || CategoryNo;
 		setCategory(categor);
 
@@ -124,6 +112,9 @@ const AddsTab = (props) => {
 
 		const mod = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].mode : null) || MODE_ALL;
 		setMode(mod);
+
+		console.log('flters loook', cit, categor, rad);
+		setFiltersOn(cit != NoRegion || categor != CategoryNo || rad != 0);
 	}, [props.inputData[ADS_FILTERS]]);
 
 	const [searchR, setSearchR] = useState('');
@@ -145,17 +136,6 @@ const AddsTab = (props) => {
 
 	const [refreshMe, setRefreshMe] = useState(1);
 	const [pageNumber, setPageNumber] = useState(1);
-	const [filtersOn, setFiltersOn] = useState(false);
-	useEffect(() => {
-		if (activeModal) {
-			return;
-		}
-		if (country == NoRegion && city == NoRegion && category == CategoryNo && radius == 0) {
-			setFiltersOn(false);
-			return;
-		}
-		setFiltersOn(true);
-	}, [country, city, category, radius]);
 
 	const [isMounted, setIsMounted] = useState(true);
 	useEffect(() => {
@@ -433,25 +413,39 @@ const AddsTab = (props) => {
 				}}
 			>
 				{mode != MODE_WANTED ? (
-					<div style={{ display: 'flex', background: 'var(--background_content)' }}>
-						<Search
-							key="search"
-							autoFocus={true}
-							// onBlur={() => searchRef.current.focus }
-							value={search}
-							onChange={handleSearch}
-							icon={<Icon24Filter />}
-							onIconClick={props.onFiltersClick}
-						/>
-						{filtersOn ? (
-							<PanelHeaderButton mode="secondary" size="m" onClick={dropFilters}>
-								<div style={{ paddingRight: '10px' }}>
-									<Avatar size={24}>
-										<Icon24Dismiss />
-									</Avatar>
-								</div>
-							</PanelHeaderButton>
-						) : null}
+					<div style={{ display: 'flex' }}>
+						<div style={{}}></div>
+						<div
+							style={{
+								transition: '0.3s',
+								width: `${filtersOn ? '90%' : '100%'}`,
+							}}
+						>
+							<Search
+								style={{
+									transition: '0.3s',
+								}}
+								key="search"
+								// onBlur={() => searchRef.current.focus }
+								value={search}
+								onChange={handleSearch}
+								icon={<Icon24Filter />}
+								onIconClick={props.onFiltersClick}
+							/>
+						</div>
+						<div
+							style={{
+								transition: '0.3s',
+								width: `${filtersOn ? '100%' : '0%'}`,
+							}}
+						>
+							<SimpleCell
+								style={{ padding: '0px', margin: '0px' }}
+								before={<Icon24Dismiss />}
+								mode="secondary"
+								onClick={dropFilters}
+							/>
+						</div>
 					</div>
 				) : null}
 

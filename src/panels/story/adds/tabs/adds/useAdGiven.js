@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-import { ScreenSpinner, Spinner } from '@vkontakte/vkui';
+import { Spinner } from '@vkontakte/vkui';
 
 import { Addr, BASE_USER } from '../../../../../store/addr';
 
@@ -18,7 +18,7 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 	}, [user_id]);
 
 	useEffect(() => {
-		setPopout(<Spinner size="small"/>)
+		setPopout(<Spinner size="small" />);
 		setLoading(true);
 		setError(false);
 		setInited(false);
@@ -39,7 +39,7 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 		})
 			.then((res) => {
 				if (clear) {
-					return
+					return;
 				}
 				console.log('useAdGiven', res);
 				const newAds = res.data;
@@ -53,7 +53,7 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 			})
 			.catch((e) => {
 				if (clear) {
-					return
+					return;
 				}
 				console.log('fail', e);
 				if (axios.isCancel(e)) return;
@@ -64,9 +64,9 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 				setInited(true);
 			});
 		return () => {
-			clear = true
+			clear = true;
 			cancel();
-		}
+		};
 	}, [pageNumber, user_id]);
 
 	return { loading, ads, hasMore, newPage: pageNumber };

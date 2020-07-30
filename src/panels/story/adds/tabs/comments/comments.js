@@ -13,6 +13,7 @@ import {
 	IOS,
 	Avatar,
 	Link,
+	Card,
 } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
@@ -56,10 +57,10 @@ const CommentsI = (props) => {
 		props.maxAmount
 	);
 
-	useEffect(()=>{
-		console.log("AD is", AD.comments, pageNumber)
-		setNots(AD.comments)
-	}, [AD.comments])
+	useEffect(() => {
+		console.log('AD is', AD.comments, pageNumber);
+		setNots(AD.comments);
+	}, [AD.comments]);
 
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
@@ -124,33 +125,26 @@ const CommentsI = (props) => {
 		}
 		return (
 			<Group
-				style={{ marginBottom: props.mini ? '0px' : '52px' }}
 				header={
-					props.mini ? (
-						<Header aside={props.mini ? <Link onClick={openCommentaries}>Показать все</Link> : ''}>
-							{'Комментарии'}
-						</Header>
-					) : (
-						''
+					props.mini && (
+						<Header aside={<Link onClick={openCommentaries}>Показать все</Link>}>Комментарии</Header>
 					)
 				}
 			>
 				{props.mini ? (
 					<Comment onClick={openCommentaries} v={nots[0]} />
 				) : (
-					nots.map((v, index) => {
-						let inner = <Comment onClick={() => onUserClick(v)} v={v} />;
-
-						if (nots.length === index + 1) {
-							return (
-								<div key={v.comment_id} ref={lastAdElementRef}>
-									{inner}
-								</div>
-							);
-						} else {
-							return <div key={v.comment_id}>{inner}</div>;
-						}
-					})
+					nots.map((v, index) => (
+						<div
+							style={{ padding: '4px' }}
+							key={v.comment_id}
+							ref={nots.length === index + 1 ? lastAdElementRef : null}
+						>
+							<Card mode="outline">
+								<Comment onClick={() => onUserClick(v)} v={v} />
+							</Card>
+						</div>
+					))
 				)}
 			</Group>
 		);

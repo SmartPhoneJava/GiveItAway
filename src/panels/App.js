@@ -395,6 +395,7 @@ const App = (props) => {
 	let choosen = activeAd;
 
 	if (!inited) {
+		console.log("lock lock lock3")
 		return <ScreenSpinner size="large" />;
 	}
 
@@ -521,7 +522,7 @@ const App = (props) => {
 								goBack();
 								goBack();
 								goBack();
-								openModal(MODAL_ADS_FILTERS);
+								// openModal(MODAL_ADS_FILTERS);
 							}}
 							goBack={goBack}
 							redux_form={ADS_FILTERS_B}

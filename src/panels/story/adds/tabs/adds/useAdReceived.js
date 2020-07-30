@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-import { ScreenSpinner, Spinner } from '@vkontakte/vkui';
+import { Spinner } from '@vkontakte/vkui';
 
 import { Addr, BASE_USER } from '../../../../../store/addr';
 
@@ -39,7 +39,7 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 		})
 			.then((res) => {
 				if (clear) {
-					return
+					return;
 				}
 				console.log('useAdReceived', res);
 				const newAds = res.data;
@@ -53,7 +53,7 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 			})
 			.catch((e) => {
 				if (clear) {
-					return
+					return;
 				}
 				console.log('fail', e);
 				if (axios.isCancel(e)) return;

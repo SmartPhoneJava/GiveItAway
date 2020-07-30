@@ -420,11 +420,11 @@ export function Close(ad_id, ad_type, subscriber_id, s, f) {
 	const failCallback = f || ((e) => {});
 	let err = false;
 	let cancel;
-	let params = { type: ad_type }
+	let params = { type: ad_type };
 	if (subscriber_id > 0) {
-		params.subscriber_id = subscriber_id
+		params.subscriber_id = subscriber_id;
 	}
-	console.log("loooook at ad_type", ad_type)
+	console.log('loooook at ad_type', ad_type);
 	axios({
 		method: 'put',
 		withCredentials: true,
@@ -435,7 +435,7 @@ export function Close(ad_id, ad_type, subscriber_id, s, f) {
 		.then(function (response) {
 			store.dispatch(closePopout());
 			store.dispatch(setStatus(STATUS_CHOSEN));
-			updateDealInfo()
+			updateDealInfo();
 			console.log('response from Close:', response);
 			success('Спасибо, что делаете других людей счастливыми :) Ждем подтверждения от второй стороны!', () => {
 				CancelClose(ad_id);
@@ -456,7 +456,8 @@ export function Close(ad_id, ad_type, subscriber_id, s, f) {
 }
 
 export async function getSubscribers(ad_id, successCallback, failCallback, count) {
-	store.dispatch(openPopout(<ScreenSpinner size="large" />));
+	console.log("lock lock lock4")
+	//store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;
 	const subscribers = await axios({
@@ -474,12 +475,12 @@ export async function getSubscribers(ad_id, successCallback, failCallback, count
 			return response.data;
 		})
 		.then(function (response) {
-			store.dispatch(closePopout());
+			//store.dispatch(closePopout());
 			successCallback(response);
 			return response;
 		})
 		.catch(function (error) {
-			store.dispatch(closePopout());
+			//store.dispatch(closePopout());
 			if (err) {
 				fail('Нет соединения с сервером');
 			}
@@ -491,7 +492,6 @@ export async function getSubscribers(ad_id, successCallback, failCallback, count
 }
 
 export async function getDetails(ad_id, successCallback, failCallback) {
-	// store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;
 	const data = await axios({
@@ -501,7 +501,6 @@ export async function getDetails(ad_id, successCallback, failCallback) {
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
 	})
 		.then(function (response) {
-			// store.dispatch(closePopout());
 			console.log('response from getDetails:', response);
 			return response.data;
 		})
@@ -519,14 +518,12 @@ export async function getDetails(ad_id, successCallback, failCallback) {
 			fail('Нет соединения с сервером', () => {
 				getDetails(ad_id);
 			});
-			// store.dispatch(closePopout());
 		});
 
 	return { details: data, err };
 }
 
 export async function canWritePrivateMessage(id, appID, apiVersion, successCallback, failCallback) {
-	console.log('before userdata', id, appID, apiVersion);
 	bridge
 		.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' })
 		.then((data) => {
@@ -807,5 +804,4 @@ export function fail(err, repeat, end) {
 	}
 }
 
-// 745
-// 600
+// 745 -> 600 -> 806

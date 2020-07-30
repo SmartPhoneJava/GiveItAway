@@ -5,7 +5,6 @@ import {
 	Button,
 	Group,
 	Cell,
-	ScreenSpinner,
 	Placeholder,
 	Caption,
 	CardScroll,
@@ -13,8 +12,8 @@ import {
 	Tooltip,
 	RichCell,
 	Subhead,
-	MiniInfoCell,
 	Alert,
+	Spinner,
 } from '@vkontakte/vkui';
 
 import { AnimateOnChange, AnimateGroup } from 'react-animation';
@@ -525,8 +524,7 @@ const AddMore2r = (props) => {
 
 	const [componentChosenSub, setComponentChosenSub] = useState();
 	useEffect(() => {
-		console.log('update me please', props.AD);
-		const { ad_type, subscribers_num, ad_id, isSub, status } = props.AD;
+		const { ad_type, ad_id } = props.AD;
 
 		setComponentChosenSub(
 			<div style={{ flex: 1 }}>
@@ -678,7 +676,7 @@ const AddMore2r = (props) => {
 	if (isNotValid(AD)) {
 		return (
 			<Placeholder stretched header="Загрузка объявления">
-				<ScreenSpinner size="large" />
+				<Spinner size="large" />
 			</Placeholder>
 		);
 	}
@@ -721,12 +719,8 @@ const AddMore2r = (props) => {
 				<div style={{ flex: 1, padding: '5px' }}>
 					<Card mode="outline">{componentChosenSub}</Card>
 				</div>
-				{/* {componentSubs ? (
-					<div style={{ flex: 1, padding: '5px' }}>
-						<Card mode="outline">{componentSubs}</Card>
-					</div>
-				) : null} */}
-				<div style={{ flex: 1, padding: '5px' }}>
+
+				<div style={{ flex: 1, padding: '5px', paddingTop: '12px' }}>
 					<Card mode="outline">{componentComments}</Card>
 				</div>
 			</div>
@@ -782,4 +776,4 @@ const AddMore2 = connect(mapStateToProps, mapDispatchToProps)(AddMore2r);
 export default AddMore2;
 
 // 857 -> 936 -> 838 -> 923 -> 1016 -> 935 -> 987 -> 897 -> 953 -> 899
-// 830
+// 830 -> 780

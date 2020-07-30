@@ -1,31 +1,9 @@
 import React, { useState } from 'react';
-import { Link, Avatar, Cell } from '@vkontakte/vkui';
+import { Link, Avatar, Cell, RichCell } from '@vkontakte/vkui';
 
 import './comment.css';
 
 import { time } from './../../../../../utils/time';
-
-function shortText(str, newLength) {
-	if (str.length > newLength) {
-		const s = str.slice(0, newLength);
-		return s + '...';
-	}
-	return str;
-}
-
-function getHeader(props) {
-	if (
-		!props ||
-		!props.notification ||
-		!props.notification.payload ||
-		!props.notification.payload.ad ||
-		!props.notification.payload.ad.header
-	) {
-		return '';
-	}
-	const header = props.notification.payload.ad.header;
-	return <Link style={{ marginRight: '3px' }}>{shortText(header, 30)}</Link>;
-}
 
 function getImage(props) {
 	if (!props || !props.v || !props.v.author || !props.v.author.photo_url) {
@@ -46,30 +24,18 @@ function getAuthorHref(props) {
 
 const Comment = (props) => {
 	return (
-		<Cell
+		<RichCell
 			onClick={props.onClick}
-			className="block_in"
-			size="l"
-			multiline="true"
-			description={
-				<div style={{ display: 'flex', marginTop: '2px' }}>
-					<div style={{ marginRight: '4px', color: 'var(--text_secondary)' }}>
-						{time(props.v.creation_date_time)}{' '}
-					</div>
-				</div>
-			}
+			text={props.v.text}
+			caption={time(props.v.creation_date_time)}
+			multiline
 			before={getImage(props)}
 		>
-			<div className="block">
-				<div style={{ display: 'block' }}>
-					{getAuthorHref(props)}
-					<div style={{ color: 'var(--text_subhead)' }}>{props.v.text} </div>
-				</div>
-			</div>
-		</Cell>
+			{getAuthorHref(props)}
+		</RichCell>
 	);
 };
 
 export default Comment;
 
-// 260 -> 241
+// 260 -> 241 -> 41

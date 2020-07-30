@@ -1,6 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import { ScreenSpinner, Snackbar, Avatar } from '@vkontakte/vkui';
-
 import axios from 'axios';
 
 import { Addr, BASE_AD } from '../../../../../store/addr';
@@ -20,7 +17,6 @@ export function getMyUser() {
 }
 
 export function subscribe(ad_id, clCancel, s, f, e) {
-	// setPopout(<ScreenSpinner size="large" />);
 	const end = e || (() => {});
 	const successCallback = s || ((v) => {});
 	const failCallback = f || ((v) => {});
@@ -36,7 +32,6 @@ export function subscribe(ad_id, clCancel, s, f, e) {
 			return response.data;
 		})
 		.then(function (response) {
-			// setPopout(null);
 			successCallback(response);
 
 			store.dispatch(addSub(getMyUser()));
@@ -45,7 +40,6 @@ export function subscribe(ad_id, clCancel, s, f, e) {
 		})
 		.catch(function (error) {
 			err = true;
-			console.log('loook, error', error, status);
 			failCallback(error);
 			if (error == 'Error: Request failed with status code 409') {
 				fail('недостаточно кармы. Откажитесь от другой вещи, чтобы получить эту!', null, end);
@@ -58,13 +52,11 @@ export function subscribe(ad_id, clCancel, s, f, e) {
 					end
 				);
 			}
-			// setPopout(null);
 		});
 	return err;
 }
 
 export function unsubscribe(ad_id, clCancel, s, f, e) {
-	// setPopout(<ScreenSpinner size="large" />);
 	const end = e || (() => {});
 	const successCallback = s || ((v) => {});
 	const failCallback = f || ((v) => {});
@@ -80,7 +72,6 @@ export function unsubscribe(ad_id, clCancel, s, f, e) {
 			return response.data;
 		})
 		.then(function (response) {
-			// setPopout(null);
 			successCallback(response);
 			store.dispatch(deleteSub(getMyUser().vk_id));
 			success('Больше вы не будете получать связанные с этим постом уведомления', clCancel, end);
@@ -96,7 +87,6 @@ export function unsubscribe(ad_id, clCancel, s, f, e) {
 				},
 				end
 			);
-			// setPopout(null);
 		});
 	return err;
 }
