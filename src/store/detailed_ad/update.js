@@ -18,14 +18,12 @@ export async function updateDealInfo(successCallback, failCallback) {
 			getUser(
 				d.subscriber_id,
 				(user) => {
-					console.log('really1 setDealer', user);
 					store.dispatch(setDealer(user));
-					successC()
+					successC();
 				},
 				(e) => {
-					console.log('really1 error', user);
 					store.dispatch(setDealer(null));
-					failC()
+					failC();
 				}
 			);
 		},
@@ -34,7 +32,7 @@ export async function updateDealInfo(successCallback, failCallback) {
 			store.dispatch(setDeal(null));
 			store.dispatch(setIsDealer(false));
 			store.dispatch(setDealer(null));
-			failC()
+			failC();
 		}
 	);
 }

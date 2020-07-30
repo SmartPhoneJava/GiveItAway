@@ -13,7 +13,7 @@ import Icon24User from '@vkontakte/icons/dist/24/user';
 import Icon24Help from '@vkontakte/icons/dist/24/help';
 import Icon24MarketOutline from '@vkontakte/icons/dist/24/market_outline';
 
-import { TYPE_CHOICE, STATUS_OFFER, TYPE_RANDOM } from '../../const/ads';
+import { TYPE_CHOICE, STATUS_OFFER, TYPE_RANDOM, STATUS_ABORTED, STATUS_CLOSED } from '../../const/ads';
 import { getAuctionMaxUser, getCashback, CancelClose, Close } from '../../requests';
 import { withLoadingIf } from '../image/image_cache';
 import { openModal, setProfile, setPage } from '../../store/router/actions';
@@ -67,6 +67,7 @@ const DealLabelInner = (props) => {
 	const [componentChosen, setComponentChosen] = useState(<></>);
 	useEffect(() => {
 		const { dealer } = props.ad;
+		console.log('dealer is', dealer, props.dealRequestSuccess);
 		setComponentChosen(
 			withLoadingIf(
 				props.dealRequestSuccess,
@@ -239,13 +240,16 @@ const DealLabelInner = (props) => {
 					</AnimateOnChange>
 				</div>
 				{/* {componentAuthor} */}
-
-				<AnimateOnChange style={{ width: '100%' }} animation="bounce">
-					{componentSubs}
-				</AnimateOnChange>
-				<AnimateOnChange style={{ width: '100%' }} animation="bounce">
-					{componentSub}
-				</AnimateOnChange>
+				{!(props.ad.status == STATUS_ABORTED || props.ad.status == STATUS_CLOSED) && (
+					<>
+						<AnimateOnChange style={{ width: '100%' }} animation="bounce">
+							{componentSubs}
+						</AnimateOnChange>
+						<AnimateOnChange style={{ width: '100%' }} animation="bounce">
+							{componentSub}
+						</AnimateOnChange>
+					</>
+				)}
 			</div>
 		</Group>
 	);

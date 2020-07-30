@@ -33,11 +33,21 @@ import {
 	COLOR_CANCEL,
 	STATUS_OFFER,
 } from '../../const/ads';
-import { getAuctionMaxUser, getCashback, increaseAuctionRate, fail, success, CancelClose, Close } from '../../requests';
+import {
+	getAuctionMaxUser,
+	getCashback,
+	increaseAuctionRate,
+	fail,
+	success,
+	CancelClose,
+	Close,
+	getDeal,
+} from '../../requests';
 import { withLoadingIf, animateOnChangeIf } from '../image/image_cache';
 import { openModal, setProfile } from '../../store/router/actions';
 import { MODAL_ADS_TYPES, MODAL_ADS_FROZEN, MODAL_ADS_COST } from '../../store/router/modalTypes';
 import { AdHeader } from './faq';
+import { updateDealInfo } from '../../store/detailed_ad/update';
 
 const AuctionLabelInner = (props) => {
 	const [componentStatus, setComponentStatus] = useState(<></>);
@@ -91,22 +101,31 @@ const AuctionLabelInner = (props) => {
 
 	const [componentMaxUser, setComponentMaxUser] = useState(<></>);
 	useEffect(() => {
-		const { dealer } = props.ad;
+		const { dealer, status, cost } = props.ad;
+		let amu = actionMaxUser;
+		if (status == STATUS_CLOSED || status == STATUS_ABORTED) {
+			if (!dealer) {
+				updateDealInfo();
+				console.log('we set yoooooou');
+				return;
+			}
+			console.log('we set you yep', cost, dealer);
+			amu = dealer;
+			amu.cost = -1;
+		}
 		setComponentMaxUser(
-			actionMaxUser ? (
+			amu ? (
 				<Cell
 					onClick={() => {
-						if (actionMaxUser) {
-							props.setProfile(actionMaxUser.vk_id);
-						}
+						props.setProfile(amu.vk_id);
 					}}
 					description={dealer ? 'Победитель' : 'Лидирует'}
 					multiline={true}
-					key={actionMaxUser.vk_id}
-					before={<Avatar size={36} src={actionMaxUser.photo_url} />}
-					asideContent={<Counter mode="primary">{actionMaxUser.cost + ' K'}</Counter>}
+					key={amu.vk_id}
+					before={<Avatar size={36} src={amu.photo_url} />}
+					asideContent={amu.cost > 0 && <Counter mode="primary">{amu.cost + ' K'}</Counter>}
 				>
-					{actionMaxUser ? actionMaxUser.name + ' ' + actionMaxUser.surname : 'Никто еще откликнулся'}
+					{amu.name + ' ' + amu.surname}
 				</Cell>
 			) : (
 				<Cell multiline before={<Icon24Users />}>
@@ -223,9 +242,11 @@ const AuctionLabelInner = (props) => {
 						{componentMaxUser}
 					</AnimateOnChange>
 				</div>
-				<AnimateOnChange style={{ width: '100%' }} animation="bounce">
-					{componentMyRate}
-				</AnimateOnChange>
+				{!(props.ad.status == STATUS_ABORTED || props.ad.status == STATUS_CLOSED) && (
+					<AnimateOnChange style={{ width: '100%' }} animation="bounce">
+						{componentMyRate}
+					</AnimateOnChange>
+				)}
 			</div>
 		</Group>
 	);
