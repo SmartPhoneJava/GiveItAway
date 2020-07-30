@@ -42,7 +42,7 @@ import { Close, CancelClose } from './../../../../../requests';
 import Icon44SmileOutline from '@vkontakte/icons/dist/44/smile_outline';
 import { openPopout, closePopout, setPage, setProfile } from '../../../../../store/router/actions';
 import { PANEL_SUBS } from '../../../../../store/router/panelTypes';
-import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED, TYPE_CHOICE } from '../../../../../const/ads';
+import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED, TYPE_CHOICE, TYPE_AUCTION } from '../../../../../const/ads';
 import { updateDealInfo } from '../../../../../store/detailed_ad/update';
 import { withLoadingIf, AnimationChange } from '../../../../../components/image/image_cache';
 import { Collapse } from 'react-collapse';
@@ -50,10 +50,9 @@ import { Collapse } from 'react-collapse';
 const Subs = (props) => {
 	const osname = usePlatform();
 	const { openPopout, closePopout, setProfile, setPage, AD } = props;
-	const { dealer, subs, ad_id, ad_type, subscribers_num } = AD;
+	const { dealer, subs, ad_id, isAuthor, ad_type, subscribers_num } = AD;
 	const status = AD.status || STATUS_OFFER;
 
-	const [photos, setPhotos] = useState([]);
 	const [openFAQ, setOpenFAQ] = useState(false);
 	const [pageNumber, setPageNumber] = useState(1);
 
@@ -73,15 +72,17 @@ const Subs = (props) => {
 		if (v) {
 			openPopout(
 				<ActionSheet onClose={closePopout}>
-					{!dealer || v.vk_id != dealer.vk_id ? (
-						<ActionSheetItem autoclose onClick={() => close(v)}>
-							Отдать
-						</ActionSheetItem>
-					) : (
-						<ActionSheetItem autoclose onClick={() => cancel(v)}>
-							Отменить
-						</ActionSheetItem>
-					)}
+					{isAuthor && ad_type == TYPE_CHOICE ? (
+						!dealer || v.vk_id != dealer.vk_id ? (
+							<ActionSheetItem autoclose onClick={() => close(v)}>
+								Отдать
+							</ActionSheetItem>
+						) : (
+							<ActionSheetItem autoclose onClick={() => cancel(v)}>
+								Отменить
+							</ActionSheetItem>
+						)
+					) : null}
 					<ActionSheetItem autoclose onClick={onClickOpen}>
 						Перейти в профиль
 					</ActionSheetItem>
@@ -123,20 +124,25 @@ const Subs = (props) => {
 				<div>{dealer ? dealer.name + ' ' + dealer.surname : 'Никто не выбран'}</div>
 			</Cell>
 		);
-
 	}, [props.AD.dealer]);
 
 	function showSubs(lastAdElementRef, close, cancel) {
+		const { ad_type, isAuthor } = props.AD;
 		return (
 			<>
 				<Group header={<Header mode="secondary">Получатель</Header>}>
-					<AnimationChange newValue={newGiven} duration={300} />
+					<AnimationChange ignoreFirst={true} controll={newGiven} duration={300} />
 				</Group>
 
 				<Group header={<Header mode="secondary">Откликнулись</Header>}>
-					<CellButton onClick={() => close(subs[getRandomInt(subscribers_num)])} before={<Icon24Shuffle />}>
-						Случайный выбор
-					</CellButton>
+					{ad_type != TYPE_AUCTION && isAuthor && (
+						<CellButton
+							onClick={() => close(subs[getRandomInt(subscribers_num)])}
+							before={<Icon24Shuffle />}
+						>
+							Случайный выбор
+						</CellButton>
+					)}
 					{subs.length > 0 ? (
 						subs.map((v, i) => (
 							<div key={v.vk_id} ref={subs.length == i + 1 ? lastAdElementRef : null}>
@@ -203,7 +209,6 @@ const Subs = (props) => {
 		ad_id,
 		props.maxAmount,
 		(s) => {
-			setPhotos([...s].map((v) => v.photo_url));
 			updateDealInfo();
 		},
 		(e) => {}
@@ -250,12 +255,16 @@ const Subs = (props) => {
 			</CellButton>
 			<Collapse isOpened={openFAQ}>
 				<Div>
-					Кликните по пользователю в списке откливнушихся, чтобы связаться с ним или отдать ему вещь.
-					Выбранный пользователь получит уведомление о том, что он был выбран получателем вещи. Свяжитесь с
-					ним для обсуждения деталей. Также потенциальный получатель получит уведомление, нажав на которое, он
-					подвтердит, что передача состоялась, напомните ему нажать на него после того как отдадите вещь.
-					После этого обьявление автоматически закроется. Вы в любой момент можете отозвать предложение или
-					изменить получателя.
+					{ad_type == TYPE_CHOICE
+						? `Кликните по пользователю в списке откливнушихся, чтобы связаться с ним или назначить получателем.
+					Вы можете выбрать случайного пользователя, кликнув по кнопке "Случайный выбор".
+					Выбранный пользователь получит соответствующее уведомление. После того как вы отдадите вещь,
+					напомните получателю подтвердить получение вещи: перейти на страницу объявления и нажать
+					"Подтвердить".`
+						: `Кликните по пользователю в списке откливнушихся, чтобы связаться с ним. 
+					Чтобы определить получателя, нажмите "Случайный выбор". Выбранный пользователь получит соответствующее уведомление. После того как вы отдадите вещь,
+					напомните получателю подтвердить получение вещи: перейти на страницу объявления и нажать
+					"Подтвердить".`}
 				</Div>
 			</Collapse>
 			{showSubs(

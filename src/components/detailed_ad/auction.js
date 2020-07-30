@@ -43,7 +43,7 @@ import {
 	Close,
 	getDeal,
 } from '../../requests';
-import { withLoadingIf, animateOnChangeIf } from '../image/image_cache';
+import { withLoadingIf, animateOnChangeIf, AnimationChange } from '../image/image_cache';
 import { openModal, setProfile } from '../../store/router/actions';
 import { MODAL_ADS_TYPES, MODAL_ADS_FROZEN, MODAL_ADS_COST } from '../../store/router/modalTypes';
 import { AdHeader } from './faq';
@@ -233,19 +233,23 @@ const AuctionLabelInner = (props) => {
 			<div style={{ display: 'block', width: '100%' }}>
 				<div style={{ display: 'flex', width: '100%' }}>
 					<SimpleCell>
-						<AnimateOnChange style={{ width: '100%' }} animation="bounce">
+						<AnimationChange mayTheSame={true} ignoreFirst={true} controll={componentStatus} />
+						{/* <AnimationChange controll={componentStatus}/> */}
+						{/* <AnimateOnChange style={{ width: '100%' }} animation="bounce">
 							{componentStatus}
-						</AnimateOnChange>
+						</AnimateOnChange> */}
 					</SimpleCell>
 
-					<AnimateOnChange style={{ width: '100%' }} animation="bounce">
+					<AnimationChange mayTheSame={true} ignoreFirst={true} controll={componentMaxUser} />
+					{/* <AnimateOnChange style={{ width: '100%' }} animation="bounce">
 						{componentMaxUser}
-					</AnimateOnChange>
+					</AnimateOnChange> */}
 				</div>
 				{!(props.ad.status == STATUS_ABORTED || props.ad.status == STATUS_CLOSED) && (
-					<AnimateOnChange style={{ width: '100%' }} animation="bounce">
-						{componentMyRate}
-					</AnimateOnChange>
+					<AnimationChange mayTheSame={true} ignoreFirst={true} controll={componentMyRate} />
+					// <AnimateOnChange style={{ width: '100%' }} animation="bounce">
+					// 	{componentMyRate}
+					// </AnimateOnChange>
 				)}
 			</div>
 		</Group>

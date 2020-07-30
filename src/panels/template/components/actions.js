@@ -8,12 +8,13 @@ import { getSubscribers } from './../../../requests';
 
 import { CancelClose, adVisible, adHide, deleteAd } from './../../../requests';
 import { SNACKBAR_DURATION_DEFAULT } from '../../../store/const';
-import { closePopout, openSnackbar, closeSnackbar } from '../../../store/router/actions';
+import { closePopout, openSnackbar, closeSnackbar, openPopout } from '../../../store/router/actions';
 import { STATUS_CHOSEN, TYPE_CHOICE, STATUS_OFFER } from '../../../const/ads';
+import { deleteAlert } from '../AddMore2';
 
 const OpenActions = (props) => {
 	const osname = usePlatform();
-	const { closePopout, openSnackbar, closeSnackbar, refresh, ad, onCloseClick } = props;
+	const { closePopout, openPopout, openSnackbar, closeSnackbar, refresh, ad, onCloseClick } = props;
 
 	const { ad_id, ad_type, hidden, status } = ad;
 
@@ -21,7 +22,7 @@ const OpenActions = (props) => {
 
 	return (
 		<ActionSheet onClose={closePopout}>
-{/* 			
+			{/* 			
 			{ad_type == TYPE_CHOICE ? (
 				status == STATUS_CHOSEN ? (
 					<ActionSheetItem
@@ -89,7 +90,17 @@ const OpenActions = (props) => {
 				</ActionSheetItem>
 			)}
 
-			<ActionSheetItem autoclose mode="destructive" onClick={() => deleteAd(ad_id, refresh)}>
+			<ActionSheetItem
+				autoclose
+				mode="destructive"
+				onClick={() =>
+					openPopout(
+						deleteAlert(() => {
+							deleteAd(ad_id, refresh);
+						}, closePopout)
+					)
+				}
+			>
 				Удалить
 			</ActionSheetItem>
 			{osname === IOS && (
@@ -109,6 +120,7 @@ const mapDispatchToProps = {
 	closePopout,
 	openSnackbar,
 	closeSnackbar,
+	openPopout,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(OpenActions);

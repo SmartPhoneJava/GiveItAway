@@ -64,6 +64,7 @@ import {
 	setStory,
 	closePopout,
 	setProfile,
+	closeModal,
 } from '../../store/router/actions';
 import { setIsSub, setIsHidden, setExtraInfo, setIsAuthor } from '../../store/detailed_ad/actions';
 import { AdDefault, AD_LOADING, STATUS_CLOSED, STATUS_ABORTED, TYPE_CHOICE, TYPE_AUCTION } from '../../const/ads';
@@ -75,7 +76,7 @@ import { FORM_CREATE } from '../../components/categories/redux';
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { updateDealInfo, updateCost, updateSubs } from '../../store/detailed_ad/update';
 import { showStatus } from '../../components/detailed_ad/status';
-import { withLoading, withLoadingIf, animatedDiv, ImageCache } from '../../components/image/image_cache';
+import { withLoading, withLoadingIf, animatedDiv, ImageCache, AnimationChange } from '../../components/image/image_cache';
 import { TagsLabel, tag } from '../../components/categories/label';
 import { AuctionLabel } from '../../components/detailed_ad/auction';
 import { DealLabel } from '../../components/detailed_ad/deal';
@@ -91,6 +92,28 @@ const col = '#00a550';
 // const col = randomColor({
 // 	luminosity: 'dark',
 // });
+
+export const deleteAlert = (deleteAd, closePopout) => (
+	<Alert
+		actions={[
+			{
+				title: 'Отмена',
+				autoclose: true,
+				mode: 'cancel',
+			},
+			{
+				title: 'Удалить',
+				autoclose: true,
+				mode: 'destructive',
+				action: deleteAd,
+			},
+		]}
+		onClose={closePopout}
+	>
+		<h2>Вы действительно хотите удалить объявление?</h2>
+		<p>Отменить данное действие будет невозможно</p>
+	</Alert>
+);
 
 const AddMore2r = (props) => {
 	const { myID, dispatch } = props;
@@ -560,39 +583,27 @@ const AddMore2r = (props) => {
 	useEffect(() => {
 		const { isAuthor, author, isDealer, isSub, status, hidden, ad_id } = rAd;
 		const disabled = isFinished(status);
-		const alert = (
-			<Alert
-				actions={[
-					{
-						title: 'Отмена',
-						autoclose: true,
-						mode: 'cancel',
-					},
-					{
-						title: 'Удалить',
-						autoclose: true,
-						mode: 'destructive',
-						action: () => deleteAd(ad_id, props.refresh),
-					},
-				]}
-				onClose={closePopout}
-			>
-				<h2>Вы действительно хотите удалить объявление?</h2>
-				<p>Отменить данное действие будет невозможно</p>
-			</Alert>
-		);
+		const alert =  deleteAlert(() => deleteAd(ad_id, props.refresh), closePopout)
 		let buttons = [
 			buttonAction(<Icon24Write />, 'Изменить', onEditClick, null, disabled),
 			// <AnimateOnChange>
-			buttonAction(
-				hidden ? <Icon24Globe /> : <Icon24Hide />,
-				hidden ? 'Открыть' : 'Скрыть',
-				() => {
-					hidden ? adVisible(ad_id, () => setIsHidden(false)) : adHide(ad_id, () => setIsHidden(true));
-				},
-				null,
-				disabled
-			),
+			<AnimationChange
+				ignoreFirst={true}
+				visibleFirst={true}
+				mayTheSame={true}
+				controll={
+					buttonAction(
+						hidden ? <Icon24Globe /> : <Icon24Hide />,
+						hidden ? 'Открыть' : 'Скрыть',
+						() => {
+							hidden ? adVisible(ad_id, () => setIsHidden(false)) : adHide(ad_id, () => setIsHidden(true));
+						},
+						null,
+						disabled
+					)
+				}
+			/>,
+		
 			// </AnimateOnChange>,
 			buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK),
 			buttonAction(

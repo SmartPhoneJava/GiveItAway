@@ -4,26 +4,39 @@ import { HideUntilLoaded, AnimateOnChange } from 'react-animation';
 import { Spinner } from '@vkontakte/vkui';
 
 export const AnimationChange = (props) => {
-	const { newValue, duration } = props;
-	const [value, setValue] = useState(<></>);
-	const [invisible, setInvisible] = useState(false);
+	const duration = props.duration || 300;
+	const [first, setFirst] = useState(true);
+	const [value, setValue] = useState(props.withSpinner ? <Spinner /> : <></>);
+	const [invisible, setInvisible] = useState(!props.visibleFirst);
 	useEffect(() => {
 		let cleanup = false;
+		if (first) {
+			setFirst(false);
+			if (props.ignoreFirst) {
+				return;
+			}
+		}
+		if (!props.mayTheSame && props.controll.key == value.key) {
+			return;
+		}
+		console.log('WE UPDATE SYSTEM', props.controll, value);
 		setInvisible(true);
 		setTimeout(() => {
 			if (cleanup) {
 				return;
 			}
-			setValue(newValue);
+
+			setValue(props.controll);
 			setInvisible(false);
 		}, duration);
 		return () => {
 			cleanup = true;
 		};
-	}, [props.newValue]);
+	}, [props.controll]);
 	return (
 		<div
 			style={{
+				...props.style,
 				transition: `${duration / 1000}s`,
 				opacity: `${invisible ? 0 : 1}`,
 			}}
