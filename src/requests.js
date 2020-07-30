@@ -397,10 +397,10 @@ export async function CancelClose(ad_id, s, f, blockSnackbar) {
 				(v) => {
 					if (!blockSnackbar) {
 						success('Запрос успешно отменен!');
-						store.dispatch(setDealer(null));
-						store.dispatch(setDeal(null));
-						store.dispatch(setStatus(STATUS_OFFER));
 					}
+					store.dispatch(setDealer(null));
+					store.dispatch(setDeal(null));
+					store.dispatch(setStatus(STATUS_OFFER));
 					successCallback(v);
 				},
 				(e) => failCallback(e),
@@ -456,7 +456,7 @@ export function Close(ad_id, ad_type, subscriber_id, s, f) {
 }
 
 export async function getSubscribers(ad_id, successCallback, failCallback, count) {
-	console.log("lock lock lock4")
+	console.log('lock lock lock4');
 	//store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;

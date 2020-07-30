@@ -3,6 +3,36 @@ import React, { useState, useEffect } from 'react';
 import { HideUntilLoaded, AnimateOnChange } from 'react-animation';
 import { Spinner } from '@vkontakte/vkui';
 
+export const AnimationChange = (props) => {
+	const { newValue, duration } = props;
+	const [value, setValue] = useState(<></>);
+	const [invisible, setInvisible] = useState(false);
+	useEffect(() => {
+		let cleanup = false;
+		setInvisible(true);
+		setTimeout(() => {
+			if (cleanup) {
+				return;
+			}
+			setValue(newValue);
+			setInvisible(false);
+		}, duration);
+		return () => {
+			cleanup = true;
+		};
+	}, [props.newValue]);
+	return (
+		<div
+			style={{
+				transition: `${duration / 1000}s`,
+				opacity: `${invisible ? 0 : 1}`,
+			}}
+		>
+			{value}
+		</div>
+	);
+};
+
 export const ImageCache = (props) => {
 	const [image, setImage] = useState(<></>);
 	const spinS = props.spinnerStyle || {};

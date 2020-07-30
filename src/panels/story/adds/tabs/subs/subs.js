@@ -44,7 +44,7 @@ import { openPopout, closePopout, setPage, setProfile } from '../../../../../sto
 import { PANEL_SUBS } from '../../../../../store/router/panelTypes';
 import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED, TYPE_CHOICE } from '../../../../../const/ads';
 import { updateDealInfo } from '../../../../../store/detailed_ad/update';
-import { withLoadingIf } from '../../../../../components/image/image_cache';
+import { withLoadingIf, AnimationChange } from '../../../../../components/image/image_cache';
 import { Collapse } from 'react-collapse';
 
 const Subs = (props) => {
@@ -102,8 +102,14 @@ const Subs = (props) => {
 		return Math.floor(Math.random() * Math.floor(max));
 	}
 
-	const given = (
-		<Group header={<Header>Получатель</Header>}>
+	const [newGiven, setNewGiven] = useState([]);
+	useEffect(() => {
+		if (!props.AD) {
+			return;
+		}
+		const { dealer } = props.AD;
+
+		setNewGiven(
 			<Cell
 				onClick={() => {
 					cancel_ad(dealer, false);
@@ -116,13 +122,16 @@ const Subs = (props) => {
 			>
 				<div>{dealer ? dealer.name + ' ' + dealer.surname : 'Никто не выбран'}</div>
 			</Cell>
-		</Group>
-	);
+		);
+
+	}, [props.AD.dealer]);
 
 	function showSubs(lastAdElementRef, close, cancel) {
 		return (
 			<>
-				<AnimateOnChange animation="bounce">{given}</AnimateOnChange>
+				<Group header={<Header mode="secondary">Получатель</Header>}>
+					<AnimationChange newValue={newGiven} duration={300} />
+				</Group>
 
 				<Group header={<Header mode="secondary">Откликнулись</Header>}>
 					<CellButton onClick={() => close(subs[getRandomInt(subscribers_num)])} before={<Icon24Shuffle />}>
@@ -137,11 +146,15 @@ const Subs = (props) => {
 									}}
 									before={<Avatar size={36} src={v.photo_url} />}
 									asideContent={
-										<AnimateOnChange animation="bounce">
-											{dealer && v.vk_id == dealer.vk_id && (
-												<Icon24Gift style={{ color: 'var(--header_tint)' }} />
-											)}
-										</AnimateOnChange>
+										<div
+											style={{
+												marginLeft: '15px',
+												transition: '0.3s',
+												opacity: `${dealer && v.vk_id == dealer.vk_id ? 1 : 0}`,
+											}}
+										>
+											<Icon24Gift style={{ color: 'var(--header_tint)' }} />
+										</div>
 									}
 								>
 									<div>{v.name + ' ' + v.surname}</div>
@@ -181,9 +194,6 @@ const Subs = (props) => {
 			(e) => {},
 			true
 		);
-	}
-	function openSubs() {
-		setPage(PANEL_SUBS);
 	}
 
 	let { inited, loading, error, hasMore, newPage } = useSubsGet(
