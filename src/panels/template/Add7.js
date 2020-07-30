@@ -17,10 +17,22 @@ import Icon from './../../img/icon150.png';
 
 import { time } from '../../utils/time';
 
+import { Transition } from 'react-transition-group';
+
 import './Add7.css';
 import { GetCategoryText } from '../../components/categories/Categories';
 import { STATUS_ABORTED, STATUS_CLOSED, STATUS_CHOSEN, STATUS_OFFER } from '../../const/ads';
 import { ImageCache } from '../../components/image/image_cache';
+import { Collapse } from 'react-collapse';
+
+const duration = 300;
+
+const transitionStyles = {
+	entering: { opacity: 1, transition: `opacity ${duration}ms ease-in-out` },
+	entered: { opacity: 1, transition: `opacity ${duration}ms ease-in-out` },
+	exiting: { opacity: 0, transition: `opacity ${duration}ms ease-in-out` },
+	exited: { opacity: 0, transition: `opacity ${duration}ms ease-in-out` },
+};
 
 const Add7 = (props) => {
 	const [ad] = useState(props.ad);
@@ -98,6 +110,66 @@ const Add7 = (props) => {
 		);
 	}
 
+	const [label, setLabel] = useState(<></>);
+	const [hasLabel, setHasLabel] = useState(false);
+	useEffect(() => {
+		const { status } = props.ad;
+		let newLabel = null;
+		switch (status) {
+			case STATUS_ABORTED:
+				newLabel = (
+					<div className="failed">
+						<div className="on-img-text">
+							<Icon16Clear style={{ marginRight: '5px' }} />
+							Отменено
+						</div>
+					</div>
+				);
+
+			case STATUS_CLOSED:
+				newLabel = (
+					<div className="success">
+						<div className="on-img-text">
+							<Icon16CheckCircle style={{ marginRight: '5px' }} />
+							Вещь отдана
+						</div>
+					</div>
+				);
+			case STATUS_CHOSEN:
+				if (isAuthor()) {
+					newLabel = (
+						<div className="deal">
+							<div style={{ color: 'rgb(220,220,220)', fontSize: '12px', padding: '2px' }}>
+								Ожидание ответа
+							</div>
+						</div>
+					);
+				}
+		}
+
+		if (!isVisible && isAuthor()) {
+			if (status == STATUS_CHOSEN) {
+				newLabel = (
+					<div className="hidden2 on-img-text">
+						<Icon12Lock />
+						Видно только вам
+					</div>
+				);
+			} else {
+				newLabel = (
+					<div className="hidden on-img-text">
+						<Icon12Lock />
+						Видно только вам
+					</div>
+				);
+			}
+		}
+		if (newLabel) {
+			setLabel(newLabel);
+		}
+		setHasLabel(newLabel != null);
+	}, [props.ad, isVisible]);
+
 	if (!ad) {
 		return <></>;
 	}
@@ -118,50 +190,17 @@ const Add7 = (props) => {
 							<Icon16Place /> {ad.district ? ad.district : ad.region}
 						</div>
 
-						{ad.status == STATUS_ABORTED ? (
-							<div className="failed">
-								<div className="on-img-text">
-									<Icon16Clear style={{ marginRight: '5px' }} />
-									Отменено
+						<Transition in={hasLabel} timeout={duration}>
+							{(state) => (
+								<div
+									style={{
+										...transitionStyles[state],
+									}}
+								>
+									{label}
 								</div>
-							</div>
-						) : (
-							''
-						)}
-						{ad.status == STATUS_CLOSED ? (
-							<div className="success">
-								<div className="on-img-text">
-									<Icon16CheckCircle style={{ marginRight: '5px' }} />
-									Вещь отдана
-								</div>
-							</div>
-						) : (
-							''
-						)}
-						{ad.status == STATUS_CHOSEN && isAuthor() && ad.status == STATUS_CHOSEN ? (
-							<div className="deal">
-								<div style={{ color: 'rgb(220,220,220)', fontSize: '12px', padding: '2px' }}>
-									Ожидание ответа
-								</div>
-							</div>
-						) : (
-							''
-						)}
-						{!isVisible ? (
-							isAuthor() && ad.status == STATUS_CHOSEN ? (
-								<div className="hidden2 on-img-text">
-									<Icon12Lock />
-									Видно только вам
-								</div>
-							) : (
-								<div className="hidden on-img-text">
-									<Icon12Lock />
-									Видно только вам
-								</div>
-							)
-						) : (
-							''
-						)}
+							)}
+						</Transition>
 					</div>
 					<div className="aright-main">
 						<div style={{ display: 'flex' }}>

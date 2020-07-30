@@ -115,6 +115,7 @@ import AdvicePanel from './advice';
 import LicencePanel from './licence';
 import SubcategoriesPanel from '../components/categories/subcategory_panel';
 import { DIRECTION_BACK, DIRECTION_FORWARD } from '../store/router/directionTypes';
+import { pushToCache } from '../store/cache/actions';
 
 const adsText = 'Объявления';
 const addText = 'Создать обьявление';
@@ -214,8 +215,8 @@ const App = (props) => {
 
 	useEffect(() => {
 		if (props.from == PANEL_SUBS || props.to == PANEL_SUBS) {
-			return
-		} 
+			return;
+		}
 		if (props.from == PANEL_ONE || props.to == PANEL_ONE) {
 			if (props.direction == DIRECTION_BACK) {
 				props.backToPrevAd();
@@ -516,6 +517,7 @@ const App = (props) => {
 					<Panel id={PANEL_SUBSUBCATEGORIES}>
 						<SubcategoriesPanel
 							goNext={() => {
+								props.pushToCache(true, 'ignore_cache');
 								goBack();
 								goBack();
 								goBack();
@@ -637,6 +639,7 @@ function mapDispatchToProps(dispatch) {
 				setStatus,
 				clearAds,
 				setPage,
+				pushToCache,
 
 				setToHistory,
 				backToPrevAd,

@@ -117,6 +117,9 @@ const CategoriesLabel = (props) => {
 
 	useEffect(() => {
 		props.updateModalHeight();
+		return () => {
+			props.updateModalHeight();
+		};
 	});
 
 	return (

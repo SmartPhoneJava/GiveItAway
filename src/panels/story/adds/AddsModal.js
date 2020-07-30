@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ModalRoot, ModalPage, Cell, List, Avatar, InfoRow, ModalCard } from '@vkontakte/vkui';
 
-import Icon24BrowserForward from '@vkontakte/icons/dist/24/browser_forward';
-
 import Freeze100 from './../../../img/100/freeze.png';
-
-import CategoriesLabel from './../../../components/categories/label';
 
 import { ModalHeader } from './../../headers/modal';
 
@@ -23,22 +19,19 @@ import {
 	MODAL_ADS_SORT,
 } from './../../../store/router/modalTypes';
 
-import { ADS_FILTERS } from './../../../store/create_post/types';
 import { STORY_ADS } from '../../../store/router/storyTypes';
 
-import { SORT_TIME } from './../../../const/ads';
 import { getUser } from '../profile/requests';
 import { getAdType } from '../../../components/detailed_ad/faq';
 import { ModalCardCaptionAdsType } from '../../../components/modal/ad_type';
-import { ModalPageAdsGeo, getGeoFilters } from '../../../components/modal/geo_filter';
+import { ModalPageAdsGeo } from '../../../components/modal/geo_filter';
 import { ModalPageAdsSort } from '../../../components/modal/ad_sort';
+import { AdFilters } from '../../../components/modal/ad_filters';
 
 const AddsModal = (props) => {
-	const { closeModal, inputData } = props;
-	const { openGeoSearch, openSort, openCategories, openCarma } = props;
+	const { closeModal, openCarma } = props;
 	const [backUser, setBackUser] = useState();
 
-	const sort = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].sort : null) || SORT_TIME;
 	const activeModal = props.activeModals[STORY_ADS];
 
 	const cost = props.ad.cost || 0;
@@ -82,23 +75,7 @@ const AddsModal = (props) => {
 				dynamicContentHeight
 				header={<ModalHeader name="Фильтры" back={closeModal} />}
 			>
-				<CategoriesLabel redux_form={ADS_FILTERS} leftMargin="10px" open={openCategories} />
-				<List>
-					<Cell
-						asideContent={<Icon24BrowserForward />}
-						onClick={openGeoSearch}
-						indicator={getGeoFilters(props.inputData[ADS_FILTERS])}
-					>
-						Искать
-					</Cell>
-					<Cell
-						asideContent={<Icon24BrowserForward />}
-						onClick={openSort}
-						indicator={sort == SORT_TIME ? 'по времени' : 'по близости'}
-					>
-						Сортировка
-					</Cell>
-				</List>
+				<AdFilters />
 			</ModalPage>
 			<ModalPage
 				id={MODAL_ADS_CATEGORIES}
@@ -197,4 +174,4 @@ const AddsModal = (props) => {
 
 export default AddsModal;
 
-// 373 -> 273 -> 406 -> 517 -> 343 -> 262 -> 200
+// 373 -> 273 -> 406 -> 517 -> 343 -> 262 -> 200 -> 177

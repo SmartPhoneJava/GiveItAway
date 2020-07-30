@@ -9,7 +9,7 @@ import Icon24Done from '@vkontakte/icons/dist/24/done';
 
 import { setFormData } from '../../store/create_post/actions';
 import { ADS_FILTERS, ADS_FILTERS_B } from '../../store/create_post/types';
-import { closeAllModals, setPage } from '../../store/router/actions';
+import { closeAllModals, setPage, closeModal } from '../../store/router/actions';
 import { PANEL_COUNTRIES, PANEL_CITIES } from '../../store/router/panelTypes';
 
 import {
@@ -25,6 +25,8 @@ import {
 import { getGeodata } from '../../services/VK';
 import { pushToCache } from '../../store/cache/actions';
 import { DIRECTION_BACK } from '../../store/router/directionTypes';
+import { SaveCancelButtons } from './ad_sort';
+import { store } from '../..';
 
 const { GEO_TYPE_FILTERS, GEO_TYPE_NEAR } = require('../../const/ads');
 
@@ -55,7 +57,7 @@ export const getGeoFilters = (data) => {
 };
 
 const ModalPageAdsGeoInner = (props) => {
-	const { setFormData, closeAllModals, setPage, inputData, pushToCache } = props;
+	const { setFormData, closeAllModals, setPage, inputData, pushToCache, closeModal } = props;
 
 	const [geoType, setGeoType] = useState(GEO_TYPE_NEAR);
 	const [isGeoTypeFilters, setIsGeoTypeFilters] = useState(false);
@@ -75,7 +77,7 @@ const ModalPageAdsGeoInner = (props) => {
 		if (inputData[WHERE].radius) {
 			setRadius(inputData[WHERE].radius);
 		}
-	}
+    }
 
 	useEffect(() => {
 		if (props.direction == DIRECTION_BACK) {
@@ -98,8 +100,8 @@ const ModalPageAdsGeoInner = (props) => {
 			geotype: GEO_TYPE_FILTERS,
 		});
 		setGeoType(GEO_TYPE_FILTERS);
-        setIsGeoTypeFilters(true);
-        props.updateModalHeight();
+		setIsGeoTypeFilters(true);
+		props.updateModalHeight();
 	}
 
 	function setGeoNear() {
@@ -111,8 +113,8 @@ const ModalPageAdsGeoInner = (props) => {
 					geotype: GEO_TYPE_NEAR,
 				});
 				setGeoType(GEO_TYPE_NEAR);
-                setIsGeoTypeFilters(false);
-                props.updateModalHeight();
+				setIsGeoTypeFilters(false);
+				props.updateModalHeight();
 				// if (updateModalHeight) {
 				// 	updateModalHeight();
 				// }
@@ -132,8 +134,8 @@ const ModalPageAdsGeoInner = (props) => {
 			(err) => {
 				setValid(false);
 			}
-        );
-        props.updateModalHeight();
+		);
+		props.updateModalHeight();
 	}, []);
 
 	function openCountries() {
@@ -146,9 +148,9 @@ const ModalPageAdsGeoInner = (props) => {
 		setPage(PANEL_CITIES);
 	}
 
-	function save(FROM, TO) {
-		const to = TO || ADS_FILTERS;
-		const from = FROM || ADS_FILTERS_B;
+	function save() {
+		const to = ADS_FILTERS;
+		const from = ADS_FILTERS_B;
 
 		setFormData(to, {
 			...inputData[to],
@@ -157,6 +159,7 @@ const ModalPageAdsGeoInner = (props) => {
 			city: inputData[from] ? inputData[from].city : null,
 			country: inputData[from] ? inputData[from].country : null,
 		});
+
 		pushToCache(true, 'ignore_cache');
 		closeAllModals();
 	}
@@ -207,26 +210,7 @@ const ModalPageAdsGeoInner = (props) => {
 						/>
 					</FormLayout>
 				)}
-				<div className="flex-center">
-					<div style={{ display: 'flex' }}>
-						<div style={{ padding: '8px', flex: 1 }}>
-							<Button
-								stretched
-								size="l"
-								mode="destructive"
-								onClick={closeAllModals}
-								before={<Icon24Cancel />}
-							>
-								Отменить
-							</Button>
-						</div>
-						<div style={{ padding: '8px', flex: 1 }}>
-							<Button stretched size="l" mode="primary" onClick={save} before={<Icon24Done />}>
-								Сохранить
-							</Button>
-						</div>
-					</div>
-				</div>
+				{SaveCancelButtons(save, closeModal)}
 			</div>
 		</>
 	);
@@ -244,6 +228,7 @@ const mapDispatchToProps = {
 	closeAllModals,
 	setPage,
 	pushToCache,
+	closeModal,
 };
 
 export const ModalPageAdsGeo = withModalRootContext(connect(mapStateToProps, mapDispatchToProps)(ModalPageAdsGeoInner));
