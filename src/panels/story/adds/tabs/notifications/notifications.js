@@ -21,9 +21,9 @@ import { timeDate } from './../../../../../utils/time';
 import { sendSnack } from './../../../../../requests';
 
 import './notification.css';
-import Notification from './Notification';
 import { STATUS_CHOSEN, STATUS_ABORTED } from '../../../../../const/ads';
 import { openSnackbar, openPopout } from '../../../../../store/router/actions';
+import Notification, { NotificationTESTER } from './Notification';
 
 export const NT_CLOSE = 'ad_close'; // приходит выбранному автором пользователю
 export const NT_RESPOND = 'respond'; // приходит автору
@@ -227,7 +227,7 @@ const arr = [
 	},
 ];
 
-function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackbar) {
+function getNotifications(bigarr, lastAdElementRef) {
 	return bigarr.map((arr, jindex) => {
 		const dt = timeDate(arr[0].creation_date_time);
 		return (
@@ -250,11 +250,8 @@ function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackba
 									}
 									header={v.payload.ad.header}
 									system={true}
-									openUser={openUser}
-									openAd={openAd}
 									key={v.id}
 									notification={v}
-									setSnackbar={setSnackbar}
 								/>
 							);
 							break;
@@ -267,11 +264,8 @@ function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackba
 									text="Автор выбрал вас получателем. Кликни по мне после получения объекта объявления!"
 									header={v.payload.ad.header}
 									system={true}
-									openUser={openUser}
-									openAd={openAd}
 									key={v.id}
 									notification={v}
-									setSnackbar={setSnackbar}
 								/>
 							);
 							break;
@@ -284,11 +278,8 @@ function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackba
 									text="Объявление удалено"
 									header={v.payload.ad.header}
 									system={true}
-									openUser={openUser}
-									openAd={openAd}
 									key={v.id}
 									notification={v}
-									setSnackbar={setSnackbar}
 								/>
 							);
 							break;
@@ -303,11 +294,8 @@ function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackba
 									text="хочет забрать!"
 									header={v.payload.ad.header}
 									system={true}
-									openUser={openUser}
-									openAd={openAd}
 									key={v.id}
 									notification={v}
-									setSnackbar={setSnackbar}
 								/>
 							);
 							break;
@@ -320,11 +308,8 @@ function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackba
 									text="Ваша вещь получена!"
 									header={v.payload.ad.header}
 									system={true}
-									openUser={openUser}
-									openAd={openAd}
 									key={v.id}
 									notification={v}
-									setSnackbar={setSnackbar}
 								/>
 							);
 							break;
@@ -344,12 +329,9 @@ function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackba
 									text={v.payload ? v.payload.comment.text : ''}
 									header={v.payload ? v.payload.ad.header : ''}
 									system={false}
-									openUser={openUser}
 									ad={v.payload.ad}
-									openAd={openAd}
 									key={v.id}
 									notification={v}
-									setSnackbar={setSnackbar}
 								/>
 							);
 							break;
@@ -367,11 +349,8 @@ function getNotifications(bigarr, lastAdElementRef, openUser, openAd, setSnackba
 									text="отписался от обновлений"
 									header={v.payload.ad.header}
 									system={true}
-									openUser={openUser}
-									openAd={openAd}
 									key={v.id}
 									notification={v}
-									setSnackbar={setSnackbar}
 								/>
 							);
 					}
@@ -467,21 +446,15 @@ const Notifications = (props) => {
 		<div>
 			{arrNotRead.length > 0 ? (
 				<Group header={<Header mode="primary">Непрочитанные</Header>}>
-					{getNotifications(arrNotRead, lastAdElementRef, props.openUser, props.openAd, props.setSnackbar)}
+					{getNotifications(arrNotRead, lastAdElementRef)}
 				</Group>
-			) : (
-				''
-			)}
+			) : null}
 			{arrRead.length > 0 ? (
-				<Group header={<Header mode="primary"> {arrNotRead.length > 0 ? 'Прочитанные' : ''} </Header>}>
-					{getNotifications(arrRead, lastAdElementRef, props.openUser, props.openAd, props.setSnackbar)}
+				<Group header={arrNotRead.length > 0 && <Header mode="primary"> Прочитанные </Header>}>
+					{getNotifications(arrRead, lastAdElementRef)}
 				</Group>
-			) : (
-				''
-			)}
-			{!inited ? (
-				''
-			) : arrNotRead.length + arrRead.length == 0 ? (
+			) : null}
+			{!inited ? null : arrNotRead.length + arrRead.length == 0 ? (
 				<Placeholder
 					icon={<Icon56CheckCircleOutline />}
 					action={
@@ -492,9 +465,7 @@ const Notifications = (props) => {
 				>
 					Непрочитанных объявлений нет
 				</Placeholder>
-			) : (
-				''
-			)}
+			) : null}
 		</div>
 	);
 };
@@ -509,3 +480,5 @@ const mapDispatchToProps = {
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Notifications);
+
+// 502

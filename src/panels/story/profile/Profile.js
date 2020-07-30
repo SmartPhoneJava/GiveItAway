@@ -141,7 +141,7 @@ const Profile = (props) => {
 		const v = (
 			<Collapse isOpened={collapseOpen}>
 				<div style={{ display: width < 500 ? 'block' : 'flex' }}>
-					{carmaDiv(openFreeze, -backuser.frozen_carma, 'Заморожено')}
+					{carmaDiv(openFreeze, backuser.frozen_carma, 'Заморожено')}
 					{carmaDiv(null, backuser.total_earned_carma, 'Получено')}
 					{carmaDiv(null, backuser.total_spent_carma, 'Потрачено')}
 				</div>
@@ -251,6 +251,7 @@ const Profile = (props) => {
 				if (cleanupFunction) {
 					return;
 				}
+				console.log("we log you v!", v)
 				setBackUser(v);
 				if (profileID == myID) {
 					props.setProfileName('Мой профиль');

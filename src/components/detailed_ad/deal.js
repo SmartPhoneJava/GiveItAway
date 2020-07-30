@@ -1,17 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-	Avatar,
-	Header,
-	InfoRow,
-	Group,
-	Cell,
-	Counter,
-	Link,
-	SimpleCell,
-	Button,
-	CellButton,
-	Title,
-} from '@vkontakte/vkui';
+import { Avatar, Header, InfoRow, Group, Cell, Counter, SimpleCell, CellButton, Title } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 

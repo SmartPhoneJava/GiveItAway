@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
 import { Snackbar, Avatar, Cell, Separator } from '@vkontakte/vkui';
 
+import { connect } from 'react-redux';
+
 import './notification.css';
 
 import { timeShort } from './../../../../../utils/time';
 
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
-import Question50 from './../../../../../img/50/question.png';
+import Gift from './../../../../../img/icon278.png';
+
 import { SNACKBAR_DURATION_DEFAULT } from '../../../../../store/const';
+import { openSnackbar, closeSnackbar, setAd, setStory } from '../../../../../store/router/actions';
+import { setExtraInfo } from '../../../../../store/detailed_ad/actions';
+import { STORY_ADS } from '../../../../../store/router/storyTypes';
 
 function getImage(props) {
-	let photoURL = Question50;
+	let photoURL = Gift;
 	if (
 		props &&
 		props.notification &&
@@ -32,21 +38,23 @@ function getImage(props) {
 	return <Avatar size={48} src={photoURL} />;
 }
 
-const Notification = (props) => {
-	function hideSnckbar() {
-		props.setSnackbar(null);
-	}
+const NotificationInner = (props) => {
+	const { openSnackbar, closeSnackbar, setExtraInfo, setAd, setStory } = props;
+
 	return (
 		<>
 			<Cell
 				onClick={() => {
 					if (props.ad) {
-						props.openAd(props.ad);
+						setStory(STORY_ADS);
+						setExtraInfo(props.ad);
+						setAd(props.ad);
+						console.log('cliiiiick');
 					} else {
-						props.setSnackbar(
+						openSnackbar(
 							<Snackbar
 								duration={SNACKBAR_DURATION_DEFAULT}
-								onClose={hideSnckbar}
+								onClose={closeSnackbar}
 								before={
 									<Avatar size={24} style={{ background: 'red' }}>
 										<Icon24Cancel fill="#fff" width={14} height={14} />
@@ -84,6 +92,18 @@ const Notification = (props) => {
 	);
 };
 
-export default Notification;
+const mapStateToProps = (state) => {
+	return {};
+};
+
+const mapDispatchToProps = {
+	openSnackbar,
+	closeSnackbar,
+	setExtraInfo,
+	setAd,
+	setStory,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(NotificationInner);
 
 // 260 -> 241 -> 207 -> 87

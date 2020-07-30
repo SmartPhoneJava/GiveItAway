@@ -49,27 +49,19 @@ export const showChosen = (isDealer, isAuthor, dealer, acceptClick, cancelClick,
 	if (isDealer && !isAuthor) {
 		return statusWrapper(
 			<>
-				<AnimateOnChange animation="bounce">
-					<InfoRow>Автор решил отдать вещь вам. Подтвердите получение вещи после получения:</InfoRow>
-					<div style={{ display: 'flex' }}>
-						<div style={{ padding: '8px', flex: 1 }}>
-							<Button stretched size="l" mode="commerce" onClick={acceptClick} before={<Icon24Done />}>
-								Подтвердить
-							</Button>
-						</div>
-						<div style={{ padding: '8px', flex: 1 }}>
-							<Button
-								stretched
-								size="l"
-								mode="destructive"
-								onClick={cancelClick}
-								before={<Icon24Cancel />}
-							>
-								Отклонить
-							</Button>
-						</div>
+				<InfoRow>Автор решил отдать вещь вам. Подтвердите получение вещи после получения:</InfoRow>
+				<div style={{ display: width < 350 ? 'block' : 'flex' }}>
+					<div style={{ padding: width < 350 ? '4px' : '8px', flex: 1 }}>
+						<Button stretched size="l" mode="commerce" onClick={acceptClick} before={<Icon24Done />}>
+							Подтвердить
+						</Button>
 					</div>
-				</AnimateOnChange>
+					<div style={{ padding: '8px', flex: 1 }}>
+						<Button stretched size="l" mode="destructive" onClick={cancelClick} before={<Icon24Cancel />}>
+							Отклонить
+						</Button>
+					</div>
+				</div>
 			</>,
 			COLOR_DEFAULT
 		);
