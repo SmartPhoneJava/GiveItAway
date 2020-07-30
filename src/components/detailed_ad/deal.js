@@ -106,6 +106,8 @@ const DealLabelInner = (props) => {
 	const onCarmaClick = () => props.openModal(MODAL_ADS_COST);
 	const openSubs = () => props.setPage(PANEL_SUBS);
 
+	const width = document.body.clientWidth;
+
 	const [componentSub, setComponentSub] = useState(<></>);
 	useEffect(() => {
 		const { sub, unsub } = props;
@@ -127,7 +129,7 @@ const DealLabelInner = (props) => {
 							</Header>
 						}
 					>
-						<div style={{ display: 'flex' }}>
+						<div style={{ display: width < 330 ? 'block' : 'flex' }}>
 							<CellButton
 								mode="danger"
 								onClick={() => {
@@ -173,7 +175,7 @@ const DealLabelInner = (props) => {
 							</Header>
 						}
 					>
-						<div style={{ display: 'flex' }}>
+						<div style={{ display: width < 330 ? 'block' : 'flex' }}>
 							<CellButton
 								disabled={disable}
 								onClick={unsub}
@@ -201,10 +203,12 @@ const DealLabelInner = (props) => {
 				);
 			} else {
 				button = (
-					<div style={{ display: 'flex' }}>
-						<CellButton onClick={sub} disabled={disable} before={<Icon24MarketOutline />}>
-							Откликнуться
-						</CellButton>{' '}
+					<div style={{ display: width < 330 ? 'block' : 'flex' }}>
+						<div>
+							<CellButton onClick={sub} disabled={disable} before={<Icon24MarketOutline />}>
+								Откликнуться
+							</CellButton>
+						</div>
 						<div style={{ display: 'flex', flex: 1 }}>
 							<Cell
 								indicator={

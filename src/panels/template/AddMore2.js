@@ -489,9 +489,7 @@ const AddMore2r = (props) => {
 					}}
 				>
 					<div style={{ display: 'inline-block' }}>{icon}</div>
-					<Caption level="1" weight="semibold">
-						{text}
-					</Caption>
+					<Caption level="1">{text}</Caption>
 				</div>
 			</Button>
 		);
@@ -627,14 +625,22 @@ const AddMore2r = (props) => {
 				null
 			);
 
-			buttons = [
-				subBtn,
-				helpBtn,
-				buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK),
-				buttonAction(<Icon24Report />, 'Пожаловаться', () => {
-					window.open('https://vk.com/im?media=&sel=-194671970');
-				}),
-			];
+			console.log('width is', width);
+			buttons = (
+				<div style={{ display: width < 330 ? 'block' : 'flex' }}>
+					<div className="flex-center">
+						{subBtn}
+						{helpBtn}
+					</div>
+
+					<div className="flex-center">
+						{buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK)}
+						{buttonAction(<Icon24Report />, 'Пожаловаться', () => {
+							window.open('https://vk.com/im?media=&sel=-194671970');
+						})}
+					</div>
+				</div>
+			);
 		}
 
 		setAllActions(

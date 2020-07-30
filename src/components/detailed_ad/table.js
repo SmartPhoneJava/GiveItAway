@@ -19,6 +19,7 @@ const AdMainInfoInner = (props) => {
 	function tableElement(Icon, text, value, After, onClick) {
 		return (
 			<MiniInfoCell
+				multiline
 				onClick={onClick}
 				mode={onClick ? 'more' : null}
 				before={<Icon width={20} height={20} />}
