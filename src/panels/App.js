@@ -529,7 +529,6 @@ const App = (props) => {
 								goBack();
 								goBack();
 								goBack();
-								// openModal(MODAL_ADS_FILTERS);
 							}}
 							goBack={goBack}
 							redux_form={ADS_FILTERS_B}
@@ -597,22 +596,10 @@ const App = (props) => {
 						<Cities redux_form={FORM_LOCATION_CREATE} goBack={goBack} />
 					</Panel>
 				</View>
-				<View
-					id={STORY_NOTIFICATIONS}
-					activePanel={PANEL_NOTIFICATIONS}
-					// popout={createPopout}
-					// history={createPanels}
-				>
+				<View id={STORY_NOTIFICATIONS} activePanel={PANEL_NOTIFICATIONS}>
 					<Panel id={PANEL_NOTIFICATIONS}>
 						<PanelHeader>Уведомления</PanelHeader>
-						<Notifications
-							zeroNots={() => {
-								notsCounterrr = 0;
-							}}
-							openUser={setProfile}
-							openAd={setReduxAd}
-							goToAds={() => {}}
-						/>
+						<Notifications zeroNots={() => (notsCounterrr = 0)} />
 						{snackbars[PANEL_NOTIFICATIONS]}
 					</Panel>
 				</View>

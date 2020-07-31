@@ -137,7 +137,13 @@ const AuctionLabelInner = (props) => {
 
 	const [componentMyRate, setComponentMyRate] = useState(<></>);
 	useEffect(() => {
-		const { isAuthor, dealer, ad_id, ad_type, isSub, cost } = props.ad;
+		const { isAuthor, isDealer, status, dealer, ad_id, ad_type, isSub, cost } = props.ad;
+		console.log("props.ad look", isDealer, status == STATUS_CHOSEN, props.ad)
+		if (isDealer && status == STATUS_CHOSEN) {
+			setComponentMyRate(null);
+			return
+		}
+		console.log("go neeeext", isDealer, props.ad)
 		setComponentMyRate(
 			isAuthor ? (
 				!dealer ? (
@@ -149,14 +155,16 @@ const AuctionLabelInner = (props) => {
 						Завершить
 					</CellButton>
 				) : (
-					<CellButton
-						mode="danger"
-						onClick={() => CancelClose(ad_id)}
-						disabled={!actionMaxUser}
-						before={<Icon24Cancel />}
-					>
-						Отменить выбор
-					</CellButton>
+					!(status == STATUS_ABORTED || status == STATUS_CLOSED) && (
+						<CellButton
+							mode="danger"
+							onClick={() => CancelClose(ad_id)}
+							disabled={!actionMaxUser}
+							before={<Icon24Cancel />}
+						>
+							Отменить выбор
+						</CellButton>
+					)
 				)
 			) : isSub ? (
 				actionMaxUser && (
@@ -245,12 +253,13 @@ const AuctionLabelInner = (props) => {
 						{componentMaxUser}
 					</AnimateOnChange> */}
 				</div>
-				{!(props.ad.status == STATUS_ABORTED || props.ad.status == STATUS_CLOSED) && (
-					<AnimationChange mayTheSame={true} ignoreFirst={true} controll={componentMyRate} />
+
+				<AnimationChange mayTheSame={true} ignoreFirst={true} controll={componentMyRate} />
+				{
 					// <AnimateOnChange style={{ width: '100%' }} animation="bounce">
 					// 	{componentMyRate}
 					// </AnimateOnChange>
-				)}
+				}
 			</div>
 		</Group>
 	);

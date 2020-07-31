@@ -455,16 +455,7 @@ const Notifications = (props) => {
 				</Group>
 			) : null}
 			{!inited ? null : arrNotRead.length + arrRead.length == 0 ? (
-				<Placeholder
-					icon={<Icon56CheckCircleOutline />}
-					action={
-						<Button onClick={() => props.goToAds()} size="l">
-							Назад
-						</Button>
-					}
-				>
-					Непрочитанных объявлений нет
-				</Placeholder>
+				<Placeholder icon={<Icon56CheckCircleOutline />}>Непрочитанных объявлений нет</Placeholder>
 			) : null}
 		</div>
 	);

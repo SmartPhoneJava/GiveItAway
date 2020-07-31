@@ -154,7 +154,7 @@ const AddsModal = (props) => {
 						action: openCarma,
 					},
 					{
-						title: 'Подробнее',
+						title: 'Назад',
 						mode: 'secondary',
 						action: closeModal,
 					},
