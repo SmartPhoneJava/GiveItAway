@@ -1,97 +1,109 @@
 import React, { useState, useEffect } from 'react';
-import { Avatar, Header, Group } from '@vkontakte/vkui';
+import { Avatar, Header, Group, Cell, SimpleCell, Title, Subhead, Counter } from '@vkontakte/vkui';
 import { RadialChart } from 'react-vis';
 
+const COLOR_GIVEN = '#00CCFF';
+const COLOR_RECEIVED = '#FFCC33';
+const COLOR_SUCCESS = '#00CC66';
+const COLOR_FAILED = '#FF9933';
+
 export const Statistics = (props) => {
-    const {backuser} = props;
-    const width = document.body.clientWidth;
+	const { backuser } = props;
+	const width = document.body.clientWidth;
+
+	function counter(background, text, value) {
+		return (
+			<SimpleCell before={<Avatar style={{ background }} size={24} />}>
+				<Title weight="regular" level="3">
+					{text}: <b>{`${value}`}</b>
+				</Title>
+			</SimpleCell>
+		);
+	}
+
+	function radialChart(data) {
+		return (
+			<RadialChart
+				data={data}
+				showLabels={true}
+				radius={60}
+				innerRadius={55}
+				width={width / 2}
+				height={160}
+				labelsAboveChildren={false}
+				labelsRadiusMultiplier={2}
+				colorType="literal"
+			/>
+		);
+	}
+
+	const dataGivenReceived =
+		backuser.total_given_ads + backuser.total_received_ads == 0
+			? [
+					{ angle: 1, color: COLOR_GIVEN },
+					{
+						angle: 1,
+						color: COLOR_RECEIVED,
+					},
+			  ]
+			: [
+					{ angle: backuser.total_given_ads, color: COLOR_GIVEN },
+					{
+						angle: backuser.total_received_ads,
+						color: COLOR_RECEIVED,
+					},
+			  ];
+
+	const dataSuccessFail =
+		backuser.total_given_ads + backuser.total_received_ads + backuser.total_aborted_ads == 0
+			? [
+					{
+						angle: 1,
+						color: COLOR_SUCCESS,
+					},
+					{
+						angle: 1,
+						color: COLOR_FAILED,
+					},
+			  ]
+			: [
+					{
+						angle: backuser.total_given_ads - backuser.total_aborted_ads,
+						color: COLOR_SUCCESS,
+					},
+					{
+						angle: backuser.total_aborted_ads,
+						color: COLOR_FAILED,
+					},
+			  ];
+
 	return backuser.total_received_ads + backuser.total_given_ads == 0 ? null : (
 		<Group header={<Header mode="secondary">Статистика</Header>}>
 			<div className="infographics-main">
 				<div className="infographics-column">
-					<div>Вещей</div>
-					<RadialChart
-						data={
-							backuser.total_given_ads + backuser.total_received_ads == 0
-								? [
-										{ angle: 1, color: '#00CCFF' },
-										{
-											angle: 1,
-											color: '#FFCC33',
-										},
-								  ]
-								: [
-										{ angle: backuser.total_given_ads, color: '#00CCFF' },
-										{
-											angle: backuser.total_received_ads,
-											color: '#FFCC33',
-										},
-								  ]
-						}
-						showLabels={true}
-						radius={40}
-						innerRadius={30}
-						width={width / 2}
-						height={100}
-						labelsAboveChildren={false}
-						labelsRadiusMultiplier={2}
-						colorType="literal"
-					/>
+					<div style={{ position: 'relative' }}>
+						{radialChart(dataGivenReceived)}
+						<div className="infographics-column-header">
+							<Title level="2">Вещей</Title>
+						</div>
+					</div>
 
-					<div style={{ display: 'flex', justifyContent: 'center' }}>
-						<Avatar style={{ background: '#00CCFF', marginRight: '3px' }} size={14}></Avatar>
-						<>Отдано</>
-					</div>
-					<div style={{ display: 'flex', paddingLeft: '15px', justifyContent: 'center' }}>
-						<Avatar style={{ background: '#FFCC33', marginRight: '3px' }} size={14}></Avatar>
-						<>Получено</>
-					</div>
+					{counter(COLOR_GIVEN, 'Отдано', backuser.total_given_ads)}
+					{counter(COLOR_RECEIVED, 'Получено', backuser.total_received_ads)}
 				</div>
 				<div className="infographics-column">
-					Обменов
-					<RadialChart
-						data={
-							backuser.total_given_ads + backuser.total_received_ads + backuser.total_aborted_ads == 0
-								? [
-										{
-											angle: 1,
-											color: '#00CC66',
-										},
-										{
-											angle: 1,
-											color: '#FF9933',
-										},
-								  ]
-								: [
-										{
-											angle: backuser.total_given_ads + backuser.total_received_ads,
-											color: '#00CC66',
-										},
-										{
-											angle: backuser.total_aborted_ads,
-											color: '#FF9933',
-										},
-								  ]
-						}
-						colorType="literal"
-						showLabels={true}
-						radius={40}
-						innerRadius={30}
-						width={width / 2}
-						height={100}
-						labelsAboveChildren={false}
-						labelsRadiusMultiplier={2}
-					/>
-					<div style={{ display: 'flex', paddingLeft: '18px', justifyContent: 'center' }}>
-						<Avatar style={{ background: '#00CC66', marginRight: '3px' }} size={14}></Avatar>
-						<>Проведено</>
+					<div style={{ position: 'relative' }}>
+						{radialChart(dataSuccessFail)}
+						<div className="infographics-column-header">
+							<Title level="2">Обменов</Title>
+						</div>
 					</div>
-					<div style={{ display: 'flex', justifyContent: 'center' }}>
-						<Avatar style={{ background: '#FF9933', marginRight: '3px' }} size={14}></Avatar>
-						<>Сорвано</>
-					</div>
+					{counter(COLOR_SUCCESS, 'Проведено', backuser.total_given_ads - backuser.total_aborted_ads)}
+					{counter(COLOR_FAILED, 'Сорвано', backuser.total_aborted_ads)}
 				</div>
 			</div>
 		</Group>
 	);
 };
+
+// 124

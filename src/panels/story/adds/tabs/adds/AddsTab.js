@@ -188,7 +188,7 @@ const AddsTab = (props) => {
 				</div>
 			))
 		);
-	}, [rads]);
+	}, [rads, hasMore]);
 
 	useEffect(() => {
 		if (activeModal) {
@@ -353,6 +353,7 @@ const AddsTab = (props) => {
 			if (observer.current) observer.current.disconnect();
 			observer.current = new IntersectionObserver((entries) => {
 				if (entries[0].isIntersecting && hasMore) {
+					console.log("we see hasMore", hasMore)
 					setPageNumber((prev) => prev + 1);
 				}
 			});

@@ -1,12 +1,11 @@
 .profile-block {
 	line-height: 1.4;
 	font-size: 14px;
-	
 }
 
 .ReactCollapse--collapse {
-	transition: height 500ms;
-  }
+	transition: height 250ms;
+}
 
 .profile-main-left {
 	position: relative;
@@ -47,3 +46,9 @@ img.profile-tiled {
 	flex: 1;
 }
 
+.infographics-column-header {
+	position: absolute;
+	top: 70px;
+	left: 0px;
+	right: 0px;
+}

@@ -5,6 +5,7 @@ import Icon16Place from '@vkontakte/icons/dist/16/place';
 
 import MetroImage30 from './../../img/30/metro.png';
 
+import Icon12Fire from '@vkontakte/icons/dist/12/fire';
 import Icon24MoreVertical from '@vkontakte/icons/dist/24/more_vertical';
 
 import Icon12Lock from '@vkontakte/icons/dist/12/lock';
@@ -106,6 +107,17 @@ const Add7 = (props) => {
 		);
 	}
 
+	function statusText(text, className, Icon) {
+		return (
+			<div className={className}>
+				<div className="on-img-text">
+					<Icon style={{ marginRight: '2px' }} />
+					{text}
+				</div>
+			</div>
+		);
+	}
+
 	const [label, setLabel] = useState(<></>);
 	const [hasLabel, setHasLabel] = useState(false);
 	useEffect(() => {
@@ -113,52 +125,19 @@ const Add7 = (props) => {
 		let newLabel = null;
 		switch (status) {
 			case STATUS_ABORTED:
-				newLabel = (
-					<div className="failed">
-						<div className="on-img-text">
-							<Icon16Clear style={{ marginRight: '5px' }} />
-							Отменено
-						</div>
-					</div>
-				);
+				newLabel = statusText('Отменено', 'failed', Icon16Clear);
 
 			case STATUS_CLOSED:
-				newLabel = (
-					<div className="success">
-						<div className="on-img-text">
-							<Icon16CheckCircle style={{ marginRight: '5px' }} />
-							Вещь отдана
-						</div>
-					</div>
-				);
+				newLabel = statusText('Вещь отдана', 'success', Icon16CheckCircle);
+
 			case STATUS_CHOSEN:
 				if (isAuthor()) {
-					newLabel = (
-						<div className="deal">
-							<div style={{ color: 'rgb(220,220,220)', fontSize: '12px', padding: '2px' }}>
-								Ожидание ответа
-							</div>
-						</div>
-					);
+					newLabel = statusText('Ожидание ответа', 'deal', Icon12Fire);
 				}
 		}
 
 		if (!isVisible && isAuthor()) {
-			if (status == STATUS_CHOSEN) {
-				newLabel = (
-					<div className="hidden2 on-img-text">
-						<Icon12Lock />
-						Видно только вам
-					</div>
-				);
-			} else {
-				newLabel = (
-					<div className="hidden on-img-text">
-						<Icon12Lock />
-						Видно только вам
-					</div>
-				);
-			}
+			newLabel = statusText('Видно только вам', 'hidden', Icon12Lock);
 		}
 		if (newLabel) {
 			setLabel(newLabel);

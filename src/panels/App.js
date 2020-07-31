@@ -198,14 +198,16 @@ const App = (props) => {
 	};
 
 	function scrollWindow(to) {
-		var scrolledSoFar = window.scrollY;
-		var scrollEnd = to;
+		let scrolledSoFar = window.scrollY;
+		let scrollEnd = to;
 		if (scrolledSoFar == scrollEnd) {
 			return;
 		}
-		var timerID = setInterval(function () {
+		let repeat = 50;
+		let timerID = setInterval(function () {
+			repeat--;
 			window.scrollTo(0, scrollEnd);
-			if (scrolledSoFar != window.scrollY && scrollEnd <= window.scrollY) {
+			if (epeat <= 0 || (scrolledSoFar != window.scrollY && scrollEnd <= window.scrollY)) {
 				clearInterval(timerID);
 			}
 		}, 10);
