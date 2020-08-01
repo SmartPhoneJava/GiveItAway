@@ -26,6 +26,7 @@ import {
 	MODE_ALL,
 	MODE_GIVEN,
 	MODE_WANTED,
+	GEO_TYPE_NO,
 } from '../../../../../const/ads';
 import { ADS_FILTERS, GEO_DATA } from '../../../../../store/create_post/types';
 import { openPopout, closePopout, setStory } from '../../../../../store/router/actions';
@@ -72,13 +73,16 @@ const AddsTab = (props) => {
 			setSearch(s);
 		}
 
-		const gt = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geotype : null) || GEO_TYPE_FILTERS;
+		const gt = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geotype : null) || GEO_TYPE_NO;
 		setGeoType(gt);
 
 		const rad = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].radius : null) || 0;
 		setRadius(rad);
 
-		const geod = (inputData[GEO_DATA] ? inputData[GEO_DATA].geodata : null) || null;
+		let geod = inputData[GEO_DATA] ? inputData[GEO_DATA].geodata : null;
+		if (!geod) {
+			geod = inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geodata : null;
+		}
 		setGeodata(geod);
 
 		const count = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].country : null) || NoRegion;
@@ -103,7 +107,9 @@ const AddsTab = (props) => {
 		setMode(mod);
 
 		console.log('flters loook', cit, categor, rad);
-		setFiltersOn(cit != NoRegion || categor != CategoryNo || rad != 0);
+		setFiltersOn(
+			(gt == GEO_TYPE_FILTERS && cit != NoRegion) || categor != CategoryNo || (gt == GEO_TYPE_NEAR && rad != 0)
+		);
 	}, [props.inputData[ADS_FILTERS]]);
 
 	const [searchR, setSearchR] = useState('');
@@ -279,7 +285,7 @@ const AddsTab = (props) => {
 
 			if (geoType == GEO_TYPE_NEAR) {
 				params.radius = radius || 0.5;
-			} else {
+			} else if (geoType == GEO_TYPE_FILTERS) {
 				if (city && city.id != -1) {
 					params.district = city.title;
 				}
@@ -353,7 +359,7 @@ const AddsTab = (props) => {
 			if (observer.current) observer.current.disconnect();
 			observer.current = new IntersectionObserver((entries) => {
 				if (entries[0].isIntersecting && hasMore) {
-					console.log("we see hasMore", hasMore)
+					console.log('we see hasMore', hasMore);
 					setPageNumber((prev) => prev + 1);
 				}
 			});

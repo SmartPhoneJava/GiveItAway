@@ -94,7 +94,7 @@ const AddsModal = (props) => {
 				id={MODAL_ADS_SORT}
 				onClose={closeModal}
 				dynamicContentHeight
-				header={<ModalHeader isBack={true} name="Отсортировать" back={closeModal} />}
+				header={<ModalHeader isBack={true} name="Применить сортировку" back={closeModal} />}
 			>
 				<ModalPageAdsSort />
 			</ModalPage>

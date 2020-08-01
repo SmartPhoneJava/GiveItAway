@@ -10,9 +10,10 @@ import { closeAllModals, closeModal } from '../../store/router/actions';
 
 import bridge from '@vkontakte/vk-bridge';
 
-import { Radio, Header, CellButton, Button, Group } from '@vkontakte/vkui';
+import { Radio, Header, CellButton, Button, Group, FormStatus, withModalRootContext } from '@vkontakte/vkui';
 import { getGeodata } from '../../services/VK';
 import { pushToCache } from '../../store/cache/actions';
+import { fail } from '../../requests';
 
 const { SORT_TIME, SORT_GEO } = require('../../const/ads');
 
@@ -21,7 +22,7 @@ export const SaveCancelButtons = (save, cancel) => {
 		<div className="flex-center">
 			<div className="filters-button">
 				<Button stretched size="xl" mode="secondary" onClick={cancel} before={<Icon24Cancel />}>
-					Отменить
+					Назад
 				</Button>
 			</div>
 			<div className="filters-button">
@@ -36,6 +37,8 @@ export const SaveCancelButtons = (save, cancel) => {
 const ModalPageAdsSortInner = (props) => {
 	const { setFormData, closeAllModals, inputData, pushToCache, closeModal } = props;
 
+	const [changed, setChanged] = useState(false);
+	const [valid, setValid] = useState(true);
 	const [isTimeSort, setIsTimeSort] = useState(true);
 	const [sort, setSort] = useState(SORT_TIME);
 	const [geodata, setGeodata] = useState();
@@ -49,28 +52,39 @@ const ModalPageAdsSortInner = (props) => {
 	function applyTimeSort() {
 		setIsTimeSort(true);
 		setSort(SORT_TIME);
+		setChanged(sort != SORT_TIME);
+		props.updateModalHeight();
+	}
+
+	function applyGeoSortInner() {
+		setIsTimeSort(false);
+		setSort(SORT_GEO);
+		setValid(true);
+		setChanged(sort != SORT_GEO);
+		props.updateModalHeight();
 	}
 
 	function applyGeoSort() {
-		setIsTimeSort(false);
-		setSort(SORT_GEO);
-
-		bridge.send('VKWebAppGetGeodata').then((value) => {
-			setGeodata(value);
-
-			console.log('VKWebAppGetGeodata', value);
-		});
+		bridge
+			.send('VKWebAppGetGeodata')
+			.then((value) => {
+				setGeodata(value);
+				applyGeoSortInner();
+				console.log('VKWebAppGetGeodata', value);
+			})
+			.catch(() => {
+				setValid(false);
+				applyTimeSort()
+				fail('Нет доступа к геопозиции');
+			});
 	}
 
-	useEffect(() => {
-		getGeodata();
-	}, []);
-
 	function save() {
+		console.log("geodata is", geodata)
 		setFormData(ADS_FILTERS, {
 			...inputData[ADS_FILTERS],
 			sort,
-			geodata,
+			geodata: geodata ? geodata : inputData[ADS_FILTERS].geodata,
 		});
 		pushToCache(true, 'ignore_cache');
 		closeAllModals();
@@ -78,7 +92,7 @@ const ModalPageAdsSortInner = (props) => {
 
 	return (
 		<>
-			<Group separator="show" header={<Header mode="secondary">Отсортировать по</Header>}>
+			<Group separator="show">
 				<Radio checked={isTimeSort} key={SORT_TIME} value={SORT_TIME} name="sort" onChange={applyTimeSort}>
 					По времени
 				</Radio>
@@ -86,7 +100,14 @@ const ModalPageAdsSortInner = (props) => {
 					По близости
 				</Radio>
 			</Group>
-			{SaveCancelButtons(save, closeModal)}
+			{!valid && (
+				<div style={{ padding: '10px' }}>
+					<FormStatus header="Нет доступа к GPS" mode={valid ? 'default' : 'error'}>
+						Проверьте, что у вас включена геолокация и вы предоставили сервису доступ к нему.
+					</FormStatus>
+				</div>
+			)}
+			{changed && SaveCancelButtons(save, closeModal)}
 		</>
 	);
 };
@@ -105,6 +126,8 @@ const mapDispatchToProps = {
 	closeModal,
 };
 
-export const ModalPageAdsSort = connect(mapStateToProps, mapDispatchToProps)(ModalPageAdsSortInner);
+export const ModalPageAdsSort = withModalRootContext(
+	connect(mapStateToProps, mapDispatchToProps)(ModalPageAdsSortInner)
+);
 
 // 112

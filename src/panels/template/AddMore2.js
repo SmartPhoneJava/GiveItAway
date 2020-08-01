@@ -50,7 +50,6 @@ import Icon24MarketOutline from '@vkontakte/icons/dist/24/market_outline';
 
 import { adVisible, adHide, deleteAd, getSubscribers, getDetails, acceptDeal, denyDeal } from './../../requests';
 
-import './addsTab.css';
 import './styles.css';
 
 import Comments from './../story/adds/tabs/comments/comments';
@@ -64,7 +63,6 @@ import {
 	setStory,
 	closePopout,
 	setProfile,
-	closeModal,
 } from '../../store/router/actions';
 import { setIsSub, setIsHidden, setExtraInfo, setIsAuthor } from '../../store/detailed_ad/actions';
 import { AdDefault, AD_LOADING, STATUS_CLOSED, STATUS_ABORTED, TYPE_CHOICE, TYPE_AUCTION } from '../../const/ads';

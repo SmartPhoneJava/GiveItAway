@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FormLayout, SelectMimicry, Group, Header, Link, Div, withModalRootContext } from '@vkontakte/vkui';
+import { FormLayout, SelectMimicry, Group, Header, Link, Div, withModalRootContext, RichCell } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
@@ -43,34 +43,32 @@ export const tag = (text, color, background, borderColor) => {
 export const TagsLabel = (props) => {
 	const tagsUpdate = props.tagsUpdate || true;
 	return (
-		<Div>
-			<DraggableArea
-				draggable={false}
-				tags={props.tags}
-				render={({ tag, index }) => (
-					<Transition in={tagsUpdate} timeout={duration}>
-						{(state) => {
-							const s = (
-								<div
-									className="categories-tag-row"
-									onClick={props.onClick}
-									style={{
-										...transitionStyles[state],
-										background: tag.background,
-										color: tag.color,
-										borderColor: tag.borderColor,
-									}}
-								>
-									{tag.content}
-								</div>
-							);
-							return s;
-						}}
-					</Transition>
-				)}
-				onChange={(tags) => console.log(tags)}
-			/>
-		</Div>
+		<DraggableArea
+			draggable={false}
+			tags={props.tags}
+			render={({ tag, index }) => (
+				<Transition in={tagsUpdate} timeout={duration}>
+					{(state) => {
+						const s = (
+							<div
+								className="categories-tag-row"
+								onClick={props.onClick}
+								style={{
+									...transitionStyles[state],
+									background: tag.background,
+									color: tag.color,
+									borderColor: tag.borderColor,
+								}}
+							>
+								{tag.content}
+							</div>
+						);
+						return s;
+					}}
+				</Transition>
+			)}
+			onChange={(tags) => console.log(tags)}
+		/>
 	);
 };
 
@@ -120,15 +118,22 @@ const CategoriesLabel = (props) => {
 	});
 
 	return (
-		<Group
-			header={
-				<Header mode="secondary" aside={<Link onClick={props.open}>Изменить</Link>}>
-					Категория
-				</Header>
-			}
+		<RichCell
+			multiline
+			text={<TagsLabel tagsUpdate={tagsUpdate} tags={tags} onClick={props.open} />}
+			after={<Link onClick={props.open}>Изменить</Link>}
 		>
-			<TagsLabel tagsUpdate={tagsUpdate} tags={tags} onClick={props.open} />
-		</Group>
+			Категория
+		</RichCell>
+		// <Group
+		// 	header={
+		// 		<Header mode="secondary" aside={<Link onClick={props.open}>Изменить</Link>}>
+		// 			Категория
+		// 		</Header>
+		// 	}
+		// >
+		// 	<TagsLabel tagsUpdate={tagsUpdate} tags={tags} onClick={props.open} />
+		// </Group>
 	);
 };
 

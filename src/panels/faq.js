@@ -1,36 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import {
-	Panel,
-	PanelHeader,
-	PanelHeaderBack,
-	Footer,
-	Link,
-	Cell,
-	Group,
-	Header,
-	SimpleCell,
-	InfoRow,
-	Placeholder,
-	Banner,
-	Title,
-	Div,
-	Headline,
-} from '@vkontakte/vkui';
-
-import { STORY_ADS } from '../store/router/storyTypes';
-import { PANEL_USER, PANEL_ABOUT } from '../store/router/panelTypes';
+import { PanelHeader, PanelHeaderBack, Footer, Link, Group, SimpleCell, InfoRow, Banner, Title } from '@vkontakte/vkui';
 
 import background from './../img/backgrounds/1_dark.jpg';
-import './main.css';
-import Music from './../img/music.png';
 
 import { connect } from 'react-redux';
-import { goBack, setPage } from '../store/router/actions';
-
-import Profile from './story/profile/Profile';
-
-import Icon28MusicOutline from '@vkontakte/icons/dist/28/music_outline';
-import Icon from '@vkontakte/icons/dist/24/cancel';
+import { goBack } from '../store/router/actions';
 
 const width = document.body.clientWidth;
 const FAQPanel = (props) => {

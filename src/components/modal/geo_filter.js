@@ -4,40 +4,31 @@ import { connect } from 'react-redux';
 import { NoRegion } from './../location/const';
 import Location from './../location/label';
 
-import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
-import Icon24Done from '@vkontakte/icons/dist/24/done';
-
 import { setFormData } from '../../store/create_post/actions';
 import { ADS_FILTERS, ADS_FILTERS_B } from '../../store/create_post/types';
 import { closeAllModals, setPage, closeModal } from '../../store/router/actions';
 import { PANEL_COUNTRIES, PANEL_CITIES } from '../../store/router/panelTypes';
 
-import {
-	Slider,
-	Input,
-	FormLayout,
-	Radio,
-	FormStatus,
-	CellButton,
-	Button,
-	withModalRootContext,
-} from '@vkontakte/vkui';
+import { Slider, Input, FormLayout, Radio, FormStatus, withModalRootContext, Div } from '@vkontakte/vkui';
 import { getGeodata } from '../../services/VK';
 import { pushToCache } from '../../store/cache/actions';
 import { DIRECTION_BACK } from '../../store/router/directionTypes';
 import { SaveCancelButtons } from './ad_sort';
-import { store } from '../..';
 
-const { GEO_TYPE_FILTERS, GEO_TYPE_NEAR } = require('../../const/ads');
+const { GEO_TYPE_FILTERS, GEO_TYPE_NEAR, GEO_TYPE_NO } = require('../../const/ads');
 
 export const getGeoFilters = (data) => {
 	if (!data || data == undefined) {
 		return 'везде';
 	}
+	
 	const { geotype, radius } = data;
 	const country = data.country || NoRegion;
 	const city = data.city || NoRegion;
 
+	if (geotype == GEO_TYPE_NO) {
+		return 'везде';
+	}
 	if (geotype == GEO_TYPE_FILTERS) {
 		if (country.id == NoRegion.id && city.id == NoRegion.id) {
 			return 'везде';
@@ -59,10 +50,15 @@ export const getGeoFilters = (data) => {
 const ModalPageAdsGeoInner = (props) => {
 	const { setFormData, closeAllModals, setPage, inputData, pushToCache, closeModal } = props;
 
-	const [geoType, setGeoType] = useState(GEO_TYPE_NEAR);
-	const [isGeoTypeFilters, setIsGeoTypeFilters] = useState(false);
+	const [geoType, setGeoType] = useState(GEO_TYPE_NO);
+	const [changed, setChanged] = useState(false);
 	const [radius, setRadius] = useState(0.5);
 	const [valid, setValid] = useState(true);
+
+	function setRadiusR(v) {
+		setRadius(v);
+		setChanged(true);
+	}
 
 	function load(WHERE) {
 		const inputData = props.inputData;
@@ -72,12 +68,18 @@ const ModalPageAdsGeoInner = (props) => {
 
 		if (inputData[WHERE].geotype) {
 			setGeoType(inputData[WHERE].geotype);
-			setIsGeoTypeFilters(inputData[WHERE].geotype == GEO_TYPE_FILTERS);
 		}
 		if (inputData[WHERE].radius) {
 			setRadius(inputData[WHERE].radius);
 		}
-    }
+		if (inputData[WHERE].changed) {
+			setChanged(true);
+		}
+	}
+
+	useEffect(() => {
+		props.updateModalHeight();
+	}, [changed, valid]);
 
 	useEffect(() => {
 		if (props.direction == DIRECTION_BACK) {
@@ -98,10 +100,18 @@ const ModalPageAdsGeoInner = (props) => {
 		setFormData(ADS_FILTERS_B, {
 			...inputData[ADS_FILTERS_B],
 			geotype: GEO_TYPE_FILTERS,
+			changed: geoType != GEO_TYPE_FILTERS,
 		});
 		setGeoType(GEO_TYPE_FILTERS);
-		setIsGeoTypeFilters(true);
-		props.updateModalHeight();
+	}
+
+	function setGeoNo() {
+		setFormData(ADS_FILTERS_B, {
+			...inputData[ADS_FILTERS_B],
+			geotype: GEO_TYPE_NO,
+		});
+		setChanged(geoType != GEO_TYPE_NO);
+		setGeoType(GEO_TYPE_NO);
 	}
 
 	function setGeoNear() {
@@ -112,31 +122,14 @@ const ModalPageAdsGeoInner = (props) => {
 					...inputData[ADS_FILTERS_B],
 					geotype: GEO_TYPE_NEAR,
 				});
+				setChanged(geoType != GEO_TYPE_NEAR);
 				setGeoType(GEO_TYPE_NEAR);
-				setIsGeoTypeFilters(false);
-				props.updateModalHeight();
-				// if (updateModalHeight) {
-				// 	updateModalHeight();
-				// }
 			},
 			(err) => {
 				setValid(false);
-				setGeoFilters();
 			}
 		);
 	}
-
-	useEffect(() => {
-		getGeodata(
-			(success) => {
-				setValid(true);
-			},
-			(err) => {
-				setValid(false);
-			}
-		);
-		props.updateModalHeight();
-	}, []);
 
 	function openCountries() {
 		closeAllModals();
@@ -166,12 +159,15 @@ const ModalPageAdsGeoInner = (props) => {
 
 	return (
 		<>
-			<Radio name="radio" value={GEO_TYPE_FILTERS} checked={isGeoTypeFilters} onChange={setGeoFilters}>
-				В указанном городе
+			<Radio name="radio" value={GEO_TYPE_NO} checked={geoType == GEO_TYPE_NO} onChange={setGeoNo}>
+				Везде
+			</Radio>
+			<Radio name="radio" value={GEO_TYPE_FILTERS} checked={geoType == GEO_TYPE_FILTERS} onChange={setGeoFilters}>
+				В определенном городе
 			</Radio>
 			<Radio
 				name="radio"
-				checked={!isGeoTypeFilters}
+				checked={geoType == GEO_TYPE_NEAR}
 				value={GEO_TYPE_NEAR}
 				onChange={setGeoNear}
 				description="Необходимо предоставить доступ к GPS"
@@ -180,37 +176,37 @@ const ModalPageAdsGeoInner = (props) => {
 			</Radio>
 			<div>
 				{geoType == GEO_TYPE_FILTERS ? (
-					<>
-						<Location redux_form={ADS_FILTERS_B} openCountries={openCountries} openCities={openCities} />
-						{valid ? null : (
-							<div style={{ padding: '10px' }}>
-								<FormStatus header="Нет доступа к GPS" mode={valid ? 'default' : 'error'}>
-									Проверьте, что у вас включена геолокация и вы предоставили сервису доступ к нему.
-								</FormStatus>
-							</div>
-						)}
-					</>
+					<Location redux_form={ADS_FILTERS_B} openCountries={openCountries} openCities={openCities} />
 				) : (
-					<FormLayout>
-						<Slider
-							step={0.5}
-							min={0.5}
-							max={100}
-							value={radius}
-							onChange={setRadius}
-							top={'Область поиска: ' + radius + ' км'}
-						/>
-						<Input
-							placeholder="радиус круга поиска"
-							status={isRadiusValid() ? 'valid' : 'error'}
-							bottom={!isRadiusValid() ? 'Введите число километров от 0.5 до 100' : ''}
-							value={String(radius)}
-							onChange={(e) => setRadius(e.target.value)}
-							type="number"
-						/>
-					</FormLayout>
+					geoType == GEO_TYPE_NEAR && (
+						<FormLayout>
+							<Slider
+								step={0.5}
+								min={0.5}
+								max={100}
+								value={radius}
+								onChange={setRadiusR}
+								top={'Область поиска: ' + radius + ' км'}
+							/>
+							<Input
+								placeholder="радиус круга поиска"
+								status={isRadiusValid() ? 'valid' : 'error'}
+								bottom={!isRadiusValid() ? 'Введите число километров от 0.5 до 100' : ''}
+								value={String(radius)}
+								onChange={(e) => setRadiusR(e.target.value)}
+								type="number"
+							/>
+						</FormLayout>
+					)
 				)}
-				{SaveCancelButtons(save, closeModal)}
+				{!valid && (
+					<Div>
+						<FormStatus header="Нет доступа к GPS" mode={valid ? 'default' : 'error'}>
+							Проверьте, что у вас включена геолокация и вы предоставили сервису доступ к нему.
+						</FormStatus>
+					</Div>
+				)}
+				{changed && SaveCancelButtons(save, closeModal)}
 			</div>
 		</>
 	);

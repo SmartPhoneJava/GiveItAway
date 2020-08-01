@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { PanelHeader, PanelHeaderBack, Footer, Link, Cell, Group, Header } from '@vkontakte/vkui';
+import { PanelHeader, PanelHeaderBack, Cell, Group, Header } from '@vkontakte/vkui';
 
-import { STORY_ADS } from '../store/router/storyTypes';
 import { PANEL_FAQ, PANEL_ADVICES, PANEL_LICENCE } from '../store/router/panelTypes';
-
-import './main.css';
 
 import { connect } from 'react-redux';
 import { goBack, setPage } from '../store/router/actions';

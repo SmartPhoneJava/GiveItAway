@@ -89,7 +89,7 @@ import AddMore2 from './template/AddMore2';
 
 import Notifications from './story/adds/tabs/notifications/notifications';
 
-import { GEO_TYPE_FILTERS, AdDefault, STATUS_OFFER, STATUS_CHOSEN } from './../const/ads';
+import { AdDefault, STATUS_CHOSEN } from './../const/ads';
 
 import { Auth, getToken, fail, getNotificationCounter } from '../requests';
 

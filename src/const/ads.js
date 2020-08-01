@@ -9,6 +9,7 @@ import Bb from './../img/bb.jpg';
 
 export const GEO_TYPE_FILTERS = 'filters';
 export const GEO_TYPE_NEAR = 'near';
+export const GEO_TYPE_NO = 'no';
 
 export const SORT_TIME = 'time';
 export const SORT_GEO = 'geo';
