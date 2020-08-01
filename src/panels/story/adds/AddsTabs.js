@@ -8,20 +8,15 @@ import {
 	PanelHeaderContext,
 	TabsItem,
 	Tabs,
-	TabbarItem,
 } from '@vkontakte/vkui';
 
-import Icon28Notifications from '@vkontakte/icons/dist/28/notifications';
 import Icon28CubeBoxOutline from '@vkontakte/icons/dist/28/cube_box_outline';
-import Icon28Notification from '@vkontakte/icons/dist/28/notification';
 
 import Icon28LiveOutline from '@vkontakte/icons/dist/28/live_outline';
 import Icon28UserCircleOutline from '@vkontakte/icons/dist/28/user_circle_outline';
 
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
-
-import Notifications from './tabs/notifications/notifications';
 
 import AddsTab from './tabs/adds/AddsTab';
 import { setFormData } from '../../../store/create_post/actions';

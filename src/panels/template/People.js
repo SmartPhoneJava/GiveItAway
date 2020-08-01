@@ -6,24 +6,12 @@ import { connect } from 'react-redux';
 
 import { getSubscribers, Close } from './../../requests';
 
-export const PeopleList = (subs) => {
-	{
-		subs.length > 0 ? (
-			subs.map((v) => (
-				<Cell key={v.vk_id} before={<Avatar size={36} src={v.photo_url} />}>
-					{v.name + ' ' + v.surname}
-				</Cell>
-			))
-		) : (
-			<InfoRow style={{ paddingLeft: '16px' }}> пусто</InfoRow>
-		);
-	}
-};
 
 export const PeopleRBI = withModalRootContext((props) => {
 	const [subs, setSubs] = useState([]);
 	const { ad_id, ad_type } = props.ad;
 
+	console.log("wtf is itttttttttttt")
 	useEffect(() => {
 		let cancelFunc = false;
 		getSubscribers(

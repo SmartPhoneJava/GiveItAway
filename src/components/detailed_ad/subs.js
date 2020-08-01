@@ -12,9 +12,7 @@ const SubsLabelInner = (props) => {
 	const [componentSubs, setComponentSubs] = useState(<></>);
 
 	function openSubs() {
-		if (props.ad.isAuthor) {
-			props.setPage(PANEL_SUBS);
-		}
+		props.setPage(PANEL_SUBS);
 	}
 
 	useEffect(() => {
@@ -29,10 +27,7 @@ const SubsLabelInner = (props) => {
 			) : (
 				<Group
 					header={
-						<Header
-							mode="secondary"
-							aside={props.ad.isAuthor && <Link onClick={openSubs}>Показать всех</Link>}
-						>
+						<Header mode="secondary" aside={<Link onClick={openSubs}>Показать всех</Link>}>
 							Откликнулись
 						</Header>
 					}

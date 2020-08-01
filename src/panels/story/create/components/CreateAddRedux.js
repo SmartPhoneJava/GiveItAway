@@ -38,7 +38,7 @@ import { getAdress, getMetro } from '../../../../services/geodata';
 import { NoRegion } from '../../../../components/location/const';
 import { CategoryNo, CategoryOnline } from '../../../../components/categories/const';
 import { FORM_CREATE } from '../../../../components/categories/redux';
-import { GetCategoryImage, GetCategory50, GetCategory400 } from '../../../../components/categories/Categories';
+import { GetCategory400 } from '../../../../components/categories/Categories';
 
 const duration = 300;
 

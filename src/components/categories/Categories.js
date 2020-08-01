@@ -519,19 +519,6 @@ export function GetCategoryImage100(category) {
 	return <img src={image} className="category100v" />;
 }
 
-export function GetCategoryImage(category) {
-	let image = GetCategory50(category);
-	return (
-		<img
-			src={image}
-			style={{
-				transition: 'margin .5s',
-				margin: '5px',
-			}}
-		/>
-	);
-}
-
 export function GetCategoryImageSmall(category) {
 	let image = GetCategory30(category);
 	return <img src={image} className="category30" />;
@@ -688,24 +675,17 @@ export const CategoriesStruct = {
 		{
 			header: null,
 			array: categories,
-			oneCellStyle: (v, i) => {
-				return (
-					<div
-						className="hyphenate"
-						style={{
-							background: 'linear-gradient(to top left, ' + cFrom[i] + ', ' + cTo[i] + ')',
-						}}
-					>
-						<div
-							style={{
-								height: '100%',
-							}}
-						>
-							{v}
-						</div>
-					</div>
-				);
-			},
+			oneCellStyle: (v, i) => (
+				<div
+					className="categories-outter"
+					style={{
+						background: `linear-gradient(to top left, ${cFrom[i]}, ${cTo[i]})`,
+					}}
+				>
+					{v}
+				</div>
+			),
+
 			listCellStyle: (gr) => ColumnsFunc(width < 200, gr, 0, width < 500 ? 2 : width < 1000 ? 4 : 8),
 			search: (arr, searchText) => {
 				if (searchText == '') {

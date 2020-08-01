@@ -465,7 +465,7 @@ const AddsTab = (props) => {
 				)}
 			</div>
 		);
-	}, [mode, pullLoading, search, props.inputData, props.activeModals, cols]);
+	}, [mode, inited, pullLoading, search, props.inputData, props.activeModals, cols]);
 
 	return body;
 };

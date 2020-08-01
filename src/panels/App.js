@@ -207,7 +207,7 @@ const App = (props) => {
 		let timerID = setInterval(function () {
 			repeat--;
 			window.scrollTo(0, scrollEnd);
-			if (epeat <= 0 || (scrolledSoFar != window.scrollY && scrollEnd <= window.scrollY)) {
+			if (repeat <= 0 || (scrolledSoFar != window.scrollY && scrollEnd <= window.scrollY)) {
 				clearInterval(timerID);
 			}
 		}, 10);
@@ -505,7 +505,7 @@ const App = (props) => {
 					<Panel id={PANEL_SUBS}>
 						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
 							<p className="panel-header">Откликнувшиеся</p>
-							{/* {choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошибка'} */}
+							
 						</PanelHeader>
 						{choosen ? <Subs openUser={setProfile} amount={5} maxAmount={-1} /> : Error}
 						{snackbars[PANEL_SUBS]}

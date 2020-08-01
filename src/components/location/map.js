@@ -33,17 +33,7 @@ const AdMap = (props) => {
 	}
 
 	return (
-		<div
-			style={{
-				display: 'block',
-				textAlign: 'center',
-				alignItems: 'center',
-				justifyContent: 'center',
-				flex: 1,
-				marginLeft: 'auto',
-				marginRight: 'auto',
-			}}
-		>
+		<div className="ad-map">
 			{!loaded ? <ScreenSpinner size="large" /> : null}
 			<YMaps>
 				<Map

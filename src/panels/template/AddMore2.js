@@ -76,7 +76,13 @@ import { FORM_CREATE } from '../../components/categories/redux';
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { updateDealInfo, updateCost, updateSubs } from '../../store/detailed_ad/update';
 import { showStatus } from '../../components/detailed_ad/status';
-import { withLoading, withLoadingIf, animatedDiv, ImageCache, AnimationChange } from '../../components/image/image_cache';
+import {
+	withLoading,
+	withLoadingIf,
+	animatedDiv,
+	ImageCache,
+	AnimationChange,
+} from '../../components/image/image_cache';
 import { TagsLabel, tag } from '../../components/categories/label';
 import { AuctionLabel } from '../../components/detailed_ad/auction';
 import { DealLabel } from '../../components/detailed_ad/deal';
@@ -583,7 +589,7 @@ const AddMore2r = (props) => {
 	useEffect(() => {
 		const { isAuthor, author, isDealer, isSub, status, hidden, ad_id } = rAd;
 		const disabled = isFinished(status);
-		const alert =  deleteAlert(() => deleteAd(ad_id, props.refresh), closePopout)
+		const alert = deleteAlert(() => deleteAd(ad_id, props.refresh), closePopout);
 		let buttons = [
 			buttonAction(<Icon24Write />, 'Изменить', onEditClick, null, disabled),
 			// <AnimateOnChange>
@@ -591,19 +597,17 @@ const AddMore2r = (props) => {
 				ignoreFirst={true}
 				visibleFirst={true}
 				mayTheSame={true}
-				controll={
-					buttonAction(
-						hidden ? <Icon24Globe /> : <Icon24Hide />,
-						hidden ? 'Открыть' : 'Скрыть',
-						() => {
-							hidden ? adVisible(ad_id, () => setIsHidden(false)) : adHide(ad_id, () => setIsHidden(true));
-						},
-						null,
-						disabled
-					)
-				}
+				controll={buttonAction(
+					hidden ? <Icon24Globe /> : <Icon24Hide />,
+					hidden ? 'Открыть' : 'Скрыть',
+					() => {
+						hidden ? adVisible(ad_id, () => setIsHidden(false)) : adHide(ad_id, () => setIsHidden(true));
+					},
+					null,
+					disabled
+				)}
 			/>,
-		
+
 			// </AnimateOnChange>,
 			buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK),
 			buttonAction(
@@ -616,16 +620,16 @@ const AddMore2r = (props) => {
 		];
 		if (!isAuthor) {
 			const color = isSub ? 'var(--destructive)' : 'var(--header_tint)';
-			const subBtn = buttonAction(
-				<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-					<Icon24MarketOutline style={{ color }} />
-					{subButton}
-				</div>,
-				isSub ? 'Перестать отслеживать' : 'Откликнуться',
-				() => (isSub ? unsub(ad_id) : sub(ad_id)),
-				isSub,
-				isFinished(status) || isDealer
-			);
+			// const subBtn = buttonAction(
+			// 	<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+			// 		<Icon24MarketOutline style={{ color }} />
+			// 		{subButton}
+			// 	</div>,
+			// 	isSub ? 'Перестать отслеживать' : 'Откликнуться',
+			// 	() => (isSub ? unsub(ad_id) : sub(ad_id)),
+			// 	isSub,
+			// 	isFinished(status) || isDealer
+			// );
 
 			const helpBtn = buttonAction(
 				<Icon28Messages />,
@@ -638,19 +642,20 @@ const AddMore2r = (props) => {
 
 			console.log('width is', width);
 			buttons = (
-				<div style={{ display: width < 330 ? 'block' : 'flex' }}>
-					<div className="flex-center">
-						{subBtn}
-						{helpBtn}
-					</div>
+				// <div style={{ display: width < 330 ? 'block' : 'flex' }}>
+				// 	<div className="flex-center">
+				// 		{subBtn}
+				// 		{helpBtn}
+				// 	</div>
 
-					<div className="flex-center">
-						{buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK)}
-						{buttonAction(<Icon24Report />, 'Пожаловаться', () => {
-							window.open('https://vk.com/im?media=&sel=-194671970');
-						})}
-					</div>
+				<div className="flex-center">
+					{helpBtn}
+					{buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK)}
+					{buttonAction(<Icon24Report />, 'Пожаловаться', () => {
+						window.open('https://vk.com/im?media=&sel=-194671970');
+					})}
 				</div>
+				// </div>
 			);
 		}
 

@@ -70,32 +70,36 @@ const Subs = (props) => {
 
 	function userClick(v, close, cancel) {
 		if (v) {
-			openPopout(
-				<ActionSheet onClose={closePopout}>
-					{isAuthor && ad_type == TYPE_CHOICE ? (
-						!dealer || v.vk_id != dealer.vk_id ? (
-							<ActionSheetItem autoclose onClick={() => close(v)}>
-								Отдать
-							</ActionSheetItem>
-						) : (
-							<ActionSheetItem autoclose onClick={() => cancel(v)}>
+			if (isAuthor) {
+				openPopout(
+					<ActionSheet onClose={closePopout}>
+						{isAuthor && ad_type == TYPE_CHOICE ? (
+							!dealer || v.vk_id != dealer.vk_id ? (
+								<ActionSheetItem autoclose onClick={() => close(v)}>
+									Отдать
+								</ActionSheetItem>
+							) : (
+								<ActionSheetItem autoclose onClick={() => cancel(v)}>
+									Отменить
+								</ActionSheetItem>
+							)
+						) : null}
+						<ActionSheetItem autoclose onClick={onClickOpen}>
+							Перейти в профиль
+						</ActionSheetItem>
+						<ActionSheetItem autoclose onClick={onClickWrite}>
+							Написать
+						</ActionSheetItem>
+						{osname === IOS && (
+							<ActionSheetItem autoclose mode="cancel">
 								Отменить
 							</ActionSheetItem>
-						)
-					) : null}
-					<ActionSheetItem autoclose onClick={onClickOpen}>
-						Перейти в профиль
-					</ActionSheetItem>
-					<ActionSheetItem autoclose onClick={onClickWrite}>
-						Написать
-					</ActionSheetItem>
-					{osname === IOS && (
-						<ActionSheetItem autoclose mode="cancel">
-							Отменить
-						</ActionSheetItem>
-					)}
-				</ActionSheet>
-			);
+						)}
+					</ActionSheet>
+				);
+			} else {
+				onClickOpen();
+			}
 		}
 	}
 
@@ -113,7 +117,9 @@ const Subs = (props) => {
 		setNewGiven(
 			<Cell
 				onClick={() => {
-					cancel_ad(dealer, false);
+					if (isAuthor) {
+						cancel_ad(dealer, false);
+					}
 				}}
 				multiline={true}
 				description={dealer ? 'Ждём подтверждение получения вещи' : ''}
@@ -245,14 +251,16 @@ const Subs = (props) => {
 
 	return (
 		<div>
-			<CellButton
-				onClick={() => {
-					setOpenFAQ((prev) => !prev);
-				}}
-				before={<Icon24Help />}
-			>
-				Как отдать вещь?
-			</CellButton>
+			{isAuthor && (
+				<CellButton
+					onClick={() => {
+						setOpenFAQ((prev) => !prev);
+					}}
+					before={<Icon24Help />}
+				>
+					Как отдать вещь?
+				</CellButton>
+			)}
 			<Collapse isOpened={openFAQ}>
 				<Div>
 					{ad_type == TYPE_CHOICE

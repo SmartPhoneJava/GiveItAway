@@ -3,7 +3,6 @@ import { FormLayout, SelectMimicry, Group, Header, Link, Div, withModalRootConte
 
 import { connect } from 'react-redux';
 
-import { GetCategoryImage } from './Categories';
 import { CategoryNo } from './const';
 
 import { DraggableArea } from 'react-draggable-tags';
@@ -28,8 +27,6 @@ const transitionStyles = {
 let i = 1;
 
 export const tag = (text, color, background, borderColor) => {
-	const c = color || 'var(--accent)'; //'#ffffff';
-	const b = background || null;
 	// randomColor({
 	// 	luminosity: 'dark',
 	// });
@@ -37,30 +34,30 @@ export const tag = (text, color, background, borderColor) => {
 	return {
 		id: i,
 		content: text,
-		color: c,
-		background: b,
-		borderColor: borderColor,
+		color,
+		background,
+		borderColor,
 	};
 };
 
 export const TagsLabel = (props) => {
 	const tagsUpdate = props.tagsUpdate || true;
 	return (
-		<div className="Simple">
+		<Div>
 			<DraggableArea
+				draggable={false}
 				tags={props.tags}
 				render={({ tag, index }) => (
 					<Transition in={tagsUpdate} timeout={duration}>
 						{(state) => {
 							const s = (
 								<div
-									className="row"
+									className="categories-tag-row"
 									onClick={props.onClick}
 									style={{
 										...transitionStyles[state],
 										background: tag.background,
 										color: tag.color,
-										fontWeight: 600,
 										borderColor: tag.borderColor,
 									}}
 								>
@@ -73,7 +70,7 @@ export const TagsLabel = (props) => {
 				)}
 				onChange={(tags) => console.log(tags)}
 			/>
-		</div>
+		</Div>
 	);
 };
 
@@ -94,8 +91,8 @@ const CategoriesLabel = (props) => {
 		if (!data) {
 			return;
 		}
-		const p1 = tag('•', null, 'rgba(0,0,0,0)', 'rgba(0,0,0,0)');
-		const p2 = tag('•', null, 'rgba(0,0,0,0)', 'rgba(0,0,0,0)');
+		const p1 = tag('•');
+		const p2 = tag('•');
 		const s1 = data.category ? tag(data.category) : null;
 		const s2 = data.subcategory ? tag(data.subcategory) : null;
 		const s3 = data.incategory ? tag(data.incategory) : null;

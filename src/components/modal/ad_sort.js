@@ -19,12 +19,12 @@ const { SORT_TIME, SORT_GEO } = require('../../const/ads');
 export const SaveCancelButtons = (save, cancel) => {
 	return (
 		<div className="flex-center">
-			<div style={{ padding: '8px', flex: 1, width: '100%' }}>
+			<div className="filters-button">
 				<Button stretched size="xl" mode="secondary" onClick={cancel} before={<Icon24Cancel />}>
 					Отменить
 				</Button>
 			</div>
-			<div style={{ padding: '8px', flex: 1, width: '100%' }}>
+			<div className="filters-button">
 				<Button stretched size="xl" mode="primary" onClick={save} before={<Icon24Done />}>
 					Сохранить
 				</Button>
