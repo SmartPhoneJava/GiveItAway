@@ -11,6 +11,13 @@ img.atiled {
 	object-fit: cover;
 	width: 120px;
 	height: 120px;
+	background-color: var(--background_content);
+}
+
+.faq {
+	background-position: right bottom;
+	background-repeat: no-repeat;
+	background-color: var(--text_primary);
 }
 
 .acity {

@@ -115,6 +115,7 @@ img.details-card-img {
 	object-fit: cover;
 	width: 144px;
 	height: 96px;
+	background-color: var(--background_content);
 }
 
 .details-card-btn-outter {

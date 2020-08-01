@@ -570,7 +570,7 @@ export async function Auth(user, successCallback, failCallback) {
 	console.log('secret:', window.location.href);
 	console.log('user:', user);
 	let cancel;
-	const getUser = await axios({
+	axios({
 		method: 'post',
 		withCredentials: true,
 		data: JSON.stringify({
@@ -597,7 +597,7 @@ export async function Auth(user, successCallback, failCallback) {
 			failCallback(error);
 			fail('Не удалось авторизоваться');
 		});
-	return getUser;
+		
 }
 
 export async function CreateImages(photos, id, goToAds) {

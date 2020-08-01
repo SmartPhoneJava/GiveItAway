@@ -344,6 +344,7 @@ const App = (props) => {
 				Auth(
 					us,
 					(v) => {
+						console.log("FAILED")
 						setInited(true);
 						dispatch(addProfile(us.id));
 						getToken((v) => {
@@ -353,6 +354,8 @@ const App = (props) => {
 						});
 					},
 					(e) => {
+						console.log("SUCCESS")
+						setInited(false);
 						fail('Не удалось получить ваши данные');
 					}
 				);

@@ -75,9 +75,7 @@ import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { updateDealInfo, updateCost, updateSubs } from '../../store/detailed_ad/update';
 import { showStatus } from '../../components/detailed_ad/status';
 import {
-	withLoading,
 	withLoadingIf,
-	animatedDiv,
 	ImageCache,
 	AnimationChange,
 } from '../../components/image/image_cache';
@@ -186,37 +184,37 @@ const AddMore2r = (props) => {
 		);
 	}, [localPhotos, isOpen, options]);
 
-	const [tooltip, setTooltip] = useState(false);
+	// const [tooltip, setTooltip] = useState(false);
 
-	const [componentPhotos, setComponentPhotos] = useState(null);
-	useEffect(() => {
-		const pathes_to_photo = rAd.pathes_to_photo || [];
+	// const [componentPhotos, setComponentPhotos] = useState(null);
+	// useEffect(() => {
+	// 	const pathes_to_photo = rAd.pathes_to_photo || [];
 
-		setComponentPhotos(
-			<CardScroll>
-				<div style={{ display: 'flex' }}>
-					{pathes_to_photo.map((img, i) => (
-						<Card
-							key={i}
-							size="s"
-							key={i}
-							onClick={() => {
-								openImage(imgs, i);
-							}}
-						>
-							<ImageCache className="details-card-img" url={img.PhotoUrl} />
-							<div className="details-card-btn-outter">
-								<Avatar className="details-card-btn-inner" size={26}>
-									<Icon24Fullscreen fill="var(--white)" />
-								</Avatar>
-							</div>
-						</Card>
-					))}
-				</div>
-			</CardScroll>
-		);
-		return () => setComponentPhotos(null);
-	}, [rAd]);
+		// setComponentPhotos(
+		// 	<CardScroll>
+		// 		<div style={{ display: 'flex' }}>
+		// 			{pathes_to_photo.map((img, i) => (
+		// 				<Card
+		// 					key={i}
+		// 					size="s"
+		// 					key={i}
+		// 					onClick={() => {
+		// 						openImage(imgs, i);
+		// 					}}
+		// 				>
+		// 					<ImageCache className="details-card-img" url={img.PhotoUrl} />
+		// 					<div className="details-card-btn-outter">
+		// 						<Avatar className="details-card-btn-inner" size={26}>
+		// 							<Icon24Fullscreen fill="var(--white)" />
+		// 						</Avatar>
+		// 					</div>
+		// 				</Card>
+		// 			))}
+		// 		</div>
+		// 	</CardScroll>
+		// );
+		// return () => setComponentPhotos(null);
+	// }, [rAd]);
 
 	const [componentImages, setComponentImages] = useState();
 	useEffect(() => {
