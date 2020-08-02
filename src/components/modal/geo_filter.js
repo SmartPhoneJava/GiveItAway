@@ -9,7 +9,7 @@ import { ADS_FILTERS, ADS_FILTERS_B } from '../../store/create_post/types';
 import { closeAllModals, setPage, closeModal } from '../../store/router/actions';
 import { PANEL_COUNTRIES, PANEL_CITIES } from '../../store/router/panelTypes';
 
-import { Slider, Input, FormLayout, Radio, FormStatus, withModalRootContext, Div } from '@vkontakte/vkui';
+import { Slider, Input, FormLayout, Radio, FormStatus, withModalRootContext, Div, Spinner } from '@vkontakte/vkui';
 import { getGeodata } from '../../services/VK';
 import { pushToCache } from '../../store/cache/actions';
 import { DIRECTION_BACK } from '../../store/router/directionTypes';
@@ -21,7 +21,7 @@ export const getGeoFilters = (data) => {
 	if (!data || data == undefined) {
 		return 'везде';
 	}
-	
+
 	const { geotype, radius } = data;
 	const country = data.country || NoRegion;
 	const city = data.city || NoRegion;
@@ -52,6 +52,7 @@ const ModalPageAdsGeoInner = (props) => {
 
 	const [geoType, setGeoType] = useState(GEO_TYPE_NO);
 	const [changed, setChanged] = useState(false);
+	const [loading, setLoading] = useState(false);
 	const [radius, setRadius] = useState(0.5);
 	const [valid, setValid] = useState(true);
 
@@ -115,6 +116,7 @@ const ModalPageAdsGeoInner = (props) => {
 	}
 
 	function setGeoNear() {
+		setLoading(true);
 		getGeodata(
 			(success) => {
 				setValid(true);
@@ -124,9 +126,11 @@ const ModalPageAdsGeoInner = (props) => {
 				});
 				setChanged(geoType != GEO_TYPE_NEAR);
 				setGeoType(GEO_TYPE_NEAR);
+				setLoading(false);
 			},
 			(err) => {
 				setValid(false);
+				setLoading(false);
 			}
 		);
 	}
@@ -165,15 +169,24 @@ const ModalPageAdsGeoInner = (props) => {
 			<Radio name="radio" value={GEO_TYPE_FILTERS} checked={geoType == GEO_TYPE_FILTERS} onChange={setGeoFilters}>
 				В определенном городе
 			</Radio>
-			<Radio
-				name="radio"
-				checked={geoType == GEO_TYPE_NEAR}
-				value={GEO_TYPE_NEAR}
-				onChange={setGeoNear}
-				description="Необходимо предоставить доступ к GPS"
-			>
-				Недалеко от меня
-			</Radio>
+			<div style={{ display: 'flex' }}>
+				<Radio
+					name="radio"
+					checked={geoType == GEO_TYPE_NEAR}
+					value={GEO_TYPE_NEAR}
+					onChange={setGeoNear}
+					description="Необходимо предоставить доступ к GPS"
+				>
+					Недалеко от меня
+				</Radio>
+
+				{loading && (
+					<Div className="right">
+						<Spinner size="small" />
+					</Div>
+				)}
+			</div>
+
 			<div>
 				{geoType == GEO_TYPE_FILTERS ? (
 					<Location redux_form={ADS_FILTERS_B} openCountries={openCountries} openCities={openCities} />

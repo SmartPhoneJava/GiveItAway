@@ -299,6 +299,11 @@ export const getGeodata = (successCallback, failCallback) => {
 	bridge
 		.send('VKWebAppGetGeodata')
 		.then((geodata) => {
+			if (geodata.type == 'VKWebAppGeodataFailed') {
+				f(error);
+				fail('Не удалось получить местоположение. Проверьте, включен ли GPS');
+				return;
+			}
 			s(geodata);
 			if (!cleanupFunction) {
 				store.dispatch(setGeoData(geodata));

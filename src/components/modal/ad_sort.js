@@ -10,7 +10,17 @@ import { closeAllModals, closeModal } from '../../store/router/actions';
 
 import bridge from '@vkontakte/vk-bridge';
 
-import { Radio, Header, CellButton, Button, Group, FormStatus, withModalRootContext, Div } from '@vkontakte/vkui';
+import {
+	Radio,
+	Header,
+	CellButton,
+	Button,
+	Group,
+	FormStatus,
+	withModalRootContext,
+	Div,
+	Spinner,
+} from '@vkontakte/vkui';
 import { getGeodata } from '../../services/VK';
 import { pushToCache } from '../../store/cache/actions';
 import { fail } from '../../requests';
@@ -38,6 +48,7 @@ const ModalPageAdsSortInner = (props) => {
 	const { setFormData, closeAllModals, inputData, pushToCache, closeModal } = props;
 
 	const [changed, setChanged] = useState(false);
+	const [loading, setLoading] = useState(false);
 	const [valid, setValid] = useState(true);
 	const [isTimeSort, setIsTimeSort] = useState(true);
 	const [sort, setSort] = useState(SORT_TIME);
@@ -70,18 +81,20 @@ const ModalPageAdsSortInner = (props) => {
 	}
 
 	function applyGeoSort() {
-		bridge
-			.send('VKWebAppGetGeodata')
-			.then((value) => {
+		setLoading(true);
+		getGeodata(
+			(value) => {
+				setLoading(false);
 				setGeodata(value);
 				applyGeoSortInner();
-				console.log('VKWebAppGetGeodata', value);
-			})
-			.catch(() => {
+				setValid(true);
+			},
+			() => {
+				setLoading(false);
 				setValid(false);
 				applyTimeSort();
-				fail('Нет доступа к геопозиции');
-			});
+			}
+		);
 	}
 
 	function save() {
@@ -101,9 +114,17 @@ const ModalPageAdsSortInner = (props) => {
 				<Radio checked={isTimeSort} key={SORT_TIME} value={SORT_TIME} name="sort" onChange={applyTimeSort}>
 					По времени
 				</Radio>
-				<Radio checked={!isTimeSort} key={SORT_GEO} value={SORT_GEO} name="sort" onChange={applyGeoSort}>
-					По близости
-				</Radio>
+				<div style={{ display: 'flex' }}>
+					<Radio checked={!isTimeSort} key={SORT_GEO} value={SORT_GEO} name="sort" onChange={applyGeoSort}>
+						По близости
+					</Radio>
+
+					{loading && (
+						<Div className="right">
+							<Spinner size="medium" />
+						</Div>
+					)}
+				</div>
 				{!valid && (
 					<Div>
 						<FormStatus header="Нет доступа к GPS" mode={valid ? 'default' : 'error'}>
@@ -111,9 +132,8 @@ const ModalPageAdsSortInner = (props) => {
 						</FormStatus>
 					</Div>
 				)}
+				{changed && SaveCancelButtons(save, closeModal)}
 			</Group>
-
-			{changed && SaveCancelButtons(save, closeModal)}
 		</>
 	);
 };
