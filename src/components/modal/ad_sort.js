@@ -76,6 +76,7 @@ const ModalPageAdsSortInner = (props) => {
 				setValid(false);
 				applyTimeSort()
 				fail('Нет доступа к геопозиции');
+				props.updateModalHeight();
 			});
 	}
 

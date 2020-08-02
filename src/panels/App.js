@@ -120,6 +120,7 @@ import LicencePanel from './licence';
 import SubcategoriesPanel from '../components/categories/subcategory_panel';
 import { DIRECTION_BACK, DIRECTION_FORWARD } from '../store/router/directionTypes';
 import { pushToCache } from '../store/cache/actions';
+import { AdsTabV2 } from './story/adds/tabs/adds/AddsTab';
 
 const adsText = 'Объявления';
 const notText = 'Уведомления';
@@ -344,7 +345,7 @@ const App = (props) => {
 				Auth(
 					us,
 					(v) => {
-						console.log("FAILED")
+						console.log('FAILED');
 						setInited(true);
 						dispatch(addProfile(us.id));
 						getToken((v) => {
@@ -354,7 +355,7 @@ const App = (props) => {
 						});
 					},
 					(e) => {
-						console.log("SUCCESS")
+						console.log('SUCCESS');
 						setInited(false);
 						fail('Не удалось получить ваши данные');
 					}
@@ -463,6 +464,7 @@ const App = (props) => {
 							dropFilters={dropFilters}
 							openAd={setReduxAd}
 						/>
+					
 						{snackbars[PANEL_ADS]}
 					</Panel>
 					<Panel id={PANEL_ONE}>
@@ -508,7 +510,6 @@ const App = (props) => {
 					<Panel id={PANEL_SUBS}>
 						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
 							<p className="panel-header">Откликнувшиеся</p>
-							
 						</PanelHeader>
 						{choosen ? <Subs openUser={setProfile} amount={5} maxAmount={-1} /> : Error}
 						{snackbars[PANEL_SUBS]}

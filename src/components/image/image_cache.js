@@ -19,7 +19,6 @@ export const AnimationChange = (props) => {
 		if (!props.mayTheSame && props.controll.key == value.key) {
 			return;
 		}
-		console.log('WE UPDATE SYSTEM', props.controll, value);
 		setInvisible(true);
 		setTimeout(() => {
 			if (cleanup) {

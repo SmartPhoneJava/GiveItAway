@@ -3,7 +3,7 @@ import { Placeholder, Button } from '@vkontakte/vkui';
 
 import Icon56ErrorOutline from '@vkontakte/icons/dist/56/error_outline';
 
-const Error = props => {
+const Error = (props) => {
 	return (
 		<Placeholder
 			style={{ background: 'var(--destructive)' }}
@@ -18,7 +18,6 @@ const Error = props => {
 					''
 				)
 			}
-			stretched={true}
 		>
 			Мы работаем над тем, чтобы вернуть все в норму!
 		</Placeholder>

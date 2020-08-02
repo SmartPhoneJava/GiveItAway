@@ -18,7 +18,7 @@ import Icon28UserCircleOutline from '@vkontakte/icons/dist/28/user_circle_outlin
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 
-import AddsTab from './tabs/adds/AddsTab';
+import AddsTab, { AdsTabV2 } from './tabs/adds/AddsTab';
 import { setFormData } from '../../../store/create_post/actions';
 import { ADS_FILTERS } from '../../../store/create_post/types';
 import { TAB_ADS, TAB_NOTIFICATIONS, MODE_ALL, MODE_WANTED, MODE_GIVEN } from '../../../const/ads';
