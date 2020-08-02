@@ -464,6 +464,7 @@ const AddsTab = (props) => {
 			return;
 		}
 		const s = inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].search : null || '';
+		console.log("we change allll", s)
 		if (s == undefined) {
 			setSearch('');
 		} else {
@@ -552,6 +553,7 @@ const AddsTab = (props) => {
 	// }, [refreshMe]);
 
 	useEffect(() => {
+		console.log("DONE done ", searchR)
 		if (activeModal) {
 			return;
 		}
@@ -560,9 +562,11 @@ const AddsTab = (props) => {
 			setGoBackDone(true);
 		} else {
 			if (props.direction == DIRECTION_BACK && !goBackDone) {
+				setGoBackDone(true);
 				return;
 			}
 		}
+		console.log("DONE done!!! ", searchR)
 		setRads([]);
 		setCols([]);
 		setPageNumber(-1);

@@ -10,7 +10,7 @@ import { closeAllModals, closeModal } from '../../store/router/actions';
 
 import bridge from '@vkontakte/vk-bridge';
 
-import { Radio, Header, CellButton, Button, Group, FormStatus, withModalRootContext } from '@vkontakte/vkui';
+import { Radio, Header, CellButton, Button, Group, FormStatus, withModalRootContext, Div } from '@vkontakte/vkui';
 import { getGeodata } from '../../services/VK';
 import { pushToCache } from '../../store/cache/actions';
 import { fail } from '../../requests';
@@ -49,6 +49,11 @@ const ModalPageAdsSortInner = (props) => {
 		setSort(inputData[ADS_FILTERS].sort);
 		setIsTimeSort(inputData[ADS_FILTERS].sort == SORT_TIME);
 	}, []);
+
+	useEffect(() => {
+		props.updateModalHeight();
+	}, [changed, valid]);
+
 	function applyTimeSort() {
 		setIsTimeSort(true);
 		setSort(SORT_TIME);
@@ -74,14 +79,13 @@ const ModalPageAdsSortInner = (props) => {
 			})
 			.catch(() => {
 				setValid(false);
-				applyTimeSort()
+				applyTimeSort();
 				fail('Нет доступа к геопозиции');
-				props.updateModalHeight();
 			});
 	}
 
 	function save() {
-		console.log("geodata is", geodata)
+		console.log('geodata is', geodata);
 		setFormData(ADS_FILTERS, {
 			...inputData[ADS_FILTERS],
 			sort,
@@ -100,14 +104,15 @@ const ModalPageAdsSortInner = (props) => {
 				<Radio checked={!isTimeSort} key={SORT_GEO} value={SORT_GEO} name="sort" onChange={applyGeoSort}>
 					По близости
 				</Radio>
+				{!valid && (
+					<Div>
+						<FormStatus header="Нет доступа к GPS" mode={valid ? 'default' : 'error'}>
+							Проверьте, что у вас включена геолокация и вы предоставили сервису доступ к нему.
+						</FormStatus>
+					</Div>
+				)}
 			</Group>
-			{!valid && (
-				<div style={{ padding: '10px' }}>
-					<FormStatus header="Нет доступа к GPS" mode={valid ? 'default' : 'error'}>
-						Проверьте, что у вас включена геолокация и вы предоставили сервису доступ к нему.
-					</FormStatus>
-				</div>
-			)}
+
 			{changed && SaveCancelButtons(save, closeModal)}
 		</>
 	);
