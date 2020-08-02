@@ -47,27 +47,35 @@
 	z-index: 101;
 }
 
-.write {
-	position: fixed;
-	margin-bottom: 52px;
-
-	bottom: 0;
-	left: 0;
-	right: 0;
-	z-index: 100;
-	padding-right: 2px;
-	padding-left: 4px;
-	margin-right: 2px;
+.comments-element-inner {
+	padding: 4px;
 }
 
-.comment-button {
-	position: fixed;
-	margin-bottom: 72px;
-	margin-right: 20px;
-	height: auto;
-	bottom: 0;
-	right: 0;
-	z-index: 101;
+.comments-element-outter {
+	padding-bottom: 50px;
+	background-color: var(--background_content);
+}
+
+.write-comment-panel {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	background-color: var(--background_content);
+}
+
+.write-comment-input {
+	padding: 8px;
+	width: 90%;
+}
+
+.write-comment-button {
+	padding: 8px;
+	width: 2%;
+}
+
+.write-comment-button-color {
+	color: var(--accent);
 }
 
 .comment-button1 {

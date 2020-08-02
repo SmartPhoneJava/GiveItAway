@@ -132,6 +132,22 @@ let centrifuge = new Centrifuge(addr);
 
 let notsCounterrr = 0;
 
+export const scrollWindow = (to) => {
+	let scrolledSoFar = window.scrollY;
+	let scrollEnd = to;
+	if (scrolledSoFar == scrollEnd) {
+		return;
+	}
+	let repeat = 50;
+	let timerID = setInterval(function () {
+		repeat--;
+		window.scrollTo(0, scrollEnd);
+		if (repeat <= 0 || (scrolledSoFar != window.scrollY && scrollEnd <= window.scrollY)) {
+			clearInterval(timerID);
+		}
+	}, 10);
+}
+
 const App = (props) => {
 	const { colorScheme, myUser, myID, inputData, AD } = props;
 	const { activeStory, activePanels, panelsHistory, popouts, snackbars, scrollPosition, activeAd } = props;
@@ -198,21 +214,7 @@ const App = (props) => {
 		}
 	};
 
-	function scrollWindow(to) {
-		let scrolledSoFar = window.scrollY;
-		let scrollEnd = to;
-		if (scrolledSoFar == scrollEnd) {
-			return;
-		}
-		let repeat = 50;
-		let timerID = setInterval(function () {
-			repeat--;
-			window.scrollTo(0, scrollEnd);
-			if (repeat <= 0 || (scrolledSoFar != window.scrollY && scrollEnd <= window.scrollY)) {
-				clearInterval(timerID);
-			}
-		}, 10);
-	}
+	
 	useEffect(() => {
 		if (props.direction == DIRECTION_BACK) {
 			scrollWindow(scrollPosition.y);

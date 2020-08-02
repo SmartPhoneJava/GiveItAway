@@ -353,7 +353,6 @@ const AdsTabV2Inner = (props) => {
 		>
 			{mode != MODE_WANTED ? (
 				<div style={{ display: 'flex' }}>
-					<div style={{}}></div>
 					<div
 						style={{
 							transition: '0.3s',

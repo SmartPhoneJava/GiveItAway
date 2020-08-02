@@ -14,7 +14,11 @@ import {
 	Avatar,
 	Link,
 	Card,
+	FixedLayout,
+	Div,
 } from '@vkontakte/vkui';
+
+import { AnimateGroup, AnimateOnChange } from 'react-animation';
 
 import { connect } from 'react-redux';
 
@@ -34,6 +38,7 @@ import Comment from './comment';
 import { SNACKBAR_DURATION_DEFAULT } from '../../../../../store/const';
 import { PANEL_COMMENTS } from '../../../../../store/router/panelTypes';
 import { deleteCommentByID } from '../../../../../store/detailed_ad/actions';
+import { scrollWindow } from '../../../../App';
 
 const NO_ID = -1;
 
@@ -123,30 +128,24 @@ const CommentsI = (props) => {
 		if (nots.length == 0) {
 			return;
 		}
-		return (
-			<Group
-				header={
-					props.mini && (
-						<Header aside={<Link onClick={openCommentaries}>Показать все</Link>}>Комментарии</Header>
-					)
-				}
-			>
-				{props.mini ? (
-					<Comment onClick={openCommentaries} v={nots[0]} />
-				) : (
-					nots.map((v, index) => (
-						<div
-							style={{ padding: '4px' }}
-							key={v.comment_id}
-							ref={nots.length === index + 1 ? lastAdElementRef : null}
-						>
-							<Card mode="outline">
-								<Comment onClick={() => onUserClick(v)} v={v} />
-							</Card>
-						</div>
-					))
-				)}
+		return props.mini ? (
+			<Group header={<Header aside={<Link onClick={openCommentaries}>Показать все</Link>}>Комментарии</Header>}>
+				<Comment onClick={openCommentaries} v={nots[0]} />
 			</Group>
+		) : (
+			<AnimateGroup className="comments-element-outter">
+				{nots.map((v, index) => (
+					<div
+						className="comments-element-inner"
+						key={v.comment_id + index}
+						ref={nots.length === index + 1 ? lastAdElementRef : null}
+					>
+						<Card mode="outline">
+							<Comment onClick={() => onUserClick(v)} v={v} />
+						</Card>
+					</div>
+				))}
+			</AnimateGroup>
 		);
 	}
 
@@ -202,6 +201,7 @@ const CommentsI = (props) => {
 				obj,
 				(v) => {
 					setText('');
+					scrollWindow(document.body.scrollHeight);
 				},
 				(e) => {},
 				() => {
@@ -233,24 +233,27 @@ const CommentsI = (props) => {
 			{showComments()}
 
 			{props.mini || hide ? null : (
-				<div className="write">
-					<Input
-						style={{ paddingRight: '30px' }}
-						placeholder="Комментарий"
-						value={text}
-						onChange={(e) => {
-							setText(e.currentTarget.value);
-						}}
-					/>
-
-					<div className="comment-button">
-						<PanelHeaderButton onClick={sendComment}>
-							<Avatar size="20">
-								<Icon24Send style={{ color: '#0071B8' }} size="24" />
-							</Avatar>
-						</PanelHeaderButton>
+				<FixedLayout vertical="bottom">
+					<div className="write-comment-panel">
+						<div className="write-comment-input">
+							<Input
+								style={{ transition: '0.3s' }}
+								placeholder="Комментарий"
+								value={text}
+								onChange={(e) => {
+									setText(e.currentTarget.value);
+								}}
+							/>
+						</div>
+						<div className="write-comment-button">
+							<PanelHeaderButton onClick={sendComment}>
+								<Avatar size="20">
+									<Icon24Send className="write-comment-button-color" size="24" />
+								</Avatar>
+							</PanelHeaderButton>
+						</div>
 					</div>
-				</div>
+				</FixedLayout>
 			)}
 		</div>
 	);
@@ -275,3 +278,5 @@ const mapDispatchToProps = {
 const Comments = connect(mapStateToProps, mapDispatchToProps)(CommentsI);
 
 export default Comments;
+
+// 279
