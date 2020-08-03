@@ -82,6 +82,10 @@ const CommentsI = (props) => {
 		[loading, hasMore]
 	);
 
+	useEffect(() => {
+		console.log('hashashas', hasMore);
+	}, [hasMore]);
+
 	function onEditClick(v) {
 		setText(v.text);
 		setEditableID(v.comment_id);
@@ -215,7 +219,7 @@ const CommentsI = (props) => {
 		props.setPage(PANEL_COMMENTS);
 	};
 
-	console.log("loading is", loading)
+	console.log('loading is', loading);
 
 	return (
 		<div>

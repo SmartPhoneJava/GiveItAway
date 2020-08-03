@@ -5,6 +5,7 @@ import { MODAL_ADS_COST } from './../../store/router/modalTypes';
 import { openModal, closeModal } from './../../store/router/actions';
 
 import AddsModal from './../../panels/story/adds/AddsModal';
+import { setFormData } from '../../store/create_post/actions';
 
 function openCarma(dispatch) {
 	dispatch(openModal(MODAL_ADS_COST));
@@ -21,6 +22,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
 	return {
+		setFormData: (t, v) => {
+			dispatch(setFormData(t, v));
+		},
 		closeModal: () => dispatch(closeModal()),
 		openCarma: () => openCarma(dispatch),
 	};

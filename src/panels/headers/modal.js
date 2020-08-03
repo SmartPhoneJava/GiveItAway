@@ -9,18 +9,24 @@ export const ModalHeader = (props) => {
 	return (
 		<ModalPageHeader
 			left={
-				IS_PLATFORM_ANDROID && (
+				IS_PLATFORM_ANDROID ? (
 					<PanelHeaderButton onClick={() => props.back()}>
 						{props.isBack ? <Icon24BrowserBack /> : <Icon24Cancel />}
 					</PanelHeaderButton>
+				) : (
+					props.right
 				)
 			}
 			right={
-				IS_PLATFORM_IOS && (
-					<PanelHeaderButton onClick={() => props.back()}>
-						<Icon24Dismiss />
-					</PanelHeaderButton>
-				)
+				<div className="flex-center">
+					{IS_PLATFORM_IOS ? (
+						<PanelHeaderButton onClick={() => props.back()}>
+							<Icon24Dismiss />
+						</PanelHeaderButton>
+					) : (
+						props.right
+					)}
+				</div>
 			}
 		>
 			{props.name}

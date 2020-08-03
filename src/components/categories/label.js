@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FormLayout, SelectMimicry, Group, Header, Link, Div, withModalRootContext, RichCell } from '@vkontakte/vkui';
 
+import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';
+
 import { connect } from 'react-redux';
 
 import { CategoryNo } from './const';
@@ -26,7 +28,7 @@ const transitionStyles = {
 
 let i = 1;
 
-export const tag = (text, color, background, borderColor) => {
+export const tag = (text, color, background, borderColor, onClick, right) => {
 	// randomColor({
 	// 	luminosity: 'dark',
 	// });
@@ -37,6 +39,8 @@ export const tag = (text, color, background, borderColor) => {
 		color,
 		background,
 		borderColor,
+		right,
+		onClick,
 	};
 };
 
@@ -44,28 +48,35 @@ export const TagsLabel = (props) => {
 	const tagsUpdate = props.tagsUpdate || true;
 	return (
 		<DraggableArea
+			axis={props.Y ? 'y' : 'x'}
 			draggable={false}
 			tags={props.tags}
+			style={{ display: 'flex' }}
 			render={({ tag, index }) => (
-				<Transition in={tagsUpdate} timeout={duration}>
-					{(state) => {
-						const s = (
-							<div
-								className="categories-tag-row"
-								onClick={props.onClick}
-								style={{
-									...transitionStyles[state],
-									background: tag.background,
-									color: tag.color,
-									borderColor: tag.borderColor,
-								}}
-							>
-								{tag.content}
-							</div>
-						);
-						return s;
-					}}
-				</Transition>
+				<div style={{ display: 'flex' }}>
+					<Transition in={tagsUpdate} timeout={duration}>
+						{(state) => {
+							const s = (
+								<div
+									className="categories-tag-row"
+									onClick={tag.onClick || props.onClick}
+									style={{
+										...transitionStyles[state],
+										background: tag.background,
+										color: tag.color,
+										borderColor: tag.borderColor,
+									}}
+								>
+									<div className="flex-center">
+										{tag.content}
+										{tag.right}
+									</div>
+								</div>
+							);
+							return s;
+						}}
+					</Transition>
+				</div>
 			)}
 			onChange={(tags) => console.log(tags)}
 		/>

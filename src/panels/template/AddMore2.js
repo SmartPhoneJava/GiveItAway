@@ -49,7 +49,7 @@ import { K } from './../story/profile/const';
 
 import Icon24MarketOutline from '@vkontakte/icons/dist/24/market_outline';
 
-import { adVisible, adHide, deleteAd, getSubscribers, getDetails, acceptDeal, denyDeal } from './../../requests';
+import { adVisible, adHide, deleteAd, getSubscribers, getDetails, acceptDeal, denyDeal, fail } from './../../requests';
 
 import './styles.css';
 
@@ -64,6 +64,7 @@ import {
 	setStory,
 	closePopout,
 	setProfile,
+	goBack,
 } from '../../store/router/actions';
 import { setIsSub, setIsHidden, setExtraInfo, setIsAuthor } from '../../store/detailed_ad/actions';
 import { AdDefault, AD_LOADING, STATUS_CLOSED, STATUS_ABORTED, TYPE_CHOICE, TYPE_AUCTION } from '../../const/ads';
@@ -170,6 +171,7 @@ const AddMore2r = (props) => {
 
 		setComponentCategories(
 			<TagsLabel
+				Y={true}
 				tags={[tag(category, col, null, col), tag(subcat_list, col, null, col), tag(subcat, col, null, col)]}
 			/>
 		);
@@ -356,6 +358,8 @@ const AddMore2r = (props) => {
 					if (cancelFunc) {
 						return;
 					}
+					props.goBack();
+					fail('объявление удалено или ещё не создано');
 					setIsAuthor(false);
 					setDetailsRequestSuccess(true);
 				}
@@ -738,6 +742,7 @@ const mapDispatchToProps = (dispatch) => {
 				deleteAd,
 				getSubscribers,
 				getDetails,
+				goBack,
 				acceptDeal,
 				denyDeal,
 

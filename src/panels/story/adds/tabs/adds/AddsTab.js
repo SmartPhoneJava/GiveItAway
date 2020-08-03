@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, PullToRefresh, Spinner, SimpleCell } from '@vkontakte/vkui';
+import { Search, PullToRefresh, Spinner, SimpleCell, Div } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
+import Icon16Clear from '@vkontakte/icons/dist/16/clear';
 
 import Add7 from './../../../../template/Add7';
 import axios from 'axios';
@@ -28,7 +29,7 @@ import {
 	MODE_WANTED,
 	GEO_TYPE_NO,
 } from '../../../../../const/ads';
-import { ADS_FILTERS, GEO_DATA } from '../../../../../store/create_post/types';
+import { ADS_FILTERS, ADS_FILTERS_ON, GEO_DATA, ADS_FILTERS_S } from '../../../../../store/create_post/types';
 import { openPopout, closePopout, setStory } from '../../../../../store/router/actions';
 import AdNoWanted from '../../../../placeholders/adNoWanted';
 import { setFormData } from '../../../../../store/create_post/actions';
@@ -39,6 +40,8 @@ import { ColumnsFunc } from '../../../../template/columns';
 import { DIRECTION_BACK } from '../../../../../store/router/directionTypes';
 import { pushToCache } from '../../../../../store/cache/actions';
 import { STORY_ADS } from '../../../../../store/router/storyTypes';
+import { TagsLabel, tag } from '../../../../../components/categories/label';
+import { Collapse } from 'react-collapse';
 
 let i = 0;
 
@@ -341,51 +344,40 @@ const AdsTabV2Inner = (props) => {
 
 	return (
 		<div
+			className="ads_feed"
 			style={{
-				height: 'auto',
-				display: 'flex',
-
-				flexDirection: 'column',
-				overflow: 'hidden',
-				textOverflow: 'ellipsis',
 				whiteSpace: rads.length > 0 ? 'nowrap' : 'normal',
 			}}
 		>
-			{mode != MODE_WANTED ? (
-				<div style={{ display: 'flex' }}>
-					<div
-						style={{
-							transition: '0.3s',
-							width: `${filtersOn ? '90%' : '100%'}`,
-						}}
-					>
-						<Search
+			{mode != MODE_WANTED && (
+				<>
+					<div style={{ display: 'flex' }}>
+						<div
 							style={{
 								transition: '0.3s',
+								width: `${filtersOn ? '90%' : '100%'}`,
 							}}
-							key="search"
-							// onBlur={() => searchRef.current.focus }
-							value={search}
-							onChange={handleSearch}
-							icon={<Icon24Filter />}
-							onIconClick={props.onFiltersClick}
-						/>
+						>
+							<Search
+								key="search"
+								// onBlur={() => searchRef.current.focus }
+								value={search}
+								onChange={handleSearch}
+								icon={<Icon24Filter />}
+								onIconClick={props.onFiltersClick}
+							/>
+						</div>
+						<div
+							style={{
+								transition: '0.3s',
+								width: `${filtersOn ? '100%' : '0%'}`,
+							}}
+						>
+							<SimpleCell before={<Icon24Dismiss />} mode="secondary" onClick={dropFilters} />
+						</div>
 					</div>
-					<div
-						style={{
-							transition: '0.3s',
-							width: `${filtersOn ? '100%' : '0%'}`,
-						}}
-					>
-						<SimpleCell
-							style={{ padding: '0px', margin: '0px' }}
-							before={<Icon24Dismiss />}
-							mode="secondary"
-							onClick={dropFilters}
-						/>
-					</div>
-				</div>
-			) : null}
+				</>
+			)}
 
 			{/* <PullToRefresh
 				onRefresh={() => {
@@ -447,6 +439,8 @@ const AddsTab = (props) => {
 
 	const activeModal = props.activeModals[STORY_ADS];
 
+	const [tagsLabel, setTags] = useState([]);
+
 	const [geoType, setGeoType] = useState(GEO_TYPE_FILTERS);
 	const [radius, setRadius] = useState(0);
 	const [geodata, setGeodata] = useState();
@@ -464,8 +458,11 @@ const AddsTab = (props) => {
 			return;
 		}
 		const s =
-			inputData[ADS_FILTERS] && inputData[ADS_FILTERS].search != undefined ? inputData[ADS_FILTERS].search : '';
-		console.log('we change allll', s);
+			inputData[ADS_FILTERS_S] && inputData[ADS_FILTERS_S].search != undefined
+				? inputData[ADS_FILTERS_S].search
+				: '';
+
+		console.log('setSearch', s);
 		setSearch(s);
 		if (!searchR) {
 			setSearchR(s);
@@ -502,7 +499,185 @@ const AddsTab = (props) => {
 		setMode(mod);
 
 		console.log('flters loook', cit, categor, rad);
-		setFiltersOn(cit != NoRegion || categor != CategoryNo || rad != 0);
+		setFiltersOn(
+			(gt == GEO_TYPE_FILTERS && cit != NoRegion) ||
+				categor != CategoryNo ||
+				(gt == GEO_TYPE_NEAR && rad != 0) ||
+				(s != undefined && s != '')
+		);
+		setFormData(ADS_FILTERS_ON, {
+			...inputData[ADS_FILTERS],
+			filtersOn:
+				(gt == GEO_TYPE_FILTERS && cit != NoRegion) ||
+				categor != CategoryNo ||
+				(gt == GEO_TYPE_NEAR && rad != 0) ||
+				(s != undefined && s != ''),
+		});
+		let tags = [];
+
+		if (categor != CategoryNo) {
+			tags.push(
+				tag(
+					`категория: ${categor}`,
+					null,
+					null,
+					null,
+					() => {
+						setFormData(ADS_FILTERS, { ...inputData[ADS_FILTERS], category: null });
+					},
+					<Icon16Clear
+						onClick={() => {
+							setFormData(ADS_FILTERS, { ...inputData[ADS_FILTERS], category: null });
+						}}
+						style={{ paddingLeft: '4px' }}
+						fill="var(--accent)"
+					/>
+				)
+			);
+		}
+		if (incategor != CategoryNo) {
+			tags.push(
+				tag(
+					`подкатегория: ${incategor}`,
+					null,
+					null,
+					null,
+					() => {
+						setFormData(ADS_FILTERS, {
+							...inputData[ADS_FILTERS],
+							incategory: null,
+							subcategory: null,
+						});
+					},
+					<Icon16Clear
+						onClick={() => {
+							setFormData(ADS_FILTERS, {
+								...inputData[ADS_FILTERS],
+								incategory: null,
+								subcategory: null,
+							});
+						}}
+						style={{ paddingLeft: '4px' }}
+						fill="var(--accent)"
+					/>
+				)
+			);
+		} else if (subcategor != CategoryNo) {
+			tags.push(
+				tag(
+					`подкатегория: ${subcategor}`,
+					null,
+					null,
+					null,
+					() => {
+						setFormData(ADS_FILTERS, {
+							...inputData[ADS_FILTERS],
+							incategory: null,
+							subcategory: null,
+						});
+					},
+					<Icon16Clear
+						onClick={() => {
+							setFormData(ADS_FILTERS, {
+								...inputData[ADS_FILTERS],
+								incategory: null,
+								subcategory: null,
+							});
+						}}
+						style={{ paddingLeft: '4px' }}
+						fill="var(--accent)"
+					/>
+				)
+			);
+		}
+		if (s != '') {
+			tags.push(
+				tag(
+					`содержит текст: ${s}`,
+					null,
+					null,
+					null,
+					() => {
+						setFormData(ADS_FILTERS_S, {
+							...inputData[ADS_FILTERS_S],
+							search: '',
+						});
+					},
+					<Icon16Clear
+						onClick={() => {
+							setFormData(ADS_FILTERS_S, {
+								...inputData[ADS_FILTERS_S],
+								search: '',
+							});
+						}}
+						style={{ paddingLeft: '4px' }}
+						fill="var(--accent)"
+					/>
+				)
+			);
+		}
+		if (gt == GEO_TYPE_FILTERS && cit != NoRegion) {
+			tags.push(
+				tag(
+					`в городе: ${cit.title}`,
+					null,
+					null,
+					null,
+					() => {
+						setFormData(ADS_FILTERS, {
+							...inputData[ADS_FILTERS],
+							city: null,
+							geoType: GEO_TYPE_NO,
+						});
+					},
+					<Icon16Clear
+						onClick={() => {
+							setFormData(ADS_FILTERS, {
+								...inputData[ADS_FILTERS],
+								city: null,
+								geoType: GEO_TYPE_NO,
+							});
+						}}
+						style={{ paddingLeft: '4px' }}
+						fill="var(--accent)"
+					/>
+				)
+			);
+		}
+		if (gt == GEO_TYPE_NEAR && rad != 0) {
+			tags.push(
+				tag(
+					`около меня: ${rad} км`,
+					null,
+					null,
+					null,
+					() => {
+						setFormData(ADS_FILTERS, {
+							...inputData[ADS_FILTERS],
+							geoType: GEO_TYPE_NO,
+						});
+					},
+					<Icon16Clear
+						onClick={() => {
+							setFormData(ADS_FILTERS, {
+								...inputData[ADS_FILTERS],
+								geoType: GEO_TYPE_NO,
+							});
+						}}
+						style={{ paddingLeft: '4px' }}
+						fill="var(--accent)"
+					/>
+				)
+			);
+		}
+
+		setTags(
+			tags.length == 0 ? null : (
+				<div style={{ padding: '4px' }}>
+					<TagsLabel tags={tags} />
+				</div>
+			)
+		);
 	}, [props.inputData[ADS_FILTERS]]);
 
 	const [searchR, setSearchR] = useState('');
@@ -516,7 +691,7 @@ const AddsTab = (props) => {
 		setTimeout(() => {
 			if (j == i && !cleanupFunction) {
 				setSearchR(search);
-				setFormData(ADS_FILTERS, { ...inputData[ADS_FILTERS], search });
+				setFormData(ADS_FILTERS_S, { ...inputData[ADS_FILTERS_S], search });
 			}
 		}, SEARCH_WAIT);
 		return () => (cleanupFunction = true);
@@ -613,44 +788,33 @@ const AddsTab = (props) => {
 		}
 		console.log('BEFORE LOOK hasMore', hasMore, pageNumber);
 		if (!hasMore) {
-			// setInited(true);
 			return;
 		}
 		if (pageNumber < 0) {
-			// setInited(true);
 			setPageNumber(1);
 			return;
 		}
 		let cancel;
 		let cleanupFunction = false;
+
+		console.log('BEFORE LOOK', search, pageNumber);
+
+		if (props.direction == DIRECTION_BACK && !goBackDone) {
+			if (pageNumber < props.cache.ads_page) {
+				setRads(props.cache.ads_list || []);
+				setPageNumber(props.cache.ads_page);
+				return;
+			} else if (pageNumber == props.cache.ads_page) {
+				setGoBackDone(true);
+				return;
+			}
+		}
 		setLoading(true);
 		setError(false);
 		setError404(false);
 		setInited(false);
 
-		console.log('BEFORE LOOK', search, pageNumber);
-
-		if (props.direction == DIRECTION_BACK && !goBackDone) {
-			// setAds(props.cache.ads_list);
-			if (pageNumber < props.cache.ads_page) {
-				setRads(props.cache.ads_list || []);
-				setPageNumber(props.cache.ads_page);
-				setInited(true);
-				setLoading(false);
-				return;
-			} else if (pageNumber == props.cache.ads_page) {
-				setInited(true);
-				setLoading(false);
-				setGoBackDone(true);
-				return;
-			}
-		}
-
 		async function f() {
-			if (rads.length == 0) {
-				openPopout(<Spinner size="large" />);
-			}
-
 			let rowsPerPage = 4;
 			let query = searchR;
 			let params = {
@@ -718,7 +882,7 @@ const AddsTab = (props) => {
 
 					setHasMore(newAds.length > 0);
 					setLoading(false);
-					closePopout();
+
 					setInited(true);
 				})
 				.catch((e) => {
@@ -738,7 +902,7 @@ const AddsTab = (props) => {
 						setPageNumber((prev) => (prev == 1 ? 1 : prev - 1));
 					}
 					setLoading(false);
-					closePopout();
+
 					setInited(true);
 					if (pageNumber == 1) {
 						setRads([]);
@@ -751,6 +915,14 @@ const AddsTab = (props) => {
 			cleanupFunction = true;
 		};
 	}, [pageNumber]);
+
+	useEffect(() => {
+		if (loading) {
+			openPopout(<Spinner size="large" />);
+		} else {
+			closePopout();
+		}
+	}, [loading]);
 
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
@@ -796,81 +968,80 @@ const AddsTab = (props) => {
 	useEffect(() => {
 		setBody(
 			<div
+				className="ads_feed"
 				style={{
-					height: 'auto',
-					display: 'flex',
-
-					flexDirection: 'column',
-					overflow: 'hidden',
-					textOverflow: 'ellipsis',
 					whiteSpace: rads.length > 0 ? 'nowrap' : 'normal',
 				}}
 			>
-				{mode != MODE_WANTED ? (
-					<div style={{ display: 'flex' }}>
-						<div style={{}}></div>
-						<div
-							style={{
-								transition: '0.3s',
-								width: `${filtersOn ? '90%' : '100%'}`,
-							}}
-						>
-							<Search
+				{mode != MODE_WANTED && (
+					<>
+						<div style={{ display: 'flex' }}>
+							<div style={{}}></div>
+							<div
 								style={{
 									transition: '0.3s',
+									width: `${filtersOn ? '90%' : '100%'}`,
 								}}
-								key="search"
-								// onBlur={() => searchRef.current.focus }
-								value={search}
-								onChange={handleSearch}
-								icon={<Icon24Filter />}
-								onIconClick={props.onFiltersClick}
-							/>
+							>
+								<Search
+									style={{
+										transition: '0.3s',
+									}}
+									key="search"
+									// onBlur={() => searchRef.current.focus }
+									value={search}
+									onChange={handleSearch}
+									icon={<Icon24Filter />}
+									onIconClick={props.onFiltersClick}
+								/>
+							</div>
+							<div
+								style={{
+									transition: '0.3s',
+									width: `${filtersOn ? '100%' : '0%'}`,
+								}}
+							>
+								<SimpleCell
+									style={{ padding: '0px', margin: '0px' }}
+									before={<Icon24Dismiss />}
+									mode="secondary"
+									onClick={dropFilters}
+								/>
+							</div>
 						</div>
-						<div
-							style={{
-								transition: '0.3s',
-								width: `${filtersOn ? '100%' : '0%'}`,
-							}}
-						>
-							<SimpleCell
-								style={{ padding: '0px', margin: '0px' }}
-								before={<Icon24Dismiss />}
-								mode="secondary"
-								onClick={dropFilters}
-							/>
-						</div>
-					</div>
-				) : null}
-
-				<PullToRefresh
-					onRefresh={() => {
-						setPullLoading(true);
-
-						setTimeout(() => {
-							setPullLoading(false);
-							setRefreshMe((prev) => prev + 1);
-						}, 150);
-					}}
-					isFetching={pullLoading}
-				>
-					{cols}
-				</PullToRefresh>
-
-				{loading ? (
-					<Spinner size="medium" />
-				) : rads.length > 0 ? null : error ? (
-					<Error />
-				) : mode == MODE_ALL ? (
-					<AdNotFound dropFilters={dropFilters} />
-				) : mode == MODE_GIVEN ? (
-					<AdNoGiven setAllMode={setAllMode} />
-				) : (
-					<AdNoWanted setAllMode={setAllMode} />
+						<Collapse isOpened={filtersOn}>{tagsLabel}</Collapse>
+					</>
 				)}
+
+				<>
+					<div
+						style={{ opacity: loading ? '0' : '1' }}
+						onRefresh={() => {
+							setPullLoading(true);
+
+							setTimeout(() => {
+								setPullLoading(false);
+								setRefreshMe((prev) => prev + 1);
+							}, 150);
+						}}
+						isFetching={pullLoading}
+					>
+						{cols}
+					</div>
+
+					{rads.length > 0 ? null : error ? (
+						<Error />
+					) : mode == MODE_ALL ? (
+						<AdNotFound dropFilters={dropFilters} />
+					) : mode == MODE_GIVEN ? (
+						<AdNoGiven setAllMode={setAllMode} />
+					) : (
+						<AdNoWanted setAllMode={setAllMode} />
+					)}
+				</>
 			</div>
 		);
-	}, [mode, pullLoading, loading, search, props.inputData, props.activeModals, cols]);
+	}, [mode, loading, search, filtersOn, props.inputData, props.activeModals, cols]);
 
 	return body;
 };
@@ -900,4 +1071,4 @@ const mapDispatchToProps = {
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddsTab);
 
-//283 -> 380 -> 418 -> 358 -> 406 -> 503 -> 885
+//283 -> 380 -> 418 -> 358 -> 406 -> 503 -> 885 -> 900

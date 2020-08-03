@@ -81,7 +81,8 @@ const SubcategoriesPanel = (props) => {
 					choosenGroup
 						? (group, cell) => {
 								setFormData(props.redux_main_form, {
-									...formData.forms[redux_form],
+									...formData.forms[props.redux_main_form],
+									category: formData.forms[redux_form].category,
 									incategory: cell,
 									subcategory: group.header,
 								});

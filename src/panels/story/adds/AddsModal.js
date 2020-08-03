@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ModalRoot, ModalPage, Cell, List, Avatar, InfoRow, ModalCard } from '@vkontakte/vkui';
+import { ModalRoot, ModalPage, Cell, List, Avatar, InfoRow, ModalCard, CellButton } from '@vkontakte/vkui';
 
 import Freeze100 from './../../../img/100/freeze.png';
 
@@ -27,9 +27,10 @@ import { ModalCardCaptionAdsType } from '../../../components/modal/ad_type';
 import { ModalPageAdsGeo } from '../../../components/modal/geo_filter';
 import { ModalPageAdsSort } from '../../../components/modal/ad_sort';
 import { AdFilters } from '../../../components/modal/ad_filters';
+import { ADS_FILTERS, ADS_FILTERS_ON } from '../../../store/create_post/types';
 
 const AddsModal = (props) => {
-	const { closeModal, openCarma } = props;
+	const { closeModal, openCarma, inputData } = props;
 	const [backUser, setBackUser] = useState();
 
 	const activeModal = props.activeModals[STORY_ADS];
@@ -73,7 +74,27 @@ const AddsModal = (props) => {
 				id={MODAL_ADS_FILTERS}
 				onClose={closeModal}
 				dynamicContentHeight
-				header={<ModalHeader name="Фильтры" back={closeModal} />}
+				header={
+					<ModalHeader
+						name="Фильтры"
+						back={closeModal}
+						right={
+							inputData[ADS_FILTERS_ON] &&
+							inputData[ADS_FILTERS_ON].filtersOn && (
+								<CellButton
+									onClick={() => {
+										props.closeModal()
+										props.setFormData(ADS_FILTERS, null);
+										console.log("cliiiiiiiick")
+									}}
+									mode="danger"
+								>
+									Сбросить
+								</CellButton>
+							)
+						}
+					/>
+				}
 			>
 				<AdFilters />
 			</ModalPage>

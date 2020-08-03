@@ -49,7 +49,6 @@ export const ImageCache = (props) => {
 	const [image, setImage] = useState(<></>);
 	const { url, className, onClick } = props;
 	useEffect(() => {
-		console.log('url is', url);
 		let cancel = false;
 		var i = new Image();
 		i.src = url;

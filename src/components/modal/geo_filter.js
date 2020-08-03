@@ -44,7 +44,7 @@ export const getGeoFilters = (data) => {
 	if (radius == undefined) {
 		return 'везде';
 	}
-	return 'рядом со мной в радиусе ' + radius + ' км';
+	return 'рядом (' + radius + ' км)';
 };
 
 const ModalPageAdsGeoInner = (props) => {
@@ -66,6 +66,7 @@ const ModalPageAdsGeoInner = (props) => {
 		if (!inputData[WHERE]) {
 			return;
 		}
+		console.log('WHERE inputData', inputData[WHERE]);
 
 		if (inputData[WHERE].geotype) {
 			setGeoType(inputData[WHERE].geotype);
@@ -80,7 +81,7 @@ const ModalPageAdsGeoInner = (props) => {
 
 	useEffect(() => {
 		props.updateModalHeight();
-	}, [changed, valid]);
+	}, [changed, valid, props.direction]);
 
 	useEffect(() => {
 		if (props.direction == DIRECTION_BACK) {
@@ -101,8 +102,9 @@ const ModalPageAdsGeoInner = (props) => {
 		setFormData(ADS_FILTERS_B, {
 			...inputData[ADS_FILTERS_B],
 			geotype: GEO_TYPE_FILTERS,
-			changed: geoType != GEO_TYPE_FILTERS,
+			changed: true,
 		});
+		setChanged(true);
 		setGeoType(GEO_TYPE_FILTERS);
 	}
 
@@ -189,7 +191,14 @@ const ModalPageAdsGeoInner = (props) => {
 
 			<div>
 				{geoType == GEO_TYPE_FILTERS ? (
-					<Location redux_form={ADS_FILTERS_B} openCountries={openCountries} openCities={openCities} />
+					<Location
+						redux_form={ADS_FILTERS_B}
+						openCountries={openCountries}
+						openCities={() => {
+							setGeoFilters()
+							openCities();
+						}}
+					/>
 				) : (
 					geoType == GEO_TYPE_NEAR && (
 						<FormLayout>

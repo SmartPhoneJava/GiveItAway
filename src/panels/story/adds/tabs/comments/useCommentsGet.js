@@ -69,6 +69,7 @@ export default function useCommentsGet(ignorePopout, pageNumber, rowsPerPage, ad
 				}
 				setLoading(false);
 				setInited(true);
+				setHasMore(false);
 			});
 		return () => cancel();
 	}, [pageNumber]);

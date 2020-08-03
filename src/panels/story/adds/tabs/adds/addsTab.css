@@ -1,8 +1,8 @@
 .one-block {
 	-o-text-overflow: ellipsis;
 	text-overflow: ellipsis;
-    overflow-x: hidden;
-    width: 50%;
+	overflow-x: hidden;
+	width: 50%;
 }
 
 .flex-blocks {
@@ -10,4 +10,9 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	/* white-space: nowrap; */
+}
+
+.ads_feed {
+	overflow: hidden;
+	text-overflow: ellipsis;
 }

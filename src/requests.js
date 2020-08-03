@@ -515,9 +515,6 @@ export async function getDetails(ad_id, successCallback, failCallback) {
 			if (failCallback) {
 				failCallback(error);
 			}
-			fail('Нет соединения с сервером', () => {
-				getDetails(ad_id);
-			});
 		});
 
 	return { details: data, err };
@@ -597,7 +594,6 @@ export async function Auth(user, successCallback, failCallback) {
 			failCallback(error);
 			fail('Не удалось авторизоваться');
 		});
-		
 }
 
 export async function CreateImages(photos, id, goToAds) {

@@ -56,16 +56,12 @@ const Subs = (props) => {
 	const [openFAQ, setOpenFAQ] = useState(false);
 	const [pageNumber, setPageNumber] = useState(1);
 
-	function onClickOpen() {
-		if (dealer) {
-			setProfile(dealer.vk_id);
-		}
+	function onClickOpen(vk_id) {
+		setProfile(vk_id);
 	}
 
-	function onClickWrite() {
-		if (dealer) {
-			window.open('https://vk.com/im?sel=' + dealer.vk_id);
-		}
+	function onClickWrite(vk_id) {
+		window.open('https://vk.com/im?sel=' + vk_id);
 	}
 
 	function userClick(v, close, cancel) {
@@ -84,10 +80,10 @@ const Subs = (props) => {
 								</ActionSheetItem>
 							)
 						) : null}
-						<ActionSheetItem autoclose onClick={onClickOpen}>
+						<ActionSheetItem autoclose onClick={() => onClickOpen(v.vk_id)}>
 							Перейти в профиль
 						</ActionSheetItem>
-						<ActionSheetItem autoclose onClick={onClickWrite}>
+						<ActionSheetItem autoclose onClick={() => onClickWrite(v.vk_id)}>
 							Написать
 						</ActionSheetItem>
 						{osname === IOS && (
@@ -98,7 +94,7 @@ const Subs = (props) => {
 					</ActionSheet>
 				);
 			} else {
-				onClickOpen();
+				onClickOpen(v.vk_id);
 			}
 		}
 	}
