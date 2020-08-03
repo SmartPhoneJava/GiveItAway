@@ -6,15 +6,11 @@ import { ImageCache } from '../../components/image/image_cache';
 
 export const AdLight = (props) => {
 	const { ad, imageURL, openAd } = props;
-	const [image, setImage] = useState(<ImageCache className="light-tiled" url={imageURL} />);
-	useEffect(() => {
-		return () => setImage(null);
-	}, []);
 
 	return (
-		<div onClick={openAd}>
-			{image}
-			<div style={{ padding: '2px' }}>{shortText(ad.header, 30)}</div>
+		<div className="light-tiled-panel" onClick={openAd}>
+			{<ImageCache className="light-tiled" spinnerClassName="light-tiled-spinner" url={imageURL} />}
+			<div className="light-tiled-text">{shortText(ad.header, 30)}</div>
 		</div>
 	);
 };

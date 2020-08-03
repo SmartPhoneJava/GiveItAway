@@ -47,42 +47,37 @@ export const AnimationChange = (props) => {
 
 export const ImageCache = (props) => {
 	const [image, setImage] = useState(<></>);
-	const spinS = props.spinnerStyle || {};
 	const { url, className, onClick } = props;
 	useEffect(() => {
+		console.log('url is', url);
+		let cancel = false;
 		var i = new Image();
 		i.src = url;
+		i.onload = function () {
+			if (cancel) {
+				return;
+			}
+			setImage(<img src={url} className={className} onClick={onClick} />);
+		};
+		if (i.complete) {
+			cancel = true;
+		}
 		setImage(
 			i.complete ? (
 				<img srcSet={url} className={className} onClick={onClick} />
 			) : (
-				<HideUntilLoaded
-					animationIn="bounceIn"
-					imageToLoad={url}
-					Spinner={() => (
-						<div
-							style={{
-								height: '100%',
-								width: '100%',
-								justifyContent: 'center',
-								alignItems: 'center',
-								...spinS,
-							}}
-						>
-							<Spinner size="large" />
-						</div>
-					)}
-				>
-					<img src={url} className={className} onClick={onClick} />
-				</HideUntilLoaded>
+				<div className={props.spinnerClassName}>
+					<Spinner size="medium" />
+				</div>
 			)
 		);
 		return () => {
-			setImage(null);
+			cancel = true;
 		};
 	}, [props.url]);
 
 	return image;
+	//return <AnimationChange duration={100} ignoreFirst={true} mayTheSame={true} controll={image} />;
 };
 
 export function withSpinner(wrapper, elem, size, spinStyle) {

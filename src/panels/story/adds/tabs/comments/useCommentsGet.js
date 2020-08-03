@@ -67,6 +67,7 @@ export default function useCommentsGet(ignorePopout, pageNumber, rowsPerPage, ad
 				if (!ignorePopout) {
 					store.dispatch(closePopout());
 				}
+				setLoading(false);
 				setInited(true);
 			});
 		return () => cancel();

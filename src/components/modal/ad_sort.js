@@ -121,7 +121,7 @@ const ModalPageAdsSortInner = (props) => {
 
 					{loading && (
 						<Div className="right">
-							<Spinner size="medium" />
+							<Spinner size="small" />
 						</Div>
 					)}
 				</div>

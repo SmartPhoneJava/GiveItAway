@@ -141,7 +141,7 @@ const AdsTabV2Inner = (props) => {
 				if (props.direction == DIRECTION_BACK && !goBackDone) {
 					setRads(props.cache.ads_list || []);
 					setGoBackDone(true);
-					setInited(true)
+					setInited(true);
 					return;
 				}
 				setRads([]);
@@ -463,12 +463,12 @@ const AddsTab = (props) => {
 		if (activeModal) {
 			return;
 		}
-		const s = inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].search : null || '';
-		console.log("we change allll", s)
-		if (s == undefined) {
-			setSearch('');
-		} else {
-			setSearch(s);
+		const s =
+			inputData[ADS_FILTERS] && inputData[ADS_FILTERS].search != undefined ? inputData[ADS_FILTERS].search : '';
+		console.log('we change allll', s);
+		setSearch(s);
+		if (!searchR) {
+			setSearchR(s);
 		}
 
 		const gt = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geotype : null) || GEO_TYPE_FILTERS;
@@ -553,7 +553,6 @@ const AddsTab = (props) => {
 	// }, [refreshMe]);
 
 	useEffect(() => {
-		console.log("DONE done ", searchR)
 		if (activeModal) {
 			return;
 		}
@@ -566,11 +565,7 @@ const AddsTab = (props) => {
 				return;
 			}
 		}
-		console.log("DONE done!!! ", searchR)
-		setRads([]);
-		setCols([]);
 		setPageNumber(-1);
-		setInited(false);
 		setHasMore(true);
 	}, [category, mode, searchR, city, country, sort, geodata, geoType, radius, refreshMe]);
 
@@ -612,17 +607,17 @@ const AddsTab = (props) => {
 			console.log('i will set these', props.cache.ads_list);
 			setRads(props.cache.ads_list || []);
 			setPageNumber(props.cache.ads_page);
-			setInited(true);
+			// setInited(true);
 			setLoading(false);
 			return;
 		}
 		console.log('BEFORE LOOK hasMore', hasMore, pageNumber);
 		if (!hasMore) {
-			setInited(true);
+			// setInited(true);
 			return;
 		}
 		if (pageNumber < 0) {
-			setInited(true);
+			// setInited(true);
 			setPageNumber(1);
 			return;
 		}
@@ -633,7 +628,7 @@ const AddsTab = (props) => {
 		setError404(false);
 		setInited(false);
 
-		console.log('BEFORE LOOK', goBackDone);
+		console.log('BEFORE LOOK', search, pageNumber);
 
 		if (props.direction == DIRECTION_BACK && !goBackDone) {
 			// setAds(props.cache.ads_list);
@@ -712,7 +707,11 @@ const AddsTab = (props) => {
 					if (cleanupFunction || !isMounted) {
 						return;
 					}
-					setRads((prev) => [...prev, ...newAds]);
+					if (pageNumber == 1) {
+						setRads(newAds);
+					} else {
+						setRads((prev) => [...prev, ...newAds]);
+					}
 
 					props.pushToCache([...rads, ...newAds], 'ads_list');
 					props.pushToCache(pageNumber, 'ads_page');
@@ -736,11 +735,14 @@ const AddsTab = (props) => {
 						console.log('non real err', e);
 						setError404(true);
 						setHasMore(false);
-						setPageNumber((prev) => prev - 1);
+						setPageNumber((prev) => (prev == 1 ? 1 : prev - 1));
 					}
 					setLoading(false);
 					closePopout();
 					setInited(true);
+					if (pageNumber == 1) {
+						setRads([]);
+					}
 				});
 		}
 		f();
@@ -855,10 +857,10 @@ const AddsTab = (props) => {
 					{cols}
 				</PullToRefresh>
 
-				{rads.length > 0 ? null : error ? (
+				{loading ? (
+					<Spinner size="medium" />
+				) : rads.length > 0 ? null : error ? (
 					<Error />
-				) : !inited ? (
-					<></>
 				) : mode == MODE_ALL ? (
 					<AdNotFound dropFilters={dropFilters} />
 				) : mode == MODE_GIVEN ? (
@@ -868,7 +870,7 @@ const AddsTab = (props) => {
 				)}
 			</div>
 		);
-	}, [mode, pullLoading, search, props.inputData, props.activeModals, cols]);
+	}, [mode, pullLoading, loading, search, props.inputData, props.activeModals, cols]);
 
 	return body;
 };

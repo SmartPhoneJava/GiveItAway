@@ -122,6 +122,11 @@ img.details-card-img {
 	background-color: var(--background_page);
 }
 
+.details-card-img-spinner {
+	width: 144px;
+	height: 96px;
+}
+
 .details-card-btn-outter {
 	right: 7px;
 	position: absolute;

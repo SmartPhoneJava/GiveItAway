@@ -25,6 +25,7 @@ import { GetCategoryText } from '../../components/categories/Categories';
 import { STATUS_ABORTED, STATUS_CLOSED, STATUS_CHOSEN, STATUS_OFFER } from '../../const/ads';
 import { ImageCache } from '../../components/image/image_cache';
 import { Collapse } from 'react-collapse';
+import { CardWithPadding } from '../App';
 
 const duration = 300;
 
@@ -43,13 +44,8 @@ const Add7 = (props) => {
 	const [image, setImage] = useState();
 	useEffect(() => {
 		const url = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : Icon;
-		const im = (
-			<ImageCache url={url} className="atiled" spinnerStyle={{ paddingLeft: '60px', paddingTop: '100px' }} />
-		);
-		setImage(im);
-		return () => {
-			setImage(null);
-		};
+
+		setImage(<ImageCache url={url} className="atiled" spinnerClassName="atiled-spinner" />);
 	}, [ad.pathes_to_photo]);
 
 	useEffect(() => {
@@ -148,53 +144,43 @@ const Add7 = (props) => {
 	if (!ad) {
 		return <></>;
 	}
-	return (
-		<div className="aoutter">
-			<Card size="l" mode="shadow">
-				<div className="atile">
-					<div onClick={props.openAd} className="amain-left">
+	return CardWithPadding(
+		<div className="atile">
+			<div onClick={props.openAd} className="amain-left">
+				{image}
+				<div className="acity">
+					<Icon16Place /> {ad.district ? ad.district : ad.region}
+				</div>
+
+				<Transition in={hasLabel} timeout={duration}>
+					{(state) => (
 						<div
 							style={{
-								alignItems: 'center',
-								justifyContent: 'center',
+								...transitionStyles[state],
 							}}
 						>
-							{image}
+							{label}
 						</div>
-						<div className="acity">
-							<Icon16Place /> {ad.district ? ad.district : ad.region}
-						</div>
+					)}
+				</Transition>
+			</div>
+			<div className="aright-main">
+				<div style={{ display: 'flex' }}>
+					<InfoRow onClick={props.openAd} className="aheader">
+						{ad.header}
+					</InfoRow>
 
-						<Transition in={hasLabel} timeout={duration}>
-							{(state) => (
-								<div
-									style={{
-										...transitionStyles[state],
-									}}
-								>
-									{label}
-								</div>
-							)}
-						</Transition>
-					</div>
-					<div className="aright-main">
-						<div style={{ display: 'flex' }}>
-							<InfoRow onClick={props.openAd} className="aheader">
-								{ad.header}
-							</InfoRow>
-
-							{controllButton()}
-						</div>
-						<div onClick={props.openAd}>
-							<InfoRow className="atext"> {GetCategoryText(ad.category)} </InfoRow>
-							<InfoRow className="atext"> {time(ad.creation_date, 300)} </InfoRow>
-							{metroPanel()}
-							{authorPanel()}
-						</div>
-					</div>
+					{controllButton()}
 				</div>
-			</Card>
-		</div>
+				<div onClick={props.openAd}>
+					<InfoRow className="atext"> {GetCategoryText(ad.category)} </InfoRow>
+					<InfoRow className="atext"> {time(ad.creation_date, 300)} </InfoRow>
+					{metroPanel()}
+					{authorPanel()}
+				</div>
+			</div>
+		</div>,
+		'shadow'
 	);
 };
 

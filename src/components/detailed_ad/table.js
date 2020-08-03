@@ -22,6 +22,7 @@ const AdMainInfoInner = (props) => {
 				multiline
 				onClick={onClick}
 				mode={onClick ? 'more' : null}
+				style={{ padding: '4px' }}
 				before={<Icon width={20} height={20} />}
 				after={
 					After ? (

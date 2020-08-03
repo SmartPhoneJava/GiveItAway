@@ -9,6 +9,7 @@ import {
 	TabbarItem,
 	ScreenSpinner,
 	ConfigProvider,
+	Card,
 } from '@vkontakte/vkui';
 
 import { STORY_ADS, STORY_CREATE, STORY_NOTIFICATIONS } from './../store/router/storyTypes';
@@ -146,7 +147,7 @@ export const scrollWindow = (to) => {
 			clearInterval(timerID);
 		}
 	}, 10);
-}
+};
 
 const App = (props) => {
 	const { colorScheme, myUser, myID, inputData, AD } = props;
@@ -214,7 +215,6 @@ const App = (props) => {
 		}
 	};
 
-	
 	useEffect(() => {
 		if (props.direction == DIRECTION_BACK) {
 			scrollWindow(scrollPosition.y);
@@ -466,7 +466,7 @@ const App = (props) => {
 							dropFilters={dropFilters}
 							openAd={setReduxAd}
 						/>
-					
+
 						{snackbars[PANEL_ADS]}
 					</Panel>
 					<Panel id={PANEL_ONE}>
@@ -670,6 +670,12 @@ function mapDispatchToProps(dispatch) {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
+
+export const CardWithPadding = (value, mode) => (
+	<div style={{ padding: '4px' }}>
+		<Card mode={mode || 'shadow'}>{value}</Card>
+	</div>
+);
 
 // 477 -> 516 -> 674 -> 703 -> 795 -> 749 -> 587 -> 524 -> 583
 // 722 -> 645

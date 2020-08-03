@@ -14,6 +14,7 @@ import {
 	Subhead,
 	Alert,
 	Spinner,
+	Div,
 } from '@vkontakte/vkui';
 
 import { AnimateOnChange, AnimateGroup } from 'react-animation';
@@ -74,17 +75,14 @@ import { FORM_CREATE } from '../../components/categories/redux';
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { updateDealInfo, updateCost, updateSubs } from '../../store/detailed_ad/update';
 import { showStatus } from '../../components/detailed_ad/status';
-import {
-	withLoadingIf,
-	ImageCache,
-	AnimationChange,
-} from '../../components/image/image_cache';
+import { withLoadingIf, ImageCache, AnimationChange } from '../../components/image/image_cache';
 import { TagsLabel, tag } from '../../components/categories/label';
 import { AuctionLabel } from '../../components/detailed_ad/auction';
 import { DealLabel } from '../../components/detailed_ad/deal';
 import { isFinished } from '../../components/detailed_ad/faq';
 import { Collapse } from 'react-collapse';
 import { AdMainInfo } from '../../components/detailed_ad/table';
+import { CardWithPadding } from '../App';
 
 let current_i = 0;
 
@@ -186,36 +184,6 @@ const AddMore2r = (props) => {
 
 	// const [tooltip, setTooltip] = useState(false);
 
-	// const [componentPhotos, setComponentPhotos] = useState(null);
-	// useEffect(() => {
-	// 	const pathes_to_photo = rAd.pathes_to_photo || [];
-
-		// setComponentPhotos(
-		// 	<CardScroll>
-		// 		<div style={{ display: 'flex' }}>
-		// 			{pathes_to_photo.map((img, i) => (
-		// 				<Card
-		// 					key={i}
-		// 					size="s"
-		// 					key={i}
-		// 					onClick={() => {
-		// 						openImage(imgs, i);
-		// 					}}
-		// 				>
-		// 					<ImageCache className="details-card-img" url={img.PhotoUrl} />
-		// 					<div className="details-card-btn-outter">
-		// 						<Avatar className="details-card-btn-inner" size={26}>
-		// 							<Icon24Fullscreen fill="var(--white)" />
-		// 						</Avatar>
-		// 					</div>
-		// 				</Card>
-		// 			))}
-		// 		</div>
-		// 	</CardScroll>
-		// );
-		// return () => setComponentPhotos(null);
-	// }, [rAd]);
-
 	const [componentImages, setComponentImages] = useState();
 	useEffect(() => {
 		const { header, text } = rAd;
@@ -247,7 +215,11 @@ const AddMore2r = (props) => {
 									openImage(imgs, i);
 								}}
 							>
-								<ImageCache className="details-card-img" url={img.PhotoUrl} />
+								<ImageCache
+									className="details-card-img"
+									spinnerClassName="details-card-img-spinner"
+									url={img.PhotoUrl}
+								/>
 								<div className="details-card-btn-outter">
 									<Avatar className="details-card-btn-inner" size={26}>
 										<Icon24Fullscreen fill="var(--white)" />
@@ -651,15 +623,10 @@ const AddMore2r = (props) => {
 						window.open('https://vk.com/im?media=&sel=-194671970');
 					})}
 				</div>
-				// </div>
 			);
 		}
 
-		setAllActions(
-			<Card mode="outline" style={{ margin: '5px' }}>
-				<div className="flex-center">{buttons}</div>
-			</Card>
-		);
+		setAllActions(CardWithPadding(<div className="flex-center">{buttons}</div>, 'outline'));
 	}, [rAd, subButton, costRequestSuccess]);
 
 	function onEditClick() {
@@ -710,21 +677,24 @@ const AddMore2r = (props) => {
 						display: 'block',
 						flex: 1,
 						maxWidth: width < 500 ? null : '' + width / 2 + 'px',
-						padding: '5px',
 					}}
 				>
-					<Card mode="outline">
-						<div style={{ paddingBottom: '12px', paddingRight: '12px' }}>{componentImages}</div>
-					</Card>
+					{CardWithPadding(
+						<div style={{ paddingBottom: '12px', paddingRight: '12px' }}>{componentImages}</div>,
+						'outline'
+					)}
 				</div>
 
 				{width < 500 ? allActions : null}
 
-				<div style={{ display: 'block', flex: 1, padding: '5px' }}>
-					<Card mode="outline">
-						{componentCategories}
-						<AdMainInfo />
-					</Card>
+				<div style={{ display: 'block', flex: 1 }}>
+					{CardWithPadding(
+						<>
+							<div style={{ padding: '4px' }}>{componentCategories}</div>
+							<AdMainInfo />{' '}
+						</>,
+						'outline'
+					)}
 				</div>
 			</div>
 			{width < 500 ? null : allActions}
@@ -734,11 +704,11 @@ const AddMore2r = (props) => {
 					display: width < 500 ? 'block' : 'flex',
 				}}
 			>
-				<div style={{ flex: 1, padding: '5px' }}>
+				<div style={{ flex: 1, padding: '4px' }}>
 					<Card mode="outline">{componentChosenSub}</Card>
 				</div>
 
-				<div style={{ flex: 1, padding: '5px', paddingTop: '12px' }}>
+				<div style={{ flex: 1, padding: '4px', paddingTop: '12px' }}>
 					<Card mode="outline">{componentComments}</Card>
 				</div>
 			</div>

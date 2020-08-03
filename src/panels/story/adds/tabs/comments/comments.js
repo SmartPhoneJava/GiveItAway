@@ -57,7 +57,7 @@ const CommentsI = (props) => {
 	let { inited, loading, error, hasMore, newPage } = useCommentsGet(
 		props.mini,
 		pageNumber,
-		10,
+		AD.comments_count,
 		AD.ad_id,
 		props.maxAmount
 	);
@@ -215,9 +215,11 @@ const CommentsI = (props) => {
 		props.setPage(PANEL_COMMENTS);
 	};
 
+	console.log("loading is", loading)
+
 	return (
 		<div>
-			{nots.length == 0 ? (
+			{nots.length == 0 && !loading ? (
 				<Placeholder
 					action={
 						props.mini ? (

@@ -27,6 +27,7 @@ import { NO_USER, NO_VK_USER } from './const';
 import { Statistics } from '../../../components/profile/statistics';
 import { withLoading, withLoadingIf } from '../../../components/image/image_cache';
 import { Collapse } from 'react-collapse';
+import { CardWithPadding } from '../../App';
 
 function getImage(backuser) {
 	if (!backuser || !backuser.photo_url) {
@@ -90,7 +91,7 @@ const Profile = (props) => {
 	const [authorPanel, setAuthorPanel] = useState();
 	useEffect(() => {
 		setAuthorPanel(
-			<Card mode="shadow">
+			CardWithPadding(
 				<Cell
 					onClick={openUserVK}
 					size="l"
@@ -112,8 +113,9 @@ const Profile = (props) => {
 						</div>,
 						'small'
 					)}
-				</Cell>
-			</Card>
+				</Cell>,
+				'shadow'
+			)
 		);
 	}, [vkUser, backuser]);
 
@@ -148,7 +150,7 @@ const Profile = (props) => {
 			</Collapse>
 		);
 		setCarmaPanel(
-			<Card mode="shadow">
+			CardWithPadding(
 				<Group
 					separator="hide"
 					header={
@@ -176,8 +178,9 @@ const Profile = (props) => {
 					}
 				>
 					{profileID == myID && v}
-				</Group>
-			</Card>
+				</Group>,
+				'shadow'
+			)
 		);
 	}, [profileID, myID, backuser, userRequestSucess, collapseOpen]);
 
@@ -251,7 +254,7 @@ const Profile = (props) => {
 				if (cleanupFunction) {
 					return;
 				}
-				console.log("we log you v!", v)
+				console.log('we log you v!', v);
 				setBackUser(v);
 				if (profileID == myID) {
 					props.setProfileName('Мой профиль');

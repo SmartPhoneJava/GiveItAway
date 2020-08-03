@@ -65,28 +65,19 @@ const AdsPanel = (props) => {
 							</Header>
 						}
 					>
-						<CardScroll style={{ paddingBottom: 2 }}>
-							<AnimateGroup
-								animationIn="fadeInUp"
-								animationOut="fadeOutDown"
-								durationOut={500}
-								style={{ display: 'flex' }}
-							>
-								<div style={{ display: 'flex' }}>
-									{ads.map((ad, index) => (
-										<div
-											onClick={() => props.openAd(ad)}
-											style={{ padding: '4px', width: 144, textAlign: 'center' }}
-											key={ad.ad_id}
-											ref={ads.length === index + 1 ? lastElementRef : null}
-										>
-											<Card mode="outline" size="s">
-												{Ad(ad)}
-											</Card>
-										</div>
-									))}
+						<CardScroll style={{ height:"100%" }}>
+							{ads.map((ad, index) => (
+								<div
+									onClick={() => props.openAd(ad)}
+									className="light-tiled-outter"
+									key={ad.ad_id}
+									ref={ads.length === index + 1 ? lastElementRef : null}
+								>
+									<Card className="light-tiled-inner" mode="outline" size="s">
+										{Ad(ad)}
+									</Card>
 								</div>
-							</AnimateGroup>
+							))}
 						</CardScroll>
 					</Group>
 				</Gradient>
