@@ -172,6 +172,7 @@ const App = (props) => {
 
 	const adPopout = popouts[STORY_ADS];
 	const createPopout = popouts[STORY_CREATE];
+	const notsPopout = popouts[STORY_NOTIFICATIONS];
 
 	const [inited, setInited] = useState(false);
 
@@ -602,7 +603,7 @@ const App = (props) => {
 						<Cities redux_form={FORM_LOCATION_CREATE} goBack={goBack} />
 					</Panel>
 				</View>
-				<View id={STORY_NOTIFICATIONS} activePanel={PANEL_NOTIFICATIONS}>
+				<View id={STORY_NOTIFICATIONS} activePanel={PANEL_NOTIFICATIONS} popout={notsPopout}>
 					<Panel id={PANEL_NOTIFICATIONS}>
 						<PanelHeader>Уведомления</PanelHeader>
 						<Notifications zeroNots={() => (notsCounterrr = 0)} />

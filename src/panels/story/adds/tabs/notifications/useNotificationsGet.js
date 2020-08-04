@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-import { ScreenSpinner } from '@vkontakte/vkui';
-
 import { Addr, BASE } from '../../../../../store/addr';
 
-export default function useNotificationsGet(setPopout, query, pageNumber, rowsPerPage) {
+export default function useNotificationsGet(pageNumber, rowsPerPage) {
 	const [inited, setInited] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
@@ -13,7 +11,6 @@ export default function useNotificationsGet(setPopout, query, pageNumber, rowsPe
 	const [hasMore, setHasMore] = useState(false);
 
 	useEffect(() => {
-		setPopout(<ScreenSpinner size="large" />);
 		setLoading(true);
 		setError(false);
 		setInited(false);
@@ -36,9 +33,8 @@ export default function useNotificationsGet(setPopout, query, pageNumber, rowsPe
 				setNots((prev) => {
 					return [...new Set([...prev, ...newNots])];
 				});
-				setHasMore(newNots.length > 0);
+				setHasMore(newNots.length > 0 && newNots.length == rowsPerPage);
 				setLoading(false);
-				setPopout(null);
 				setInited(true);
 			})
 			.catch((e) => {
@@ -46,11 +42,11 @@ export default function useNotificationsGet(setPopout, query, pageNumber, rowsPe
 				setError(true);
 				if (axios.isCancel(e)) return;
 
-				setPopout(null);
+				setLoading(false);
 				setInited(true);
 			});
 		return () => cancel();
-	}, [query, pageNumber]);
+	}, [pageNumber]);
 
 	return { inited, newPage: pageNumber, nots, loading, error, hasMore };
 }

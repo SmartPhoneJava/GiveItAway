@@ -3,6 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { HideUntilLoaded, AnimateOnChange } from 'react-animation';
 import { Spinner } from '@vkontakte/vkui';
 
+export const AnimationGroup = (arr) => {
+	return arr.map((v, i) => <AnimationChange mayTheSame={true} duration={100 + i * 50} controll={v} />);
+};
+
 export const AnimationChange = (props) => {
 	const duration = props.duration || 300;
 	const [first, setFirst] = useState(true);
