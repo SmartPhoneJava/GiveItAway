@@ -30,3 +30,17 @@ img.create-photo {
 	background: rgba(0, 0, 0, 0.9);
 	border-radius: 15px;
 }
+
+.geo-position-icon {
+	padding: 0px;
+	margin: 0px;
+}
+
+.geo-position-label {
+	width:90%;
+}
+
+.geo-position-spinner {
+	padding: 8px;
+	width:20px;
+}

@@ -15,6 +15,7 @@ import {
 	Banner,
 	Checkbox,
 	FormLayout,
+	SimpleCell,
 } from '@vkontakte/vkui';
 import { ReactDadata } from 'react-dadata';
 
@@ -186,9 +187,6 @@ const CreateAddRedux = (props) => {
 						set_geodata_string(data_string);
 						setNeedRefreshL(true);
 						setTimeout(() => {
-							if (cancelFunc) {
-								return;
-							}
 							setNeedRefreshL(false);
 						}, 50);
 
@@ -294,7 +292,7 @@ const CreateAddRedux = (props) => {
 		};
 	};
 
-	const [width, setWidth] = useState(document.body.clientWidth - 40);
+	const [width, setWidth] = useState(document.body.clientWidth - 15);
 	const [ymapsL, setYmapsL] = useState({});
 
 	return (
@@ -308,14 +306,6 @@ const CreateAddRedux = (props) => {
 					}}
 				/>
 			</Group>
-
-			{/* <Group separator="hide" header={<Header>Местоположение объявления</Header>}>
-				<Location
-					redux_form={FORM_LOCATION_CREATE}
-					openCountries={() => setPage(PANEL_COUNTRIES)}
-					openCities={() => setPage(PANEL_CITIES)}
-				/>
-			</Group> */}
 
 			{category == CategoryOnline ? (
 				<Banner
@@ -335,10 +325,10 @@ const CreateAddRedux = (props) => {
 					}
 				>
 					<>
-						<div style={{ paddingRight: '15px' }}>
-							<div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+						<div style={{ padding: '8px' }}>
+							<div className="flex-center">
 								<PanelHeaderButton
-									style={{ padding: '0px', margin: '0px' }}
+									className="geo-position-icon"
 									onClick={() => {
 										setDadataB(ON_REFRESH_CLICK);
 									}}
@@ -346,7 +336,7 @@ const CreateAddRedux = (props) => {
 									<Icon24Place fill="var(--accent)" />
 								</PanelHeaderButton>
 
-								<div style={{ flex: 1 }}>
+								<div className="geo-position-label">
 									{needRefreshL ? null : (
 										<ReactDadata
 											disabled={needEdit}
@@ -380,11 +370,14 @@ const CreateAddRedux = (props) => {
 										/>
 									)}
 								</div>
-
-								{dadataB == NO_CLICK ? null : <Spinner size="small" />}
+								{dadataB == NO_CLICK ? null : (
+									<div className="geo-position-spinner">
+										<Spinner size="small" />
+									</div>
+								)}
 							</div>
 
-							<div style={{ paddingLeft: '15px' }}>
+							<div style={{ marginTop: '10px' }}>
 								{/* {needRefreshM ? null : ( */}
 								<YMaps query={{ apikey: '7f6269fb-0f48-4182-bd23-13b3cb155a06' }}>
 									<Map

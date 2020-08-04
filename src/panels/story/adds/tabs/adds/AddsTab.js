@@ -457,6 +457,7 @@ const AddsTab = (props) => {
 		if (activeModal) {
 			return;
 		}
+		setSoftLoading(false);
 		const s =
 			inputData[ADS_FILTERS_S] && inputData[ADS_FILTERS_S].search != undefined
 				? inputData[ADS_FILTERS_S].search
@@ -678,6 +679,7 @@ const AddsTab = (props) => {
 				</div>
 			)
 		);
+		
 	}, [props.inputData[ADS_FILTERS]]);
 
 	const [searchR, setSearchR] = useState('');
@@ -699,6 +701,7 @@ const AddsTab = (props) => {
 
 	const [refreshMe, setRefreshMe] = useState(1);
 	const [pageNumber, setPageNumber] = useState(1);
+	const [softLoading, setSoftLoading] = useState(false);
 
 	const [isMounted, setIsMounted] = useState(true);
 	useEffect(() => {
@@ -917,7 +920,7 @@ const AddsTab = (props) => {
 	}, [pageNumber]);
 
 	useEffect(() => {
-		if (loading) {
+		if (loading && !softLoading) {
 			openPopout(<Spinner size="large" />);
 		} else {
 			closePopout();
@@ -931,6 +934,7 @@ const AddsTab = (props) => {
 			if (observer.current) observer.current.disconnect();
 			observer.current = new IntersectionObserver((entries) => {
 				if (entries[0].isIntersecting && hasMore) {
+					setSoftLoading(true);
 					setPageNumber((prev) => prev + 1);
 				}
 			});
@@ -1015,7 +1019,7 @@ const AddsTab = (props) => {
 
 				<>
 					<div
-						style={{ opacity: loading ? '0' : '1' }}
+						style={{ opacity: loading && !softLoading ? '0' : '1' }}
 						onRefresh={() => {
 							setPullLoading(true);
 
@@ -1029,15 +1033,16 @@ const AddsTab = (props) => {
 						{cols}
 					</div>
 
-					{rads.length > 0 ? null : error ? (
-						<Error />
-					) : mode == MODE_ALL ? (
-						<AdNotFound dropFilters={dropFilters} />
-					) : mode == MODE_GIVEN ? (
-						<AdNoGiven setAllMode={setAllMode} />
-					) : (
-						<AdNoWanted setAllMode={setAllMode} />
-					)}
+					{!loading &&
+						(rads.length > 0 ? null : error ? (
+							<Error />
+						) : mode == MODE_ALL ? (
+							<AdNotFound dropFilters={dropFilters} />
+						) : mode == MODE_GIVEN ? (
+							<AdNoGiven setAllMode={setAllMode} />
+						) : (
+							<AdNoWanted setAllMode={setAllMode} />
+						))}
 				</>
 			</div>
 		);
