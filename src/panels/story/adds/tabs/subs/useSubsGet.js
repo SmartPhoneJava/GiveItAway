@@ -35,7 +35,6 @@ export default function useSubsGet(
 			return;
 		}
 		if (!ignorePopout) {
-			console.log("lock lock lock1")
 			store.dispatch(openPopout(<ScreenSpinner size="large" />));
 		}
 		setLoading(true);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScreenSpinner, Snackbar, Avatar } from '@vkontakte/vkui';
+import { ScreenSpinner, Snackbar, Avatar, Spinner } from '@vkontakte/vkui';
 
 import bridge from '@vkontakte/vk-bridge';
 import axios from 'axios';
@@ -456,8 +456,6 @@ export function Close(ad_id, ad_type, subscriber_id, s, f) {
 }
 
 export async function getSubscribers(ad_id, successCallback, failCallback, count) {
-	console.log('lock lock lock4');
-	//store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;
 	const subscribers = await axios({
@@ -475,12 +473,10 @@ export async function getSubscribers(ad_id, successCallback, failCallback, count
 			return response.data;
 		})
 		.then(function (response) {
-			//store.dispatch(closePopout());
 			successCallback(response);
 			return response;
 		})
 		.catch(function (error) {
-			//store.dispatch(closePopout());
 			if (err) {
 				fail('Нет соединения с сервером');
 			}
@@ -653,7 +649,7 @@ export async function CreateImages(photos, id, goToAds) {
 }
 
 export function CreateAd(ad, obj, photos, openAd, loadAd, successcallback) {
-	store.dispatch(openPopout(<ScreenSpinner size="large" />));
+	store.dispatch(openPopout(<Spinner size="large" />));
 	let cancel;
 	axios({
 		method: 'post',
