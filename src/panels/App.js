@@ -306,19 +306,6 @@ const App = (props) => {
 	}, [AD.ad_id]);
 
 	useEffect(() => {
-		getNotificationCounter(
-			(r) => {
-				console.log('r.data.number', r.number);
-				notsCounterrr = r.number;
-				setNotsCounterr(r.number);
-			},
-			(e) => {
-				console.log('some error happened', e);
-			}
-		);
-	}, []);
-
-	useEffect(() => {
 		openPopout(<ScreenSpinner size="large" />);
 		const { dispatch } = props;
 		dispatch(VK.initApp());
@@ -356,6 +343,16 @@ const App = (props) => {
 							centrifuge.connect();
 							turnOnNotifications(us.id);
 						});
+						getNotificationCounter(
+							(r) => {
+								console.log('r.data.number', r.number);
+								notsCounterrr = r.number;
+								setNotsCounterr(r.number);
+							},
+							(e) => {
+								console.log('some error happened', e);
+							}
+						);
 					},
 					(e) => {
 						console.log('SUCCESS');
