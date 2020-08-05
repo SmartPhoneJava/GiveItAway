@@ -16,6 +16,7 @@ import {
 	Card,
 	FixedLayout,
 	Div,
+	FormStatus,
 } from '@vkontakte/vkui';
 
 import { AnimateGroup, AnimateOnChange } from 'react-animation';
@@ -39,8 +40,11 @@ import { SNACKBAR_DURATION_DEFAULT } from '../../../../../store/const';
 import { PANEL_COMMENTS } from '../../../../../store/router/panelTypes';
 import { deleteCommentByID } from '../../../../../store/detailed_ad/actions';
 import { scrollWindow } from '../../../../App';
+import { Collapse } from 'react-collapse';
 
 const NO_ID = -1;
+
+const MAX_COMMENT_LENGTH = 500;
 
 const CommentsI = (props) => {
 	const osname = usePlatform();
@@ -48,6 +52,8 @@ const CommentsI = (props) => {
 
 	const [nots, setNots] = useState([]);
 
+	const [commentValid, setCommentValid] = useState(false);
+	const [tooBigComment, setTooBigComment] = useState(false);
 	const [text, setText] = useState('');
 	const [hide, setHide] = useState(false);
 
@@ -66,6 +72,12 @@ const CommentsI = (props) => {
 		console.log('AD is', AD.comments, pageNumber);
 		setNots(AD.comments);
 	}, [AD.comments]);
+
+	function trySetText(text) {
+		setCommentValid(text.length != 0 && text.length <= MAX_COMMENT_LENGTH)
+		setTooBigComment(text.length > MAX_COMMENT_LENGTH);
+		setText(text);
+	}
 
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
@@ -240,6 +252,14 @@ const CommentsI = (props) => {
 
 			{props.mini || hide ? null : (
 				<FixedLayout vertical="bottom">
+					<Div>
+						<Collapse isOpened={tooBigComment}>
+							<FormStatus
+								mode="error"
+								header={'Слишком много текста'}
+							>{`Максимально допустимая длина комментария: ${MAX_COMMENT_LENGTH} символов`}</FormStatus>
+						</Collapse>
+					</Div>
 					<div className="write-comment-panel">
 						<div className="write-comment-input">
 							<Input
@@ -247,12 +267,12 @@ const CommentsI = (props) => {
 								placeholder="Комментарий"
 								value={text}
 								onChange={(e) => {
-									setText(e.currentTarget.value);
+									trySetText(e.currentTarget.value);
 								}}
 							/>
 						</div>
 						<div className="write-comment-button">
-							<PanelHeaderButton onClick={sendComment}>
+							<PanelHeaderButton disabled={!commentValid} onClick={sendComment}>
 								<Avatar size="20">
 									<Icon24Send className="write-comment-button-color" size="24" />
 								</Avatar>
