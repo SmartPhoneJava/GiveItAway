@@ -20,6 +20,7 @@ import Icon24StoryOutline from '@vkontakte/icons/dist/24/story_outline';
 import { shareApp, postApp, postStoryApp } from '../services/VK';
 
 const AboutPanel = (props) => {
+	console.log('platform is', props.platform);
 	const { goBack, setPage } = props;
 	return (
 		<>
@@ -111,22 +112,26 @@ const AboutPanel = (props) => {
 				>
 					Создать запись на стене
 				</Cell>
-				<Cell
-					multiline
-					expandable
-					before={<Icon24StoryOutline />}
-					onClick={postStoryApp}
-					description="Поделиться историей с друзьями!"
-				>
-					Опубликовать историю
-				</Cell>
+				{props.platform != 'mobile_web' && (
+					<Cell
+						multiline
+						expandable
+						before={<Icon24StoryOutline />}
+						onClick={postStoryApp}
+						description="Поделиться историей с друзьями!"
+					>
+						Опубликовать историю
+					</Cell>
+				)}
 			</Group>
 		</>
 	);
 };
 
 const mapStateToProps = (state) => {
-	return {};
+	return {
+		platform: state.vkui.platform,
+	};
 };
 
 const mapDispatchToProps = {

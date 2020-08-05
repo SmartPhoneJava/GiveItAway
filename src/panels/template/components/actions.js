@@ -14,7 +14,7 @@ import { deleteAlert } from '../AddMore2';
 
 const OpenActions = (props) => {
 	const osname = usePlatform();
-	const { closePopout, openPopout, openSnackbar, closeSnackbar, refresh, ad, onCloseClick } = props;
+	const { closePopout, openPopout, openSnackbar, closeSnackbar, refresh, ad, onCloseClick, isAdmin } = props;
 
 	const { ad_id, ad_type, hidden, status } = ad;
 
@@ -70,25 +70,27 @@ const OpenActions = (props) => {
 				)
 			) : null} */}
 
-			{hidden ? (
-				<ActionSheetItem
-					autoclose
-					onClick={() => {
-						adVisible(ad_id, () => props.setIsVisible(true));
-					}}
-				>
-					Сделать видимым
-				</ActionSheetItem>
-			) : (
-				<ActionSheetItem
-					autoclose
-					onClick={() => {
-						adHide(ad_id, () => props.setIsVisible(false));
-					}}
-				>
-					Скрыть
-				</ActionSheetItem>
-			)}
+			{isAdmin ? (
+				hidden ? (
+					<ActionSheetItem
+						autoclose
+						onClick={() => {
+							adVisible(ad_id, () => props.setIsVisible(true));
+						}}
+					>
+						Сделать видимым
+					</ActionSheetItem>
+				) : (
+					<ActionSheetItem
+						autoclose
+						onClick={() => {
+							adHide(ad_id, () => props.setIsVisible(false));
+						}}
+					>
+						Скрыть
+					</ActionSheetItem>
+				)
+			) : null}
 
 			<ActionSheetItem
 				autoclose

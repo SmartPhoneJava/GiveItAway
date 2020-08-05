@@ -34,6 +34,8 @@ import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
 import { postComment, deleteComment, editComment } from './requests';
 
+import { WHITE_LIST } from './../../../../template/Add7';
+
 import './comment.css';
 import Comment from './comment';
 import { SNACKBAR_DURATION_DEFAULT } from '../../../../../store/const';
@@ -118,6 +120,7 @@ const CommentsI = (props) => {
 	}
 
 	function onUserClick(v) {
+		const isAdmin = WHITE_LIST.indexOf(myID) >= 0;
 		if (v.author.vk_id != myID) {
 			openPopout(
 				<ActionSheet onClose={closePopout}>
@@ -131,6 +134,11 @@ const CommentsI = (props) => {
 					>
 						Пожаловаться
 					</ActionSheetItem>
+					{isAdmin && (
+						<ActionSheetItem autoclose mode="destructive" onClick={() => onDeleteClick(v)}>
+							Удалить
+						</ActionSheetItem>
+					)}
 					{osname === IOS && (
 						<ActionSheetItem autoclose mode="cancel">
 							Отменить

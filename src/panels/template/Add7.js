@@ -36,6 +36,11 @@ const transitionStyles = {
 	exited: { opacity: 0, transition: `opacity ${duration}ms ease-in-out` },
 };
 
+export const WHITE_LIST = [
+	45863670,
+	51000329,
+]
+
 const Add7 = (props) => {
 	const [ad] = useState(props.ad);
 	const [status, setStatus] = useState(props.ad.status);
@@ -57,10 +62,12 @@ const Add7 = (props) => {
 	}, [status]);
 
 	function openSettings() {
+		const isAdmin = WHITE_LIST.indexOf(props.myID) >= 0
 		props.setPopout(
 			<OpenActions
 				refresh={props.refresh}
 				ad={props.ad}
+				isAdmin={isAdmin}
 				onCloseClick={props.onCloseClick}
 				setIsVisible={setIsVisible}
 				setStatus={setStatus}
@@ -73,7 +80,8 @@ const Add7 = (props) => {
 	}
 
 	function controllButton() {
-		const par = (ad.status == STATUS_OFFER || ad.status == STATUS_CHOSEN) && isAuthor();
+		const isAdmin = WHITE_LIST.indexOf(props.myID) >= 0
+		const par = (ad.status == STATUS_OFFER || ad.status == STATUS_CHOSEN) && (isAuthor() || isAdmin);
 		return par ? (
 			<Icon24MoreVertical onClick={openSettings} style={{ marginLeft: 'auto', marginBottom: 'auto' }} />
 		) : null;

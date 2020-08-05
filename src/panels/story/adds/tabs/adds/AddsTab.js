@@ -315,7 +315,6 @@ const AdsTabV2Inner = (props) => {
 	function Ad(ad) {
 		return (
 			<Add7
-				vkPlatform={props.vkPlatform}
 				openAd={() => {
 					props.openAd(ad);
 				}}
@@ -976,7 +975,6 @@ const AddsTab = (props) => {
 	function Ad(ad) {
 		return (
 			<Add7
-				vkPlatform={props.vkPlatform}
 				openAd={() => {
 					props.openAd(ad);
 				}}

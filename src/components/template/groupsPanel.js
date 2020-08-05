@@ -24,6 +24,7 @@ import {
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 
 import Icon56InfoOutline from '@vkontakte/icons/dist/56/info_outline';
+import { AnimationChange, AnimationGroup } from '../image/image_cache';
 
 export const CHOOSE_ANOTHER = 'another';
 
@@ -215,7 +216,7 @@ const GroupsPanel = (props) => {
 					ShowCell(group, group.header, getText, getImage, false, arr)
 				) : (
 					<Group key={group.header} header={ShowCell(group, group.header, getText, getImage, true)}>
-						<List>{arr.map((v) => ShowCell(group, v, getText, getImage))}</List>
+						<AnimationGroup arr={arr.map((v) => ShowCell(group, v, getText, getImage))} />
 						{needShowAllBtn ? (
 							<Div>
 								<Link
@@ -233,9 +234,7 @@ const GroupsPanel = (props) => {
 			.filter((el) => el);
 
 		return cellArr.length > 0 ? (
-			<Group header={<Header mode="secondary">{gr.header}</Header>}>
-				<AnimateGroup duration={animationDuration}>{cellArr}</AnimateGroup>
-			</Group>
+			<Group header={<Header mode="secondary">{gr.header}</Header>}>{cellArr}</Group>
 		) : null;
 	};
 
@@ -303,7 +302,7 @@ const GroupsPanel = (props) => {
 		return foundCells.length > 0 ? (
 			<Group header={<Header mode="primary">Найдено в других категориях</Header>}>
 				<Separator />
-				<AnimateGroup duration={animationDuration}>{foundCells}</AnimateGroup>
+				<AnimationGroup duration={animationDuration} arr={foundCells} />
 			</Group>
 		) : null;
 	};
@@ -360,7 +359,7 @@ const GroupsPanel = (props) => {
 							</>
 						)
 					) : (
-						<AnimateGroup duration={animationDuration}>{ShowList(Groups)}</AnimateGroup>
+						ShowList(Groups)
 					)}
 				</>
 			)}

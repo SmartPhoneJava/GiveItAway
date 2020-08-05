@@ -136,7 +136,7 @@ const AddMore2r = (props) => {
 
 	const [componentStatus, setComponentStatus] = useState();
 	useEffect(() => {
-		const { isAuthor, isDealer, dealer, deal, status } = rAd;
+		const { isAuthor, isDealer, dealer, deal, status, hidden } = rAd;
 		console.log('');
 		setComponentStatus(
 			showStatus(
@@ -144,6 +144,7 @@ const AddMore2r = (props) => {
 				isDealer,
 				isAuthor,
 				dealer,
+				hidden,
 				() =>
 					acceptDeal(
 						deal.deal_id,
@@ -564,20 +565,20 @@ const AddMore2r = (props) => {
 		let buttons = [
 			buttonAction(<Icon24Write />, 'Изменить', onEditClick, null, disabled),
 			// <AnimateOnChange>
-			<AnimationChange
-				ignoreFirst={true}
-				visibleFirst={true}
-				mayTheSame={true}
-				controll={buttonAction(
-					hidden ? <Icon24Globe /> : <Icon24Hide />,
-					hidden ? 'Открыть' : 'Скрыть',
-					() => {
-						hidden ? adVisible(ad_id, () => setIsHidden(false)) : adHide(ad_id, () => setIsHidden(true));
-					},
-					null,
-					disabled
-				)}
-			/>,
+			// <AnimationChange
+			// 	ignoreFirst={true}
+			// 	visibleFirst={true}
+			// 	mayTheSame={true}
+			// 	controll={buttonAction(
+			// 		hidden ? <Icon24Globe /> : <Icon24Hide />,
+			// 		hidden ? 'Открыть' : 'Скрыть',
+			// 		() => {
+			// 			hidden ? adVisible(ad_id, () => setIsHidden(false)) : adHide(ad_id, () => setIsHidden(true));
+			// 		},
+			// 		null,
+			// 		disabled
+			// 	)}
+			// />,
 
 			// </AnimateOnChange>,
 			buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK),

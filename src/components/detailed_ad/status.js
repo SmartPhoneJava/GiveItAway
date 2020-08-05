@@ -24,6 +24,13 @@ const textWrapper = (text) => {
 	);
 };
 
+export const showHidden = () => {
+	let text =
+		'Объявление находится на модерации и скрыто в поиске. Проверка не займет много времени, пожалуйста ожидайте!';
+
+	return statusWrapper(textWrapper(text), "var(--accent)");
+};
+
 export const showClosed = (isDealer, isAuthor) => {
 	let text = 'Отдано!';
 	if (isAuthor) {
@@ -108,7 +115,10 @@ export const showChosen = (isDealer, isAuthor, dealer, acceptClick, cancelClick,
 	}
 };
 
-export const showStatus = (status, isDealer, isAuthor, dealer, acceptClick, cancelClick, openUser) => {
+export const showStatus = (status, isDealer, isAuthor, dealer, hidden, acceptClick, cancelClick, openUser) => {
+	if (hidden) {
+		return showHidden();
+	}
 	switch (status) {
 		case STATUS_CHOSEN:
 			return showChosen(isDealer, isAuthor, dealer, acceptClick, cancelClick, openUser);
