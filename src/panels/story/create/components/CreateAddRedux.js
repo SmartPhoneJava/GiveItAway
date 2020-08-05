@@ -155,6 +155,7 @@ const CreateAddRedux = (props) => {
 	const [mapState, setMapState] = useState({ center: [2.75, 2.57], zoom: 9, controls: [] });
 	const [place, setPlace] = useState([2.75, 2.57]);
 	const [dadataB, setDadataB] = useState(NO_CLICK);
+	const [isLoading, setIsLoading] = useState(false);
 	const [needRefreshL, setNeedRefreshL] = useState(false);
 
 	useEffect(() => {
@@ -170,47 +171,52 @@ const CreateAddRedux = (props) => {
 			}, 1000);
 			return;
 		}
-		getGeodata(
-			(data) => {
-				if (cancelFunc) {
-					return;
-				}
-				const center = [data.lat, data.long];
-				setMapState({ ...mapState, center });
-				setPlace(center);
-				getAdress(
-					data,
-					(data_string) => {
-						if (cancelFunc) {
-							return;
-						}
-						set_geodata_string(data_string);
-						setNeedRefreshL(true);
-						setTimeout(() => {
-							setNeedRefreshL(false);
-						}, 50);
-
-						console.log('go deeper 2', data_string);
-						setDadataB(NO_CLICK);
-						// getMetro((l) => {
-						// 	console.log('go deeper 3', l);
-						// });
-					},
-					(e) => {
-						if (cancelFunc) {
-							return;
-						}
-						setDadataB(NO_CLICK);
+		setIsLoading(true);
+		setTimeout(() => {
+			getGeodata(
+				(data) => {
+					if (cancelFunc) {
+						return;
 					}
-				);
-			},
-			(e) => {
-				if (cancelFunc) {
-					return;
+					const center = [data.lat, data.long];
+					setMapState({ ...mapState, center });
+					setPlace(center);
+					setIsLoading(false);
+					getAdress(
+						data,
+						(data_string) => {
+							if (cancelFunc) {
+								return;
+							}
+							set_geodata_string(data_string);
+							setNeedRefreshL(true);
+							setTimeout(() => {
+								setNeedRefreshL(false);
+							}, 50);
+
+							console.log('go deeper 2', data_string);
+							setDadataB(NO_CLICK);
+							// getMetro((l) => {
+							// 	console.log('go deeper 3', l);
+							// });
+						},
+						(e) => {
+							if (cancelFunc) {
+								return;
+							}
+							setDadataB(NO_CLICK);
+						}
+					);
+				},
+				(e) => {
+					if (cancelFunc) {
+						return;
+					}
+					setIsLoading(false);
+					setDadataB(NO_CLICK);
 				}
-				setDadataB(NO_CLICK);
-			}
-		);
+			);
+		}, 3000);
 		return () => {
 			cancelFunc = true;
 		};
@@ -292,6 +298,10 @@ const CreateAddRedux = (props) => {
 		};
 	};
 
+	useEffect(() => {
+		console.log('look at isLoading', isLoading);
+	}, [isLoading]);
+
 	const [width, setWidth] = useState(document.body.clientWidth - 15);
 	const [ymapsL, setYmapsL] = useState({});
 
@@ -325,7 +335,7 @@ const CreateAddRedux = (props) => {
 					}
 				>
 					<>
-						<div style={{ padding: '8px' }}>
+						<Div>
 							<div className="flex-center">
 								<PanelHeaderButton
 									className="geo-position-icon"
@@ -336,8 +346,13 @@ const CreateAddRedux = (props) => {
 									<Icon24Place fill="var(--accent)" />
 								</PanelHeaderButton>
 
-								<div className="geo-position-label">
-									{needRefreshL ? null : (
+								{needRefreshL ? null : (
+									<div
+										style={{
+											transition: '0.3s',
+											width: !isLoading ? '100%' : '90%',
+										}}
+									>
 										<ReactDadata
 											disabled={needEdit}
 											token={'efb37d1dc6b04c11116d3ab7ef9482fa13e0b664'}
@@ -368,13 +383,18 @@ const CreateAddRedux = (props) => {
 											autocomplete={geodata_string}
 											placeholder={'Введите адрес'}
 										/>
-									)}
-								</div>
-								{dadataB == NO_CLICK ? null : (
-									<div className="geo-position-spinner">
-										<Spinner size="small" />
 									</div>
 								)}
+
+								<div
+									style={{
+										transition: '0.3s',
+										width: isLoading ? '10%' : '0%',
+										opacity: isLoading ? '1' : '0',
+									}}
+								>
+									<Spinner size="small" />
+								</div>
 							</div>
 
 							<div style={{ marginTop: '10px' }}>
@@ -395,7 +415,7 @@ const CreateAddRedux = (props) => {
 								</YMaps>
 								{/* )} */}
 							</div>
-						</div>
+						</Div>
 					</>
 				</Group>
 			)}

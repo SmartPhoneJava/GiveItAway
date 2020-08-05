@@ -74,7 +74,7 @@ const CommentsI = (props) => {
 	}, [AD.comments]);
 
 	function trySetText(text) {
-		setCommentValid(text.length != 0 && text.length <= MAX_COMMENT_LENGTH)
+		setCommentValid(text.length != 0 && text.length <= MAX_COMMENT_LENGTH);
 		setTooBigComment(text.length > MAX_COMMENT_LENGTH);
 		setText(text);
 	}
@@ -119,7 +119,25 @@ const CommentsI = (props) => {
 
 	function onUserClick(v) {
 		if (v.author.vk_id != myID) {
-			props.openUser(v.author.vk_id);
+			openPopout(
+				<ActionSheet onClose={closePopout}>
+					<ActionSheetItem autoclose onClick={() => props.openUser(v.author.vk_id)}>
+						Открыть профиль
+					</ActionSheetItem>
+					<ActionSheetItem
+						autoclose
+						mode="destructive"
+						onClick={() => window.open('https://vk.com/im?media=&sel=-194671970')}
+					>
+						Пожаловаться
+					</ActionSheetItem>
+					{osname === IOS && (
+						<ActionSheetItem autoclose mode="cancel">
+							Отменить
+						</ActionSheetItem>
+					)}
+				</ActionSheet>
+			);
 			return;
 		}
 
