@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, PullToRefresh, Spinner, SimpleCell, Div } from '@vkontakte/vkui';
+import { Search, PullToRefresh, Spinner, SimpleCell, Div, FormStatus } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
@@ -42,8 +42,11 @@ import { pushToCache } from '../../../../../store/cache/actions';
 import { STORY_ADS } from '../../../../../store/router/storyTypes';
 import { TagsLabel, tag } from '../../../../../components/categories/label';
 import { Collapse } from 'react-collapse';
+import formPanel from '../../../../../components/template/formPanel';
 
 let i = 0;
+
+const SEARCH_MAX_LENGTH = 50;
 
 const REASON_NO_SEARCH = 'reason: no search';
 const REASON_SEARCH = 'reason: search - ';
@@ -298,6 +301,7 @@ const AdsTabV2Inner = (props) => {
 	}, [inited, hasMore]);
 
 	const [search, setSearch] = useState('');
+
 	function handleSearch(e) {
 		setSearch(e.target.value);
 		setFormData(ADS_FILTERS, { ...inputData[ADS_FILTERS], search: e.target.value });
@@ -458,7 +462,7 @@ const AddsTab = (props) => {
 			return;
 		}
 		setSoftLoading(false);
-		const s =
+		let s =
 			inputData[ADS_FILTERS_S] && inputData[ADS_FILTERS_S].search != undefined
 				? inputData[ADS_FILTERS_S].search
 				: '';
@@ -592,6 +596,7 @@ const AddsTab = (props) => {
 			);
 		}
 		if (s != '') {
+			s = s.substr(0, SEARCH_MAX_LENGTH);
 			tags.push(
 				tag(
 					`содержит текст: ${s}`,
@@ -674,25 +679,41 @@ const AddsTab = (props) => {
 
 		setTags(
 			tags.length == 0 ? null : (
-				<div style={{ padding: '4px' }}>
-					<TagsLabel tags={tags} />
+				<div style={{ paddingLeft: '8px', paddingRight: '8px' }}>
+					{!searchValid && (
+						<Div>
+							<FormStatus
+								header="Слишком длинный поисковый запрос"
+								mode="error"
+							>{`Максимальная длина: ${SEARCH_MAX_LENGTH} символов. Остальные символы игнорируются.`}</FormStatus>
+						</Div>
+					)}
+
+					<TagsLabel Y={true} tags={tags} />
 				</div>
 			)
 		);
-		
-	}, [props.inputData[ADS_FILTERS]]);
+	}, [props.inputData[ADS_FILTERS], searchValid]);
 
+	const [searchValid, setSearchValid] = useState(true);
 	const [searchR, setSearchR] = useState('');
 	useEffect(() => {
 		if (activeModal) {
 			return;
+		}
+		let s = search;
+		if (s.length > SEARCH_MAX_LENGTH) {
+			setSearchValid(false);
+			s = s.substr(0, SEARCH_MAX_LENGTH);
+		} else {
+			setSearchValid(true);
 		}
 		let cleanupFunction = false;
 		i++;
 		let j = i;
 		setTimeout(() => {
 			if (j == i && !cleanupFunction) {
-				setSearchR(search);
+				setSearchR(s);
 				setFormData(ADS_FILTERS_S, { ...inputData[ADS_FILTERS_S], search });
 			}
 		}, SEARCH_WAIT);

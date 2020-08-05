@@ -48,10 +48,10 @@ export const TagsLabel = (props) => {
 	const tagsUpdate = props.tagsUpdate || true;
 	return (
 		<DraggableArea
-			axis={props.Y ? 'y' : 'x'}
-			draggable={false}
+			// isList={props.Y ? true : null}
+			disable={true}
 			tags={props.tags}
-			style={{ display: 'flex' }}
+			// style={{ display: 'block' }}
 			render={({ tag, index }) => (
 				<div style={{ display: 'flex' }}>
 					<Transition in={tagsUpdate} timeout={duration}>

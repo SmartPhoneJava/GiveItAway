@@ -171,7 +171,6 @@ const AddMore2r = (props) => {
 
 		setComponentCategories(
 			<TagsLabel
-				Y={true}
 				tags={[tag(category, col, null, col), tag(subcat_list, col, null, col), tag(subcat, col, null, col)]}
 			/>
 		);
@@ -620,7 +619,7 @@ const AddMore2r = (props) => {
 				// 		{helpBtn}
 				// 	</div>
 
-				<div className="flex-center">
+				<div style={{ display: 'flex', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
 					{helpBtn}
 					{buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK)}
 					{buttonAction(<Icon24Report />, 'Пожаловаться', () => {

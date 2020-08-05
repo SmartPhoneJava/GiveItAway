@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import {
-	PanelHeader,
-	List,
-	Cell,
-	PanelHeaderButton,
-	PanelHeaderContext,
-	TabsItem,
-	Tabs,
-} from '@vkontakte/vkui';
+import { PanelHeader, List, Cell, PanelHeaderButton, PanelHeaderContext, TabsItem, Tabs, PanelHeaderContent } from '@vkontakte/vkui';
 
 import Icon28CubeBoxOutline from '@vkontakte/icons/dist/28/cube_box_outline';
 
@@ -50,7 +42,23 @@ const AddsTabs = (props) => {
 	return (
 		<React.Fragment>
 			<PanelHeader left={<PanelHeaderButton />} separator={false}>
-				<Tabs>
+				
+				<PanelHeaderContent
+					aside={
+						<Icon16Dropdown
+							fill="var(--accent)"
+							style={{
+								marginLeft: '15px',
+								transition: '0.3s',
+								transform: `rotate(${contextOpened ? '180deg' : '0'})`,
+							}}
+						/>
+					}
+					onClick={onTabAdsClick}
+				>
+					{mode == MODE_ALL ? 'Все объявления' : mode == MODE_WANTED ? 'Хочу забрать' : 'Отдаю'}
+				</PanelHeaderContent>
+				{/* <Tabs>
 					<TabsItem
 						onClick={onTabAdsClick}
 						selected={activeTab === TAB_ADS}
@@ -67,7 +75,7 @@ const AddsTabs = (props) => {
 					>
 						{mode == MODE_ALL ? 'Все' : mode == MODE_WANTED ? 'Хочу забрать' : 'Отдаю'}
 					</TabsItem>
-				</Tabs>
+				</Tabs> */}
 			</PanelHeader>
 			<PanelHeaderContext
 				opened={contextOpened}
