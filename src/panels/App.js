@@ -323,7 +323,7 @@ const App = (props) => {
 
 		dispatch(setPlatform(vk_platform));
 		dispatch(setAppID(app_id));
-		dispatch(VK.getAuthToken());
+		// dispatch(VK.getAuthToken());
 
 		window.history.pushState({ currPanel: PANEL_ADS, ad: AdDefault }, PANEL_ADS);
 		window.onpopstate = function (event) {

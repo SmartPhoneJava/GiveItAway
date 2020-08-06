@@ -7,12 +7,18 @@
 	margin: 5px;
 }
 
-.category100v {
+.category100v img{
 	transition: margin 0.5s;
 	padding: 5px;
 	max-width: 100px;
 	object-fit: cover;
 	max-height: 100px;
+	transform: scale(0.5, 0.5);
+    max-width:100%;
+	max-height: 100%;
+	visibility: hidden;
+	width: 100%;
 }
+
 
 	

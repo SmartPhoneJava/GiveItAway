@@ -166,7 +166,6 @@ const GroupsPanel = (props) => {
 			done = isDone(v, getText);
 		}
 
-		const img = <div style={{ marginRight: '10px' }}>{getImage(v)}</div>;
 		const description = darr.length == 0 ? null : darr.filter((v, i) => i < 6).join(', ') + addSymbol;
 
 		if (description && description.length == 0) {
@@ -177,7 +176,7 @@ const GroupsPanel = (props) => {
 				// expandable
 				multiline
 				key={text}
-				before={imageLeft ? img : null}
+				before={imageLeft && getImage(v)}
 				description={description}
 				onClick={() => onCellClick(gr, v)}
 			>

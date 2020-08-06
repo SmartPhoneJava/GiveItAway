@@ -92,21 +92,21 @@ const CreateAddRedux = (props) => {
 	}, [inputData[FORM_CREATE]]);
 
 	const [pmOpen, setPmOpen] = useState(true);
-	useEffect(() => {
-		let cleanupFunction = false;
-		canWritePrivateMessage(
-			myUser.id,
-			appID,
-			apiVersion,
-			(isClosed) => {
-				if (!cleanupFunction) {
-					setPmOpen(!isClosed);
-				}
-			},
-			(e) => {}
-		);
-		return () => (cleanupFunction = true);
-	}, []);
+	// useEffect(() => {
+	// 	let cleanupFunction = false;
+	// 	canWritePrivateMessage(
+	// 		myUser.id,
+	// 		appID,
+	// 		apiVersion,
+	// 		(isClosed) => {
+	// 			if (!cleanupFunction) {
+	// 				setPmOpen(!isClosed);
+	// 			}
+	// 		},
+	// 		(e) => {}
+	// 	);
+	// 	return () => (cleanupFunction = true);
+	// }, []);
 
 	const [errorHeader, setErrorHeader] = useState('');
 	const [errorText, setErrorText] = useState('');

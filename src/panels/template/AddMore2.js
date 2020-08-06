@@ -663,6 +663,7 @@ const AddMore2r = (props) => {
 	}
 
 	if (isNotValid(AD)) {
+		console.log('lock lock lock 6');
 		return (
 			<Placeholder stretched header="Загрузка объявления">
 				<Spinner size="large" />

@@ -364,7 +364,7 @@ export const routerReducer = (state = initialState, action) => {
 
 			if (finish) {
 				VK.closeApp();
-				return;
+				return state;
 			}
 			// VK.swipeBackOff();
 

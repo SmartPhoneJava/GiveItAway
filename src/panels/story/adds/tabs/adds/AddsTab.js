@@ -941,8 +941,13 @@ const AddsTab = (props) => {
 
 	useEffect(() => {
 		if (loading && !softLoading) {
+			console.log("lock lock lock 5")
 			openPopout(<Spinner size="large" />);
 		} else {
+			console.log("lock lock unlock5")
+			closePopout();
+		}
+		return ()=>{
 			closePopout();
 		}
 	}, [loading]);
@@ -1037,8 +1042,7 @@ const AddsTab = (props) => {
 				)}
 
 				<>
-					<div
-						style={{ opacity: loading && !softLoading ? '0' : '1' }}
+					<PullToRefresh
 						onRefresh={() => {
 							setPullLoading(true);
 
@@ -1049,8 +1053,8 @@ const AddsTab = (props) => {
 						}}
 						isFetching={pullLoading}
 					>
-						{cols}
-					</div>
+						<div style={{ opacity: loading && !softLoading ? '0' : '1' }}>{cols}</div>
+					</PullToRefresh>
 
 					{!loading &&
 						(rads.length > 0 ? null : error ? (
@@ -1065,7 +1069,7 @@ const AddsTab = (props) => {
 				</>
 			</div>
 		);
-	}, [mode, loading, search, filtersOn, props.inputData, props.activeModals, cols]);
+	}, [mode, loading, search, pullLoading, filtersOn, props.inputData, props.activeModals, cols]);
 
 	return body;
 };

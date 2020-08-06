@@ -442,9 +442,6 @@ const Notifications = (props) => {
 
 	console.log('arrRead:', arrRead, error);
 	props.zeroNots();
-	if (error) {
-		return <Error />;
-	}
 
 	const [body, setBody] = useState(<></>);
 
@@ -491,6 +488,9 @@ const Notifications = (props) => {
 		};
 	}, [inited, loading]);
 
+	if (error) {
+		return <Error />;
+	}
 	return body;
 };
 

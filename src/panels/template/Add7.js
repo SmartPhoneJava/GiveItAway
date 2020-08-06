@@ -36,10 +36,7 @@ const transitionStyles = {
 	exited: { opacity: 0, transition: `opacity ${duration}ms ease-in-out` },
 };
 
-export const WHITE_LIST = [
-	45863670,
-	51000329,
-]
+export const WHITE_LIST = [45863670, 51000329];
 
 const Add7 = (props) => {
 	const [ad] = useState(props.ad);
@@ -62,7 +59,7 @@ const Add7 = (props) => {
 	}, [status]);
 
 	function openSettings() {
-		const isAdmin = WHITE_LIST.indexOf(props.myID) >= 0
+		const isAdmin = WHITE_LIST.indexOf(props.myID) >= 0;
 		props.setPopout(
 			<OpenActions
 				refresh={props.refresh}
@@ -80,7 +77,7 @@ const Add7 = (props) => {
 	}
 
 	function controllButton() {
-		const isAdmin = WHITE_LIST.indexOf(props.myID) >= 0
+		const isAdmin = WHITE_LIST.indexOf(props.myID) >= 0;
 		const par = (ad.status == STATUS_OFFER || ad.status == STATUS_CHOSEN) && (isAuthor() || isAdmin);
 		return par ? (
 			<Icon24MoreVertical onClick={openSettings} style={{ marginLeft: 'auto', marginBottom: 'auto' }} />
@@ -140,8 +137,12 @@ const Add7 = (props) => {
 				}
 		}
 
-		if (!isVisible && isAuthor()) {
-			newLabel = statusText('Видно только вам', 'hidden', Icon12Lock);
+		if (!isVisible) {
+			if (isAuthor()) {
+				newLabel = statusText('Видно только вам', 'hidden', Icon12Lock);
+			} else {
+				newLabel = statusText('На модерации', 'hidden', Icon12Lock);
+			}
 		}
 		if (newLabel) {
 			setLabel(newLabel);

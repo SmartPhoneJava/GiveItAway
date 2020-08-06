@@ -14,6 +14,7 @@ import { AnimateOnChange } from 'react-animation';
 import { isFinished } from './faq';
 import { PANEL_MAP } from '../../store/router/panelTypes';
 import { setPage } from '../../store/router/actions';
+import { CategoryOnline } from '../categories/const';
 
 const AdMainInfoInner = (props) => {
 	function tableElement(Icon, text, value, After, onClick) {
@@ -54,7 +55,7 @@ const AdMainInfoInner = (props) => {
 
 	const [componentItemTable, setComponentItemTable] = useState(<></>);
 	useEffect(() => {
-		const { views_count, status, region, district } = props.ad;
+		const { views_count, status, region, district, category } = props.ad;
 		let subscribers_num = props.ad.subscribers_num || '0';
 
 		setComponentItemTable(
@@ -63,14 +64,8 @@ const AdMainInfoInner = (props) => {
 				{!isFinished(status)
 					? tableElement(Icon24Similar, 'Откликнулось', <AnimateOnChange>{subscribers_num}</AnimateOnChange>)
 					: null}
-				{/* {tableElement(
-					Icon24UserOutgoing,
-					'Вид объявления',
-					getAdType(props.ad.ad_type).toLowerCase(),
-					Icon24Help,
-					onTypesClick
-				)} */}
-				{tableElement(Icon24Place, 'Где забрать', getGeoPosition(region, district), Icon24Chevron, openMap)}
+				{category != CategoryOnline &&
+					tableElement(Icon24Place, 'Где забрать', getGeoPosition(region, district), Icon24Chevron, openMap)}
 			</div>
 		);
 	}, [props.ad]);
