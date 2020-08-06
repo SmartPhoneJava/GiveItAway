@@ -941,15 +941,15 @@ const AddsTab = (props) => {
 
 	useEffect(() => {
 		if (loading && !softLoading) {
-			console.log("lock lock lock 5")
+			console.log('lock lock lock 5');
 			openPopout(<Spinner size="large" />);
 		} else {
-			console.log("lock lock unlock5")
+			console.log('lock lock unlock5');
 			closePopout();
 		}
-		return ()=>{
+		return () => {
 			closePopout();
-		}
+		};
 	}, [loading]);
 
 	const observer = useRef();
@@ -1069,7 +1069,7 @@ const AddsTab = (props) => {
 				</>
 			</div>
 		);
-	}, [mode, loading, search, pullLoading, filtersOn, props.inputData, props.activeModals, cols]);
+	}, [mode, loading, search, pullLoading, softLoading, filtersOn, props.inputData, props.activeModals, cols]);
 
 	return body;
 };
