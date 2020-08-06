@@ -25,7 +25,6 @@ export default function useCommentsGet(ignorePopout, pageNumber, rowsPerPage, ad
 			return;
 		}
 		if (!ignorePopout) {
-			console.log("lock lock lock2")
 			store.dispatch(openPopout(<ScreenSpinner size="large" />));
 		}
 		setLoading(true);

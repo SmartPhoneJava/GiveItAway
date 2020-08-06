@@ -194,7 +194,6 @@ const CreateAddRedux = (props) => {
 								setNeedRefreshL(false);
 							}, 50);
 
-							console.log('go deeper 2', data_string);
 							setDadataB(NO_CLICK);
 							// getMetro((l) => {
 							// 	console.log('go deeper 3', l);

@@ -25,45 +25,43 @@ export const formDataReducer = (state = initialState, action) => {
 		}
 
 		case SET_GEO_DATA: {
-            console.log("seeet SET_GEO_DATA", action.payload.geodata)
-            const geodata = action.payload.geodata
+			const geodata = action.payload.geodata;
 			return {
 				...state,
 				forms: {
 					...state.forms,
 					[GEO_DATA]: {
-                        ...state.forms[GEO_DATA],
-                        geodata,
-                    },
+						...state.forms[GEO_DATA],
+						geodata,
+					},
 				},
 			};
-        }
-        
-        case SET_GEO_DATA_STRING: {
-            console.log("seeet SET_GEO_DATA_STRING", action.payload.geodata_string)
-            const geodata_string = action.payload.geodata_string
+		}
+
+		case SET_GEO_DATA_STRING: {
+			const geodata_string = action.payload.geodata_string;
 			return {
 				...state,
 				forms: {
 					...state.forms,
 					[GEO_DATA]: {
-                        ...state.forms[GEO_DATA],
-                        geodata_string,
-                    },
+						...state.forms[GEO_DATA],
+						geodata_string,
+					},
 				},
 			};
-        }
-        
-        case SET_FIAS: {
-            const fias = action.payload.fias
+		}
+
+		case SET_FIAS: {
+			const fias = action.payload.fias;
 			return {
 				...state,
 				forms: {
 					...state.forms,
 					[GEO_DATA]: {
-                        ...state.forms[GEO_DATA],
-                        fias,
-                    },
+						...state.forms[GEO_DATA],
+						fias,
+					},
 				},
 			};
 		}

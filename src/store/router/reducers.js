@@ -337,8 +337,6 @@ export const routerReducer = (state = initialState, action) => {
 				};
 			}
 
-			console.log('GO_BACK ELSE');
-
 			let Panels = state.panelsHistory[Story] || [Story];
 			let Stories = state.storiesHistory;
 			Panels.pop();

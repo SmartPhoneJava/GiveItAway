@@ -107,7 +107,6 @@ export const getuser = (success) => (dispatch) => {
 	return bridge
 		.send('VKWebAppGetUserInfo')
 		.then((data) => {
-			console.log('wonna set', data);
 			dispatch(setMyID(data.id));
 			dispatch(setMyUser(data));
 			if (success) {
@@ -300,7 +299,6 @@ export const getGeodata = (successCallback, failCallback) => {
 		.send('VKWebAppGetGeodata')
 		.then((geodata) => {
 			if (!cleanupFunction) {
-				console.log("we get these", geodata)
 				if (geodata.available) {
 					s(geodata);
 					store.dispatch(setGeoData(geodata));

@@ -11,7 +11,6 @@ export async function updateDealInfo(successCallback, failCallback) {
 	getDeal(
 		ad_id,
 		(d) => {
-			console.log('we seee', d, myID);
 			store.dispatch(setDeal(d));
 
 			store.dispatch(setIsDealer(d.subscriber_id == myID));
@@ -86,7 +85,6 @@ export async function updateCost(isSub, successCallback, failCallback) {
 		getCost(
 			ad_id,
 			(data) => {
-				console.log('set cost', data.bid);
 				store.dispatch(setCost(data.bid));
 				successC();
 			},

@@ -39,7 +39,6 @@ const AddsModal = (props) => {
 	const isSubscriber = props.ad.isSub || 0;
 
 	useEffect(() => {
-		console.log('user want update');
 		let cleanupFunction = false;
 		getUser(
 			props.myID,
@@ -83,9 +82,8 @@ const AddsModal = (props) => {
 							inputData[ADS_FILTERS_ON].filtersOn && (
 								<CellButton
 									onClick={() => {
-										props.closeModal()
+										props.closeModal();
 										props.setFormData(ADS_FILTERS, null);
-										console.log("cliiiiiiiick")
 									}}
 									mode="danger"
 								>
@@ -140,9 +138,7 @@ const AddsModal = (props) => {
 					</Cell>
 
 					<Cell>
-						<InfoRow
-							header={isSubscriber ? 'Станет доступно после отписки' : 'Станет доступно после подписки'}
-						>
+						<InfoRow header={isSubscriber ? 'Останется после отписки' : 'Станет доступно после подписки'}>
 							<div style={{ color: isSubscriber ? 'var(--accent)' : 'var(--destructive)' }}>
 								{getCost()}
 							</div>

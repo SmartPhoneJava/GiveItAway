@@ -517,7 +517,7 @@ export function GetCategoryImageBig(category) {
 export function GetCategoryImage100(category) {
 	let image = GetCategory400(category);
 
-	return <img src={image} className="category100v" />;
+	return <img src={image} className="category100v"  width="80" height="80" />;
 }
 
 export function GetCategoryImageSmall(category) {

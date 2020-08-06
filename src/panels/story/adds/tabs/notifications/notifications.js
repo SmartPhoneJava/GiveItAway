@@ -396,8 +396,6 @@ const Notifications = (props) => {
 		[loading, hasMore]
 	);
 
-	console.log('INITED IS', inited);
-
 	const [arrNotRead, setArrNotRead] = useState([]);
 	const [arrRead, setArrRead] = useState([]);
 
@@ -417,7 +415,6 @@ const Notifications = (props) => {
 			newArrNotRead.push(filtered);
 			anr = anr.slice(filtered.length);
 		}
-		console.log('newArrNotRead', newArrNotRead);
 		setArrNotRead(newArrNotRead);
 	}
 
@@ -432,26 +429,22 @@ const Notifications = (props) => {
 		while (ar.length > 0) {
 			const first = ar[0];
 			const filtered = ar.filter((v) => timeDate(v.creation_date_time) == timeDate(first.creation_date_time));
-			console.log('filtered', filtered);
 			newArrRead.push(filtered);
 			ar = ar.slice(filtered.length);
 		}
-		console.log('newArrRead', newArrRead);
+
 		setArrRead(newArrRead);
 	}
 
-	console.log('arrRead:', arrRead, error);
 	props.zeroNots();
 
 	const [body, setBody] = useState(<></>);
 
 	useEffect(() => {
-		console.log('loading INON', loading, pageNumber, delay);
 		delay++;
 		const DELAY = delay;
 		let cancel = false;
 
-		console.log('loading delay', delay, DELAY);
 		if (cancel) {
 			return;
 		}
@@ -483,7 +476,6 @@ const Notifications = (props) => {
 		);
 
 		return () => {
-			console.log('loading delay cancel');
 			cancel = true;
 		};
 	}, [inited, loading]);

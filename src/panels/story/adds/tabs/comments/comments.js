@@ -72,7 +72,6 @@ const CommentsI = (props) => {
 	);
 
 	useEffect(() => {
-		console.log('AD is', AD.comments, pageNumber);
 		setNots(AD.comments);
 	}, [AD.comments]);
 
@@ -96,10 +95,6 @@ const CommentsI = (props) => {
 		},
 		[loading, hasMore]
 	);
-
-	useEffect(() => {
-		console.log('hashashas', hasMore);
-	}, [hasMore]);
 
 	function onEditClick(v) {
 		setText(v.text);
@@ -258,13 +253,11 @@ const CommentsI = (props) => {
 		props.setPage(PANEL_COMMENTS);
 	};
 
-	console.log('loading is', loading);
-
 	const [placeholder, setPlaceholder] = useState();
 	useEffect(() => {
 		if (nots.length > 0) {
-			setPlaceholder(null)
-			return
+			setPlaceholder(null);
+			return;
 		}
 		setPlaceholder(
 			<div className="flex-center" style={{ width: '100%' }}>

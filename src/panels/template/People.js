@@ -11,7 +11,6 @@ export const PeopleRBI = withModalRootContext((props) => {
 	const [subs, setSubs] = useState([]);
 	const { ad_id, ad_type } = props.ad;
 
-	console.log("wtf is itttttttttttt")
 	useEffect(() => {
 		let cancelFunc = false;
 		getSubscribers(

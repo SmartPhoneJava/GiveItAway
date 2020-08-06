@@ -98,7 +98,6 @@ const loadAd = (ad, dispatch) => {
 
 const createAd = (myUser, inputData, dispatch) => {
 	const ad = getAd(myUser, inputData);
-	console.log('i send it', ad);
 	const obj = JSON.stringify(ad);
 	const photos = getItemInfo(inputData).photosUrl;
 	CreateAd(
@@ -108,7 +107,6 @@ const createAd = (myUser, inputData, dispatch) => {
 		(ad) => openAd(ad, dispatch),
 		(ad) => {
 			loadAd(ad, dispatch);
-			console.log('we loaded more');
 		},
 		() => {
 			clearForm(dispatch);
@@ -119,7 +117,6 @@ const createAd = (myUser, inputData, dispatch) => {
 const editAd = (myUser, inputData, dispatch) => {
 	const ad = getAd(myUser, inputData);
 	const obj = JSON.stringify(ad);
-	console.log('we redit', obj);
 
 	EditAd(
 		ad,
@@ -197,7 +194,6 @@ const isValid = (inputData) => {
 			};
 		}
 
-		console.log('isValid check category is', category);
 		if (category != CategoryOnline) {
 			if (!photosUrl || photosUrl.length == 0) {
 				return {

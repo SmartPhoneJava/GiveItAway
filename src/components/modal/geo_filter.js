@@ -66,7 +66,6 @@ const ModalPageAdsGeoInner = (props) => {
 		if (!inputData[WHERE]) {
 			return;
 		}
-		console.log('WHERE inputData', inputData[WHERE]);
 
 		if (inputData[WHERE].geotype) {
 			setGeoType(inputData[WHERE].geotype);
@@ -195,7 +194,7 @@ const ModalPageAdsGeoInner = (props) => {
 						redux_form={ADS_FILTERS_B}
 						openCountries={openCountries}
 						openCities={() => {
-							setGeoFilters()
+							setGeoFilters();
 							openCities();
 						}}
 					/>

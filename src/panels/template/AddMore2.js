@@ -137,7 +137,7 @@ const AddMore2r = (props) => {
 	const [componentStatus, setComponentStatus] = useState();
 	useEffect(() => {
 		const { isAuthor, isDealer, dealer, deal, status, hidden } = rAd;
-		console.log('');
+
 		setComponentStatus(
 			showStatus(
 				status,
@@ -291,18 +291,14 @@ const AddMore2r = (props) => {
 			const id = AD.ad_id;
 			setIsAuthor(AD.author.vk_id == myID);
 			setDealRequestSuccess(false);
-			console.log('setDealRequestSuccess init');
 			updateDealInfo(
 				() => {
-					console.log('setDealRequestSuccess success');
 					if (cancelFunc) {
 						return;
 					}
-
 					setDealRequestSuccess(true);
 				},
 				() => {
-					console.log('setDealRequestSuccess failed');
 					if (cancelFunc) {
 						return;
 					}
@@ -506,21 +502,6 @@ const AddMore2r = (props) => {
 		setComponentComments(v);
 	}, [rAd]);
 
-	const [componentSubs, setComponentSubs] = useState();
-	// useEffect(() => {
-	// 	const { status, isAuthor } = rAd;
-	// 	const finished = isFinished(status);
-	// 	let v = null;
-	// 	if (isAuthor && !finished) {
-	// 		v = <Subs amount={2} maxAmount={2} mini={true} />;
-	// 	}
-	// 	setComponentSubs(v);
-	// }, [rAd]);
-
-	useEffect(() => {
-		console.log('KIROVA', props.AD);
-	}, [props.AD]);
-
 	const [componentChosenSub, setComponentChosenSub] = useState();
 	useEffect(() => {
 		const { ad_type, ad_id } = props.AD;
@@ -612,7 +593,6 @@ const AddMore2r = (props) => {
 				null
 			);
 
-			console.log('width is', width);
 			buttons = (
 				// <div style={{ display: width < 330 ? 'block' : 'flex' }}>
 				// 	<div className="flex-center">
@@ -663,7 +643,6 @@ const AddMore2r = (props) => {
 	}
 
 	if (isNotValid(AD)) {
-		console.log('lock lock lock 6');
 		return (
 			<Placeholder stretched header="Загрузка объявления">
 				<Spinner size="large" />
@@ -770,4 +749,4 @@ const AddMore2 = connect(mapStateToProps, mapDispatchToProps)(AddMore2r);
 export default AddMore2;
 
 // 857 -> 936 -> 838 -> 923 -> 1016 -> 935 -> 987 -> 897 -> 953 -> 899
-// 830 -> 780
+// 830 -> 780 -> 756

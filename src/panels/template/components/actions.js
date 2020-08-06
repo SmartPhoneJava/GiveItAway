@@ -18,8 +18,6 @@ const OpenActions = (props) => {
 
 	const { ad_id, ad_type, hidden, status } = ad;
 
-	console.log('we get this add', ad);
-
 	return (
 		<ActionSheet onClose={closePopout}>
 			{/* 			

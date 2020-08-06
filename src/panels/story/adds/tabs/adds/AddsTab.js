@@ -141,7 +141,6 @@ const AdsTabV2Inner = (props) => {
 			);
 
 			let pageNumber = inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].pageNumber : 1;
-			console.log('numbers', changed, hasMore, error404, pageNumber);
 
 			if (changed) {
 				if (props.direction == DIRECTION_BACK && !goBackDone) {
@@ -159,15 +158,13 @@ const AdsTabV2Inner = (props) => {
 					...inputData[ADS_FILTERS],
 					pageNumber: 1,
 				});
-				// setSavedPageNumber(1);
+
 				return;
 			} else {
 				if (!hasMore) {
 					return;
 				}
 			}
-			console.log('BigLook', hasMore, inputData[ADS_FILTERS]);
-			// console.log('saved value', savedPageNumber);
 
 			let rowsPerPage = 4;
 			let query = search;
@@ -213,7 +210,6 @@ const AdsTabV2Inner = (props) => {
 				url = BASE_AD + 'wanted';
 			}
 
-			console.log('fiiiiirst', url, params);
 			axios({
 				method: 'GET',
 				url: Addr.getState() + url,
@@ -222,15 +218,12 @@ const AdsTabV2Inner = (props) => {
 				cancelToken: new axios.CancelToken((c) => (cancel = c)),
 			})
 				.then((res) => {
-					console.log('succccesss');
 					const newAds = res.data;
-					console.log('we geeet', res.data);
 
 					setRads((prev) => [...prev, ...newAds]);
 
 					props.pushToCache([...rads, ...newAds], 'ads_list');
 					props.pushToCache(pageNumber, 'ads_page');
-					// setSavedPageNumber(pageNumber);
 
 					setHasMore(newAds.length > 0);
 
@@ -238,7 +231,6 @@ const AdsTabV2Inner = (props) => {
 					setInited(true);
 				})
 				.catch((e) => {
-					console.log('faileeeee', e);
 					props.pushToCache([...rads], 'ads_list');
 					props.pushToCache(pageNumber, 'ads_page');
 
@@ -275,16 +267,13 @@ const AdsTabV2Inner = (props) => {
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
 		(node) => {
-			console.log('waiting for', hasMore, inited);
 			if (!inited) return;
 			if (observer.current) observer.current.disconnect();
 			observer.current = new IntersectionObserver((entries) => {
 				if (entries[0].isIntersecting && hasMore) {
-					console.log('we see isIntersecting', inited);
 					if (!inited) {
 						return;
 					}
-					console.log('we see hasMore', hasMore);
 					setFormData(ADS_FILTERS, {
 						...inputData[ADS_FILTERS],
 						pageNumber: inputData[ADS_FILTERS].pageNumber + 1,
@@ -295,10 +284,6 @@ const AdsTabV2Inner = (props) => {
 		},
 		[inited, hasMore]
 	);
-
-	useEffect(() => {
-		console.log('LOG inited', inited, hasMore);
-	}, [inited, hasMore]);
 
 	const [search, setSearch] = useState('');
 
@@ -466,7 +451,6 @@ const AddsTab = (props) => {
 				? inputData[ADS_FILTERS_S].search
 				: '';
 
-		console.log('setSearch', s);
 		setSearch(s);
 		if (!searchR) {
 			setSearchR(s);
@@ -502,7 +486,6 @@ const AddsTab = (props) => {
 		const mod = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].mode : null) || MODE_ALL;
 		setMode(mod);
 
-		console.log('flters loook', cit, categor, rad);
 		setFiltersOn(
 			(gt == GEO_TYPE_FILTERS && cit != NoRegion) ||
 				categor != CategoryNo ||
@@ -743,14 +726,6 @@ const AddsTab = (props) => {
 	const [cols, setCols] = useState([]);
 
 	useEffect(() => {
-		console.log('pullLoading', pullLoading);
-	}, [pullLoading]);
-
-	// useEffect(() => {
-	// 	setPullLoading(true);
-	// }, [refreshMe]);
-
-	useEffect(() => {
 		if (activeModal) {
 			return;
 		}
@@ -789,7 +764,6 @@ const AddsTab = (props) => {
 		if (activeModal) {
 			return;
 		}
-		console.log('props.deleteID', props.deleteID);
 		if (props.deleteID > 0) {
 			setRads(
 				(rads) =>
@@ -802,14 +776,11 @@ const AddsTab = (props) => {
 
 	useEffect(() => {
 		if (activeModal) {
-			console.log('i will set these', props.cache.ads_list);
 			setRads(props.cache.ads_list || []);
 			setPageNumber(props.cache.ads_page);
-			// setInited(true);
 			setLoading(false);
 			return;
 		}
-		console.log('BEFORE LOOK hasMore', hasMore, pageNumber);
 		if (!hasMore) {
 			return;
 		}
@@ -819,8 +790,6 @@ const AddsTab = (props) => {
 		}
 		let cancel;
 		let cleanupFunction = false;
-
-		console.log('BEFORE LOOK', search, pageNumber);
 
 		if (props.direction == DIRECTION_BACK && !goBackDone) {
 			if (pageNumber < props.cache.ads_page) {
@@ -939,18 +908,50 @@ const AddsTab = (props) => {
 		};
 	}, [pageNumber]);
 
+	const [adsComponent, setAdsComponent] = useState();
+
 	useEffect(() => {
 		if (loading && !softLoading) {
-			console.log('lock lock lock 5');
 			openPopout(<Spinner size="large" />);
+			setAdsComponent(
+				<PullToRefresh
+					style={{ opacity: '0' }}
+					onRefresh={() => {
+						setPullLoading(true);
+
+						setTimeout(() => {
+							setPullLoading(false);
+							setRefreshMe((prev) => prev + 1);
+						}, 150);
+					}}
+					isFetching={pullLoading}
+				>
+					{cols}
+				</PullToRefresh>
+			);
 		} else {
-			console.log('lock lock unlock5');
+			setAdsComponent(
+				<PullToRefresh
+					style={{ opacity: '1' }}
+					onRefresh={() => {
+						setPullLoading(true);
+
+						setTimeout(() => {
+							setPullLoading(false);
+							setRefreshMe((prev) => prev + 1);
+						}, 150);
+					}}
+					isFetching={pullLoading}
+				>
+					{cols}
+				</PullToRefresh>
+			);
 			closePopout();
 		}
 		return () => {
 			closePopout();
 		};
-	}, [loading]);
+	}, [loading, pullLoading]);
 
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
@@ -1042,20 +1043,7 @@ const AddsTab = (props) => {
 				)}
 
 				<>
-					<PullToRefresh
-						style={{ opacity: loading && !softLoading ? '0' : '1' }}
-						onRefresh={() => {
-							setPullLoading(true);
-
-							setTimeout(() => {
-								setPullLoading(false);
-								setRefreshMe((prev) => prev + 1);
-							}, 150);
-						}}
-						isFetching={pullLoading}
-					>
-						{cols}
-					</PullToRefresh>
+					{adsComponent}
 
 					{!loading &&
 						(rads.length > 0 ? null : error ? (
@@ -1070,7 +1058,7 @@ const AddsTab = (props) => {
 				</>
 			</div>
 		);
-	}, [mode, loading, search, pullLoading, softLoading, filtersOn, props.inputData, props.activeModals, cols]);
+	}, [mode, loading, search,adsComponent, pullLoading, softLoading, filtersOn, props.inputData, props.activeModals, cols]);
 
 	return body;
 };
@@ -1100,4 +1088,4 @@ const mapDispatchToProps = {
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddsTab);
 
-//283 -> 380 -> 418 -> 358 -> 406 -> 503 -> 885 -> 900
+//283 -> 380 -> 418 -> 358 -> 406 -> 503 -> 885 -> 900 -> 1082

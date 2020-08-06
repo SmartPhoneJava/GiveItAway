@@ -2,7 +2,6 @@ export function inputArgs() {
 	var tmp = new Array(); // два вспомогательных
 	var tmp2 = new Array(); // массива
 	const get = new Array();
-	// console.log("hi to", window.location.hash)
 	var url = window.location.search; // строка GET запроса
 	if (url != '') {
 		tmp = url.substr(1).split('&'); // разделяем переменные

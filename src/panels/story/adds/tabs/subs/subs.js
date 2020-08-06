@@ -182,9 +182,7 @@ const Subs = (props) => {
 			ad_id,
 			ad_type,
 			subscriber.vk_id,
-			(data) => {
-				console.log('what i have done?', data);
-			},
+			(data) => {},
 			(e) => {
 				console.log('Close error', e);
 			}

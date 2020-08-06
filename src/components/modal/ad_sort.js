@@ -98,7 +98,6 @@ const ModalPageAdsSortInner = (props) => {
 	}
 
 	function save() {
-		console.log('geodata is', geodata);
 		setFormData(ADS_FILTERS, {
 			...inputData[ADS_FILTERS],
 			sort,

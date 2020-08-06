@@ -113,30 +113,22 @@ function checkFileType(file) {
 }
 
 export const loadPhotos = (e, handleWrongSize, handleWrongType, addPhoto, end) => {
-	console.log('loadPhotos loop');
 	var files = e.target.files; // FileList object
 	// Loop through the FileList and render image files as thumbnails.
-	console.log('before loop', files.length);
 	for (var i = 0, file; (file = files[i]); i++) {
-		console.log('start', file);
 		if (!file) {
 			continue;
 		}
-		console.log('here we go');
 		if (!checkFileSize(file)) {
-			console.log('handleWrongSize', file);
 			handleWrongSize(file);
 			continue;
 		}
 		if (!checkFileType(file)) {
-			console.log('checkFileType', file);
 			handleWrongType(file);
 			continue;
 		}
-		console.log('work with file', file);
 		NEWhandleFiles(file, addPhoto);
 		// handleFileSelect(file, addPhoto);
 	}
-	console.log('after loop');
 	end();
 };

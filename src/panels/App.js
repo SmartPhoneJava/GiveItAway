@@ -345,7 +345,6 @@ const App = (props) => {
 						});
 						getNotificationCounter(
 							(r) => {
-								console.log('r.data.number', r.number);
 								notsCounterrr = r.number;
 								setNotsCounterr(r.number);
 							},
@@ -388,7 +387,6 @@ const App = (props) => {
 	let choosen = activeAd;
 
 	if (!inited) {
-		console.log('lock lock lock3');
 		return <ScreenSpinner size="large" />;
 	}
 

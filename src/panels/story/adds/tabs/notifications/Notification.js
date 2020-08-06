@@ -49,7 +49,6 @@ const NotificationInner = (props) => {
 						setStory(STORY_ADS);
 						setExtraInfo(props.ad);
 						setAd(props.ad);
-						console.log('cliiiiick');
 					} else {
 						openSnackbar(
 							<Snackbar

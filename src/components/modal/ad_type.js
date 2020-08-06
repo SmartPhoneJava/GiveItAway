@@ -93,7 +93,6 @@ const ModalCardCaptionAdsTypeInner = (props) => {
 
 	const [componentTypesArr, setComponentTypesArr] = useState([]);
 	useEffect(() => {
-		console.log('currentAdType', currentAdType, arr);
 		let arr = [];
 		if (currentAdType != TYPE_CHOICE) {
 			arr.push(

@@ -560,8 +560,8 @@ export async function getDetails(ad_id, successCallback, failCallback) {
 
 export async function Auth(user, successCallback, failCallback) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
-	console.log('secret:', window.location.href);
-	console.log('user:', user);
+	// console.log('secret:', window.location.href);
+	// console.log('user:', user);
 	let cancel;
 	axios({
 		method: 'post',
