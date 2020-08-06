@@ -275,8 +275,6 @@ const Profile = (props) => {
 		);
 		getUserVK(
 			profileID,
-			props.appID,
-			props.apiVersion,
 			(r) => {
 				if (cleanupFunction) {
 					return;
@@ -376,8 +374,6 @@ const Profile = (props) => {
 const mapStateToProps = (state) => {
 	return {
 		myID: state.vkui.myID,
-		apiVersion: state.vkui.apiVersion,
-		appID: state.vkui.appID,
 		activeProfile: state.router.activeProfile,
 
 		inputData: state.formData.forms,

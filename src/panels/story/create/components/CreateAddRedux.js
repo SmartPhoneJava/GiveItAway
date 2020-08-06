@@ -30,7 +30,7 @@ import { PANEL_CITIES, PANEL_CATEGORIES, PANEL_COUNTRIES } from './../../../../s
 
 import { Transition } from 'react-transition-group';
 
-import { canWritePrivateMessage } from '../../../../requests';
+// import { canWritePrivateMessage } from '../../../../requests';
 import { FORM_LOCATION_CREATE } from '../../../../components/location/redux';
 import { SNACKBAR_DURATION_DEFAULT } from '../../../../store/const';
 import { EDIT_MODE, CREATE_AD_ITEM, GEO_DATA } from '../../../../store/create_post/types';

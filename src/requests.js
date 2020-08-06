@@ -516,47 +516,47 @@ export async function getDetails(ad_id, successCallback, failCallback) {
 	return { details: data, err };
 }
 
-export async function canWritePrivateMessage(id, appID, apiVersion, successCallback, failCallback) {
-	bridge
-		.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' })
-		.then((data) => {
-			bridge
-				.send('VKWebAppCallAPIMethod', {
-					method: 'users.get',
-					request_id: 'canWritePrivateMessage' + request_id,
-					params: {
-						v: apiVersion,
-						user_ids: id,
-						fields: 'is_closed',
-						access_token: data.access_token,
-					},
-				})
-				.then(function (response) {
-					console.log('success canWritePrivateMessage:', response);
-					return response.response[0].is_closed;
-				})
-				.then((data) => {
-					if (successCallback) {
-						successCallback(data);
-					}
-					return data;
-				})
-				.catch(function (error) {
-					if (failCallback) {
-						failCallback(error);
-					}
-					console.log('fail canWritePrivateMessage:', error);
-				});
-			return data;
-		})
-		.catch(function (error) {
-			if (failCallback) {
-				failCallback(error);
-			}
-			console.log('fail VKWebAppGetAuthToken:', error);
-		});
-	request_id++;
-}
+// export async function canWritePrivateMessage(id, appID, apiVersion, successCallback, failCallback) {
+// 	bridge
+// 		.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' })
+// 		.then((data) => {
+// 			bridge
+// 				.send('VKWebAppCallAPIMethod', {
+// 					method: 'users.get',
+// 					request_id: 'canWritePrivateMessage' + request_id,
+// 					params: {
+// 						v: apiVersion,
+// 						user_ids: id,
+// 						fields: 'is_closed',
+// 						access_token: data.access_token,
+// 					},
+// 				})
+// 				.then(function (response) {
+// 					console.log('success canWritePrivateMessage:', response);
+// 					return response.response[0].is_closed;
+// 				})
+// 				.then((data) => {
+// 					if (successCallback) {
+// 						successCallback(data);
+// 					}
+// 					return data;
+// 				})
+// 				.catch(function (error) {
+// 					if (failCallback) {
+// 						failCallback(error);
+// 					}
+// 					console.log('fail canWritePrivateMessage:', error);
+// 				});
+// 			return data;
+// 		})
+// 		.catch(function (error) {
+// 			if (failCallback) {
+// 				failCallback(error);
+// 			}
+// 			console.log('fail VKWebAppGetAuthToken:', error);
+// 		});
+// 	request_id++;
+// }
 
 export async function Auth(user, successCallback, failCallback) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));

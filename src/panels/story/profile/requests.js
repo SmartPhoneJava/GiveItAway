@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Addr, BASE_USER } from './../../../store/addr';
 
 import { fail, success } from './../../../requests';
+import { store } from '../../..';
 
 let request_id = 0;
 
@@ -36,41 +37,33 @@ export async function getUser(user_id, successCallback, failCallback, inVisible)
 	return err;
 }
 
-export async function getUserVK(id, appID, apiVersion, successCallback, failCallback) {
-	console.log('appID', appID, id);
+export async function getUserVK(id, successCallback, failCallback) {
+	const access_token = store.getState().vkui.accessToken;
+	const apiVersion = store.getState().vkui.apiVersion;
+
 	bridge
-		.send('VKWebAppGetAuthToken', { app_id: appID, scope: '' })
-		.then((t) => {
-			const access_token = t.access_token;
-			bridge
-				.send('VKWebAppCallAPIMethod', {
-					method: 'users.get',
-					request_id: 'getUserVK' + request_id,
-					params: {
-						v: apiVersion,
-						user_ids: id,
-						fields: 'online,city,bdate,contacts,last_seen,can_write_private_message',
-						access_token: access_token,
-					},
-				})
-				.then(function (response) {
-					successCallback(response.response[0]);
-					return response.response[0];
-				})
-				.catch(function (error) {
-					failCallback(error);
-					console.log('cant do VKWebAppCallAPIMethod cause ', error);
-				});
-			return access_token;
+		.send('VKWebAppCallAPIMethod', {
+			method: 'users.get',
+			request_id: 'getUserVK' + request_id,
+			params: {
+				v: apiVersion,
+				user_ids: id,
+				fields: 'online,city,bdate,contacts,last_seen,can_write_private_message',
+				access_token: access_token,
+			},
 		})
-		.catch((error) => {
+		.then(function (response) {
+			successCallback(response.response[0]);
+			return response.response[0];
+		})
+		.catch(function (error) {
 			failCallback(error);
-			console.log('cant do VKWebAppGetAuthToken cause ', error);
+			console.log('cant do VKWebAppCallAPIMethod cause ', error);
 		});
 }
-
+/*
 export async function setOnline(appID, apiVersion, successCallback, failCallback) {
-	/*
+	
 	const el = await bridge.send('VKWebAppGetAuthToken', { app_id: appID, scope: 'offline' });
 
 	const userdata = await bridge
@@ -93,5 +86,5 @@ export async function setOnline(appID, apiVersion, successCallback, failCallback
 		});
 	request_id++;
 
-	return userdata;*/
-}
+	return userdata;
+}*/

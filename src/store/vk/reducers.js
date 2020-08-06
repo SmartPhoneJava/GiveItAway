@@ -10,7 +10,7 @@ import {
 } from './actionTypes';
 
 const initialState = {
-	accessToken: undefined,
+	accessToken: '5e8cd08d5e8cd08d5e8cd08d8b5efc9eac55e8c5e8cd08d00e2599e1626b258c28f29dd',
 	colorScheme: 'client_light',
 
 	activeTab: [],

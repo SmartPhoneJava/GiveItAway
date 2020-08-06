@@ -26,22 +26,22 @@ export const initApp = () => (dispatch) => {
 		});
 };
 
-export const getAuthToken = () => (dispatch) => {
-	const appID = store.getState().vkui.appID;
+// export const getAuthToken = () => (dispatch) => {
+// 	const appID = store.getState().vkui.appID;
 
-	bridge
-		.send('VKWebAppGetAuthToken', {
-			app_id: appID,
-			scope: '',
-		})
-		.then((data) => {
-			dispatch(setAccessToken(data.access_token));
-			return data;
-		})
-		.catch((e) => {
-			dispatch(setAccessToken(null));
-		});
-};
+// 	bridge
+// 		.send('VKWebAppGetAuthToken', {
+// 			app_id: appID,
+// 			scope: '',
+// 		})
+// 		.then((data) => {
+// 			dispatch(setAccessToken(data.access_token));
+// 			return data;
+// 		})
+// 		.catch((e) => {
+// 			dispatch(setAccessToken(null));
+// 		});
+// };
 
 export const closeApp = () => {
 	return bridge
