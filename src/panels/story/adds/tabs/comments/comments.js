@@ -43,6 +43,7 @@ import { PANEL_COMMENTS } from '../../../../../store/router/panelTypes';
 import { deleteCommentByID } from '../../../../../store/detailed_ad/actions';
 import { scrollWindow } from '../../../../App';
 import { Collapse } from 'react-collapse';
+import { withLoadingIf } from '../../../../../components/image/image_cache';
 
 const NO_ID = -1;
 
@@ -259,9 +260,40 @@ const CommentsI = (props) => {
 
 	console.log('loading is', loading);
 
+	const [placeholder, setPlaceholder] = useState();
+	useEffect(() => {
+		if (nots.length > 0) {
+			setPlaceholder(null)
+			return
+		}
+		setPlaceholder(
+			<div className="flex-center" style={{ width: '100%' }}>
+				{withLoadingIf(
+					!loading,
+					nots.length == 0 && (
+						<Placeholder
+							action={
+								props.mini ? (
+									<Button size="l" onClick={openCommentaries}>
+										Написать
+									</Button>
+								) : null
+							}
+							icon={<Icon56WriteOutline />}
+							header="Комментариев нет"
+						/>
+					),
+					'large',
+					null,
+					{ padding: '10px' }
+				)}
+			</div>
+		);
+	}, [nots, loading]);
+
 	return (
 		<div>
-			{nots.length == 0 && !loading ? (
+			{/* {nots.length == 0 && !loading ? (
 				<Placeholder
 					action={
 						props.mini ? (
@@ -273,7 +305,8 @@ const CommentsI = (props) => {
 					icon={<Icon56WriteOutline />}
 					header="Комментариев нет"
 				></Placeholder>
-			) : null}
+			) : null} */}
+			{placeholder}
 			{showComments()}
 
 			{props.mini || hide ? null : (

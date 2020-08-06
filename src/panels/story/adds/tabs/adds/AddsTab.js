@@ -1043,6 +1043,7 @@ const AddsTab = (props) => {
 
 				<>
 					<PullToRefresh
+						style={{ opacity: loading && !softLoading ? '0' : '1' }}
 						onRefresh={() => {
 							setPullLoading(true);
 
@@ -1053,7 +1054,7 @@ const AddsTab = (props) => {
 						}}
 						isFetching={pullLoading}
 					>
-						<div style={{ opacity: loading && !softLoading ? '0' : '1' }}>{cols}</div>
+						{cols}
 					</PullToRefresh>
 
 					{!loading &&

@@ -104,7 +104,6 @@ export const OnlineStruct = {
 				s3Online4,
 				s3Online5,
 				s3Online6,
-				s3Online6,
 				s3Online7,
 				s3Online8,
 				s3Online9,
