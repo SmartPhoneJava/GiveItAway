@@ -107,16 +107,7 @@ export function withSpinner(wrapper, elem, size, spinStyle) {
 
 export function withLoading(elem, size, animationIn, spinStyle) {
 	const aIn = animationIn || 'bounceIn';
-	return withSpinner(
-		(spin) => (
-			<HideUntilLoaded animationIn={aIn} imageToLoad={null} Spinner={() => spin}>
-				{elem}
-			</HideUntilLoaded>
-		),
-		elem,
-		size,
-		spinStyle
-	);
+	return withSpinner((spin) => elem, elem, size, spinStyle);
 }
 
 export function withLoadingIf(condition, elem, size, animationIn, spinStyle) {

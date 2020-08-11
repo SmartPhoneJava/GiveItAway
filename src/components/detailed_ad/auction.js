@@ -55,6 +55,8 @@ const AuctionLabelInner = (props) => {
 		setComponentStatus(<InfoRow header="Статус">{props.ad.dealer ? 'Завершен' : 'Активен'}</InfoRow>);
 	}, [props.ad.dealer]);
 
+	const width = document.body.clientWidth;
+
 	const [myRate, setMyRate] = useState(0);
 	const [mrDone, setMrDone] = useState(false);
 	const [mrUpdate, setMrUpdate] = useState(false);
@@ -138,12 +140,12 @@ const AuctionLabelInner = (props) => {
 	const [componentMyRate, setComponentMyRate] = useState(<></>);
 	useEffect(() => {
 		const { isAuthor, isDealer, status, dealer, ad_id, ad_type, isSub, cost } = props.ad;
-		console.log("props.ad look", isDealer, status == STATUS_CHOSEN, props.ad)
+		console.log('props.ad look', isDealer, status == STATUS_CHOSEN, props.ad);
 		if (isDealer && status == STATUS_CHOSEN) {
 			setComponentMyRate(null);
-			return
+			return;
 		}
-		console.log("go neeeext", isDealer, props.ad)
+		console.log('go neeeext', isDealer, props.ad);
 		setComponentMyRate(
 			isAuthor ? (
 				!dealer ? (
@@ -217,12 +219,14 @@ const AuctionLabelInner = (props) => {
 			) : (
 				<RichCell
 					before={<Avatar size={48} src={props.myUser.photo_100} />}
+					after={
+						<Counter style={{ width: '40px' }} onClick={onCarmaClick} mode="primary">
+							{cost + ' K'}
+						</Counter>
+					}
 					actions={
 						<React.Fragment>
 							<Button onClick={() => props.sub()}>Принять участие в аукционе</Button>
-							<Counter onClick={onCarmaClick} mode="primary">
-								{cost + ' K'}
-							</Counter>
 						</React.Fragment>
 					}
 				>

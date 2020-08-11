@@ -57,7 +57,7 @@ function getAuthorHref(backuser) {
 const Profile = (props) => {
 	const { myID, inputData } = props;
 	const { setFormData, setStory } = props;
-	const profileID = props.activeProfile || -1;
+	const profileID = props.activeProfile || myID;
 
 	const [userRequestSucess, setUserRequestSucess] = useState(false);
 

@@ -486,19 +486,15 @@ const AddsTab = (props) => {
 		const mod = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].mode : null) || MODE_ALL;
 		setMode(mod);
 
-		setFiltersOn(
+		const hasFilters =
 			(gt == GEO_TYPE_FILTERS && cit != NoRegion) ||
-				categor != CategoryNo ||
-				(gt == GEO_TYPE_NEAR && rad != 0) ||
-				(s != undefined && s != '')
-		);
+			categor != CategoryNo ||
+			(gt == GEO_TYPE_NEAR && rad != 0) ||
+			(s != undefined && s != '');
+		setFiltersOn(hasFilters);
 		setFormData(ADS_FILTERS_ON, {
 			...inputData[ADS_FILTERS],
-			filtersOn:
-				(gt == GEO_TYPE_FILTERS && cit != NoRegion) ||
-				categor != CategoryNo ||
-				(gt == GEO_TYPE_NEAR && rad != 0) ||
-				(s != undefined && s != ''),
+			filtersOn: hasFilters,
 		});
 		let tags = [];
 
@@ -743,6 +739,7 @@ const AddsTab = (props) => {
 	}, [category, mode, searchR, city, country, sort, geodata, geoType, radius, refreshMe]);
 
 	useEffect(() => {
+		
 		const c = ColumnsFunc(
 			!width || width < 500,
 			rads.map((ad) => Ad(ad)),
@@ -750,7 +747,7 @@ const AddsTab = (props) => {
 			2,
 			lastAdElementRef
 		);
-
+		console.log("loook at rads.length", c.length)
 		setCols(
 			c.map((s, i) => (
 				<div ref={lastAdElementRef} key={i}>
@@ -896,6 +893,7 @@ const AddsTab = (props) => {
 					setLoading(false);
 
 					setInited(true);
+					console.log("loook at pageNumber", pageNumber)
 					if (pageNumber == 1) {
 						setRads([]);
 					}
@@ -911,6 +909,7 @@ const AddsTab = (props) => {
 	const [adsComponent, setAdsComponent] = useState();
 
 	useEffect(() => {
+		console.log("loading is over", loading)
 		if (loading && !softLoading) {
 			openPopout(<Spinner size="large" />);
 			setAdsComponent(
@@ -951,7 +950,7 @@ const AddsTab = (props) => {
 		return () => {
 			closePopout();
 		};
-	}, [loading, pullLoading]);
+	}, [loading, pullLoading, cols]);
 
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
@@ -1058,7 +1057,18 @@ const AddsTab = (props) => {
 				</>
 			</div>
 		);
-	}, [mode, loading, search,adsComponent, pullLoading, softLoading, filtersOn, props.inputData, props.activeModals, cols]);
+	}, [
+		mode,
+		loading,
+		search,
+		adsComponent,
+		pullLoading,
+		softLoading,
+		filtersOn,
+		props.inputData,
+		props.activeModals,
+		cols,
+	]);
 
 	return body;
 };

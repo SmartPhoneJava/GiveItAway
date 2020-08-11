@@ -17,6 +17,9 @@ import {
 	FixedLayout,
 	Div,
 	FormStatus,
+	RichCell,
+	CellButton,
+	SimpleCell,
 } from '@vkontakte/vkui';
 
 import { AnimateGroup, AnimateOnChange } from 'react-animation';
@@ -28,6 +31,7 @@ import { setPage, openPopout, openSnackbar, closeSnackbar, closePopout } from '.
 import useCommentsGet from './useCommentsGet';
 
 import Icon56WriteOutline from '@vkontakte/icons/dist/56/write_outline';
+import Icon24Write from '@vkontakte/icons/dist/24/write';
 
 import Icon24Send from '@vkontakte/icons/dist/24/send';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
@@ -260,45 +264,58 @@ const CommentsI = (props) => {
 			return;
 		}
 		setPlaceholder(
-			<div className="flex-center" style={{ width: '100%' }}>
-				{withLoadingIf(
-					!loading,
-					nots.length == 0 && (
-						<Placeholder
-							action={
-								props.mini ? (
-									<Button size="l" onClick={openCommentaries}>
-										Написать
-									</Button>
-								) : null
-							}
-							icon={<Icon56WriteOutline />}
-							header="Комментариев нет"
-						/>
-					),
-					'large',
-					null,
-					{ padding: '10px' }
-				)}
-			</div>
+			withLoadingIf(
+				!loading,
+				nots.length == 0 &&
+					(props.mini ? (
+						<CellButton onClick={openCommentaries} before={<Icon24Write />}>
+							Написать первый комментарий
+						</CellButton>
+					) : (
+						<div className="flex-center" style={{ width: '100%' }}>
+							<Placeholder
+								action={
+									props.mini ? (
+										<Button size="l" onClick={openCommentaries}>
+											Написать
+										</Button>
+									) : null
+								}
+								icon={<Icon56WriteOutline />}
+								header="Комментариев нет"
+							/>
+						</div>
+					)),
+				// <RichCell
+				// 	actions={
+				// 		<CellButton before={<Icon24Write />} size="l" onClick={openCommentaries}>
+				// 			Написать
+				// 		</CellButton>
+				// 	}
+				// >
+				// 	Комментариев нет
+				// </RichCell>
+				// <Placeholder
+				// 	style={{ width: '100%', backgroundColor: 'red' }}
+				// 	action={
+				// 		props.mini ? (
+				// 			<Button size="l" onClick={openCommentaries}>
+				// 				Написать
+				// 			</Button>
+				// 		) : null
+				// 	}
+				// 	icon={<Icon56WriteOutline />}
+				// 	header="Комментариев нет"
+				// />
+				'large',
+				null,
+				{ padding: '10px' }
+			)
 		);
 	}, [nots, loading]);
 
 	return (
 		<div>
-			{/* {nots.length == 0 && !loading ? (
-				<Placeholder
-					action={
-						props.mini ? (
-							<Button size="l" onClick={openCommentaries}>
-								Написать
-							</Button>
-						) : null
-					}
-					icon={<Icon56WriteOutline />}
-					header="Комментариев нет"
-				></Placeholder>
-			) : null} */}
 			{placeholder}
 			{showComments()}
 
