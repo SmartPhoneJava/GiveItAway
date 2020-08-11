@@ -12,15 +12,26 @@
 	hyphens: auto;
 	color: grey;
 	flex: 1;
-	margin: 10px;
-	border-radius: 20px;
+	margin: 6px;
+	border-radius: 15px;
 	text-align: center;
 	align-items: center;
 	justify-content: center;
 	background-size: contain;
 	font-weight: 600;
-	height: 87%;
-	
+	height: 130px;
+	overflow-y: hidden;
+}
+
+.group-inner {
+	padding-top: 5px;
+	display: block;
+	text-align: center;
+	align-items: center;
+	justify-content: center;
+	background-size: contain;
+	color: black;
+	font-weight: 600;
 }
 
 .tag {

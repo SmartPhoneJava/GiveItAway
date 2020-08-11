@@ -168,10 +168,21 @@ const GroupsPanel = (props) => {
 
 		const description = darr.length == 0 ? null : darr.filter((v, i) => i < 6).join(', ') + addSymbol;
 
-		if (description && description.length == 0) {
-			console.log('help', text);
-		}
-		return (
+		return getImage(v) ? (
+			<div
+				// expandable
+				multiline
+				key={text}
+				before={imageLeft && getImage(v)}
+				description={description}
+				onClick={() => onCellClick(gr, v)}
+			>
+				<div className="group-inner">
+					{imageLeft ? null : <div>{getImage(v)}</div>}
+					{withB ? <b>{text}</b> : <div>{text}</div>}
+				</div>
+			</div>
+		) : (
 			<Cell
 				// expandable
 				multiline
