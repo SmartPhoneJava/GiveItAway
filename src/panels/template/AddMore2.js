@@ -79,6 +79,7 @@ import { isFinished } from '../../components/detailed_ad/faq';
 import { Collapse } from 'react-collapse';
 import { AdMainInfo } from '../../components/detailed_ad/table';
 import { CardWithPadding } from '../../App';
+import { openTab } from '../../services/_functions';
 
 let current_i = 0;
 
@@ -583,7 +584,7 @@ const AddMore2r = (props) => {
 				<Icon28Messages />,
 				'Связаться с автором',
 				() => {
-					window.open('https://vk.com/im?sel=' + author.vk_id, '_blank');
+					openTab('https://vk.com/im?sel=' + author.vk_id);
 				},
 				null
 			);
@@ -599,7 +600,7 @@ const AddMore2r = (props) => {
 					{helpBtn}
 					{buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK)}
 					{buttonAction(<Icon24Report />, 'Пожаловаться', () => {
-						window.open('https://vk.com/im?media=&sel=-194671970');
+						openTab('https://vk.com/im?media=&sel=-194671970');
 					})}
 				</div>
 			);

@@ -18,6 +18,7 @@ import Icon24Newsfeed from '@vkontakte/icons/dist/24/newsfeed';
 import Icon24StoryOutline from '@vkontakte/icons/dist/24/story_outline';
 
 import { shareApp, postApp, postStoryApp } from '../services/VK';
+import { openTab } from '../services/_functions';
 
 const AboutPanel = (props) => {
 	const { goBack, setPage } = props;
@@ -65,7 +66,7 @@ const AboutPanel = (props) => {
 					expandable
 					before={<Icon28Users3Outline />}
 					onClick={() => {
-						window.open('https://vk.com/public194671970', '_blank');
+						openTab('https://vk.com/public194671970');
 					}}
 					description="Наша группа ВКонтакте"
 				>
@@ -75,7 +76,7 @@ const AboutPanel = (props) => {
 					expandable
 					before={<Icon28MessagesOutline />}
 					onClick={() => {
-						window.open('https://vk.com/im?sel=-194671970', '_blank');
+						openTab('https://vk.com/im?sel=-194671970');
 					}}
 					description="Любые вопросы, жалобы и предложения"
 				>
@@ -85,7 +86,7 @@ const AboutPanel = (props) => {
 					expandable
 					before={<Icon28MoneyCircleOutline />}
 					onClick={() => {
-						window.open('https://vk.com/public194671970?w=app5727453_-194671970', '_blank');
+						openTab('https://vk.com/public194671970?w=app5727453_-194671970');
 					}}
 					description="Пожертвовать на развитие сервиса"
 				>

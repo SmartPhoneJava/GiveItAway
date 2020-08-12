@@ -2,6 +2,7 @@ import React from 'react';
 import { Placeholder, Button, Avatar } from '@vkontakte/vkui';
 
 import VK150 from './../../img/vk150.png';
+import { openTab } from '../../services/_functions';
 
 const NotHere = () => {
 	return (
@@ -10,13 +11,13 @@ const NotHere = () => {
 				<Button
 					size="l"
 					onClick={() => {
-						window.open('https://vk.com/app7360033_45863670', '_blank');
+						openTab('https://vk.com/app7360033_45863670');
 					}}
 				>
 					Перейти в ВК
 				</Button>
 			}
-			icon={<Avatar style={{background:"var(--background_content)"}} size={60} src={VK150}></Avatar>}
+			icon={<Avatar style={{ background: 'var(--background_content)' }} size={60} src={VK150}></Avatar>}
 			header="Мы здесь!"
 		></Placeholder>
 	);

@@ -48,6 +48,7 @@ import { deleteCommentByID } from '../../../../../store/detailed_ad/actions';
 import { scrollWindow } from '../../../../../App';
 import { Collapse } from 'react-collapse';
 import { withLoadingIf } from '../../../../../components/image/image_cache';
+import { openTab } from '../../../../../services/_functions';
 
 const NO_ID = -1;
 
@@ -130,7 +131,7 @@ const CommentsI = (props) => {
 					<ActionSheetItem
 						autoclose
 						mode="destructive"
-						onClick={() => window.open('https://vk.com/im?media=&sel=-194671970')}
+						onClick={() => openTab('https://vk.com/im?media=&sel=-194671970')}
 					>
 						Пожаловаться
 					</ActionSheetItem>

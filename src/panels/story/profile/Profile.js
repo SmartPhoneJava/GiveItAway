@@ -28,6 +28,7 @@ import { Statistics } from '../../../components/profile/statistics';
 import { withLoading, withLoadingIf, ImageCache } from '../../../components/image/image_cache';
 import { Collapse } from 'react-collapse';
 import { CardWithPadding } from '../../../App';
+import { openTab } from '../../../services/_functions';
 
 function getImage(backuser) {
 	if (!backuser || !backuser.photo_url) {
@@ -68,11 +69,7 @@ const Profile = (props) => {
 
 	const width = document.body.clientWidth;
 
-	console.log("document is", document.cookie)
-
-	function openUserVK() {
-		window.open(getUserVKstring(), '_blank');
-	}
+	console.log('document is', document.cookie);
 
 	function getUserVKstring() {
 		return 'https://vk.com/id' + profileID;
@@ -80,6 +77,10 @@ const Profile = (props) => {
 
 	function getUserDialog() {
 		return 'https://vk.com/im?sel=' + profileID;
+	}
+
+	function openUserVK() {
+		openTab(getUserVKstring());
 	}
 
 	function getUserOnline() {

@@ -33,6 +33,7 @@ import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED, TYPE_CHOICE, TYPE_AUCTION 
 import { updateDealInfo } from '../../../../../store/detailed_ad/update';
 import { AnimationChange } from '../../../../../components/image/image_cache';
 import { Collapse } from 'react-collapse';
+import { openTab } from '../../../../../services/_functions';
 
 const Subs = (props) => {
 	const osname = usePlatform();
@@ -48,7 +49,7 @@ const Subs = (props) => {
 	}
 
 	function onClickWrite(vk_id) {
-		window.open('https://vk.com/im?sel=' + vk_id);
+		openTab('https://vk.com/im?sel=' + vk_id);
 	}
 
 	function userClick(v, close, cancel) {
