@@ -38,20 +38,6 @@ const CategoriesPanel = (props) => {
 					</Placeholder>
 				}
 			/>
-			{/* <FormPanel
-				redux_form={props.redux_form}
-				goBack={props.goBack}
-				array={categories}
-				field={'category'}
-				getImage={GetCategoryImageSmall}
-				getText={GetCategoryText}
-				filterFunc={GetCategoryText}
-				none_value={CategoryNo}
-				defaultInputData={CategoryNo}
-				afterClick={() => {
-					props.setPage(PANEL_SUBCATEGORIES);
-				}}
-			/> */}
 		</>
 	);
 };

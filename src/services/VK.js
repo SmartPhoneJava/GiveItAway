@@ -2,10 +2,9 @@ import bridge from '@vkontakte/vk-bridge';
 
 import { store } from '../index';
 
-import { setColorScheme, setAccessToken, setMyID, setMyUser } from '../store/vk/actions';
+import { setColorScheme, setMyID, setMyUser } from '../store/vk/actions';
 import { success, fail } from '../requests';
-import { setFormData, setGeoData } from '../store/create_post/actions';
-import { GEO_DATA } from '../store/create_post/types';
+import { setGeoData } from '../store/create_post/actions';
 
 export const initApp = () => (dispatch) => {
 	const bridgeCallback = (e) => {

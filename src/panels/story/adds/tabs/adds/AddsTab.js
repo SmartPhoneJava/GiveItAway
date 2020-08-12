@@ -893,7 +893,6 @@ const AddsTab = (props) => {
 					setLoading(false);
 
 					setInited(true);
-					console.log("loook at pageNumber", pageNumber)
 					if (pageNumber == 1) {
 						setRads([]);
 					}
@@ -909,7 +908,6 @@ const AddsTab = (props) => {
 	const [adsComponent, setAdsComponent] = useState();
 
 	useEffect(() => {
-		console.log("loading is over", loading)
 		if (loading && !softLoading) {
 			openPopout(<Spinner size="large" />);
 			setAdsComponent(

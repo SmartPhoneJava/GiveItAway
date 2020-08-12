@@ -5,32 +5,21 @@ import {
 	Group,
 	InfoRow,
 	Cell,
-	UsersStack,
 	Placeholder,
-	Button,
 	usePlatform,
 	IOS,
 	Avatar,
 	CellButton,
 	ActionSheet,
 	ActionSheetItem,
-	Link,
-	SimpleCell,
 	Div,
 } from '@vkontakte/vkui';
 
-import { AnimateOnChange } from 'react-animation';
-
-import Icon56Users3Outline from '@vkontakte/icons/dist/56/users_outline';
-
-import Icon24Chevron from '@vkontakte/icons/dist/24/chevron';
 import Icon24Shuffle from '@vkontakte/icons/dist/24/shuffle';
 import Icon24Help from '@vkontakte/icons/dist/24/help';
-import Icon24Message from '@vkontakte/icons/dist/24/message';
 import Icon24Gift from '@vkontakte/icons/dist/24/gift';
 import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';
 
-import Icon24Users from '@vkontakte/icons/dist/24/users';
 import Icon24User from '@vkontakte/icons/dist/24/user';
 import Icon36Done from '@vkontakte/icons/dist/36/done';
 import Icon36Cancel from '@vkontakte/icons/dist/36/cancel';
@@ -39,12 +28,10 @@ import useSubsGet from './useSubsGet';
 
 import { Close, CancelClose } from './../../../../../requests';
 
-import Icon44SmileOutline from '@vkontakte/icons/dist/44/smile_outline';
 import { openPopout, closePopout, setPage, setProfile } from '../../../../../store/router/actions';
-import { PANEL_SUBS } from '../../../../../store/router/panelTypes';
 import { STATUS_ABORTED, STATUS_OFFER, STATUS_CLOSED, TYPE_CHOICE, TYPE_AUCTION } from '../../../../../const/ads';
 import { updateDealInfo } from '../../../../../store/detailed_ad/update';
-import { withLoadingIf, AnimationChange } from '../../../../../components/image/image_cache';
+import { AnimationChange } from '../../../../../components/image/image_cache';
 import { Collapse } from 'react-collapse';
 
 const Subs = (props) => {

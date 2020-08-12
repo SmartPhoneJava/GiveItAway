@@ -34,8 +34,6 @@ import Icon28Messages from '@vkontakte/icons/dist/28/messages';
 import { randomColor } from 'randomcolor';
 
 import Icon24Report from '@vkontakte/icons/dist/24/report';
-import Icon24Hide from '@vkontakte/icons/dist/24/hide';
-import Icon24Globe from '@vkontakte/icons/dist/24/globe';
 import Icon24Fullscreen from '@vkontakte/icons/dist/24/fullscreen';
 
 import Icon24Delete from '@vkontakte/icons/dist/24/delete';
@@ -46,8 +44,6 @@ import Icon24ShareExternal from '@vkontakte/icons/dist/24/share_external';
 import { subscribe, unsubscribe } from './../story/adds/tabs/subs/requests';
 
 import { K } from './../story/profile/const';
-
-import Icon24MarketOutline from '@vkontakte/icons/dist/24/market_outline';
 
 import { adVisible, adHide, deleteAd, getSubscribers, getDetails, acceptDeal, denyDeal, fail } from './../../requests';
 
@@ -83,7 +79,7 @@ import { DealLabel } from '../../components/detailed_ad/deal';
 import { isFinished } from '../../components/detailed_ad/faq';
 import { Collapse } from 'react-collapse';
 import { AdMainInfo } from '../../components/detailed_ad/table';
-import { CardWithPadding } from '../App';
+import { CardWithPadding } from '../../App';
 
 let current_i = 0;
 

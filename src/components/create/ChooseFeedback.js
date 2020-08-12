@@ -7,9 +7,7 @@ import { connect } from 'react-redux';
 import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 import { SNACKBAR_DURATION_DEFAULT } from '../../store/const';
 
-import Icon24Message from '@vkontakte/icons/dist/24/message';
 import Icon24Comment from '@vkontakte/icons/dist/24/comment';
-import Icon24Note from '@vkontakte/icons/dist/24/note';
 
 import { CREATE_AD_MAIN } from './../../store/create_post/types';
 

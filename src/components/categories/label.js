@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FormLayout, SelectMimicry, Group, Header, Link, Div, withModalRootContext, RichCell } from '@vkontakte/vkui';
-
-import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';
+import { Link, Div, withModalRootContext, RichCell } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
@@ -10,8 +8,6 @@ import { CategoryNo } from './const';
 import { DraggableArea } from 'react-draggable-tags';
 
 import { Transition } from 'react-transition-group';
-
-import ChangeIcon from './../../img/100/change_icon2.png';
 
 import { randomColor } from 'randomcolor';
 

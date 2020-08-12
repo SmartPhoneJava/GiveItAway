@@ -14,13 +14,13 @@ import Icon24Help from '@vkontakte/icons/dist/24/help';
 import Icon24MarketOutline from '@vkontakte/icons/dist/24/market_outline';
 
 import { TYPE_CHOICE, STATUS_OFFER, TYPE_RANDOM, STATUS_ABORTED, STATUS_CLOSED } from '../../const/ads';
-import { getAuctionMaxUser, getCashback, CancelClose, Close } from '../../requests';
+import {  getCashback, CancelClose, Close } from '../../requests';
 import { withLoadingIf } from '../image/image_cache';
 import { openModal, setProfile, setPage } from '../../store/router/actions';
 import { MODAL_ADS_TYPES, MODAL_ADS_FROZEN, MODAL_ADS_COST } from '../../store/router/modalTypes';
 import { SubsLabel } from './subs';
 import { K } from '../../panels/story/profile/const';
-import { getAdType, getAdTypePhoto, AdHeader, isFinished } from './faq';
+import { AdHeader, isFinished } from './faq';
 import { PANEL_SUBS } from '../../store/router/panelTypes';
 
 const DealLabelInner = (props) => {
@@ -67,7 +67,6 @@ const DealLabelInner = (props) => {
 	const [componentChosen, setComponentChosen] = useState(<></>);
 	useEffect(() => {
 		const { dealer } = props.ad;
-		console.log('dealer is', dealer, props.dealRequestSuccess);
 		setComponentChosen(
 			withLoadingIf(
 				props.dealRequestSuccess,

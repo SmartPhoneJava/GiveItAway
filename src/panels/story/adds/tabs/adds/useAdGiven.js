@@ -41,7 +41,6 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 				if (clear) {
 					return;
 				}
-				console.log('useAdGiven', res);
 				const newAds = res.data;
 				setAds((prev) => {
 					return [...new Set([...prev, ...newAds])];

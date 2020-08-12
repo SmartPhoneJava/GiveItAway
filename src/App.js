@@ -12,7 +12,7 @@ import {
 	Card,
 } from '@vkontakte/vkui';
 
-import { STORY_ADS, STORY_CREATE, STORY_NOTIFICATIONS } from './../store/router/storyTypes';
+import { STORY_ADS, STORY_CREATE, STORY_NOTIFICATIONS } from './store/router/storyTypes';
 import {
 	PANEL_ADS,
 	PANEL_ONE,
@@ -31,11 +31,11 @@ import {
 	PANEL_ADVICES,
 	PANEL_LICENCE,
 	PANEL_NOTIFICATIONS,
-} from './../store/router/panelTypes';
+} from './store/router/panelTypes';
 
-import { MODAL_ADS_FILTERS, MODAL_ADS_GEO } from './../store/router/modalTypes';
+import { MODAL_ADS_FILTERS, MODAL_ADS_GEO } from './store/router/modalTypes';
 
-import './main.css';
+import './panels/main.css';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -48,9 +48,9 @@ import {
 	addProfile,
 	openPopout,
 	setPage,
-} from '../store/router/actions';
-import * as VK from '../services/VK';
-import { setAppID, setPlatform } from '../store/vk/actions';
+} from './store/router/actions';
+import * as VK from './services/VK';
+import { setAppID, setPlatform } from './store/vk/actions';
 
 import {
 	addComment,
@@ -60,17 +60,17 @@ import {
 	setToHistory,
 	clearAds,
 	backToPrevAd,
-} from '../store/detailed_ad/actions';
+} from './store/detailed_ad/actions';
 
-import CategoriesPanel from './../components/categories/panel';
-import Countries from './../components/location/countries';
-import Cities from './../components/location/cities';
-import { FORM_LOCATION_CREATE } from './../components/location/redux';
+import CategoriesPanel from './components/categories/panel';
+import Countries from './components/location/countries';
+import Cities from './components/location/cities';
+import { FORM_LOCATION_CREATE } from './components/location/redux';
 
-import Subs from './story/adds/tabs/subs/subs';
+import Subs from './panels/story/adds/tabs/subs/subs';
 
-import AddsTabs from './story/adds/AddsTabs';
-import Create from './../containers/create/create';
+import AddsTabs from './panels/story/adds/AddsTabs';
+import Create from './containers/create/create';
 
 import Icon28User from '@vkontakte/icons/dist/28/user';
 import Icon28NewsfeedOutline from '@vkontakte/icons/dist/28/newsfeed_outline';
@@ -84,44 +84,44 @@ import {
 	NT_STATUS,
 	NT_AD_STATUS,
 	NT_CLOSE,
-} from './story/adds/tabs/notifications/notifications';
+} from './panels/story/adds/tabs/notifications/notifications';
 
-import AddMore2 from './template/AddMore2';
+import AddMore2 from './panels/template/AddMore2';
 
-import Notifications from './story/adds/tabs/notifications/notifications';
+import Notifications from './panels/story/adds/tabs/notifications/notifications';
 
-import { AdDefault, STATUS_CHOSEN } from './../const/ads';
+import { AdDefault, STATUS_CHOSEN } from './const/ads';
 
-import { Auth, getToken, fail, getNotificationCounter } from '../requests';
+import { Auth, getToken, fail, getNotificationCounter } from './requests';
 
-import Error from './placeholders/error';
-import NotHere from './placeholders/NotHere';
+import Error from './panels/placeholders/error';
+import NotHere from './panels/placeholders/NotHere';
 
-import { AddrWS } from '../store/addr_ws';
+import { AddrWS } from './store/addr_ws';
 
-import Comments from './story/adds/tabs/comments/comments';
+import Comments from './panels/story/adds/tabs/comments/comments';
 
-import { inputArgs } from '../utils/window';
+import { inputArgs } from './utils/window';
 
 import Centrifuge from 'centrifuge';
-import { FORM_CREATE, FORM_CREATE_B } from '../components/categories/redux';
-import { setFormData } from '../store/create_post/actions';
-import { ADS_FILTERS, EDIT_MODE, CREATE_AD_MAIN, CREATE_AD_ITEM, ADS_FILTERS_B } from '../store/create_post/types';
-import AdsModal from '../containers/ads/modal';
-import { defaultInputData } from '../components/create/default';
-import { updateDealInfo } from '../store/detailed_ad/update';
-import { store } from '..';
-import AdMap from '../containers/location/map';
+import { FORM_CREATE, FORM_CREATE_B } from './components/categories/redux';
+import { setFormData } from './store/create_post/actions';
+import { ADS_FILTERS, EDIT_MODE, CREATE_AD_MAIN, CREATE_AD_ITEM, ADS_FILTERS_B } from './store/create_post/types';
+import AdsModal from './containers/ads/modal';
+import { defaultInputData } from './components/create/default';
+import { updateDealInfo } from './store/detailed_ad/update';
+import { store } from '.';
+import AdMap from './containers/location/map';
 
-import ProfilePanel from './profile';
-import AboutPanel from './about';
-import FAQPanel from './faq';
-import AdvicePanel from './advice';
-import LicencePanel from './licence';
-import SubcategoriesPanel from '../components/categories/subcategory_panel';
-import { DIRECTION_BACK, DIRECTION_FORWARD } from '../store/router/directionTypes';
-import { pushToCache } from '../store/cache/actions';
-import { AdsTabV2 } from './story/adds/tabs/adds/AddsTab';
+import ProfilePanel from './panels/profile';
+import AboutPanel from './panels/about';
+import FAQPanel from './panels/faq';
+import AdvicePanel from './panels/advice';
+import LicencePanel from './panels/licence';
+import SubcategoriesPanel from './components/categories/subcategory_panel';
+import { DIRECTION_BACK, DIRECTION_FORWARD } from './store/router/directionTypes';
+import { pushToCache } from './store/cache/actions';
+import { AdsTabV2 } from './panels/story/adds/tabs/adds/AddsTab';
 
 const adsText = 'Объявления';
 const notText = 'Уведомления';

@@ -20,7 +20,6 @@ import Icon24StoryOutline from '@vkontakte/icons/dist/24/story_outline';
 import { shareApp, postApp, postStoryApp } from '../services/VK';
 
 const AboutPanel = (props) => {
-	console.log('platform is', props.platform);
 	const { goBack, setPage } = props;
 	return (
 		<>

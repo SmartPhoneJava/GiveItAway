@@ -18,7 +18,6 @@ const SubsLabelInner = (props) => {
 	useEffect(() => {
 		const subs = props.ad.subs;
 		const photos = subs.map((v) => v.photo_url);
-		console.log('subs are', subs);
 		setComponentSubs(
 			subs.length == 0 ? (
 				<Cell multiline={true} before={<Icon24Users />}>

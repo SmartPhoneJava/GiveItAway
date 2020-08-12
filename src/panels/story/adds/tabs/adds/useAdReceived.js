@@ -41,7 +41,6 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 				if (clear) {
 					return;
 				}
-				console.log('useAdReceived', res);
 				const newAds = res.data;
 				setAds((prev) => {
 					return [...new Set([...prev, ...newAds])];

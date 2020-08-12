@@ -45,7 +45,7 @@ import Comment from './comment';
 import { SNACKBAR_DURATION_DEFAULT } from '../../../../../store/const';
 import { PANEL_COMMENTS } from '../../../../../store/router/panelTypes';
 import { deleteCommentByID } from '../../../../../store/detailed_ad/actions';
-import { scrollWindow } from '../../../../App';
+import { scrollWindow } from '../../../../../App';
 import { Collapse } from 'react-collapse';
 import { withLoadingIf } from '../../../../../components/image/image_cache';
 

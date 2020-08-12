@@ -2,7 +2,7 @@ import 'core-js/features/map';
 import 'core-js/features/set';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './panels/App';
+import App from './App';
 import * as eruda from 'eruda';
 import * as erudaCode from 'eruda-code';
 import * as erudaDom from 'eruda-dom';

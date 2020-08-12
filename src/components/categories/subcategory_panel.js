@@ -86,7 +86,6 @@ const SubcategoriesPanel = (props) => {
 									incategory: cell,
 									subcategory: group.header,
 								});
-								console.log("i seet", redux_form, cell, group.header)
 								props.goNext();
 						  }
 						: (group, cell) => {

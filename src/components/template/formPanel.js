@@ -44,7 +44,6 @@ const FormPanel = (props) => {
 
 	function onCellClick(cat) {
 		if (props.clear) {
-			console.log("defaultInputData", here)
 			props.setFormData(redux_form, {
 				...defaultInputData,
 				[field]: cat,

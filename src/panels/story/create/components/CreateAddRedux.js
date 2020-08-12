@@ -260,7 +260,6 @@ const CreateAddRedux = (props) => {
 				const lom = result.geoObjects.get(0).geometry.getCoordinates();
 
 				const center = [lom[0], lom[1]];
-				console.log('looooook at center', center);
 				setGeoData({ lat: lom[0], long: lom[1] });
 				setPlace(center);
 				setMapState({ center, zoom: 9 });
@@ -357,7 +356,6 @@ const CreateAddRedux = (props) => {
 											token={'efb37d1dc6b04c11116d3ab7ef9482fa13e0b664'}
 											query={geodata_string}
 											onChange={(e) => {
-												console.log('geoDataString', e);
 												setGeoDataString(e.value);
 												set_geodata_string(e.value);
 												setDadataB(ON_SUGGESTION_CLICK);

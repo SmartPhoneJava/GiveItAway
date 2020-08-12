@@ -25,9 +25,9 @@ import GivenPanel from './given';
 import ReceivedPanel from './received';
 import { NO_USER, NO_VK_USER } from './const';
 import { Statistics } from '../../../components/profile/statistics';
-import { withLoading, withLoadingIf } from '../../../components/image/image_cache';
+import { withLoading, withLoadingIf, ImageCache } from '../../../components/image/image_cache';
 import { Collapse } from 'react-collapse';
-import { CardWithPadding } from '../../App';
+import { CardWithPadding } from '../../../App';
 
 function getImage(backuser) {
 	if (!backuser || !backuser.photo_url) {
@@ -90,17 +90,25 @@ const Profile = (props) => {
 
 	const [authorPanel, setAuthorPanel] = useState();
 	useEffect(() => {
+		const notInited = vkUser == NO_VK_USER;
 		setAuthorPanel(
 			CardWithPadding(
 				<Cell
 					onClick={openUserVK}
 					size="l"
 					multiline={true}
-					asideContent={/*contentWriteToUser()*/ <Icon24Chevron />}
-					before={withLoading(getImage(backuser))}
-					description={withLoading(getUserOnline())}
+					asideContent={<Icon24Chevron />}
+					before={
+						<ImageCache
+							className="profile-ava"
+							spinnerClassName="profile-ava-spinner"
+							url={backuser.photo_url}
+						/>
+					}
+					description={getUserOnline()}
 				>
-					{withLoading(
+					{withLoadingIf(
+						!notInited,
 						<div className="profile-block">
 							{getAuthorHref(backuser)}
 							<div style={{ display: 'flex' }}>
@@ -356,6 +364,8 @@ const Profile = (props) => {
 		);
 	}, [profileID]);
 
+	console.log('activeProfile', profileID, props.activeProfile);
+
 	if (failed) {
 		return <Error />;
 	}
@@ -387,4 +397,4 @@ const mapDispatchToProps = {
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);
 
-// 337 -> 431 -> 368
+// 337 -> 431 -> 368 -> 400

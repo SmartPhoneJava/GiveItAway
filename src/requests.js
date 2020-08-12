@@ -1,7 +1,6 @@
 import React from 'react';
 import { ScreenSpinner, Snackbar, Avatar, Spinner } from '@vkontakte/vkui';
 
-import bridge from '@vkontakte/vk-bridge';
 import axios from 'axios';
 
 import { Addr, BASE_AD, BASE_DEAL, BASE_USER, BASE } from './store/addr';
@@ -15,8 +14,6 @@ import { store } from '.';
 import { openPopout, closePopout, openSnackbar, closeSnackbar } from './store/router/actions';
 import { setCost, setDealer, setDeal, setStatus } from './store/detailed_ad/actions';
 import { updateDealInfo } from './store/detailed_ad/update';
-
-let request_id = 0;
 
 export function success(text, cancelMe, end) {
 	const close = () => {

@@ -1,20 +1,9 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Header, Group, Placeholder, Button, Spinner } from '@vkontakte/vkui';
+import { Header, Group, Placeholder, Spinner } from '@vkontakte/vkui';
 import { connect } from 'react-redux';
 import useNotificationsGet from './useNotificationsGet';
 
-import Man from './../../../../../img/man.jpeg';
-import Cat from './../../../../../img/cat.jpg';
-import Kitten from './../../../../../img/kitten.jpeg';
-import Jins from './../../../../../img/jins.jpg';
-import Tea from './../../../../../img/tea.jpg';
-import Playstein from './../../../../../img/playstein.jpg';
-import Bb from './../../../../../img/bb.jpg';
-
 import Icon56CheckCircleOutline from '@vkontakte/icons/dist/56/check_circle_outline';
-import Icon56ErrorOutline from '@vkontakte/icons/dist/56/error_outline';
-
-import { AnimateGroup, AnimateOnChange } from 'react-animation';
 
 import Error from './../../../../placeholders/error';
 
@@ -23,10 +12,10 @@ import { timeDate } from './../../../../../utils/time';
 import { sendSnack } from './../../../../../requests';
 
 import './notification.css';
-import { STATUS_CHOSEN, STATUS_ABORTED } from '../../../../../const/ads';
+import { STATUS_CHOSEN } from '../../../../../const/ads';
 import { openSnackbar, openPopout, closePopout } from '../../../../../store/router/actions';
-import Notification, { NotificationTESTER } from './Notification';
-import { AnimationChange, AnimationGroup } from '../../../../../components/image/image_cache';
+import Notification from './Notification';
+import { AnimationGroup } from '../../../../../components/image/image_cache';
 
 export const NT_CLOSE = 'ad_close'; // приходит выбранному автором пользователю
 export const NT_RESPOND = 'respond'; // приходит автору
@@ -64,170 +53,6 @@ export function handleNotifications(note) {
 			return;
 	}
 }
-
-const arr = [
-	{
-		id: 1,
-		notification_type: NT_CLOSE,
-		creation_date_time: '18.03.2020 12:11',
-		is_read: true,
-		payload: {
-			author: {
-				vk_id: 45863670,
-				name: 'Семен',
-				surname: 'Eфимов',
-				photo_url: Man,
-			},
-			ad: {
-				ad_id: 3201,
-				status: STATUS_CHOSEN,
-				header: 'Отдам котенка',
-				pathes_to_photo: [
-					{ AdPhotoId: 1, PhotoUrl: Cat },
-					{ AdPhotoId: 2, PhotoUrl: Bb },
-					{ AdPhotoId: 3, PhotoUrl: Tea },
-				],
-			},
-			deal: {
-				id: 1,
-			},
-		},
-	},
-	{
-		id: 2,
-		notification_type: NT_RESPOND,
-		creation_date_time: '19.03.2020 17:20',
-		is_read: false,
-		payload: {
-			author: {
-				vk_id: 45863670,
-				name: 'Семен',
-				surname: 'Eфимов',
-				photo_url: 'Man',
-			},
-			ad: {
-				ad_id: 3201,
-				status: 'offer',
-				header: 'Заберите продукты: бананы и морковку',
-				pathes_to_photo: [
-					{ AdPhotoId: 1, PhotoUrl: Tea },
-					{ AdPhotoId: 2, PhotoUrl: Bb },
-					{ AdPhotoId: 3, PhotoUrl: Cat },
-				],
-			},
-		},
-	},
-	{
-		id: 3,
-		notification_type: NT_STATUS,
-		creation_date_time: '19.03.2020 17:20',
-		is_read: false,
-		payload: {
-			ad: {
-				ad_id: 3201,
-				status: STATUS_CHOSEN,
-				header: 'Меняю вещи',
-				pathes_to_photo: [
-					{ AdPhotoId: 1, PhotoUrl: Jins },
-					{ AdPhotoId: 2, PhotoUrl: Bb },
-					{ AdPhotoId: 3, PhotoUrl: Tea },
-				],
-			},
-		},
-	},
-	{
-		id: 4,
-		notification_type: NT_FULFILL,
-		creation_date_time: '19.03.2020 17:20',
-		is_read: false,
-		payload: {
-			ad: {
-				ad_id: 3201,
-				status: STATUS_CHOSEN,
-				header: 'Ловите штукатурку',
-				pathes_to_photo: [
-					{ AdPhotoId: 1, PhotoUrl: Bb },
-					{ AdPhotoId: 2, PhotoUrl: Jins },
-					{ AdPhotoId: 3, PhotoUrl: Tea },
-				],
-			},
-		},
-	},
-	{
-		id: 5,
-		notification_type: NT_STATUS,
-		creation_date_time: '19.03.2020 17:20',
-		is_read: false,
-		payload: {
-			ad: {
-				ad_id: 3201,
-				status: STATUS_ABORTED,
-				header: 'Заберите продукты: бананы и морковку',
-				pathes_to_photo: [
-					{ AdPhotoId: 1, PhotoUrl: Tea },
-					{ AdPhotoId: 2, PhotoUrl: Bb },
-					{ AdPhotoId: 3, PhotoUrl: Cat },
-				],
-			},
-		},
-	},
-	{
-		id: 6,
-		notification_type: NT_STATUS,
-		creation_date_time: '19.03.2020 17:20',
-		is_read: false,
-		payload: {
-			ad: {
-				ad_id: 3201,
-				status: 'closen',
-				header: 'Заберите продукты: бананы и морковку',
-				pathes_to_photo: [
-					{ AdPhotoId: 1, PhotoUrl: Tea },
-					{ AdPhotoId: 2, PhotoUrl: Bb },
-					{ AdPhotoId: 3, PhotoUrl: Cat },
-				],
-			},
-		},
-	},
-	{
-		id: 7,
-		notification_type: NT_STATISTICS,
-		creation_date_time: '19.03.2020 17:20',
-		is_read: false,
-		payload: {
-			ad: {
-				ad_id: 3201,
-				status: 'closen',
-				header: 'Заберите продукты: бананы и морковку',
-				pathes_to_photo: [
-					{ AdPhotoId: 1, PhotoUrl: Tea },
-					{ AdPhotoId: 2, PhotoUrl: Bb },
-					{ AdPhotoId: 3, PhotoUrl: Cat },
-				],
-			},
-			views: 100,
-		},
-	},
-	{
-		id: 8,
-		notification_type: NT_DELETED,
-		creation_date_time: '19.03.2020 17:20',
-		is_read: false,
-		payload: {
-			ad: {
-				ad_id: 3201,
-				status: 'closen',
-				header: 'Заберите продукты: бананы и морковку',
-				pathes_to_photo: [
-					{ AdPhotoId: 1, PhotoUrl: Tea },
-					{ AdPhotoId: 2, PhotoUrl: Bb },
-					{ AdPhotoId: 3, PhotoUrl: Cat },
-				],
-			},
-			views: 100,
-		},
-	},
-];
 
 let delay = 0;
 

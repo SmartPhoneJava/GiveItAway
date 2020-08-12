@@ -12,7 +12,6 @@ img.atiled {
 	width: 120px;
 	height: 120px;
 	background-color: var(--background_page);
-	/* background-color: var(--background_content); */
 }
 
 .atiled-spinner {

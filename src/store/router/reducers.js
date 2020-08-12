@@ -383,7 +383,6 @@ export const routerReducer = (state = initialState, action) => {
 			const scrollHistory = state.scrollHistory;
 			const scrollPosition = scrollHistory.length > 0 ? scrollHistory.pop() : state.scrollPosition;
 
-			console.log('GO_BACK history', scrollHistory, scrollPosition);
 			return {
 				...state,
 

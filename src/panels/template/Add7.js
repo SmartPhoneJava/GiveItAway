@@ -25,7 +25,7 @@ import { GetCategoryText } from '../../components/categories/Categories';
 import { STATUS_ABORTED, STATUS_CLOSED, STATUS_CHOSEN, STATUS_OFFER } from '../../const/ads';
 import { ImageCache } from '../../components/image/image_cache';
 import { Collapse } from 'react-collapse';
-import { CardWithPadding } from '../App';
+import { CardWithPadding } from '../../App';
 
 const duration = 300;
 

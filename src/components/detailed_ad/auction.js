@@ -1,48 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import {
-	Avatar,
-	Header,
-	InfoRow,
-	Group,
-	Cell,
-	Counter,
-	Link,
-	SimpleCell,
-	Button,
-	CellButton,
-	RichCell,
-} from '@vkontakte/vkui';
+import { Avatar, InfoRow, Group, Cell, Counter, SimpleCell, Button, CellButton, RichCell } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
-import { AnimateOnChange } from 'react-animation';
-// import AnimateOnChange from 'react-animate-on-change';
 
 import Icon24Users from '@vkontakte/icons/dist/24/users';
-import Icon24User from '@vkontakte/icons/dist/24/user';
-import Icon24Help from '@vkontakte/icons/dist/24/help';
 
-import {
-	STATUS_CHOSEN,
-	STATUS_CLOSED,
-	STATUS_ABORTED,
-	COLOR_DEFAULT,
-	COLOR_DONE,
-	COLOR_CANCEL,
-	STATUS_OFFER,
-} from '../../const/ads';
-import {
-	getAuctionMaxUser,
-	getCashback,
-	increaseAuctionRate,
-	fail,
-	success,
-	CancelClose,
-	Close,
-	getDeal,
-} from '../../requests';
+import { STATUS_CHOSEN, STATUS_CLOSED, STATUS_ABORTED } from '../../const/ads';
+import { getAuctionMaxUser, getCashback, increaseAuctionRate, fail, success, CancelClose, Close } from '../../requests';
 import { withLoadingIf, animateOnChangeIf, AnimationChange } from '../image/image_cache';
 import { openModal, setProfile } from '../../store/router/actions';
 import { MODAL_ADS_TYPES, MODAL_ADS_FROZEN, MODAL_ADS_COST } from '../../store/router/modalTypes';
@@ -54,8 +21,6 @@ const AuctionLabelInner = (props) => {
 	useEffect(() => {
 		setComponentStatus(<InfoRow header="Статус">{props.ad.dealer ? 'Завершен' : 'Активен'}</InfoRow>);
 	}, [props.ad.dealer]);
-
-	const width = document.body.clientWidth;
 
 	const [myRate, setMyRate] = useState(0);
 	const [mrDone, setMrDone] = useState(false);
@@ -103,15 +68,13 @@ const AuctionLabelInner = (props) => {
 
 	const [componentMaxUser, setComponentMaxUser] = useState(<></>);
 	useEffect(() => {
-		const { dealer, status, cost } = props.ad;
+		const { dealer, status } = props.ad;
 		let amu = actionMaxUser;
 		if (status == STATUS_CLOSED || status == STATUS_ABORTED) {
 			if (!dealer) {
 				updateDealInfo();
-				console.log('we set yoooooou');
 				return;
 			}
-			console.log('we set you yep', cost, dealer);
 			amu = dealer;
 			amu.cost = -1;
 		}
@@ -140,27 +103,53 @@ const AuctionLabelInner = (props) => {
 	const [componentMyRate, setComponentMyRate] = useState(<></>);
 	useEffect(() => {
 		const { isAuthor, isDealer, status, dealer, ad_id, ad_type, isSub, cost } = props.ad;
-		console.log('props.ad look', isDealer, status == STATUS_CHOSEN, props.ad);
+
 		if (isDealer && status == STATUS_CHOSEN) {
 			setComponentMyRate(null);
 			return;
 		}
-		console.log('go neeeext', isDealer, props.ad);
+
+		const onCloseClick = () => {
+			Close(ad_id, ad_type, 0);
+		};
+
+		const onCancelCloseClick = () => {
+			CancelClose(ad_id);
+		};
+
+		const onIncreaseClick = () => {
+			increaseAuctionRate(
+				ad_id,
+				(v) => {
+					setAmuUpdate((prev) => !prev);
+					setMrUpdate((prev) => !prev);
+					success('Ставка успешно повышена');
+				},
+				(e) => {
+					fail('Не удалось повысить ставку, попробуйте позже');
+				}
+			);
+		};
+
+		const onUserCancelClick = () => {
+			props.unsub();
+		};
+
+		const isActive = !(status == STATUS_ABORTED || status == STATUS_CLOSED);
+
+		const costMode = myRate == actionMaxUser.cost ? 'secondary' : 'prominent';
+
 		setComponentMyRate(
 			isAuthor ? (
 				!dealer ? (
-					<CellButton
-						onClick={() => Close(ad_id, ad_type, 0)}
-						disabled={!actionMaxUser}
-						before={<Icon24Done />}
-					>
+					<CellButton onClick={onCloseClick} disabled={!actionMaxUser} before={<Icon24Done />}>
 						Завершить
 					</CellButton>
 				) : (
-					!(status == STATUS_ABORTED || status == STATUS_CLOSED) && (
+					isActive && (
 						<CellButton
 							mode="danger"
-							onClick={() => CancelClose(ad_id)}
+							onClick={onCancelCloseClick}
 							disabled={!actionMaxUser}
 							before={<Icon24Cancel />}
 						>
@@ -173,10 +162,7 @@ const AuctionLabelInner = (props) => {
 					<RichCell
 						before={<Avatar size={48} src={props.myUser.photo_100} />}
 						after={
-							<Counter
-								onClick={onFreezeClick}
-								mode={myRate == actionMaxUser.cost ? 'secondary' : 'prominent'}
-							>
+							<Counter onClick={onFreezeClick} mode={costMode}>
 								{myRate + ' K'}
 							</Counter>
 						}
@@ -190,24 +176,8 @@ const AuctionLabelInner = (props) => {
 						}
 						actions={
 							<React.Fragment>
-								<Button
-									onClick={() => {
-										increaseAuctionRate(
-											ad_id,
-											(v) => {
-												setAmuUpdate((prev) => !prev);
-												setMrUpdate((prev) => !prev);
-												success('Ставка успешно повышена');
-											},
-											(e) => {
-												fail('Не удалось повысить ставку, попробуйте позже');
-											}
-										);
-									}}
-								>
-									Повысить
-								</Button>
-								<Button mode="secondary" onClick={() => props.unsub()}>
+								<Button onClick={onIncreaseClick}>Повысить</Button>
+								<Button mode="secondary" onClick={onUserCancelClick}>
 									Отменить ставку
 								</Button>
 							</React.Fragment>

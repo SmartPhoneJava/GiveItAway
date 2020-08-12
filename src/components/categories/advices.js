@@ -1,6 +1,3 @@
-import React, { useState } from 'react';
-import { Group, Cell, Header, List, FormLayout, FormLayoutGroup, Radio, SelectMimicry, Avatar } from '@vkontakte/vkui';
-
 // export const SubCategoryAnimals = 'animals';
 // export const CategoryAnother = 'another';
 // export const CategoryBooks = 'books';
