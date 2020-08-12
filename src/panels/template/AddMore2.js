@@ -14,10 +14,9 @@ import {
 	Subhead,
 	Alert,
 	Spinner,
-	Div,
 } from '@vkontakte/vkui';
 
-import { AnimateOnChange, AnimateGroup } from 'react-animation';
+import { AnimateOnChange } from 'react-animation';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -25,7 +24,7 @@ import { bindActionCreators } from 'redux';
 import { DIRECTION_FORWARD } from './../../store/router/directionTypes';
 
 import 'react-photoswipe/lib/photoswipe.css';
-import { PhotoSwipe, PhotoSwipeGallery } from 'react-photoswipe';
+import { PhotoSwipe } from 'react-photoswipe';
 
 import Icon56WriteOutline from '@vkontakte/icons/dist/56/write_outline';
 
@@ -72,7 +71,7 @@ import { FORM_CREATE } from '../../components/categories/redux';
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
 import { updateDealInfo, updateCost, updateSubs } from '../../store/detailed_ad/update';
 import { showStatus } from '../../components/detailed_ad/status';
-import { withLoadingIf, ImageCache, AnimationChange } from '../../components/image/image_cache';
+import { withLoadingIf, ImageCache } from '../../components/image/image_cache';
 import { TagsLabel, tag } from '../../components/categories/label';
 import { AuctionLabel } from '../../components/detailed_ad/auction';
 import { DealLabel } from '../../components/detailed_ad/deal';

@@ -68,6 +68,8 @@ const Profile = (props) => {
 
 	const width = document.body.clientWidth;
 
+	console.log("document is", document.cookie)
+
 	function openUserVK() {
 		window.open(getUserVKstring(), '_blank');
 	}

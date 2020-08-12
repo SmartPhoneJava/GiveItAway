@@ -15,6 +15,16 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 
 import '@vkontakte/vkui/dist/vkui.css';
 
+// document.addEventListener(
+// 	'touchstart',
+// 	function (e) {
+// 		console.log('was it false', e.defaultPrevented); // will be false
+// 		// e.preventDefault(); // does nothing since the listener is passive
+// 		console.log(e.defaultPrevented); // still false
+// 	},
+// 	Modernizr.passiveeventlisteners ? { passive: true } : false
+// );
+
 export const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)));
 
 ReactDOM.render(

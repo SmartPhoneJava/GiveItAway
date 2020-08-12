@@ -1,34 +1,22 @@
 [<img width="134" src="https://vk.com/images/apps/mini_apps/vk_mini_apps_logo.svg">](https://vk.com/services)
 
-# Create VK Mini App [![npm][npm]][npm-url] [![deps][deps]][deps-url]
+# Отдать даром
 
-## How to install
+Добро пожаловать в `frontend` репозиторий проекта [Отдать даром](https://vk.com/app7360033_45863670). `Backend` репозиторий находится [здесь](https://github.com/sergeychur/GiveItAway-backend)
 
-### Create VK Mini App with gh-pages deploy
+### О проекте
 
-`npx @vkontakte/create-vk-mini-app <app-directory-name>`
+Цель данного сервиса - дать людям возможность легко и быстро избавляться от ненужных вещей и получать необходимые, не выходя из ВК. Является нашим выпускным проектом в рамках обучения в Технопарке от Mail.ru. Мы невероятно любим получать фидбек, так что оставляйте свои мысли и пожелания касательного проекта в [группе](https://github.com/sergeychur/GiveItAway-backend) 😊
 
-### Create VK Mini App with Zeit deploy
+### О нас
 
-Firstly, you have to create Zeit account and connect it with your GitHub profile — https://zeit.co/
+Мы команда из двух человек: 
+- [Артём](https://github.com/SmartPhoneJava) - разрабатывал дизайн, внешний вид и взаимодействие с пользователями;
+- [Сергей](https://github.com/sergeychur) - серверная часть, БД, безопасность и взаимодействие микросервисов между собой и с клиентской частью.  
 
-`npx @vkontakte/create-vk-mini-app <app-directory-name> --zeit`
+Данная разработка является нашим выпускным проектом в рамках обучения в Технопарке от Mail.ru. 
 
-### Create VK Mini App with Surge deploy
+### Как запустить локально
 
-Firstly, you have to create Surge account and Surge-domain — https://surge.sh/
-
-`npx @vkontakte/create-vk-mini-app <app-directory-name> --surge <surge-domain>`
-
-## How to start work with app
-
-Go to created folder and run:
-`yarn start` || `npm start` — this will start dev server with hot reload on `localhost:10888`.
-
-`yarn run build` || `npm run build` — this will build production bundle, with tree-shaking, uglify and all this modern fancy stuff
-
-[npm]: https://img.shields.io/npm/v/@vkontakte/create-vk-mini-app.svg
-[npm-url]: https://npmjs.com/package/@vkontakte/create-vk-mini-app
-
-[deps]: https://img.shields.io/david/vkcom/create-vk-mini-app.svg
-[deps-url]: https://david-dm.org/vkcom/create-vk-mini-app
+`npm run build`   
+`npm start`

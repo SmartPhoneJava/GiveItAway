@@ -137,7 +137,7 @@ const AuctionLabelInner = (props) => {
 
 		const isActive = !(status == STATUS_ABORTED || status == STATUS_CLOSED);
 
-		const costMode = myRate == actionMaxUser.cost ? 'secondary' : 'prominent';
+		const costMode = actionMaxUser && (myRate == actionMaxUser.cost ? 'secondary' : 'prominent');
 
 		setComponentMyRate(
 			isAuthor ? (
