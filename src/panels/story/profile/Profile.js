@@ -84,11 +84,14 @@ const Profile = (props) => {
 	}
 
 	function getUserOnline() {
+		if (!vkUser || vkUser.null || !vkUser.last_seen) {
+			return 'Информация скрыта';
+		}
 		return !vkUser || vkUser.null
 			? ''
 			: vkUser.online
 			? 'online'
-			: 'был(а) в сети ' + fromSeconds(vkUser.last_seen.time);
+			: 'был(а) в сети ' + (vkUser.last_seen ? fromSeconds(vkUser.last_seen.time) : 'давно');
 	}
 
 	const [authorPanel, setAuthorPanel] = useState();

@@ -4,6 +4,7 @@ import { ScreenSpinner, Snackbar, Avatar, Spinner } from '@vkontakte/vkui';
 import axios from 'axios';
 
 import { Addr, BASE_AD, BASE_DEAL, BASE_USER, BASE } from './store/addr';
+
 import { User } from './store/user';
 
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
@@ -88,6 +89,40 @@ export function getToken(successCallback, failCallBack) {
 			}
 		});
 }
+
+//
+// export function sendNotificationToBot(successCallback, failCallBack, notification, user_id) {
+
+// 	let cancel;
+// 	axios({
+// 		method: 'get',
+// 		withCredentials: true,
+// 		url: AddrBot.getState() + '/',
+// 		data: JSON.stringify({
+// 			notification,
+// 			user_id,
+// 		}),
+// 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+// 	})
+// 		.then(function (response) {
+// 			console.log('response from getNotificationCounter:', response);
+
+// 			return response.data;
+// 		})
+// 		.then(function (response) {
+// 			if (successCallback) {
+// 				successCallback(response);
+// 			}
+// 			return response;
+// 		})
+// 		.catch(function (error) {
+// 			if (failCallBack) {
+// 				failCallBack(error);
+// 			}
+// 		});
+// 	return;
+// }
+//
 
 export async function getNotificationCounter(successCallback, failCallBack) {
 	let err = false;
