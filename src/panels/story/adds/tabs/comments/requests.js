@@ -8,10 +8,11 @@ import { Addr, BASE_AD, BASE_COMMENT } from './../../../../../store/addr';
 import { fail, success } from './../../../../../requests';
 import { store } from '../../../../..';
 import { openPopout, closePopout } from '../../../../../store/router/actions';
+import { addComment } from '../../../../../store/detailed_ad/actions';
 
 let request_id = 0;
 
-export async function postComment(ad_id, comment, successCallback, failCallback, end) {
+export async function postComment(ad_id, comment, comment_text, successCallback, failCallback, end) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 
 	let err = false;
@@ -29,6 +30,22 @@ export async function postComment(ad_id, comment, successCallback, failCallback,
 		})
 		.then(function (response) {
 			store.dispatch(closePopout());
+			var comment = {};
+			console.log('comment is1', store.getState().ad.comments_count);
+			console.log('comment is2', store.getState().vkui.myUser);
+			console.log('comment is2', store.getState().vkui.myUser);
+			comment.comment_id = store.getState().ad.comments_count;
+			const vkUser = store.getState().vkui.myUser;
+			comment.author = {
+				vk_id: vkUser.id,
+				name: vkUser.first_name,
+				surname: vkUser.last_name,
+				photo_url: vkUser.photo_100,
+			};
+			comment.creation_date_time = new Date();
+			comment.text = comment_text;
+			
+			store.dispatch(addComment(comment));
 			successCallback(response);
 			end();
 			return response;
@@ -39,7 +56,7 @@ export async function postComment(ad_id, comment, successCallback, failCallback,
 			fail(
 				'Комментарий не отправлен',
 				() => {
-					postComment(ad_id, comment, successCallback, failCallback, end);
+					postComment(ad_id, comment, text, successCallback, failCallback, end);
 				},
 				end
 			);

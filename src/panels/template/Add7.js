@@ -157,9 +157,11 @@ const Add7 = (props) => {
 		<div className="atile">
 			<div onClick={props.openAd} className="amain-left">
 				{image}
-				<div className="acity">
-					<Icon16Place /> {ad.district ? ad.district : ad.region}
-				</div>
+				{(ad.district || ad.region) && (
+					<div className="acity">
+						<Icon16Place /> {ad.district ? ad.district : ad.region}
+					</div>
+				)}
 
 				<Transition in={hasLabel} timeout={duration}>
 					{(state) => (

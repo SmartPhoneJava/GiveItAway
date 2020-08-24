@@ -61,6 +61,9 @@ export async function getUserVK(id, successCallback, failCallback) {
 			console.log('cant do VKWebAppCallAPIMethod cause ', error);
 		});
 }
+
+
+
 /*
 export async function setOnline(appID, apiVersion, successCallback, failCallback) {
 	

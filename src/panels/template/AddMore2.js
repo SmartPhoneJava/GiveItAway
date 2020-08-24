@@ -14,6 +14,7 @@ import {
 	Subhead,
 	Alert,
 	Spinner,
+	Div,
 } from '@vkontakte/vkui';
 
 import { AnimateOnChange } from 'react-animation';
@@ -27,6 +28,7 @@ import 'react-photoswipe/lib/photoswipe.css';
 import { PhotoSwipe } from 'react-photoswipe';
 
 import Icon56WriteOutline from '@vkontakte/icons/dist/56/write_outline';
+import Icon56HideOutline from '@vkontakte/icons/dist/56/hide_outline';
 
 import Icon28Messages from '@vkontakte/icons/dist/28/messages';
 
@@ -80,6 +82,7 @@ import { Collapse } from 'react-collapse';
 import { AdMainInfo } from '../../components/detailed_ad/table';
 import { CardWithPadding } from '../../App';
 import { openTab } from '../../services/_functions';
+import Icon from './../../img/icon278.png';
 
 let current_i = 0;
 
@@ -164,8 +167,12 @@ const AddMore2r = (props) => {
 
 	const [componentCategories, setComponentCategories] = useState();
 	useEffect(() => {
-		const { category, subcat_list, subcat } = rAd;
+		const { category, subcat_list, subcat, hidden } = rAd;
 
+		if (hidden) {
+			setComponentCategories();
+			return;
+		}
 		setComponentCategories(
 			<TagsLabel
 				tags={[tag(category, col, null, col), tag(subcat_list, col, null, col), tag(subcat, col, null, col)]}
@@ -184,54 +191,72 @@ const AddMore2r = (props) => {
 
 	const [componentImages, setComponentImages] = useState();
 	useEffect(() => {
-		const { header, text } = rAd;
-		const pathes_to_photo = rAd.pathes_to_photo || [];
-		if (pathes_to_photo.length == 0) {
+		const { header, text, hidden, isAuthor } = rAd;
+		let pathes_to_photo = rAd.pathes_to_photo || [];
+		pathes_to_photo = pathes_to_photo.filter((img) => img.PhotoUrl != Icon);
+		if (hidden && !isAuthor) {
+			setComponentImages(
+				<Placeholder icon={<Icon56HideOutline />} header="Информация скрыта">
+					Содержание объявления доступно только автору и модераторам, пока объявление не пройдёт проверку.
+				</Placeholder>
+			);
 			return;
 		}
 
-		const imgDivs = (
-			<Group
-				header={
-					<RichCell
-						multiline={true}
-						text={<AnimateOnChange>{text}</AnimateOnChange>}
-						style={{ marginTop: '0px' }}
-					>
-						<Subhead weight="bold">{header}</Subhead>
-					</RichCell>
-				}
-			>
-				<CardScroll>
-					<div style={{ display: 'flex' }}>
-						{pathes_to_photo.map((img, i) => (
-							<Card
-								key={i}
-								size="s"
-								key={i}
-								onClick={() => {
-									openImage(imgs, i);
-								}}
-							>
-								<ImageCache
-									className="details-card-img"
-									spinnerClassName="details-card-img-spinner"
-									url={img.PhotoUrl}
-								/>
-								<div className="details-card-btn-outter">
-									<Avatar className="details-card-btn-inner" size={26}>
-										<Icon24Fullscreen fill="var(--white)" />
-									</Avatar>
-								</div>
-							</Card>
-						))}
-					</div>
-				</CardScroll>
-			</Group>
+		const rcell = (
+			<RichCell multiline={true} text={<AnimateOnChange>{text}</AnimateOnChange>}>
+				<Subhead weight="bold">{header}</Subhead>
+			</RichCell>
 		);
+		const imgDivs =
+			pathes_to_photo.length == 0 ? (
+				rcell
+			) : (
+				<Group header={rcell}>
+					<CardScroll>
+						<div style={{ display: 'flex' }}>
+							{pathes_to_photo.map((img, i) => (
+								<Card
+									key={i}
+									size="s"
+									key={i}
+									onClick={() => {
+										openImage(imgs, i);
+									}}
+								>
+									<ImageCache
+										className="details-card-img"
+										spinnerClassName="details-card-img-spinner"
+										url={img.PhotoUrl}
+									/>
+									<div className="details-card-btn-outter">
+										<Avatar className="details-card-btn-inner" size={26}>
+											<Icon24Fullscreen fill="var(--white)" />
+										</Avatar>
+									</div>
+								</Card>
+							))}
+						</div>
+					</CardScroll>
+				</Group>
+			);
 
-		setComponentImages(imgDivs);
-		// return () => setComponentImages(null);
+		setComponentImages(
+			<div
+				style={{
+					display: 'block',
+					flex: 1,
+					maxWidth: width < 500 ? null : '' + width / 2 + 'px',
+				}}
+			>
+				{CardWithPadding(
+					<div style={{ paddingBottom: pathes_to_photo.length == 0 ? null : '12px', paddingRight: '12px' }}>
+						{imgDivs}
+					</div>,
+					'outline'
+				)}
+			</div>
+		);
 	}, [rAd]);
 
 	const handleClose = () => {
@@ -440,7 +465,11 @@ const AddMore2r = (props) => {
 
 	const [subButton, setSubButton] = useState(<></>);
 	useEffect(() => {
-		const { isDealer, status, isAuthor, isSub, cost } = rAd;
+		const { isDealer, status, isAuthor, isSub, cost, hidden } = rAd;
+		if (hidden) {
+			setSubButton(<></>);
+			return;
+		}
 		if (isAuthor || !detailsRequestSuccess || !costRequestSuccess) {
 			setSubButton(null);
 		} else {
@@ -490,30 +519,56 @@ const AddMore2r = (props) => {
 
 	const [componentComments, setComponentComments] = useState();
 	useEffect(() => {
-		const { comments_enabled } = rAd;
+		const { comments_enabled, hidden, isAuthor } = props.AD;
+		if (hidden) {
+			if (!isAuthor) {
+				setComponentComments();
+			} else {
+				setComponentComments(
+					<Placeholder icon={<Icon56HideOutline />} header="Комментарии недоступны">
+						Доступ к комментариям откроется, когда объявление станет видимым
+					</Placeholder>
+				);
+			}
+			return;
+		}
 		let v = <Placeholder icon={<Icon56WriteOutline />} header="Комментарии закрыты"></Placeholder>;
 		if (comments_enabled) {
 			v = <Comments mini={true} amount={1} maxAmount={1} openUser={props.setProfile} />;
 		}
-		setComponentComments(v);
-	}, [rAd]);
+		setComponentComments(<Card mode="outline">{v}</Card>);
+	}, [props.AD]);
 
 	const [componentChosenSub, setComponentChosenSub] = useState();
 	useEffect(() => {
-		const { ad_type, ad_id } = props.AD;
+		const { ad_type, ad_id, hidden, isAuthor } = props.AD;
+		if (hidden) {
+			if (!isAuthor) {
+				setComponentChosenSub();
+			} else {
+				setComponentChosenSub(
+					<Placeholder icon={<Icon56HideOutline />} header="Подписчики скрыты">
+						Список подписчиков недоступен, пока объявление находится на модерации
+					</Placeholder>
+				);
+			}
+			return;
+		}
 
 		setComponentChosenSub(
-			<div style={{ flex: 1 }}>
-				{ad_type == TYPE_AUCTION ? (
-					<AuctionLabel unsub={() => unsub(ad_id)} sub={() => sub(ad_id)} />
-				) : (
-					<DealLabel
-						dealRequestSuccess={dealRequestSuccess}
-						unsub={() => unsub(ad_id)}
-						sub={() => sub(ad_id)}
-					/>
-				)}
-			</div>
+			<Card mode="outline">
+				<div style={{ flex: 1 }}>
+					{ad_type == TYPE_AUCTION ? (
+						<AuctionLabel unsub={() => unsub(ad_id)} sub={() => sub(ad_id)} />
+					) : (
+						<DealLabel
+							dealRequestSuccess={dealRequestSuccess}
+							unsub={() => unsub(ad_id)}
+							sub={() => sub(ad_id)}
+						/>
+					)}
+				</div>
+			</Card>
 		);
 	}, [props.AD, dealRequestSuccess, costRequestSuccess]);
 
@@ -534,9 +589,30 @@ const AddMore2r = (props) => {
 		);
 	}, [rAd]);
 
+	const [secondaryInfo, setSecondaryInfo] = useState(<></>);
+	useEffect(() => {
+		const { hidden, isAuthor } = props.AD;
+		if (hidden && !isAuthor) {
+			setSecondaryInfo(<></>);
+			return;
+		}
+		setSecondaryInfo(
+			<div style={{ display: 'block', flex: 1 }}>
+				{CardWithPadding(
+					<>
+						<Div>{componentCategories}</Div>
+						<AdMainInfo />{' '}
+					</>,
+					'outline'
+				)}
+			</div>
+		);
+	}, [props.AD]);
+
 	const [allActions, setAllActions] = useState();
 	useEffect(() => {
 		const { isAuthor, author, isDealer, isSub, status, hidden, ad_id } = rAd;
+
 		const disabled = isFinished(status);
 		const alert = deleteAlert(() => deleteAd(ad_id, props.refresh), closePopout);
 		let buttons = [
@@ -558,7 +634,7 @@ const AddMore2r = (props) => {
 			// />,
 
 			// </AnimateOnChange>,
-			buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK),
+			buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK, null, hidden),
 			buttonAction(
 				<Icon24Delete style={{ color: 'var(--destructive)' }} />,
 				'Удалить',
@@ -586,7 +662,8 @@ const AddMore2r = (props) => {
 				() => {
 					openTab('https://vk.com/im?sel=' + author.vk_id);
 				},
-				null
+				null,
+				hidden
 			);
 
 			buttons = (
@@ -598,9 +675,9 @@ const AddMore2r = (props) => {
 
 				<div style={{ display: 'flex', width: '100%', justifyContent: 'center', alignItems: 'center' }}>
 					{helpBtn}
-					{buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK)}
+					{buttonAction(<Icon24ShareExternal />, 'Поделиться', shareInVK, null, hidden)}
 					{buttonAction(<Icon24Report />, 'Пожаловаться', () => {
-						openTab('https://vk.com/im?media=&sel=-194671970');
+						openTab('https://vk.com/im?media=&sel=-194671970'), null, hidden;
 					})}
 				</div>
 			);
@@ -652,46 +729,25 @@ const AddMore2r = (props) => {
 			{componentAuthor}
 			{componentPhotoSwipe}
 			<div style={{ display: width < 500 ? 'block' : 'flex' }}>
-				<div
-					style={{
-						display: 'block',
-						flex: 1,
-						maxWidth: width < 500 ? null : '' + width / 2 + 'px',
-					}}
-				>
-					{CardWithPadding(
-						<div style={{ paddingBottom: '12px', paddingRight: '12px' }}>{componentImages}</div>,
-						'outline'
-					)}
-				</div>
+				{componentImages}
 
 				{width < 500 ? allActions : null}
 
-				<div style={{ display: 'block', flex: 1 }}>
-					{CardWithPadding(
-						<>
-							<div style={{ padding: '4px' }}>{componentCategories}</div>
-							<AdMainInfo />{' '}
-						</>,
-						'outline'
-					)}
-				</div>
+				{secondaryInfo}
 			</div>
-			{width < 500 ? null : allActions}
 
-			<div
-				style={{
-					display: width < 500 ? 'block' : 'flex',
-				}}
-			>
-				<div style={{ flex: 1, padding: '4px' }}>
-					<Card mode="outline">{componentChosenSub}</Card>
-				</div>
+			<>
+				{width < 500 ? null : allActions}
 
-				<div style={{ flex: 1, padding: '4px', paddingTop: '12px' }}>
-					<Card mode="outline">{componentComments}</Card>
+				<div
+					style={{
+						display: width < 500 ? 'block' : 'flex',
+					}}
+				>
+					<div style={{ flex: 1, padding: '4px' }}>{componentChosenSub}</div>
+					<div style={{ flex: 1, padding: '4px', paddingTop: '12px' }}>{componentComments}</div>
 				</div>
-			</div>
+			</>
 		</div>
 	);
 };

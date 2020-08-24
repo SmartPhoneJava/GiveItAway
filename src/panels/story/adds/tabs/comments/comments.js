@@ -68,12 +68,31 @@ const CommentsI = (props) => {
 	const [editableID, setEditableID] = useState(NO_ID);
 
 	const [pageNumber, setPageNumber] = useState(1);
+	const observer = useRef();
+
+
 	let { inited, loading, error, hasMore, newPage } = useCommentsGet(
 		props.mini,
 		pageNumber,
-		AD.comments_count,
+		10,
 		AD.ad_id,
 		props.maxAmount
+	);
+
+	const lastAdElementRef = useCallback(
+		(node) => {
+			
+			if (loading) return;
+			if (observer.current) observer.current.disconnect();
+			observer.current = new IntersectionObserver((entries) => {
+				
+				if (entries[0].isIntersecting && hasMore) {
+					setPageNumber((prevPageNumber) => newPage + 1);
+				}
+			});
+			if (node) observer.current.observe(node);
+		},
+		[loading, hasMore]
 	);
 
 	useEffect(() => {
@@ -85,21 +104,6 @@ const CommentsI = (props) => {
 		setTooBigComment(text.length > MAX_COMMENT_LENGTH);
 		setText(text);
 	}
-
-	const observer = useRef();
-	const lastAdElementRef = useCallback(
-		(node) => {
-			if (loading) return;
-			if (observer.current) observer.current.disconnect();
-			observer.current = new IntersectionObserver((entries) => {
-				if (entries[0].isIntersecting && hasMore) {
-					setPageNumber((prevPageNumber) => newPage + 1);
-				}
-			});
-			if (node) observer.current.observe(node);
-		},
-		[loading, hasMore]
-	);
 
 	function onEditClick(v) {
 		setText(v.text);
@@ -167,30 +171,38 @@ const CommentsI = (props) => {
 		);
 	}
 
-	function showComments() {
-		if (nots.length == 0) {
+	const [commentsComponent, setCommentsComponent] = useState(<></>);
+	useEffect(() => {
+		if (!AD || !AD.comments || AD.comments.length == 0) {
+			setCommentsComponent(<></>);
 			return;
 		}
-		return props.mini ? (
-			<Group header={<Header aside={<Link onClick={openCommentaries}>Показать все</Link>}>Комментарии</Header>}>
-				<Comment onClick={openCommentaries} v={nots[0]} />
-			</Group>
-		) : (
-			<AnimateGroup className="comments-element-outter">
-				{nots.map((v, index) => (
-					<div
-						className="comments-element-inner"
-						key={v.comment_id + index}
-						ref={nots.length === index + 1 ? lastAdElementRef : null}
-					>
-						<Card mode="outline">
-							<Comment onClick={() => onUserClick(v)} v={v} />
-						</Card>
-					</div>
-				))}
-			</AnimateGroup>
+		console.log('AD.comments', nots.length);
+		setCommentsComponent(
+			props.mini ? (
+				<Group
+					header={<Header aside={<Link onClick={openCommentaries}>Показать все</Link>}>Комментарии</Header>}
+				>
+					<Comment onClick={openCommentaries} v={nots[0]} />
+				</Group>
+			) : (
+				<AnimateGroup className="comments-element-outter">
+					{nots.map((v, index) => (
+						<div
+							className="comments-element-inner"
+							key={v.comment_id + index}
+							
+							ref={nots.length == index + 1 ? lastAdElementRef : null}
+						>
+							<Card mode="outline">
+								<Comment onClick={() => onUserClick(v)} v={v} />
+							</Card>
+						</div>
+					))}
+				</AnimateGroup>
+			)
 		);
-	}
+	}, [nots, lastAdElementRef, loading, hasMore]);
 
 	function sendComment() {
 		setHide(true);
@@ -242,8 +254,10 @@ const CommentsI = (props) => {
 			postComment(
 				AD.ad_id,
 				obj,
+				text,
 				(v) => {
 					setText('');
+
 					scrollWindow(document.body.scrollHeight);
 				},
 				(e) => {},
@@ -318,7 +332,29 @@ const CommentsI = (props) => {
 	return (
 		<div>
 			{placeholder}
-			{showComments()}
+			{/* {props.mini ? (
+				<Group
+					header={<Header aside={<Link onClick={openCommentaries}>Показать все</Link>}>Комментарии</Header>}
+				>
+					<Comment onClick={openCommentaries} v={nots[0]} />
+				</Group>
+			) : (
+				<AnimateGroup className="comments-element-outter">
+					{nots.map((v, index) => (
+						<div
+							className="comments-element-inner"
+							key={v.comment_id + index}
+							ref={lastAdElementRef}
+							// ref={nots.length == index + 1 ? lastAdElementRef : null}
+						>
+							<Card mode="outline">
+								<Comment onClick={() => onUserClick(v)} v={v} />
+							</Card>
+						</div>
+					))}
+				</AnimateGroup>
+			)} */}
+			{commentsComponent}
 
 			{props.mini || hide ? null : (
 				<FixedLayout vertical="bottom">

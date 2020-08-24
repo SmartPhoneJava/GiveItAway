@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
-import { MiniInfoCell } from '@vkontakte/vkui';
+import { MiniInfoCell, Placeholder, Cell } from '@vkontakte/vkui';
 
 import Icon24View from '@vkontakte/icons/dist/24/view';
 import Icon24Similar from '@vkontakte/icons/dist/24/similar';
@@ -17,6 +17,9 @@ import { setPage } from '../../store/router/actions';
 import { CategoryOnline } from '../categories/const';
 
 const AdMainInfoInner = (props) => {
+	if (props.ad.hidden && !props.ad.isAuthor) {
+		return <></>;
+	}
 	function tableElement(Icon, text, value, After, onClick) {
 		return (
 			<MiniInfoCell

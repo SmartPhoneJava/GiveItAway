@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Header, Group, Placeholder, Spinner } from '@vkontakte/vkui';
+import { Header, Group, Placeholder, Spinner, Cell, Switch } from '@vkontakte/vkui';
 import { connect } from 'react-redux';
 import useNotificationsGet from './useNotificationsGet';
 
@@ -9,13 +9,14 @@ import Error from './../../../../placeholders/error';
 
 import { timeDate } from './../../../../../utils/time';
 
-import { sendSnack } from './../../../../../requests';
+import { sendSnack, getPermissionPM, setPermissionPM } from './../../../../../requests';
 
 import './notification.css';
 import { STATUS_CHOSEN } from '../../../../../const/ads';
 import { openSnackbar, openPopout, closePopout } from '../../../../../store/router/actions';
 import Notification from './Notification';
-import { AnimationGroup } from '../../../../../components/image/image_cache';
+import { AnimationGroup, withLoadingIf } from '../../../../../components/image/image_cache';
+import { allowMessages } from '../../../../../services/VK';
 
 export const NT_CLOSE = 'ad_close'; // приходит выбранному автором пользователю
 export const NT_RESPOND = 'respond'; // приходит автору
@@ -27,6 +28,7 @@ export const NT_DELETED = 'deleted'; // приходит подписчикам
 export const NT_COMMENT = 'new_comment'; // приходит всем
 export const NT_COMMENT_DELETED = 'delete_comment'; // приходит всем
 export const NT_AD_STATUS = 'status_changed';
+export const NT_MAX_BID = 'max_bid_upd';
 
 export function handleNotifications(note) {
 	switch (note.data.notification_type) {
@@ -51,6 +53,8 @@ export function handleNotifications(note) {
 		case NT_COMMENT:
 			sendSnack('Обьявление прокомментировано');
 			return;
+		case NT_MAX_BID:
+			sendSnack('Кто то перебил вашу ставку');
 	}
 }
 
@@ -206,6 +210,22 @@ const Notifications = (props) => {
 	const [pageNumber, setPageNumber] = useState(1);
 	let { inited, loading, nots, error, hasMore, newPage } = useNotificationsGet(pageNumber, 10);
 
+	const [notsPM, setNotsPM] = useState(false);
+	const [notsPMLoaded, setNotsPMLoaded] = useState(false);
+	useEffect(() => {
+		getPermissionPM(
+			props.myID,
+			(v) => {
+				setNotsPM(v);
+				setNotsPMLoaded(true);
+			},
+			() => {
+				setNotsPM(false);
+				setNotsPMLoaded(true);
+			}
+		);
+	}, []);
+
 	const observer = useRef();
 	const lastAdElementRef = useCallback(
 		(node) => {
@@ -237,6 +257,7 @@ const Notifications = (props) => {
 			const filtered = anr.filter((v) => {
 				return timeDate(v.creation_date_time) == timeDate(first.creation_date_time);
 			});
+			console.log('filtered', filtered);
 			newArrNotRead.push(filtered);
 			anr = anr.slice(filtered.length);
 		}
@@ -263,6 +284,15 @@ const Notifications = (props) => {
 
 	props.zeroNots();
 
+	function handleChecked(e) {
+		const newValue = e.currentTarget.checked;
+		if (newValue) {
+			allowMessages();
+		}
+		setNotsPM(newValue);
+		setPermissionPM(props.myID, newValue);
+	}
+
 	const [body, setBody] = useState(<></>);
 
 	useEffect(() => {
@@ -284,6 +314,12 @@ const Notifications = (props) => {
 		}
 		setBody(
 			<div>
+				<Cell
+					multiline
+					asideContent={withLoadingIf(notsPMLoaded, <Switch checked={notsPM} onChange={handleChecked} />)}
+				>
+					Отправлять уведомления в Личные Сообщение
+				</Cell>
 				{arrNotRead.length > 0 ? (
 					<Group header={<Header mode="primary">Непрочитанные</Header>}>
 						{getNotifications(arrNotRead, lastAdElementRef)}
@@ -303,7 +339,7 @@ const Notifications = (props) => {
 		return () => {
 			cancel = true;
 		};
-	}, [inited, loading]);
+	}, [inited, loading, notsPM, notsPMLoaded]);
 
 	if (error) {
 		return <Error />;
@@ -312,7 +348,9 @@ const Notifications = (props) => {
 };
 
 const mapStateToProps = (state) => {
-	return {};
+	return {
+		myID: state.vkui.myID,
+	};
 };
 
 const mapDispatchToProps = {

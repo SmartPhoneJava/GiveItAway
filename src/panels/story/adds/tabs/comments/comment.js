@@ -17,7 +17,8 @@ function getAuthorHref(props) {
 }
 
 const Comment = (props) => {
-	const author = props.v.author;
+	
+	const author = props.v ? props.v.author : null;
 	if (!author) {
 		return <>?</>;
 	}

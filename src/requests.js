@@ -828,4 +828,64 @@ export function fail(err, repeat, end) {
 	}
 }
 
+export async function getPermissionPM(user_id, successCallback, failCallback) {
+	let err = false;
+	let cancel;
+	const deal = await axios({
+		method: 'get',
+		withCredentials: true,
+		url: Addr.getState() + BASE_USER + user_id + '/nots_pm',
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(function (response) {
+			console.log('response from getPermissionPM:', response);
+			return response.data;
+		})
+		.then(function (response) {
+			const canSend = response.can_send;
+			if (successCallback) {
+				successCallback(canSend);
+			}
+			return canSend;
+		})
+		.catch(function (error) {
+			err = true;
+			if (failCallback) {
+				failCallback(error);
+			}
+		});
+	return { deal, err };
+}
+
+export async function setPermissionPM(user_id, can_send, successCallback, failCallback) {
+	let err = false;
+	let cancel;
+	const deal = await axios({
+		method: 'post',
+		withCredentials: true,
+		data: JSON.stringify({
+			can_send,
+		}),
+		url: Addr.getState() + BASE_USER + user_id + '/nots_pm',
+		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+	})
+		.then(function (response) {
+			console.log('response from setPermissionPM:', response);
+			return response.data;
+		})
+		.then(function (response) {
+			if (successCallback) {
+				successCallback(response);
+			}
+			return response;
+		})
+		.catch(function (error) {
+			err = true;
+			if (failCallback) {
+				failCallback(error);
+			}
+		});
+	return { deal, err };
+}
+
 // 745 -> 600 -> 806

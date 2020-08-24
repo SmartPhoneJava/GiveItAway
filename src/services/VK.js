@@ -118,6 +118,17 @@ export const getuser = (success) => (dispatch) => {
 		});
 };
 
+export const allowMessages = () => {
+	return bridge
+		.send('VKWebAppAllowMessagesFromGroup', { group_id: 194671970, key:"dBuBKe1kFcdemzB" })
+		.then((data) => {
+			return data;
+		})
+		.catch((error) => {
+			return error;
+		});
+};
+
 export const shareInVK = () => {
 	const appID = store.getState().vkui.appID;
 	const adID = store.getState().ad.ad_id;
