@@ -318,7 +318,7 @@ const Notifications = (props) => {
 					multiline
 					asideContent={withLoadingIf(notsPMLoaded, <Switch checked={notsPM} onChange={handleChecked} />)}
 				>
-					Отправлять уведомления в Личные Сообщение
+					Отправлять уведомления в Личные Сообщения
 				</Cell>
 				{arrNotRead.length > 0 ? (
 					<Group header={<Header mode="primary">Непрочитанные</Header>}>
