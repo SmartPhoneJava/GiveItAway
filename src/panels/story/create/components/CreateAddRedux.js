@@ -120,7 +120,7 @@ const CreateAddRedux = (props) => {
 		let cleanupFunction = false;
 		let { v, header, text } = props.isValid(inputData);
 		var l = needEdit ? true : licenceAgree;
-		var p = needEdit ? true : validPlace;
+		var p = needEdit || category == CategoryOnline ? true : validPlace;
 		if (v && !l) {
 			v = l;
 			text = 'Прочтите и согласитель с правилами использования';
