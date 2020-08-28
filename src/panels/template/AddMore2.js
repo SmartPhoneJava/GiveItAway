@@ -204,7 +204,7 @@ const AddMore2r = (props) => {
 		}
 
 		const rcell = (
-			<RichCell multiline={true} text={<AnimateOnChange>{text}</AnimateOnChange>}>
+			<RichCell multiline text={<AnimateOnChange>{text}</AnimateOnChange>}>
 				<Subhead weight="bold">{header}</Subhead>
 			</RichCell>
 		);
@@ -223,6 +223,7 @@ const AddMore2r = (props) => {
 									onClick={() => {
 										openImage(imgs, i);
 									}}
+									style={{ cursor: 'pointer' }}
 								>
 									<ImageCache
 										className="details-card-img"
@@ -502,7 +503,7 @@ const AddMore2r = (props) => {
 				key={uid}
 				mode="tertiary"
 				onClick={onClick}
-				style={{ padding: '5px', margin: '0px', flex: 1 }}
+				style={{ cursor: disabled ? null : 'pointer', padding: '5px', margin: '0px', flex: 1 }}
 			>
 				<div
 					style={{
@@ -580,7 +581,7 @@ const AddMore2r = (props) => {
 				onClick={() => props.setProfile(author.vk_id)}
 				before={<Avatar style={{ margin: '0px', padding: '0px' }} size={40} src={author.photo_url} />}
 				description={time(creation_date)}
-				style={{ marginBottom: '0px', paddingBottom: '0px' }}
+				style={{ cursor: 'pointer', marginBottom: '0px', paddingBottom: '0px' }}
 			>
 				<div style={{ display: 'flex', margin: '0px', padding: '0px' }}>
 					{author.name + ' ' + author.surname}{' '}

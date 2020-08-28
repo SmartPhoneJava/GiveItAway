@@ -127,8 +127,12 @@ const CategoriesLabel = (props) => {
 	return (
 		<RichCell
 			multiline
-			text={<TagsLabel tagsUpdate={tagsUpdate} tags={tags} onClick={props.open} />}
-			after={<Link onClick={props.open}>Изменить</Link>}
+			text={<TagsLabel style={{ cursor: 'pointer' }} tagsUpdate={tagsUpdate} tags={tags} onClick={props.open} />}
+			after={
+				<Link style={{ cursor: 'pointer' }} onClick={props.open}>
+					Изменить
+				</Link>
+			}
 		>
 			Категория
 		</RichCell>

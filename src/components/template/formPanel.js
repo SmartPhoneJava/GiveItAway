@@ -57,7 +57,7 @@ const FormPanel = (props) => {
 		if (!afterClick) {
 			goBack();
 		} else {
-			afterClick()
+			afterClick();
 		}
 	}
 
@@ -75,6 +75,7 @@ const FormPanel = (props) => {
 								onClick={() => {
 									onCellClick(cat);
 								}}
+								style={{ cursor: 'pointer' }}
 								asideContent={isDone(cat) ? <Icon24Done /> : null}
 								// draggable
 								// onDragFinish={({ from, to }) => {

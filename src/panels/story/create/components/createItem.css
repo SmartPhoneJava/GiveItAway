@@ -1,18 +1,18 @@
-
 img.create-photo {
-    position: absolute;
+	position: absolute;
 	top: 0;
 	left: 0;
 
 	border-radius: 10px;
 	object-fit: cover;
 	width: 120px;
-    height: 120px;
-    
-    border-style: solid;
-    border-width: 2px;
-    border-color: var(--field_border);
-    border-radius: 15px;
+	height: 120px;
+
+	border-style: solid;
+	border-width: 2px;
+	border-color: var(--field_border);
+	border-radius: 15px;
+	cursor: pointer;
 }
 
 .create-photo-panel {
@@ -29,7 +29,24 @@ img.create-photo {
 	color: rgb(240, 240, 240);
 	background: rgba(0, 0, 0, 0.9);
 	border-radius: 15px;
+	cursor: pointer;
 }
+
+.create-geodata-status {
+	position: absolute;
+	bottom: 0px;
+	
+	right: -20px;
+	align-items: flex-end;
+	/* 
+	top: 4px;
+	left: 96px;
+	color: rgb(240, 240, 240);
+	background: rgba(0, 0, 0, 0.9);
+	border-radius: 15px;
+	cursor: pointer; */
+}
+
 
 .geo-position-icon {
 	padding: 0px;
@@ -37,5 +54,5 @@ img.create-photo {
 }
 
 .geo-position-label {
-	width:90%;
+	width: 90%;
 }

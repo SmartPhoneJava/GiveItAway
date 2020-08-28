@@ -8,7 +8,7 @@ const LicencePanel = (props) => {
 	const { goBack } = props;
 	return (
 		<>
-			<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
+			<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
 				<p className="panel-header">Правила использования</p>
 				{/* {choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошибка'} */}
 			</PanelHeader>

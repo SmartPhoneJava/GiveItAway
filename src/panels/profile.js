@@ -15,20 +15,24 @@ const ProfilePanel = (props) => {
 	const { panelsHistory, snackbars } = props;
 	const { setReduxAd, goBack, setPage } = props;
 	const historyLen = panelsHistory ? (panelsHistory[STORY_ADS] ? panelsHistory[STORY_ADS].length : 0) : 0;
-    
-    const openAboutPanel = ()=>{
-        setPage(PANEL_ABOUT)
-    }
-    
-    return (
+
+	const openAboutPanel = () => {
+		setPage(PANEL_ABOUT);
+	};
+
+	return (
 		<>
-			<PanelHeader left={historyLen <= 1 ? null : <PanelHeaderBack onClick={goBack} />}>
+			<PanelHeader
+				left={historyLen <= 1 ? null : <PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}
+			>
 				<p className="panel-header"> {profileName} </p>
 			</PanelHeader>
 			<Profile setProfileName={setProfileName} setReduxAd={setReduxAd} />
 			{snackbars[PANEL_USER]}
 			<Footer>
-				<Link onClick={openAboutPanel}>О приложении</Link>
+				<Link style={{ cursor: 'pointer' }} onClick={openAboutPanel}>
+					О приложении
+				</Link>
 			</Footer>
 		</>
 	);

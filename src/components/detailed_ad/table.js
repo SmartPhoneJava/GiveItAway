@@ -24,9 +24,9 @@ const AdMainInfoInner = (props) => {
 		return (
 			<MiniInfoCell
 				multiline
+				style={{ padding: '4px', cursor: onClick ? 'pointer' : null }}
 				onClick={onClick}
 				mode={onClick ? 'more' : null}
-				style={{ padding: '4px' }}
 				before={<Icon width={20} height={20} />}
 				after={
 					After ? (
@@ -53,7 +53,12 @@ const AdMainInfoInner = (props) => {
 	function getGeoPosition(region, district) {
 		let r = region != undefined ? region : null || '';
 		let d = district != undefined ? district : null || '';
-		return r && d ? r + ', ' + d : r + d;
+		var place = r && d ? r + ', ' + d : r + d;
+		if (place == "") {
+			place = "Россия"
+		}
+		console.log("region isss", r,d)
+		return place
 	}
 
 	const [componentItemTable, setComponentItemTable] = useState(<></>);

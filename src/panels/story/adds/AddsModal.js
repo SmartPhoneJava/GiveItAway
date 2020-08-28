@@ -86,6 +86,7 @@ const AddsModal = (props) => {
 										props.setFormData(ADS_FILTERS, null);
 									}}
 									mode="danger"
+									style={{ cursor: 'pointer' }}
 								>
 									Сбросить
 								</CellButton>

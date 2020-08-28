@@ -45,7 +45,7 @@ export async function postComment(ad_id, comment, comment_text, successCallback,
 			comment.creation_date_time = new Date();
 			comment.text = comment_text;
 			
-			store.dispatch(addComment(comment));
+			//store.dispatch(addComment(comment));
 			successCallback(response);
 			end();
 			return response;

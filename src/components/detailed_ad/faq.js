@@ -92,7 +92,11 @@ export const AdHeader = (props) => {
 					style={{ paddingTop: '4px', paddingRight: '8px', width: '32px', height: '32px' }}
 				/>
 			}
-			asideContent={<Link onClick={props.onTypesClick}>Подробнее</Link>}
+			asideContent={
+				<Link style={{ cursor: 'pointer' }} onClick={props.onTypesClick}>
+					Подробнее
+				</Link>
+			}
 		>
 			<Title level="2" weight="heavy">
 				{getAdType(props.ad_type)}

@@ -17,7 +17,6 @@ function getAuthorHref(props) {
 }
 
 const Comment = (props) => {
-	
 	const author = props.v ? props.v.author : null;
 	if (!author) {
 		return <>?</>;
@@ -25,6 +24,7 @@ const Comment = (props) => {
 	const photoURL = author.photo_url;
 	return (
 		<RichCell
+			style={{ cursor: 'pointer' }}
 			onClick={props.onClick}
 			text={props.v.text}
 			caption={time(props.v.creation_date_time)}

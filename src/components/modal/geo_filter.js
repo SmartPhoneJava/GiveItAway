@@ -164,14 +164,27 @@ const ModalPageAdsGeoInner = (props) => {
 
 	return (
 		<>
-			<Radio name="radio" value={GEO_TYPE_NO} checked={geoType == GEO_TYPE_NO} onChange={setGeoNo}>
+			<Radio
+				style={{ cursor: 'pointer' }}
+				name="radio"
+				value={GEO_TYPE_NO}
+				checked={geoType == GEO_TYPE_NO}
+				onChange={setGeoNo}
+			>
 				Везде
 			</Radio>
-			<Radio name="radio" value={GEO_TYPE_FILTERS} checked={geoType == GEO_TYPE_FILTERS} onChange={setGeoFilters}>
+			<Radio
+				style={{ cursor: 'pointer' }}
+				name="radio"
+				value={GEO_TYPE_FILTERS}
+				checked={geoType == GEO_TYPE_FILTERS}
+				onChange={setGeoFilters}
+			>
 				В определенном городе
 			</Radio>
 			<div style={{ display: 'flex' }}>
 				<Radio
+					style={{ cursor: 'pointer' }}
 					name="radio"
 					checked={geoType == GEO_TYPE_NEAR}
 					value={GEO_TYPE_NEAR}
@@ -202,6 +215,7 @@ const ModalPageAdsGeoInner = (props) => {
 					geoType == GEO_TYPE_NEAR && (
 						<FormLayout>
 							<Slider
+								style={{ cursor: 'pointer' }}
 								step={0.5}
 								min={0.5}
 								max={100}

@@ -401,16 +401,18 @@ const App = (props) => {
 				tabbar={
 					<Tabbar>
 						<TabbarItem
+							style={{ cursor: 'pointer' }}
 							onClick={onStoryChange}
 							selected={activeStory === STORY_ADS && adActivePanel != PANEL_USER}
 							data-story={STORY_ADS}
 							data-text={adsText}
 							text={adsText}
 						>
-							<Icon28NewsfeedOutline onClick={onStoryChange} />
+							<Icon28NewsfeedOutline style={{ cursor: 'pointer' }} onClick={onStoryChange} />
 						</TabbarItem>
 
 						<TabbarItem
+							style={{ cursor: 'pointer' }}
 							onClick={onStoryChange}
 							data-text={addText}
 							selected={activeStory === STORY_CREATE}
@@ -420,6 +422,7 @@ const App = (props) => {
 							<Icon28Add onClick={onStoryChange} />
 						</TabbarItem>
 						<TabbarItem
+							style={{ cursor: 'pointer' }}
 							onClick={onStoryChange}
 							data-text={notText}
 							selected={activeStory === STORY_NOTIFICATIONS}
@@ -427,16 +430,17 @@ const App = (props) => {
 							label={notsCounterrr == 0 ? null : notsCounterrr}
 							text={notText}
 						>
-							<Icon24Notification onClick={onStoryChange} />
+							<Icon24Notification style={{ cursor: 'pointer' }} onClick={onStoryChange} />
 						</TabbarItem>
 						<TabbarItem
+							style={{ cursor: 'pointer' }}
 							onClick={onStoryChange}
 							selected={activeStory === STORY_ADS && adActivePanel == PANEL_USER}
 							data-story={STORY_ADS}
 							data-text={profileText}
 							text={profileText}
 						>
-							<Icon28User onClick={onStoryChange} />
+							<Icon28User style={{ cursor: 'pointer' }} onClick={onStoryChange} />
 						</TabbarItem>
 					</Tabbar>
 				}
@@ -466,7 +470,7 @@ const App = (props) => {
 						{snackbars[PANEL_ADS]}
 					</Panel>
 					<Panel id={PANEL_ONE}>
-						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
+						<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
 							<p className="panel-header">Объявление</p>
 							{/* {choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошибка'} */}
 						</PanelHeader>
@@ -498,7 +502,7 @@ const App = (props) => {
 						<LicencePanel />
 					</Panel>
 					<Panel id={PANEL_COMMENTS}>
-						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
+						<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
 							<p className="panel-header">Комментарии</p>
 							{/* {choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошибка'} */}
 						</PanelHeader>
@@ -506,7 +510,7 @@ const App = (props) => {
 						{snackbars[PANEL_COMMENTS]}
 					</Panel>
 					<Panel id={PANEL_SUBS}>
-						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
+						<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
 							<p className="panel-header">Откликнувшиеся</p>
 						</PanelHeader>
 						{choosen ? <Subs openUser={setProfile} amount={5} maxAmount={-1} /> : Error}
@@ -538,15 +542,25 @@ const App = (props) => {
 						/>
 					</Panel>
 					<Panel id={PANEL_COUNTRIES}>
-						<PanelHeader left={<PanelHeaderBack onClick={backToGeoFilters} />}>Выберите страну</PanelHeader>
+						<PanelHeader
+							left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={backToGeoFilters} />}
+						>
+							Выберите страну
+						</PanelHeader>
 						<Countries goBack={backToGeoFilters} redux_form={ADS_FILTERS_B} />
 					</Panel>
 					<Panel id={PANEL_CITIES}>
-						<PanelHeader left={<PanelHeaderBack onClick={backToGeoFilters} />}>Выберите город</PanelHeader>
+						<PanelHeader
+							left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={backToGeoFilters} />}
+						>
+							Выберите город
+						</PanelHeader>
 						<Cities goBack={backToGeoFilters} redux_form={ADS_FILTERS_B} />
 					</Panel>
 					<Panel id={PANEL_MAP}>
-						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>Местоположение</PanelHeader>
+						<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
+							Местоположение
+						</PanelHeader>
 						<AdMap max={true} />
 					</Panel>
 				</View>
@@ -559,7 +573,13 @@ const App = (props) => {
 					history={createPanels}
 				>
 					<Panel id={PANEL_CREATE}>
-						<PanelHeader left={historyLen <= 1 ? null : <PanelHeaderBack onClick={goBack} />}>
+						<PanelHeader
+							left={
+								historyLen <= 1 ? null : (
+									<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />
+								)
+							}
+						>
 							{needEdit ? 'Редактировать' : addText}
 						</PanelHeader>
 						<Create />
@@ -590,11 +610,15 @@ const App = (props) => {
 					</Panel>
 
 					<Panel id={PANEL_COUNTRIES}>
-						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>Выберите страну</PanelHeader>
+						<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
+							Выберите страну
+						</PanelHeader>
 						<Countries redux_form={FORM_LOCATION_CREATE} goBack={goBack} />
 					</Panel>
 					<Panel id={PANEL_CITIES}>
-						<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>Выберите город</PanelHeader>
+						<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
+							Выберите город
+						</PanelHeader>
 						<Cities redux_form={FORM_LOCATION_CREATE} goBack={goBack} />
 					</Panel>
 				</View>

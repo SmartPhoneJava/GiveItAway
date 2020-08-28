@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { PanelHeader, List, Cell, PanelHeaderButton, PanelHeaderContext, TabsItem, Tabs, PanelHeaderContent } from '@vkontakte/vkui';
+import {
+	PanelHeader,
+	List,
+	Cell,
+	PanelHeaderButton,
+	PanelHeaderContext,
+	TabsItem,
+	Tabs,
+	PanelHeaderContent,
+} from '@vkontakte/vkui';
 
 import Icon28CubeBoxOutline from '@vkontakte/icons/dist/28/cube_box_outline';
 
@@ -42,8 +51,8 @@ const AddsTabs = (props) => {
 	return (
 		<React.Fragment>
 			<PanelHeader left={<PanelHeaderButton />} separator={false}>
-				
 				<PanelHeaderContent
+					style={{ cursor: 'pointer' }}
 					aside={
 						<Icon16Dropdown
 							fill="var(--accent)"
@@ -85,6 +94,7 @@ const AddsTabs = (props) => {
 			>
 				<List>
 					<Cell
+						style={{ cursor: 'pointer' }}
 						before={<Icon28LiveOutline />}
 						asideContent={mode === MODE_ALL ? <Icon24Done fill="var(--accent)" /> : null}
 						onClick={select}
@@ -94,6 +104,7 @@ const AddsTabs = (props) => {
 						Все
 					</Cell>
 					<Cell
+						style={{ cursor: 'pointer' }}
 						before={<Icon28UserCircleOutline />}
 						asideContent={mode === MODE_GIVEN ? <Icon24Done fill="var(--accent)" /> : null}
 						onClick={select}
@@ -103,6 +114,7 @@ const AddsTabs = (props) => {
 						Отдаю
 					</Cell>
 					<Cell
+						style={{ cursor: 'pointer' }}
 						before={<Icon28CubeBoxOutline />}
 						asideContent={mode === MODE_WANTED ? <Icon24Done fill="var(--accent)" /> : null}
 						onClick={select}

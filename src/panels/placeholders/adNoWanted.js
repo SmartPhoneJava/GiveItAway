@@ -10,7 +10,7 @@ const AdNoWanted = (props) => {
 			icon={<Icon56ErrorOutline />}
 			header="Пусто"
 			action={
-				<Button onClick={() => props.setAllMode()} size="l">
+				<Button style={{ cursor: 'pointer' }} onClick={() => props.setAllMode()} size="l">
 					Назад
 				</Button>
 			}

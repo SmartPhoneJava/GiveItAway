@@ -22,6 +22,7 @@ const Location = (props) => {
 		>
 			<FormLayout style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
 				<SelectMimicry
+					style={{ cursor: 'pointer' }}
 					top="Город"
 					value={city ? city : 'Не определен'}
 					placeholder={city ? city : 'Не определен'}

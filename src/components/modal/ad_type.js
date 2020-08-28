@@ -59,7 +59,7 @@ const ModalCardCaptionAdsTypeInner = (props) => {
 
 	function cellWrapper(header, value) {
 		return (
-			<SimpleCell multiline={true} style={{ padding: '0px' }}>
+			<SimpleCell multiline style={{ padding: '0px' }}>
 				<InfoRow header={header}>
 					<div style={{ fontSize: '10pt' }}>{value}</div>
 				</InfoRow>
@@ -98,6 +98,7 @@ const ModalCardCaptionAdsTypeInner = (props) => {
 			arr.push(
 				<div key={TYPE_CHOICE} style={{ padding: '3px', flex: 1 }}>
 					<Button
+						style={{ cursor: 'pointer' }}
 						mode="secondary"
 						size="xl"
 						onClick={() => {
@@ -114,6 +115,7 @@ const ModalCardCaptionAdsTypeInner = (props) => {
 			arr.push(
 				<div key={TYPE_AUCTION} style={{ padding: '3px', flex: 1 }}>
 					<Button
+						style={{ cursor: 'pointer' }}
 						mode="secondary"
 						size="xl"
 						onClick={() => {
@@ -130,6 +132,7 @@ const ModalCardCaptionAdsTypeInner = (props) => {
 			arr.push(
 				<div key={TYPE_RANDOM} style={{ padding: '3px', flex: 1 }}>
 					<Button
+						style={{ cursor: 'pointer' }}
 						mode="secondary"
 						size="xl"
 						onClick={() => {
@@ -149,7 +152,7 @@ const ModalCardCaptionAdsTypeInner = (props) => {
 	return (
 		<>
 			<div className="flex-center">
-				<div onClick={() => setMoveAdType(-1)}>
+				<div style={{ cursor: 'pointer' }} onClick={() => setMoveAdType(-1)}>
 					<Icon24BrowserBack />
 				</div>
 				<div style={{ display: 'block' }}>
@@ -159,7 +162,7 @@ const ModalCardCaptionAdsTypeInner = (props) => {
 						</AnimateOnChange>
 					</Collapse>
 
-					<Link onClick={() => setOpenAdTypeDetails((prev) => !prev)}>
+					<Link style={{ cursor: 'pointer' }} onClick={() => setOpenAdTypeDetails((prev) => !prev)}>
 						{openAdTypeDetails ? 'Скрыть подробности' : 'Подробнее'}
 					</Link>
 					<Collapse isOpened={openAdTypeDetails}>
@@ -171,7 +174,7 @@ const ModalCardCaptionAdsTypeInner = (props) => {
 						{/* {adTypeCarmaEnd} */}
 					</Collapse>
 				</div>
-				<div onClick={() => setMoveAdType(1)}>
+				<div style={{ cursor: 'pointer' }} onClick={() => setMoveAdType(1)}>
 					<Icon24BrowserForward />
 				</div>
 			</div>

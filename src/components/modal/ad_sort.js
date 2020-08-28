@@ -8,12 +8,8 @@ import { setFormData } from '../../store/create_post/actions';
 import { ADS_FILTERS } from '../../store/create_post/types';
 import { closeAllModals, closeModal } from '../../store/router/actions';
 
-import bridge from '@vkontakte/vk-bridge';
-
 import {
 	Radio,
-	Header,
-	CellButton,
 	Button,
 	Group,
 	FormStatus,
@@ -31,12 +27,12 @@ export const SaveCancelButtons = (save, cancel) => {
 	return (
 		<div className="flex-center">
 			<div className="filters-button">
-				<Button stretched size="xl" mode="secondary" onClick={cancel} before={<Icon24Cancel />}>
+				<Button style={{ cursor: 'pointer' }} stretched size="xl" mode="secondary" onClick={cancel} before={<Icon24Cancel />}>
 					Назад
 				</Button>
 			</div>
 			<div className="filters-button">
-				<Button stretched size="xl" mode="primary" onClick={save} before={<Icon24Done />}>
+				<Button style={{ cursor: 'pointer' }} stretched size="xl" mode="primary" onClick={save} before={<Icon24Done />}>
 					Сохранить
 				</Button>
 			</div>
@@ -110,11 +106,25 @@ const ModalPageAdsSortInner = (props) => {
 	return (
 		<>
 			<Group separator="show">
-				<Radio checked={isTimeSort} key={SORT_TIME} value={SORT_TIME} name="sort" onChange={applyTimeSort}>
+				<Radio
+					style={{ cursor: 'pointer' }}
+					checked={isTimeSort}
+					key={SORT_TIME}
+					value={SORT_TIME}
+					name="sort"
+					onChange={applyTimeSort}
+				>
 					По времени
 				</Radio>
 				<div style={{ display: 'flex' }}>
-					<Radio checked={!isTimeSort} key={SORT_GEO} value={SORT_GEO} name="sort" onChange={applyGeoSort}>
+					<Radio
+						style={{ cursor: 'pointer' }}
+						checked={!isTimeSort}
+						key={SORT_GEO}
+						value={SORT_GEO}
+						name="sort"
+						onChange={applyGeoSort}
+					>
 						По близости
 					</Radio>
 

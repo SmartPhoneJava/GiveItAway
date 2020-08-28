@@ -103,6 +103,7 @@ const OpenActions = (props) => {
 			>
 				Удалить
 			</ActionSheetItem>
+
 			{osname === IOS && (
 				<ActionSheetItem autoclose mode="cancel">
 					Отменить

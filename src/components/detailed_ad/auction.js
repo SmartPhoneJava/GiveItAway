@@ -81,11 +81,12 @@ const AuctionLabelInner = (props) => {
 		setComponentMaxUser(
 			amu ? (
 				<Cell
+					style={{ cursor: 'pointer' }}
 					onClick={() => {
 						props.setProfile(amu.vk_id);
 					}}
 					description={dealer ? 'Победитель' : 'Лидирует'}
-					multiline={true}
+					multiline
 					key={amu.vk_id}
 					before={<Avatar size={36} src={amu.photo_url} />}
 					asideContent={amu.cost > 0 && <Counter mode="primary">{amu.cost + ' K'}</Counter>}
@@ -142,7 +143,12 @@ const AuctionLabelInner = (props) => {
 		setComponentMyRate(
 			isAuthor ? (
 				!dealer ? (
-					<CellButton onClick={onCloseClick} disabled={!actionMaxUser} before={<Icon24Done />}>
+					<CellButton
+						onClick={onCloseClick}
+						style={{ cursor: !actionMaxUser ? null : 'pointer' }}
+						disabled={!actionMaxUser}
+						before={<Icon24Done />}
+					>
 						Завершить
 					</CellButton>
 				) : (
@@ -151,6 +157,7 @@ const AuctionLabelInner = (props) => {
 							mode="danger"
 							onClick={onCancelCloseClick}
 							disabled={!actionMaxUser}
+							style={{ cursor: !actionMaxUser ? null : 'pointer' }}
 							before={<Icon24Cancel />}
 						>
 							Отменить выбор
@@ -162,7 +169,7 @@ const AuctionLabelInner = (props) => {
 					<RichCell
 						before={<Avatar size={48} src={props.myUser.photo_100} />}
 						after={
-							<Counter onClick={onFreezeClick} mode={costMode}>
+							<Counter style={{ cursor: 'pointer' }} onClick={onFreezeClick} mode={costMode}>
 								{myRate + ' K'}
 							</Counter>
 						}
@@ -176,8 +183,10 @@ const AuctionLabelInner = (props) => {
 						}
 						actions={
 							<React.Fragment>
-								<Button onClick={onIncreaseClick}>Повысить</Button>
-								<Button mode="secondary" onClick={onUserCancelClick}>
+								<Button style={{ cursor: 'pointer' }} onClick={onIncreaseClick}>
+									Повысить
+								</Button>
+								<Button style={{ cursor: 'pointer' }} mode="secondary" onClick={onUserCancelClick}>
 									Отменить ставку
 								</Button>
 							</React.Fragment>
@@ -190,13 +199,15 @@ const AuctionLabelInner = (props) => {
 				<RichCell
 					before={<Avatar size={48} src={props.myUser.photo_100} />}
 					after={
-						<Counter style={{ width: '40px' }} onClick={onCarmaClick} mode="primary">
+						<Counter style={{ width: '40px', cursor: 'pointer' }} onClick={onCarmaClick} mode="primary">
 							{cost + ' K'}
 						</Counter>
 					}
 					actions={
 						<React.Fragment>
-							<Button onClick={() => props.sub()}>Принять участие в аукционе</Button>
+							<Button style={{ cursor: 'pointer' }} onClick={() => props.sub()}>
+								Принять участие в аукционе
+							</Button>
 						</React.Fragment>
 					}
 				>

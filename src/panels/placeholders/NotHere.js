@@ -13,6 +13,7 @@ const NotHere = () => {
 					onClick={() => {
 						openTab('https://vk.com/app7360033_45863670');
 					}}
+					style={{ cursor: 'pointer' }}
 				>
 					Перейти в ВК
 				</Button>

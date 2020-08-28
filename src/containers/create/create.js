@@ -132,7 +132,9 @@ const isValid = (inputData) => {
 	let category = CategoryNo;
 	const itemInfo = getItemInfo(inputData);
 	if (itemInfo) {
-		const { name, description, photosUrl } = itemInfo;
+		let { name, description, photosUrl } = itemInfo;
+		name = name ? name.trim() : '';
+		description = description ? description.trim() : '';
 		if (!name || name.length == 0) {
 			return {
 				v: false,
@@ -144,7 +146,7 @@ const isValid = (inputData) => {
 			return {
 				v: false,
 				header: 'Название предмета слишком короткое',
-				text: 'Опишите чуть больше деталей!(минимум: 5 символов)',
+				text: 'Опишите чуть больше деталей! (минимум: 5 символов)',
 			};
 		}
 		if (name.length > 100) {
@@ -172,7 +174,7 @@ const isValid = (inputData) => {
 			return {
 				v: false,
 				header: 'Название предмета слишком длинное',
-				text: 'Краткость сестра таланта!(максимум: 1000 символов)',
+				text: 'Краткость сестра таланта! (максимум: 1000 символов)',
 			};
 		}
 
@@ -240,6 +242,15 @@ const isValid = (inputData) => {
 				text: 'Укажите свою страну и город с помощью выпадающих списков выше',
 			};
 		}
+
+		const geodata_string = inputData[GEO_DATA] ? inputData[GEO_DATA].geodata_string : '';
+		if (!geodata_string || geodata_string.trim() == '') {
+			return {
+				v: false,
+				header: 'Местоположение не указано',
+				text: 'Укажите район, где получатель сможет забрать вещь',
+			};
+		}
 	}
 	return {
 		v: true,
@@ -252,11 +263,8 @@ const mapStateToProps = (state) => {
 	return {
 		inputData: state.formData.forms,
 		myUser: state.vkui.myUser,
-		appID: state.vkui.appID,
-		apiVersion: state.vkui.apiVersion,
-		AD: state.ad,
 
-		snackbar: state.router.snackbars[state.router.activeStory],
+		AD: state.ad,
 
 		defaultInputData,
 		isValid,

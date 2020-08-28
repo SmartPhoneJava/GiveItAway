@@ -102,7 +102,7 @@ const Profile = (props) => {
 				<Cell
 					onClick={openUserVK}
 					size="l"
-					multiline={true}
+					multiline
 					asideContent={<Icon24Chevron />}
 					before={
 						<ImageCache
@@ -111,6 +111,7 @@ const Profile = (props) => {
 							url={backuser.photo_url}
 						/>
 					}
+					style={{ cursor: 'pointer' }} 
 					description={getUserOnline()}
 				>
 					{withLoadingIf(
@@ -169,8 +170,8 @@ const Profile = (props) => {
 					separator="hide"
 					header={
 						<Header
+							style={{ cursor: 'pointer' }}
 							onClick={() => {
-								console.log('clickkkked', collapseOpen);
 								setCollapseOpen((prev) => !prev);
 							}}
 							mode="primary"
@@ -212,7 +213,7 @@ const Profile = (props) => {
 					icon={<Icon56DoNotDisturbOutline />}
 					header="Пусто"
 					action={
-						<Button size="l" onClick={openCreateStory}>
+						<Button style={{ cursor: 'pointer' }} size="l" onClick={openCreateStory}>
 							Отдать даром
 						</Button>
 					}
@@ -241,7 +242,7 @@ const Profile = (props) => {
 					icon={<Icon56DoNotDisturbOutline />}
 					header="Пусто"
 					action={
-						<Button size="l" onClick={openAdsStory}>
+						<Button style={{ cursor: 'pointer' }} size="l" onClick={openAdsStory}>
 							Получить даром
 						</Button>
 					}
@@ -320,18 +321,6 @@ const Profile = (props) => {
 		setStory(STORY_ADS);
 	}
 
-	function contentWriteToUser() {
-		return vkUser.id == myID ? null : vkUser.can_write_private_message == 1 ? (
-			<Link style={{ marginLeft: '15px' }} href={getUserDialog()} target="_blank">
-				Написать
-			</Link>
-		) : (
-			<Link style={{ marginLeft: '15px' }} href={getUserVKstring()} target="_blank">
-				Написать
-			</Link>
-		);
-	}
-
 	const [supportPanel, setSupportPanel] = useState();
 	useEffect(() => {
 		const imgUrl = 'url(https://sun9-31.userapi.com/PQ4UCzqE_jue9hAINefBMorYCdfGXvcuV5nSjA/eYugcFYzdW8.jpg)';
@@ -360,7 +349,7 @@ const Profile = (props) => {
 						}
 						asideMode="expand"
 						actions={
-							<Button mode="overlay" size="l">
+							<Button style={{ cursor: 'pointer' }} mode="overlay" size="l">
 								Подробнее
 							</Button>
 						}

@@ -80,7 +80,9 @@ const Add7 = (props) => {
 		const isAdmin = WHITE_LIST.indexOf(props.myID) >= 0;
 		const par = (ad.status == STATUS_OFFER || ad.status == STATUS_CHOSEN) && (isAuthor() || isAdmin);
 		return par ? (
-			<Icon24MoreVertical onClick={openSettings} style={{ marginLeft: 'auto', marginBottom: 'auto' }} />
+			<div className="settings">
+				<Icon24MoreVertical onClick={openSettings} style={{ marginLeft: 'auto', marginBottom: 'auto' }} />
+			</div>
 		) : null;
 	}
 
@@ -175,21 +177,15 @@ const Add7 = (props) => {
 					)}
 				</Transition>
 			</div>
-			<div className="aright-main">
-				<div style={{ display: 'flex' }}>
-					<InfoRow onClick={props.openAd} className="aheader">
-						{ad.header}
-					</InfoRow>
 
-					{controllButton()}
-				</div>
-				<div onClick={props.openAd}>
-					<InfoRow className="atext"> {GetCategoryText(ad.category)} </InfoRow>
-					<InfoRow className="atext"> {time(ad.creation_date, 300)} </InfoRow>
-					{metroPanel()}
-					{authorPanel()}
-				</div>
+			<div className="aright-main" onClick={props.openAd}>
+				<InfoRow className="aheader">{ad.header}</InfoRow>
+				<InfoRow className="atext"> {GetCategoryText(ad.category)} </InfoRow>
+				<InfoRow className="atext"> {time(ad.creation_date, 300)} </InfoRow>
+				{metroPanel()}
+				{authorPanel()}
 			</div>
+			{controllButton()}
 		</div>,
 		'shadow'
 	);

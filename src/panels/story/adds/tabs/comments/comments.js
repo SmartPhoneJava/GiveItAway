@@ -70,7 +70,6 @@ const CommentsI = (props) => {
 	const [pageNumber, setPageNumber] = useState(1);
 	const observer = useRef();
 
-
 	let { inited, loading, error, hasMore, newPage } = useCommentsGet(
 		props.mini,
 		pageNumber,
@@ -81,11 +80,9 @@ const CommentsI = (props) => {
 
 	const lastAdElementRef = useCallback(
 		(node) => {
-			
 			if (loading) return;
 			if (observer.current) observer.current.disconnect();
 			observer.current = new IntersectionObserver((entries) => {
-				
 				if (entries[0].isIntersecting && hasMore) {
 					setPageNumber((prevPageNumber) => newPage + 1);
 				}
@@ -100,7 +97,11 @@ const CommentsI = (props) => {
 	}, [AD.comments]);
 
 	function trySetText(text) {
-		setCommentValid(text.length != 0 && text.length <= MAX_COMMENT_LENGTH);
+		let vtext = text
+		if (text) {
+			vtext = vtext.trim()
+		}
+		setCommentValid(vtext.length != 0 && text.length <= MAX_COMMENT_LENGTH);
 		setTooBigComment(text.length > MAX_COMMENT_LENGTH);
 		setText(text);
 	}
@@ -181,7 +182,17 @@ const CommentsI = (props) => {
 		setCommentsComponent(
 			props.mini ? (
 				<Group
-					header={<Header aside={<Link onClick={openCommentaries}>Показать все</Link>}>Комментарии</Header>}
+					header={
+						<Header
+							aside={
+								<Link style={{ cursor: 'pointer' }} onClick={openCommentaries}>
+									Показать все
+								</Link>
+							}
+						>
+							Комментарии
+						</Header>
+					}
 				>
 					<Comment onClick={openCommentaries} v={nots[0]} />
 				</Group>
@@ -191,11 +202,10 @@ const CommentsI = (props) => {
 						<div
 							className="comments-element-inner"
 							key={v.comment_id + index}
-							
 							ref={nots.length == index + 1 ? lastAdElementRef : null}
 						>
 							<Card mode="outline">
-								<Comment onClick={() => onUserClick(v)} v={v} />
+								<Comment style={{ cursor: 'pointer' }} onClick={() => onUserClick(v)} v={v} />
 							</Card>
 						</div>
 					))}
@@ -283,7 +293,7 @@ const CommentsI = (props) => {
 				!loading,
 				nots.length == 0 &&
 					(props.mini ? (
-						<CellButton onClick={openCommentaries} before={<Icon24Write />}>
+						<CellButton style={{ cursor: 'pointer' }} onClick={openCommentaries} before={<Icon24Write />}>
 							Написать первый комментарий
 						</CellButton>
 					) : (
@@ -291,7 +301,7 @@ const CommentsI = (props) => {
 							<Placeholder
 								action={
 									props.mini ? (
-										<Button size="l" onClick={openCommentaries}>
+										<Button size="l" onClick={openCommentaries} style={{ cursor: 'pointer' }}>
 											Написать
 										</Button>
 									) : null
@@ -369,6 +379,11 @@ const CommentsI = (props) => {
 					<div className="write-comment-panel">
 						<div className="write-comment-input">
 							<Input
+								onKeyPress={(target) => {
+									if (target.charCode == 13) {
+										sendComment();
+									}
+								}}
 								style={{ transition: '0.3s' }}
 								placeholder="Комментарий"
 								value={text}
@@ -378,7 +393,11 @@ const CommentsI = (props) => {
 							/>
 						</div>
 						<div className="write-comment-button">
-							<PanelHeaderButton disabled={!commentValid} onClick={sendComment}>
+							<PanelHeaderButton
+								style={{ cursor: commentValid ? 'pointer' : null }}
+								disabled={!commentValid}
+								onClick={sendComment}
+							>
 								<Avatar size="20">
 									<Icon24Send className="write-comment-button-color" size="24" />
 								</Avatar>

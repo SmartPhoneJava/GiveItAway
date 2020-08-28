@@ -8,7 +8,7 @@ const AdvicePanel = (props) => {
 	const { goBack } = props;
 	return (
 		<>
-			<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
+			<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
 				<p className="panel-header">Полезные советы</p>
 				{/* {choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошибка'} */}
 			</PanelHeader>
@@ -176,7 +176,7 @@ const AdvicePanel = (props) => {
 			</Group>
 
 			<Footer>
-				<Link href="https://vk.com/public194671970" target="_blank">
+				<Link style={{ cursor: 'pointer' }} href="https://vk.com/public194671970" target="_blank">
 					Перейти в наше сообщество
 				</Link>
 			</Footer>

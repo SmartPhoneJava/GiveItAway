@@ -60,14 +60,21 @@ export const ImageCache = (props) => {
 			if (cancel) {
 				return;
 			}
-			setImage(<img src={url} className={className} onClick={onClick} />);
+			setImage(
+				<img style={{ cursor: onClick ? 'pointer' : null }} src={url} className={className} onClick={onClick} />
+			);
 		};
 		if (i.complete) {
 			cancel = true;
 		}
 		setImage(
 			i.complete ? (
-				<img srcSet={url} className={className} onClick={onClick} />
+				<img
+					style={{ cursor: onClick ? 'pointer' : null }}
+					srcSet={url}
+					className={className}
+					onClick={onClick}
+				/>
 			) : (
 				<div className={props.spinnerClassName}>
 					<Spinner size="medium" />

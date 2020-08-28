@@ -55,6 +55,7 @@ img.profile-tiled {
 }
 
 .profile-carma-label {
+	cursor: pointer;
 	flex: 1;
 }
 

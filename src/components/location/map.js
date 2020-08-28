@@ -34,7 +34,7 @@ const AdMap = (props) => {
 
 	return (
 		<div className="ad-map">
-			{!loaded ? <ScreenSpinner size="large" /> : null}
+			{!loaded ? <ScreenSpinner style={{ paddingTop: '20px' }} size="large" /> : null}
 			<YMaps>
 				<Map
 					width={max ? width + 40 : null}

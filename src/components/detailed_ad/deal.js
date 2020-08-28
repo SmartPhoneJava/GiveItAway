@@ -14,7 +14,7 @@ import Icon24Help from '@vkontakte/icons/dist/24/help';
 import Icon24MarketOutline from '@vkontakte/icons/dist/24/market_outline';
 
 import { TYPE_CHOICE, STATUS_OFFER, TYPE_RANDOM, STATUS_ABORTED, STATUS_CLOSED } from '../../const/ads';
-import {  getCashback, CancelClose, Close } from '../../requests';
+import { getCashback, CancelClose, Close } from '../../requests';
 import { withLoadingIf } from '../image/image_cache';
 import { openModal, setProfile, setPage } from '../../store/router/actions';
 import { MODAL_ADS_TYPES, MODAL_ADS_FROZEN, MODAL_ADS_COST } from '../../store/router/modalTypes';
@@ -71,12 +71,13 @@ const DealLabelInner = (props) => {
 			withLoadingIf(
 				props.dealRequestSuccess,
 				<Cell
+					style={{ cursor: 'pointer' }}
 					onClick={() => {
 						if (dealer) {
 							props.setProfile(dealer.vk_id);
 						}
 					}}
-					multiline={true}
+					multiline
 					key={dealer ? dealer.vk_id : ''}
 					before={dealer ? <Avatar size={36} src={dealer.photo_url} /> : <Icon24User />}
 				>
@@ -123,13 +124,19 @@ const DealLabelInner = (props) => {
 								onClick={() => {
 									CancelClose(ad_id);
 								}}
+								style={{ cursor: disable ? null : 'pointer' }}
 								disabled={disable}
 								before={<Icon24Cancel />}
 							>
 								Отменить
 							</CellButton>
 							{ad_type == TYPE_CHOICE && (
-								<CellButton onClick={openSubs} disabled={disable} before={<Icon24Repost />}>
+								<CellButton
+									style={{ cursor: disable ? null : 'pointer' }}
+									onClick={openSubs}
+									disabled={disable}
+									before={<Icon24Repost />}
+								>
 									Изменить
 								</CellButton>
 							)}
@@ -147,6 +154,7 @@ const DealLabelInner = (props) => {
 								: openSubs
 						}
 						disabled={disable}
+						style={{ cursor: disable ? null : 'pointer' }}
 						before={<Icon24Done />}
 					>
 						{ad_type == TYPE_RANDOM ? 'Запустить' : 'Выбрать получателя'}
@@ -166,6 +174,7 @@ const DealLabelInner = (props) => {
 						<div style={{ display: width < 330 ? 'block' : 'flex' }}>
 							<CellButton
 								disabled={disable}
+								style={{ cursor: disable ? null : 'pointer' }}
 								onClick={unsub}
 								mode="danger"
 								before={<Icon24MarketOutline />}
@@ -175,14 +184,18 @@ const DealLabelInner = (props) => {
 							<div style={{ display: 'flex', flex: 1 }}>
 								<Cell
 									indicator={
-										<Counter mode="primary" onClick={onCarmaClick} style={{ fontWeight: 600 }}>
+										<Counter
+											mode="primary"
+											onClick={onCarmaClick}
+											style={{ fontWeight: 600, cursor: 'pointer' }}
+										>
 											{cost + ' ' + K}
 										</Counter>
 									}
 								>
 									Вам вернётся
 								</Cell>
-								<Cell onClick={onFreezeClick}>
+								<Cell style={{ cursor: 'pointer' }} onClick={onFreezeClick}>
 									<Icon24Help fill={'var(--counter_secondary_background)'} />
 								</Cell>
 							</div>
@@ -193,21 +206,31 @@ const DealLabelInner = (props) => {
 				button = (
 					<div style={{ display: width < 330 ? 'block' : 'flex' }}>
 						<div>
-							<CellButton onClick={sub} disabled={disable} before={<Icon24MarketOutline />}>
+							<CellButton
+								style={{ cursor: disable ? null : 'pointer' }}
+								onClick={sub}
+								disabled={disable}
+								before={<Icon24MarketOutline />}
+							>
 								Откликнуться
 							</CellButton>
 						</div>
 						<div style={{ display: 'flex', flex: 1 }}>
 							<Cell
 								indicator={
-									<Counter mode="prominent" onClick={onCarmaClick} style={{ fontWeight: 600 }}>
+									<Counter
+										style={{ cursor: 'pointer' }}
+										mode="prominent"
+										onClick={onCarmaClick}
+										style={{ fontWeight: 600 }}
+									>
 										{cost + ' ' + K}
 									</Counter>
 								}
 							>
 								Стоимость
 							</Cell>
-							<Cell onClick={onFreezeClick}>
+							<Cell style={{ cursor: 'pointer' }} onClick={onFreezeClick}>
 								<Icon24Help fill={'var(--counter_secondary_background)'} />
 							</Cell>
 						</div>

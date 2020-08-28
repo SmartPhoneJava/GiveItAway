@@ -24,13 +24,14 @@ const AboutPanel = (props) => {
 	const { goBack, setPage } = props;
 	return (
 		<>
-			<PanelHeader left={<PanelHeaderBack onClick={goBack} />}>
+			<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
 				<p className="panel-header">О сервисе</p>
 				{/* {choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошибка'} */}
 			</PanelHeader>
 
 			<Group header={<Header mode="secondary"> Общая информация </Header>}>
 				<Cell
+					style={{ cursor: 'pointer' }}
 					expandable
 					before={<Icon28HelpOutline />}
 					onClick={() => {
@@ -41,6 +42,7 @@ const AboutPanel = (props) => {
 					Ответы на вопросы
 				</Cell>
 				<Cell
+					style={{ cursor: 'pointer' }}
 					expandable
 					before={<Icon28InfoOutline />}
 					onClick={() => {
@@ -51,6 +53,7 @@ const AboutPanel = (props) => {
 					Полезные советы
 				</Cell>
 				<Cell
+					style={{ cursor: 'pointer' }}
 					expandable
 					before={<Icon28ArticleOutline />}
 					description="Пользовательское соглашение"
@@ -63,6 +66,7 @@ const AboutPanel = (props) => {
 			</Group>
 			<Group header={<Header mode="secondary"> Обратная связь </Header>}>
 				<Cell
+					style={{ cursor: 'pointer' }}
 					expandable
 					before={<Icon28Users3Outline />}
 					onClick={() => {
@@ -73,6 +77,7 @@ const AboutPanel = (props) => {
 					Официальное сообщество
 				</Cell>
 				<Cell
+					style={{ cursor: 'pointer' }}
 					expandable
 					before={<Icon28MessagesOutline />}
 					onClick={() => {
@@ -83,6 +88,7 @@ const AboutPanel = (props) => {
 					Написать разработчикам
 				</Cell>
 				<Cell
+					style={{ cursor: 'pointer' }}
 					expandable
 					before={<Icon28MoneyCircleOutline />}
 					onClick={() => {
@@ -95,6 +101,7 @@ const AboutPanel = (props) => {
 			</Group>
 			<Group header={<Header mode="secondary"> Поделиться с друзьями </Header>}>
 				<Cell
+					style={{ cursor: 'pointer' }}
 					multiline
 					expandable
 					before={<Icon24ShareExternal />}
@@ -104,6 +111,7 @@ const AboutPanel = (props) => {
 					Поделиться ссылкой на сервис
 				</Cell>
 				<Cell
+					style={{ cursor: 'pointer' }}
 					multiline
 					expandable
 					before={<Icon24Newsfeed />}
@@ -114,6 +122,7 @@ const AboutPanel = (props) => {
 				</Cell>
 				{props.platform != 'mobile_web' && (
 					<Cell
+						style={{ cursor: 'pointer' }}
 						multiline
 						expandable
 						before={<Icon24StoryOutline />}

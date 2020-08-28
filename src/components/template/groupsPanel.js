@@ -117,6 +117,7 @@ const GroupsPanel = (props) => {
 				action={
 					allowCustom ? (
 						<Button
+							style={{ cursor: 'pointer' }}
 							onClick={() => {
 								onCellClick(choosenGroup, 'Другое');
 							}}
@@ -171,7 +172,7 @@ const GroupsPanel = (props) => {
 		return getImage(v) ? (
 			<div
 				// expandable
-				multiline
+				style={{ cursor: 'pointer' }}
 				key={text}
 				before={imageLeft && getImage(v)}
 				description={description}
@@ -185,6 +186,7 @@ const GroupsPanel = (props) => {
 		) : (
 			<Cell
 				// expandable
+				style={{ cursor: 'pointer' }}
 				multiline
 				key={text}
 				before={imageLeft && getImage(v)}
@@ -230,6 +232,7 @@ const GroupsPanel = (props) => {
 						{needShowAllBtn ? (
 							<Div>
 								<Link
+									style={{ cursor: 'pointer' }}
 									onClick={() => {
 										setChoosenGroup(group);
 									}}
@@ -267,6 +270,7 @@ const GroupsPanel = (props) => {
 				{allowCustom ? (
 					<Footer>
 						<Link
+							style={{ cursor: 'pointer' }}
 							onClick={() => {
 								setNoVariant(true);
 							}}
@@ -326,7 +330,7 @@ const GroupsPanel = (props) => {
 		<>
 			{noVariant ? (
 				<>
-					<CellButton mode="danger" onClick={hideMyVariant}>
+					<CellButton style={{ cursor: 'pointer' }} mode="danger" onClick={hideMyVariant}>
 						Отменить
 					</CellButton>
 					<FormLayout>
@@ -348,7 +352,12 @@ const GroupsPanel = (props) => {
 					</FormLayout>
 
 					<Div>
-						<Button disabled={!isValid()} onClick={saveClick} size="xl">
+						<Button
+							style={{ cursor: isValid() ? 'pointer' : null }}
+							disabled={!isValid()}
+							onClick={saveClick}
+							size="xl"
+						>
 							Продолжить
 						</Button>
 					</Div>

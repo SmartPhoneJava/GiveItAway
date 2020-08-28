@@ -6,6 +6,7 @@
 }
 
 img.atiled {
+	cursor: pointer;
 	position: absolute;
 	border-radius: 5px;
 	object-fit: cover;
@@ -76,11 +77,13 @@ img.light-tiled {
 }
 
 .light-tiled-panel {
+	cursor: pointer;
 	height: 87%;
 	flex: 1;
 }
 
 .light-tiled-outter {
+	cursor: pointer;
 	padding: 4px;
 	height: 100%;
 }
@@ -217,10 +220,18 @@ img.light-tiled {
 }
 
 .aright-main {
+	cursor: pointer;
 	position: relative;
 	display: block;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	flex: 1;
+}
+
+.settings {
+	cursor: pointer;
+	position: absolute;
+	top: 8px;
+	right: 8px;
 }

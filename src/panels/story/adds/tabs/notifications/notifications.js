@@ -287,10 +287,19 @@ const Notifications = (props) => {
 	function handleChecked(e) {
 		const newValue = e.currentTarget.checked;
 		if (newValue) {
-			allowMessages();
+			console.log('aaaa');
+			allowMessages(
+				() => {
+					setPermissionPM(props.myID, newValue);
+				},
+				() => {
+					setNotsPM(false);
+				}
+			);
+		} else {
+			setPermissionPM(props.myID, newValue);
 		}
 		setNotsPM(newValue);
-		setPermissionPM(props.myID, newValue);
 	}
 
 	const [body, setBody] = useState(<></>);
@@ -316,7 +325,10 @@ const Notifications = (props) => {
 			<div>
 				<Cell
 					multiline
-					asideContent={withLoadingIf(notsPMLoaded, <Switch checked={notsPM} onChange={handleChecked} />)}
+					asideContent={withLoadingIf(
+						notsPMLoaded,
+						<Switch style={{ cursor: 'pointer' }} checked={notsPM} onChange={handleChecked} />
+					)}
 				>
 					Отправлять уведомления в Личные Сообщения
 				</Cell>

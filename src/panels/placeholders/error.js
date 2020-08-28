@@ -11,7 +11,7 @@ const Error = (props) => {
 			header="Сервер временно недоступен &#128560;"
 			action={
 				props.action ? (
-					<Button onClick={() => props.action()} size="l">
+					<Button style={{ cursor: 'pointer' }} onClick={() => props.action()} size="l">
 						Повторить попытку
 					</Button>
 				) : (

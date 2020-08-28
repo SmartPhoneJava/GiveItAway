@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, createRef } from 'react';
 import {
 	FormLayout,
 	Input,
@@ -147,6 +147,9 @@ const CreateItem = (props) => {
 	};
 
 	function deletePhoto(i) {
+		if (!inputData.photosUrl) {
+			return
+		}
 		const photoText = PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length - 1) + '/3';
 		const photosUrl = [...inputData.photosUrl.slice(0, i), ...inputData.photosUrl.slice(i + 1)];
 		setFormData(CREATE_AD_ITEM, {
@@ -161,7 +164,7 @@ const CreateItem = (props) => {
 	}
 
 	const photoSwipeImgs = inputData.photosUrl
-		? inputData.photosUrl.map((v) => {
+		? inputData.photosUrl && inputData.photosUrl.map((v) => {
 				let img = new Image();
 				const src = v.src ? v.src : v.PhotoUrl;
 				img.src = v.src;
@@ -212,8 +215,8 @@ const CreateItem = (props) => {
 				setNoPhotosA(false);
 				setTimeout(() => {
 					if (cancelFunc) {
-							return;
-						}
+						return;
+					}
 					setPhotosDelete(-1);
 				}, duration);
 			}, duration);
@@ -247,6 +250,7 @@ const CreateItem = (props) => {
 							onChange={handleInput}
 						/>
 					</FormLayout>
+
 					<FormLayout>
 						<Textarea
 							top={descriptionLabel}
@@ -289,10 +293,13 @@ const CreateItem = (props) => {
 												<File
 													multiple={true}
 													before={<Icon24Camera />}
-													disabled={inputData.photosUrl.length == 3}
-													mode={inputData.photosUrl.length == 3 ? 'secondary' : 'primary'}
+													disabled={inputData.photosUrl && inputData.photosUrl.length == 3}
+													mode={inputData.photosUrl && inputData.photosUrl.length == 3 ? 'secondary' : 'primary'}
 													onChange={loadPhoto}
-													style={{transition:`${duration}ms ease-in-out`}}
+													style={{
+														cursor: 'pointer',
+														transition: `${duration}ms ease-in-out`,
+													}}
 												>
 													Загрузить
 												</File>
@@ -313,7 +320,7 @@ const CreateItem = (props) => {
 
 								<HorizontalScroll>
 									<div style={{ display: 'flex', marginLeft: '10px', marginRight: '10px' }}>
-										{inputData.photosUrl.map((img, i) => {
+										{inputData.photosUrl && inputData.photosUrl.map((img, i) => {
 											if (needEdit) {
 												img.src = img.PhotoUrl;
 												img.id = img.AdPhotoId;
@@ -377,6 +384,7 @@ const CreateItem = (props) => {
 											icon={<Icon48Camera />}
 											action={
 												<File
+													style={{ cursor: 'pointer' }}
 													top="Снимки вещей"
 													disabled={inputData.photosUrl && inputData.photosUrl.length == 3}
 													mode={

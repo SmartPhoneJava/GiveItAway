@@ -41,6 +41,7 @@ export const AdFiltersInner = (props) => {
 				<CategoriesLabel redux_form={ADS_FILTERS} leftMargin="10px" open={openCategories} />
 				<List>
 					<Cell
+						style={{ cursor: 'pointer' }}
 						asideContent={<Icon24BrowserForward />}
 						onClick={openGeoSearch}
 						indicator={getGeoFilters(props.inputData[ADS_FILTERS])}
@@ -48,6 +49,7 @@ export const AdFiltersInner = (props) => {
 						Искать
 					</Cell>
 					<Cell
+						style={{ cursor: 'pointer' }}
 						asideContent={<Icon24BrowserForward />}
 						onClick={openSort}
 						indicator={sort == SORT_TIME ? 'по времени' : 'по близости'}

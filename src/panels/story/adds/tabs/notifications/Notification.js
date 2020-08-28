@@ -44,6 +44,7 @@ const NotificationInner = (props) => {
 	return (
 		<>
 			<Cell
+				style={{ cursor: 'pointer' }}
 				onClick={() => {
 					if (props.ad) {
 						setStory(STORY_ADS);

@@ -49,6 +49,7 @@ const SubcategoriesPanel = (props) => {
 			<PanelHeader
 				left={
 					<PanelHeaderBack
+						style={{ cursor: 'pointer' }}
 						onClick={
 							choosenGroup
 								? () => {
@@ -110,6 +111,7 @@ const SubcategoriesPanel = (props) => {
 							action={
 								allowCustom ? (
 									<Button
+										style={{ cursor: 'pointer' }}
 										onClick={() => {
 											setNoVariant(true);
 										}}

@@ -38,6 +38,7 @@ import { openTab } from '../../../../../services/_functions';
 const Subs = (props) => {
 	const osname = usePlatform();
 	const { openPopout, closePopout, setProfile, setPage, AD } = props;
+	console.log('ADDDDDD IS', AD);
 	const { dealer, subs, ad_id, isAuthor, ad_type, subscribers_num } = AD;
 	const status = AD.status || STATUS_OFFER;
 
@@ -100,12 +101,13 @@ const Subs = (props) => {
 
 		setNewGiven(
 			<Cell
+				style={{ cursor: 'pointer' }}
 				onClick={() => {
 					if (isAuthor) {
 						cancel_ad(dealer, false);
 					}
 				}}
-				multiline={true}
+				multiline
 				description={dealer ? 'Ждём подтверждение получения вещи' : ''}
 				key={dealer ? dealer.vk_id : ''}
 				before={dealer ? <Avatar size={36} src={dealer.photo_url} /> : <Icon24User />}
@@ -127,6 +129,7 @@ const Subs = (props) => {
 				<Group header={<Header mode="secondary">Откликнулись</Header>}>
 					{ad_type != TYPE_AUCTION && isAuthor && (
 						<CellButton
+							style={{ cursor: 'pointer' }}
 							onClick={() => close(subs[getRandomInt(subscribers_num)])}
 							before={<Icon24Shuffle />}
 						>
@@ -137,6 +140,7 @@ const Subs = (props) => {
 						subs.map((v, i) => (
 							<div key={v.vk_id} ref={subs.length == i + 1 ? lastAdElementRef : null}>
 								<Cell
+									style={{ cursor: 'pointer' }}
 									onClick={() => {
 										userClick(v, close, cancel);
 									}}
@@ -235,6 +239,7 @@ const Subs = (props) => {
 		<div>
 			{isAuthor && (
 				<CellButton
+					style={{ cursor: 'pointer' }}
 					onClick={() => {
 						setOpenFAQ((prev) => !prev);
 					}}

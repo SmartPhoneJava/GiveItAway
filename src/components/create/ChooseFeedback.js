@@ -49,7 +49,7 @@ const ChooseFeedback = (props) => {
 		<Group
 			separator="hide"
 			header={
-				<Cell multiline={true} description="Как откливнушиеся смогут связаться с тобой?">
+				<Cell multiline description="Как откликнувшиеся смогут связаться с тобой?">
 					<div style={{ fontWeight: 600 }}>Обратная связь</div>
 				</Cell>
 			}
@@ -79,7 +79,12 @@ const ChooseFeedback = (props) => {
 				before={<Icon24Comment fill="var(--header_tab_inactive_text)" />}
 				multiline
 				asideContent={
-					<Switch name="comments_enabled" checked={inputData.comments_enabled} onChange={handleChecked} />
+					<Switch
+						style={{ cursor: 'pointer' }}
+						name="comments_enabled"
+						checked={inputData.comments_enabled}
+						onChange={handleChecked}
+					/>
 				}
 				description="Пользователи могут оставлять коментарии в обьявлении"
 			>

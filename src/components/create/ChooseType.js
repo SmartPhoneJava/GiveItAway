@@ -28,12 +28,13 @@ const ChooseType = (props) => {
 		<Group
 			separator="hide"
 			header={
-				<Cell multiline={true} description="Как будет проходить выбор получателя вещи?">
+				<Cell multiline description="Как будет проходить выбор получателя вещи?">
 					<div style={{ fontWeight: 600 }}>Определение получателя</div>
 				</Cell>
 			}
 		>
 			<Radio
+				style={{ cursor: !edited ? 'pointer' : null }}
 				disabled={edited}
 				name="radio"
 				value={TYPE_CHOICE}
@@ -44,6 +45,7 @@ const ChooseType = (props) => {
 				Сделка
 			</Radio>
 			<Radio
+				style={{ cursor: !edited ? 'pointer' : null }}
 				disabled={edited}
 				name="radio"
 				value={TYPE_RANDOM}
@@ -54,6 +56,7 @@ const ChooseType = (props) => {
 				Лотерея
 			</Radio>
 			<Radio
+				style={{ cursor: !edited ? 'pointer' : null }}
 				disabled={edited}
 				name="radio"
 				value={TYPE_AUCTION}

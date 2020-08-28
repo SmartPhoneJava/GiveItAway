@@ -10,12 +10,12 @@ const AdNotFound = (props) => {
 			icon={<Icon56ErrorOutline />}
 			header="Упс &#128566;"
 			action={
-				<Button onClick={props.dropFilters} size="l">
+				<Button style={{ cursor: 'pointer' }} onClick={props.dropFilters} size="l">
 					Сбросить фильтры
 				</Button>
 			}
 		>
-			Кажется ничего не удалось найти. Попробуйте изменить фильтры, чтобы найти больше объявлений!
+			Кажется, ничего не удалось найти. Попробуйте изменить фильтры, чтобы найти больше объявлений!
 		</Placeholder>
 	);
 };

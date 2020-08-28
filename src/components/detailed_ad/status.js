@@ -25,10 +25,9 @@ const textWrapper = (text) => {
 };
 
 export const showHidden = () => {
-	let text =
-		'Объявление находится на модерации. Проверка не займет много времени, пожалуйста ожидайте!';
+	let text = 'Объявление находится на модерации. Проверка не займет много времени, пожалуйста ожидайте!';
 
-	return statusWrapper(textWrapper(text), "var(--accent)");
+	return statusWrapper(textWrapper(text), 'var(--accent)');
 };
 
 export const showClosed = (isDealer, isAuthor) => {
@@ -59,12 +58,26 @@ export const showChosen = (isDealer, isAuthor, dealer, acceptClick, cancelClick,
 				<InfoRow>Автор решил отдать вещь вам. Подтвердите получение вещи после получения:</InfoRow>
 				<div style={{ display: width < 350 ? 'block' : 'flex' }}>
 					<div style={{ padding: width < 350 ? '4px' : '8px', flex: 1 }}>
-						<Button stretched size="l" mode="commerce" onClick={acceptClick} before={<Icon24Done />}>
+						<Button
+							style={{ cursor: 'pointer' }}
+							stretched
+							size="l"
+							mode="commerce"
+							onClick={acceptClick}
+							before={<Icon24Done />}
+						>
 							Подтвердить
 						</Button>
 					</div>
 					<div style={{ padding: '8px', flex: 1 }}>
-						<Button stretched size="l" mode="destructive" onClick={cancelClick} before={<Icon24Cancel />}>
+						<Button
+							style={{ cursor: 'pointer' }}
+							stretched
+							size="l"
+							mode="destructive"
+							onClick={cancelClick}
+							before={<Icon24Cancel />}
+						>
 							Отклонить
 						</Button>
 					</div>

@@ -20,18 +20,25 @@ const SubsLabelInner = (props) => {
 		const photos = subs.map((v) => v.photo_url);
 		setComponentSubs(
 			subs.length == 0 ? (
-				<Cell multiline={true} before={<Icon24Users />}>
+				<Cell multiline before={<Icon24Users />}>
 					Никто еще не откликнулся
 				</Cell>
 			) : (
 				<Group
 					header={
-						<Header mode="secondary" aside={<Link onClick={openSubs}>Показать всех</Link>}>
+						<Header
+							mode="secondary"
+							aside={
+								<Link style={{ cursor: 'pointer' }} onClick={openSubs}>
+									Показать всех
+								</Link>
+							}
+						>
 							Откликнулись
 						</Header>
 					}
 				>
-					<UsersStack onClick={openSubs} visibleCount={3} photos={photos} size="m">
+					<UsersStack style={{ padding: '4px' }} onClick={openSubs} visibleCount={3} photos={photos} size="m">
 						<Text>
 							{subs.length == 1
 								? subs[0].name + ' ' + subs[0].surname
@@ -45,14 +52,14 @@ const SubsLabelInner = (props) => {
 								  ', ' +
 								  subs[2].name +
 								  'и еще ' +
-								  (subscribers_num - 3) +
+								  (subs.length - 3) +
 								  ' человек'}
 						</Text>
 					</UsersStack>
 				</Group>
 			)
 		);
-	}, [props.ad.subs]);
+	}, [props.ad]);
 	return componentSubs;
 };
 

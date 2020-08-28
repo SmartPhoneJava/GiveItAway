@@ -6,7 +6,6 @@ import { connect } from 'react-redux';
 
 import { getSubscribers, Close } from './../../requests';
 
-
 export const PeopleRBI = withModalRootContext((props) => {
 	const [subs, setSubs] = useState([]);
 	const { ad_id, ad_type } = props.ad;
@@ -38,6 +37,7 @@ export const PeopleRBI = withModalRootContext((props) => {
 						key={i}
 						name="sub"
 						value={v.vk_id}
+						style={{ cursor: 'pointer' }}
 						onClick={(e) => {
 							const { value } = e.currentTarget;
 							Close(ad_id, ad_type, value);

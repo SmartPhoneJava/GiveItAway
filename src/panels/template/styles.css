@@ -155,4 +155,5 @@ img.details-card-img {
 	justify-content: center;
 	text-align: center;
 	font-weight: 600;
+	cursor: pointer;
 }
