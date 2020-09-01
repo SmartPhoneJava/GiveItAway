@@ -163,7 +163,7 @@ const isValid = (inputData) => {
 				text: 'Опишите ваши вещи, им будет приятно!',
 			};
 		}
-		if (description.length < 5) {
+		if (description.length < 10) {
 			return {
 				v: false,
 				header: 'Описание предмета слишком короткое',

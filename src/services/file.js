@@ -1,3 +1,5 @@
+import { fail, failEasy } from "../requests";
+
 let KEY = 0;
 
 export function NEWhandleFiles(file, addPhoto, index, v) {
@@ -11,7 +13,15 @@ export function NEWhandleFiles(file, addPhoto, index, v) {
 		let img = new Image();
 		img.src = e.target.result;
 
+		console.log('we wanna start');
+		img.onerror = function () {
+			console.log('we wanna abort');
+			failEasy("Изображение поломано, загрузка не удалась")
+			KEY++;
+			v(index);
+		}
 		img.onload = function () {
+			console.log('we wanna end');
 			var ctx = canvas.getContext('2d');
 			ctx.drawImage(img, 0, 0);
 
@@ -47,8 +57,8 @@ export function NEWhandleFiles(file, addPhoto, index, v) {
 			var blob = new Blob([new Uint8Array(array)], { type: file.type });
 			let newFile = new File([blob], file.name, { type: file.type });
 			KEY++;
-			console.log("setLoading wanna", index)
-			v(index)
+			console.log('setLoading wanna', index);
+			v(index);
 			addPhoto({ src: dataurl, id: KEY, origin: newFile });
 		};
 	};
@@ -116,23 +126,37 @@ function checkFileType(file) {
 
 export const loadPhotos = (e, handleWrongSize, handleWrongType, addPhoto, end) => {
 	var files = e.target.files; // FileList object
-	// Loop through the FileList and render image files as thumbnails.
+	
+	if (files.length == 0) {
+		console.log("end is here")
+		end();
+		return;
+	}
+	const flen = files.length
+	console.log('files.length', flen);
 	for (var i = 0, file; (file = files[i]); i++) {
+		console.log('we start 1');
 		if (!file) {
 			continue;
 		}
-		// if (!checkFileSize(file)) {
-		// 	handleWrongSize(file);
-		// 	continue;
-		// }
+		console.log('we start 2');
+		if (!checkFileSize(file)) {
+			handleWrongSize(file);
+			end();
+			continue;
+		}
+		console.log('we start 3');
 		if (!checkFileType(file)) {
 			handleWrongType(file);
+			end();
 			continue;
 		}
 		NEWhandleFiles(file, addPhoto, i, (i) => {
-			console.log("loooooook", i, )
-			if (i == files.length - 1) {
+			console.log("loooook", i, flen - 1)
+			if (i == flen - 1) {
+				console.log("eeeeend")
 				end();
+				
 			}
 		});
 		// handleFileSelect(file, addPhoto);

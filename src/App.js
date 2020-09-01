@@ -75,7 +75,7 @@ import Create from './containers/create/create';
 import Icon28User from '@vkontakte/icons/dist/28/user';
 import Icon28NewsfeedOutline from '@vkontakte/icons/dist/28/newsfeed_outline';
 import Icon28Add from '@vkontakte/icons/dist/28/add_outline';
-import Icon24Notification from '@vkontakte/icons/dist/24/notification';
+import Icon28Notification from '@vkontakte/icons/dist/28/notification';
 
 import {
 	handleNotifications,
@@ -430,7 +430,7 @@ const App = (props) => {
 							label={notsCounterrr == 0 ? null : notsCounterrr}
 							text={notText}
 						>
-							<Icon24Notification style={{ cursor: 'pointer' }} onClick={onStoryChange} />
+							<Icon28Notification style={{ cursor: 'pointer' }} onClick={onStoryChange} />
 						</TabbarItem>
 						<TabbarItem
 							style={{ cursor: 'pointer' }}

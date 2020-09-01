@@ -33,34 +33,36 @@ const AdMap = (props) => {
 	}
 
 	return (
-		<div className="ad-map">
-			{!loaded ? <ScreenSpinner style={{ paddingTop: '20px' }} size="large" /> : null}
-			<YMaps>
-				<Map
-					width={max ? width + 40 : null}
-					height={max ? height : null}
-					state={mapState}
-					onLoad={() => {
-						setLoaded(true);
-					}}
-				>
-					{max ? (
-						<Circle
-							geometry={[center, 200]}
-							options={{
-								draggable: false,
-								fillColor: '#DB709377',
-								strokeColor: '#990066',
-								strokeOpacity: 0.5,
-								strokeWidth: 1,
-							}}
-						/>
-					) : (
-						<Placemark geometry={place} />
-					)}
-				</Map>
-			</YMaps>
-		</div>
+		<>
+			{!loaded ? <ScreenSpinner style={{ paddingTop: `${height / 2}px` }} size="large" /> : null}
+			<div className="ad-map">
+				<YMaps>
+					<Map
+						width={max ? width + 40 : null}
+						height={max ? height : null}
+						state={mapState}
+						onLoad={() => {
+							setLoaded(true);
+						}}
+					>
+						{max ? (
+							<Circle
+								geometry={[center, 200]}
+								options={{
+									draggable: false,
+									fillColor: '#DB709377',
+									strokeColor: '#990066',
+									strokeOpacity: 0.5,
+									strokeWidth: 1,
+								}}
+							/>
+						) : (
+							<Placemark geometry={place} />
+						)}
+					</Map>
+				</YMaps>
+			</div>
+		</>
 	);
 };
 

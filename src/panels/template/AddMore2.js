@@ -218,7 +218,7 @@ const AddMore2r = (props) => {
 							style={{
 								display: 'flex',
 								overflowX:
-									props.platform == 'desktop_web' || props.platform == 'mobile_web' ? 'scroll' : null,
+									(props.platform == 'desktop_web' || props.platform == 'mobile_web') ? 'auto' : null,
 							}}
 						>
 							{pathes_to_photo.map((img, i) => (

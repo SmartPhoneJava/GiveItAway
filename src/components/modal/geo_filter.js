@@ -84,8 +84,9 @@ const ModalPageAdsGeoInner = (props) => {
 
 	useEffect(() => {
 		if (props.direction == DIRECTION_BACK) {
+			console.log("ADS_FILTERS_B", inputData[ADS_FILTERS_B])
 			load(ADS_FILTERS_B);
-		} else {
+		} else if (props.to != PANEL_CITIES) {
 			setFormData(ADS_FILTERS_B, {
 				...inputData[ADS_FILTERS],
 			});
@@ -93,8 +94,22 @@ const ModalPageAdsGeoInner = (props) => {
 		}
 	}, [props.direction]);
 
+
+	const numbersAfterDor = x => ( (x.toString().includes('.')) ? (x.toString().split('.').pop().length) : (0) );
+
 	function isRadiusValid() {
-		return radius >= 0.5 && radius <= 100;
+		
+		return radius >= 0.5 && radius <= 100 && numbersAfterDor(radius) < 4;
+	}
+
+	function radiusError() {
+		if (!(radius >= 0.5 && radius <= 100)) {
+			return 1
+		}
+		if (numbersAfterDor(radius) > 3) {
+			return 2
+		} 
+		return 0
 	}
 
 	function setGeoFilters() {
@@ -228,7 +243,13 @@ const ModalPageAdsGeoInner = (props) => {
 							<Input
 								placeholder="радиус круга поиска"
 								status={isRadiusValid() ? 'valid' : 'error'}
-								bottom={!isRadiusValid() ? 'Введите число километров от 0.5 до 100' : ''}
+								bottom={
+									!isRadiusValid()
+										? radiusError() == 2
+											? 'Максимальное число знаков после запятой 3, например 0,532 или 83,230'
+											: 'Введите число километров от 0,5 до 100'
+										: ''
+								}
 								value={String(radius)}
 								onChange={(e) => setRadiusR(e.target.value)}
 								type="number"
@@ -253,6 +274,7 @@ const mapStateToProps = (state) => {
 	return {
 		inputData: state.formData.forms,
 		direction: state.router.direction,
+		to: state.router.to,
 	};
 };
 

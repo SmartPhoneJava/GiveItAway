@@ -365,6 +365,7 @@ const CreateAddRedux = (props) => {
 						});
 
 						findMetro(ymapsL, e.value);
+						setIsLoading(false)
 
 						// if (!e.data.geo_lat) {
 						// 	getMetro(e.data.postal_code);

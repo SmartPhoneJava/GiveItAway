@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Avatar, InfoRow, Group, Cell, Counter, SimpleCell, Button, CellButton, RichCell } from '@vkontakte/vkui';
+import { Avatar, InfoRow, Group, Cell, Counter, SimpleCell, Button, CellButton, RichCell, Div } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
@@ -136,6 +136,9 @@ const AuctionLabelInner = (props) => {
 			props.unsub();
 		};
 
+		const width = document.body.clientWidth;
+		console.log('width is ', width);
+
 		const isActive = !(status == STATUS_ABORTED || status == STATUS_CLOSED);
 
 		const costMode = actionMaxUser && (myRate == actionMaxUser.cost ? 'secondary' : 'prominent');
@@ -182,14 +185,27 @@ const AuctionLabelInner = (props) => {
 							</div>
 						}
 						actions={
-							<React.Fragment>
-								<Button style={{ cursor: 'pointer' }} onClick={onIncreaseClick}>
-									Повысить
-								</Button>
-								<Button style={{ cursor: 'pointer' }} mode="secondary" onClick={onUserCancelClick}>
-									Отменить ставку
-								</Button>
-							</React.Fragment>
+							<div style={{ display: width > 370 ? 'flex' : 'block' }}>
+								<div style={{ paddingBottom: width < 370 ? '8px' : null, paddingRight: width > 370 ? '8px' : null  }}>
+									<Button
+										stretched={width < 370}
+										style={{ cursor: 'pointer' }}
+										onClick={onIncreaseClick}
+									>
+										Повысить
+									</Button>
+								</div>
+								<div>
+									<Button
+										stretched={width < 370}
+										style={{ cursor: 'pointer' }}
+										mode="secondary"
+										onClick={onUserCancelClick}
+									>
+										Отменить ставку
+									</Button>
+								</div>
+							</div>
 						}
 					>
 						Моя ставка

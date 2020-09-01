@@ -109,13 +109,12 @@ export const routerReducer = (state = initialState, action) => {
 			let dummy = action.payload.dummy;
 
 			let Story = state.activeStory;
-			let dummies = state.dummies[Story] || [];
 
 			return {
 				...state,
 				dummies: {
 					...state.dummies,
-					[Story]: [...dummies, dummy],
+					[Story]: [dummy],
 				},
 				scrollHistory: [...state.scrollHistory, pos],
 				scrollPosition: { x: 0, y: 0 },

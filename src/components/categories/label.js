@@ -43,7 +43,6 @@ export const tag = (text, color, background, borderColor, onClick, right) => {
 export const TagsLabel = (props) => {
 	const tagsUpdate = props.tagsUpdate || true;
 	return (
-		<div >
 		<DraggableArea
 			// isList={props.Y ? true : null}
 			disable={true}
@@ -77,7 +76,6 @@ export const TagsLabel = (props) => {
 			)}
 			onChange={(tags) => console.log(tags)}
 		/>
-		</div>
 	);
 };
 

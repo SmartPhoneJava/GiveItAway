@@ -73,7 +73,7 @@ const AdsPanel = (props) => {
 									display: 'flex',
 									overflowY:"hidden",
 									overflowX:
-										platform == 'desktop_web' || props.platform == 'mobile_web' ? 'scroll' : null,
+										platform == 'desktop_web' || props.platform == 'mobile_web' ? 'auto' : null,
 								}}
 							>
 								{ads.map((ad, index) => (

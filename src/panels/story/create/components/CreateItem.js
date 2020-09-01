@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, createRef } from 'react';
+import React, { useState, useEffect, useRef, createRef, forwardRef } from 'react';
 import {
 	FormLayout,
 	Input,
@@ -130,7 +130,6 @@ const CreateItem = (props) => {
 
 	const loadPhoto = (e) => {
 		setLoading(true);
-		console.log('setLoading(true);');
 		loadPhotos(
 			e,
 			handleWrongSize,
@@ -154,7 +153,7 @@ const CreateItem = (props) => {
 		if (!inputData.photosUrl) {
 			return;
 		}
-		const photoText = PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length - 1) + '/3 снимков';
+		const photoText = PHOTO_TEXT + 'Загружено ' + (inputData.photosUrl.length - 1) + '/3 снимков';
 		const photosUrl = [...inputData.photosUrl.slice(0, i), ...inputData.photosUrl.slice(i + 1)];
 		setFormData(CREATE_AD_ITEM, {
 			...inputData,
@@ -233,6 +232,8 @@ const CreateItem = (props) => {
 	}, [inputData.photosUrl]);
 
 	const buttonFile = useRef(null);
+	const fileRef = useRef();
+	const [filesArr, setFilesArr] = useState([]);
 
 	const [photosComponent, setPhotosComponent] = useState();
 	useEffect(() => {
@@ -282,21 +283,25 @@ const CreateItem = (props) => {
 			platform != '' ? <div className="scrolling-block">{v}</div> : <HorizontalScroll>{v}</HorizontalScroll>;
 
 		const disabled = inputData.photosUrl && inputData.photosUrl.length == 3;
-		const fileComponent = (
-			<File
-				ref={buttonFile}
-				multiple={true}
-				disabled={disabled}
-				mode={disabled ? 'secondary' : 'primary'}
-				onChange={loadPhoto}
-				style={{
-					cursor: 'pointer',
-					transition: `${duration}ms ease-in-out`,
-				}}
-			>
-				Загрузить
-			</File>
-		);
+		const FileComponent = forwardRef((props, ref) => (
+			<>
+				<File
+					ref={ref}
+					multiple={true}
+					disabled={disabled}
+					mode={disabled ? 'secondary' : 'primary'}
+					onChange={loadPhoto}
+					value={filesArr}
+					style={{
+						cursor: 'pointer',
+						transition: `${duration}ms ease-in-out`,
+					}}
+				>
+					Загрузить
+				</File>
+				{/* <input ref={ref}></input> */}
+			</>
+		));
 
 		const addNewButton = () => {
 			return disabled ? null : (
@@ -307,7 +312,7 @@ const CreateItem = (props) => {
 						) : (
 							<>
 								<Icon48Camera height={64} width={64} fill={disabled ? 'grey' : 'var(--accent)'} />
-								{fileComponent}
+								<FileComponent ref={fileRef} />
 							</>
 						)}
 					</div>

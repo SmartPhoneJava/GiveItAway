@@ -90,7 +90,9 @@ const GroupsPanel = (props) => {
 	}
 
 	function onCellClick(group, value) {
+		console.log("we will clear", props.clear)
 		if (props.clear) {
+			console.log("yeeee")
 			props.setFormData(redux_form, {
 				...defaultInputData,
 				[field]: value,

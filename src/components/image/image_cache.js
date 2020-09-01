@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { HideUntilLoaded, AnimateOnChange } from 'react-animation';
 import { Spinner } from '@vkontakte/vkui';
 
+import Gift from './../../img/icon278.png';
+
 export const AnimationGroup = (arr) => {
 	return arr.map((v, i) => <AnimationChange mayTheSame={true} duration={100 + i * 50} controll={v} />);
 };
@@ -62,6 +64,14 @@ export const ImageCache = (props) => {
 			}
 			setImage(
 				<img style={{ cursor: onClick ? 'pointer' : null }} src={url} className={className} onClick={onClick} />
+			);
+		};
+		i.onerror = function () {
+			if (cancel) {
+				return;
+			}
+			setImage(
+				<img style={{ cursor: onClick ? 'pointer' : null }} src={Gift} className={className} onClick={onClick} />
 			);
 		};
 		if (i.complete) {
