@@ -105,6 +105,7 @@ const ModalPageAdsGeoInner = (props) => {
 		});
 		setChanged(true);
 		setGeoType(GEO_TYPE_FILTERS);
+		setValid(true);
 	}
 
 	function setGeoNo() {
@@ -114,6 +115,7 @@ const ModalPageAdsGeoInner = (props) => {
 		});
 		setChanged(geoType != GEO_TYPE_NO);
 		setGeoType(GEO_TYPE_NO);
+		setValid(true);
 	}
 
 	function setGeoNear() {

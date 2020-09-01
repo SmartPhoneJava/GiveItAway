@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { HorizontalScroll, Card, CardScroll, Header, Gradient, Group, Link } from '@vkontakte/vkui';
+import { Card, CardScroll, Header, Gradient, Group } from '@vkontakte/vkui';
 
-import { AnimateGroup } from 'react-animation';
+import { connect } from 'react-redux';
 
 import { AdLight } from '../../template/Add6';
 
@@ -10,7 +10,7 @@ import Icon from './../../../img/icon150.png';
 import './profile.css';
 
 const AdsPanel = (props) => {
-	const { pack, useGet, profileID } = props;
+	const { pack, useGet, profileID, platform } = props;
 
 	const [pageNumber, setPageNumber] = useState(1);
 	const [spinner, setSpinner] = useState(null);
@@ -53,6 +53,8 @@ const AdsPanel = (props) => {
 		);
 	}
 
+	console.log('platform is', platform);
+
 	const [body, setBody] = useState(<></>);
 	useEffect(() => {
 		setBody(
@@ -65,19 +67,28 @@ const AdsPanel = (props) => {
 							</Header>
 						}
 					>
-						<CardScroll style={{ height:"100%" }}>
-							{ads.map((ad, index) => (
-								<div
-									onClick={() => props.openAd(ad)}
-									className="light-tiled-outter"
-									key={ad.ad_id}
-									ref={ads.length === index + 1 ? lastElementRef : null}
-								>
-									<Card className="light-tiled-inner" mode="outline" size="s">
-										{Ad(ad)}
-									</Card>
-								</div>
-							))}
+						<CardScroll style={{ height: '100%' }}>
+							<div
+								style={{
+									display: 'flex',
+									overflowY:"hidden",
+									overflowX:
+										platform == 'desktop_web' || props.platform == 'mobile_web' ? 'scroll' : null,
+								}}
+							>
+								{ads.map((ad, index) => (
+									<div
+										onClick={() => props.openAd(ad)}
+										className="light-tiled-outter"
+										key={ad.ad_id}
+										ref={ads.length === index + 1 ? lastElementRef : null}
+									>
+										<Card className="light-tiled-inner" mode="outline" size="s">
+											{Ad(ad)}
+										</Card>
+									</div>
+								))}
+							</div>
 						</CardScroll>
 					</Group>
 				</Gradient>
@@ -88,4 +99,12 @@ const AdsPanel = (props) => {
 	return body;
 };
 
-export default AdsPanel;
+const mapStateToProps = (state) => {
+	return {
+		platform: state.vkui.platform,
+	};
+};
+
+const mapDispatchToProps = {};
+
+export default connect(mapStateToProps, mapDispatchToProps)(AdsPanel);

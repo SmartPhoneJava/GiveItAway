@@ -49,6 +49,7 @@ import { scrollWindow } from '../../../../../App';
 import { Collapse } from 'react-collapse';
 import { withLoadingIf } from '../../../../../components/image/image_cache';
 import { openTab } from '../../../../../services/_functions';
+import { fail } from '../../../../../requests';
 
 const NO_ID = -1;
 
@@ -97,9 +98,9 @@ const CommentsI = (props) => {
 	}, [AD.comments]);
 
 	function trySetText(text) {
-		let vtext = text
+		let vtext = text;
 		if (text) {
-			vtext = vtext.trim()
+			vtext = vtext.trim();
 		}
 		setCommentValid(vtext.length != 0 && text.length <= MAX_COMMENT_LENGTH);
 		setTooBigComment(text.length > MAX_COMMENT_LENGTH);
@@ -237,10 +238,10 @@ const CommentsI = (props) => {
 				}
 			);
 		} else {
-			if (text.length == 0) {
+			if (text.length == 0 || text.trim() == 0) {
 				openSnackbar(
 					<Snackbar
-						duration={SNACKBAR_DURATION_DEFAULT}
+						duration={'1500'}
 						onClose={() => {
 							closeSnackbar();
 							setHide(false);

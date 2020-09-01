@@ -64,7 +64,7 @@ const FormPanel = (props) => {
 	return (
 		<>
 			<Group>
-				<Search value={search} onChange={handleSearch} />
+				<Search value={search} onChange={handleSearch} after={null} />
 				<List>
 					{array
 						.filter((v) => v && filterFunc(v).toLowerCase().indexOf(search) != -1)

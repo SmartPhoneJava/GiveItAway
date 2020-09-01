@@ -714,7 +714,11 @@ export function CreateAd(ad, obj, photos, openAd, loadAd, successcallback) {
 			store.dispatch(closePopout());
 			console.log('Request failed', error);
 
-			fail('Нет соединения с сервером', () => createAd(ad, obj, photos, openAd, loadAd, successcallback));
+			if (error.response.status === 429) {
+				failEasy('Вы создали слишком много объявлений за короткий промежуток времени, поэтому в ближайший час вы не можете создать новое.');
+			} else {
+				fail('Нет соединения с сервером', () => createAd(ad, obj, photos, openAd, loadAd, successcallback));
+			}
 		});
 	return;
 }
@@ -775,8 +779,9 @@ export const deleteAd = (ad_id, refresh) => {
 		});
 };
 
-export function fail(err, repeat, end) {
+export function fail(err, repeat, end, dur) {
 	{
+		const duration = dur || SNACKBAR_DURATION_DEFAULT;
 		let open;
 		console.log('we wanna set snackbar', err);
 		if (repeat) {
@@ -784,7 +789,7 @@ export function fail(err, repeat, end) {
 				store.dispatch(
 					openSnackbar(
 						<Snackbar
-							duration={SNACKBAR_DURATION_DEFAULT}
+							duration={duration}
 							onClose={() => {
 								store.dispatch(closeSnackbar());
 								if (end) {
@@ -811,7 +816,7 @@ export function fail(err, repeat, end) {
 				store.dispatch(
 					openSnackbar(
 						<Snackbar
-							duration={SNACKBAR_DURATION_DEFAULT}
+							duration={duration}
 							onClose={() => store.dispatch(closeSnackbar())}
 							before={
 								<Avatar size={24} style={{ background: 'red' }}>
@@ -825,6 +830,28 @@ export function fail(err, repeat, end) {
 				);
 		}
 		store.dispatch(open);
+	}
+}
+
+export function failEasy(err, dur) {
+	{
+		const duration = dur || SNACKBAR_DURATION_DEFAULT;
+
+		store.dispatch(
+			openSnackbar(
+				<Snackbar
+					duration={duration}
+					onClose={() => store.dispatch(closeSnackbar())}
+					before={
+						<Avatar size={24} style={{ background: 'red' }}>
+							<Icon24Cancel fill="#fff" width={14} height={14} />
+						</Avatar>
+					}
+				>
+					{err}
+				</Snackbar>
+			)
+		);
 	}
 }
 

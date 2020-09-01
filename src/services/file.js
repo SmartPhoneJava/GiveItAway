@@ -1,6 +1,6 @@
 let KEY = 0;
 
-export function NEWhandleFiles(file, addPhoto) {
+export function NEWhandleFiles(file, addPhoto, index, v) {
 	var dataurl = null;
 	var canvas = document.createElement('canvas');
 
@@ -47,6 +47,8 @@ export function NEWhandleFiles(file, addPhoto) {
 			var blob = new Blob([new Uint8Array(array)], { type: file.type });
 			let newFile = new File([blob], file.name, { type: file.type });
 			KEY++;
+			console.log("setLoading wanna", index)
+			v(index)
 			addPhoto({ src: dataurl, id: KEY, origin: newFile });
 		};
 	};
@@ -119,16 +121,20 @@ export const loadPhotos = (e, handleWrongSize, handleWrongType, addPhoto, end) =
 		if (!file) {
 			continue;
 		}
-		if (!checkFileSize(file)) {
-			handleWrongSize(file);
-			continue;
-		}
+		// if (!checkFileSize(file)) {
+		// 	handleWrongSize(file);
+		// 	continue;
+		// }
 		if (!checkFileType(file)) {
 			handleWrongType(file);
 			continue;
 		}
-		NEWhandleFiles(file, addPhoto);
+		NEWhandleFiles(file, addPhoto, i, (i) => {
+			console.log("loooooook", i, )
+			if (i == files.length - 1) {
+				end();
+			}
+		});
 		// handleFileSelect(file, addPhoto);
 	}
-	end();
 };

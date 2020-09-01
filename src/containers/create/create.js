@@ -173,7 +173,7 @@ const isValid = (inputData) => {
 		if (description.length > 1000) {
 			return {
 				v: false,
-				header: 'Название предмета слишком длинное',
+				header: 'Описание предмета слишком длинное',
 				text: 'Краткость сестра таланта! (максимум: 1000 символов)',
 			};
 		}

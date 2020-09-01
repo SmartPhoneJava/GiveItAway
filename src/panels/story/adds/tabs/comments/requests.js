@@ -5,7 +5,7 @@ import axios from 'axios';
 
 import { Addr, BASE_AD, BASE_COMMENT } from './../../../../../store/addr';
 
-import { fail, success } from './../../../../../requests';
+import { fail, failEasy, success } from './../../../../../requests';
 import { store } from '../../../../..';
 import { openPopout, closePopout } from '../../../../../store/router/actions';
 import { addComment } from '../../../../../store/detailed_ad/actions';
@@ -30,10 +30,8 @@ export async function postComment(ad_id, comment, comment_text, successCallback,
 		})
 		.then(function (response) {
 			store.dispatch(closePopout());
+
 			var comment = {};
-			console.log('comment is1', store.getState().ad.comments_count);
-			console.log('comment is2', store.getState().vkui.myUser);
-			console.log('comment is2', store.getState().vkui.myUser);
 			comment.comment_id = store.getState().ad.comments_count;
 			const vkUser = store.getState().vkui.myUser;
 			comment.author = {
@@ -44,22 +42,29 @@ export async function postComment(ad_id, comment, comment_text, successCallback,
 			};
 			comment.creation_date_time = new Date();
 			comment.text = comment_text;
-			
+
 			//store.dispatch(addComment(comment));
 			successCallback(response);
 			end();
 			return response;
 		})
 		.catch(function (error) {
+			if (error.response.status === 429) {
+				failEasy('Воу, слишком много комментариев. Нельзя отправить более 50 комментариев за 15 минут');
+			} else {
+				fail(
+					'Комментарий не отправлен',
+					() => {
+						postComment(ad_id, comment, text, successCallback, failCallback, end);
+					},
+					end
+				);
+			}
 			err = true;
 			failCallback(error);
-			fail(
-				'Комментарий не отправлен',
-				() => {
-					postComment(ad_id, comment, text, successCallback, failCallback, end);
-				},
-				end
-			);
+
+			console.log('err is ', error);
+
 			store.dispatch(closePopout());
 		});
 	return err;

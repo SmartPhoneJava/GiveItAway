@@ -14,6 +14,8 @@ import {
 	Snackbar,
 	Placeholder,
 	Spinner,
+	Div,
+	Cell,
 } from '@vkontakte/vkui';
 
 import 'react-photoswipe/lib/photoswipe.css';
@@ -31,6 +33,7 @@ import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24Camera from '@vkontakte/icons/dist/24/camera';
 import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 
+import Icon56DocumentOutline from '@vkontakte/icons/dist/56/document_outline';
 import Icon48Camera from '@vkontakte/icons/dist/48/camera';
 
 import { connect } from 'react-redux';
@@ -127,13 +130,14 @@ const CreateItem = (props) => {
 
 	const loadPhoto = (e) => {
 		setLoading(true);
+		console.log('setLoading(true);');
 		loadPhotos(
 			e,
 			handleWrongSize,
 			handleWrongType,
 			(value) => {
 				const photosUrl = !inputData.photosUrl ? [value] : [...inputData.photosUrl, value];
-				const photoText = '' + PHOTO_TEXT + '. Загружено ' + photosUrl.length + '/3';
+				const photoText = '' + PHOTO_TEXT + 'Загружено ' + photosUrl.length + '/3 снимков';
 				setFormData(CREATE_AD_ITEM, {
 					...inputData,
 					photosUrl,
@@ -148,9 +152,9 @@ const CreateItem = (props) => {
 
 	function deletePhoto(i) {
 		if (!inputData.photosUrl) {
-			return
+			return;
 		}
-		const photoText = PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length - 1) + '/3';
+		const photoText = PHOTO_TEXT + '. Загружено ' + (inputData.photosUrl.length - 1) + '/3 снимков';
 		const photosUrl = [...inputData.photosUrl.slice(0, i), ...inputData.photosUrl.slice(i + 1)];
 		setFormData(CREATE_AD_ITEM, {
 			...inputData,
@@ -164,7 +168,8 @@ const CreateItem = (props) => {
 	}
 
 	const photoSwipeImgs = inputData.photosUrl
-		? inputData.photosUrl && inputData.photosUrl.map((v) => {
+		? inputData.photosUrl &&
+		  inputData.photosUrl.map((v) => {
 				let img = new Image();
 				const src = v.src ? v.src : v.PhotoUrl;
 				img.src = v.src;
@@ -227,6 +232,107 @@ const CreateItem = (props) => {
 		};
 	}, [inputData.photosUrl]);
 
+	const buttonFile = useRef(null);
+
+	const [photosComponent, setPhotosComponent] = useState();
+	useEffect(() => {
+		const onePhoto = (img, i) => {
+			if (needEdit) {
+				img.src = img.PhotoUrl;
+				img.id = img.AdPhotoId;
+			}
+			return (
+				<div key={img.id} style={{ padding: '4px' }}>
+					{
+						<Transition in={photosDelete != i} timeout={duration}>
+							{(state) => (
+								<div
+									style={{
+										...allStyles[state],
+									}}
+								>
+									<div className="create-photo-panel">
+										<img onClick={() => openPhotos(i)} src={img.src} className="create-photo" />
+										{needEdit ? null : (
+											<div
+												onClick={() => {
+													setPhotosDelete(i);
+													setTimeout(() => {
+														setPhotosDelete(-1);
+														deletePhoto(i);
+													}, duration);
+												}}
+												className="create-photo-delete"
+											>
+												<Icon24Cancel />
+											</div>
+										)}
+									</div>
+								</div>
+							)}
+						</Transition>
+					}
+				</div>
+			);
+		};
+
+		console.log('platform is', platform);
+
+		const container = (v) =>
+			platform != '' ? <div className="scrolling-block">{v}</div> : <HorizontalScroll>{v}</HorizontalScroll>;
+
+		const disabled = inputData.photosUrl && inputData.photosUrl.length == 3;
+		const fileComponent = (
+			<File
+				ref={buttonFile}
+				multiple={true}
+				disabled={disabled}
+				mode={disabled ? 'secondary' : 'primary'}
+				onChange={loadPhoto}
+				style={{
+					cursor: 'pointer',
+					transition: `${duration}ms ease-in-out`,
+				}}
+			>
+				Загрузить
+			</File>
+		);
+
+		const addNewButton = () => {
+			return disabled ? null : (
+				<div>
+					<div className="photo-add">
+						{loading ? (
+							<Spinner size="large" />
+						) : (
+							<>
+								<Icon48Camera height={64} width={64} fill={disabled ? 'grey' : 'var(--accent)'} />
+								{fileComponent}
+							</>
+						)}
+					</div>
+				</div>
+			);
+		};
+
+		setPhotosComponent(
+			<Div>
+				<div style={{ display: 'flex' }}>
+					{container(
+						<div style={{ display: 'flex' }}>
+							{inputData.photosUrl && inputData.photosUrl.map((img, i) => onePhoto(img, i))}
+							{addNewButton()}
+						</div>
+					)}
+				</div>
+			</Div>
+		);
+		//'desktop_web'
+		// <div style={{ marginLeft: '10px', marginRight: '10px' }}>
+
+		// </div>
+	}, [inputData, loading, photosDelete, needEdit]);
+
 	return (
 		<>
 			{!needEdit ? (
@@ -272,139 +378,34 @@ const CreateItem = (props) => {
 			{category == CategoryOnline ? null : (
 				<FormLayout>
 					<Group
-						header={<Header>Снимки</Header>}
-						style={{
-							display: 'block',
-							textAlign: 'center',
-							justifyContent: 'center',
-							alignItems: 'center',
-						}}
+						header={
+							<Cell
+								style={{ padding: '0px' }}
+								multiline
+								description="Снимки должны передавать реальное состояние вещи, не используй чужие картинки или
+							отредактированные фотографии. Ограничения: размер фотографии не болеее 4мб, всего снимков не более 3."
+							>
+								<div style={{ fontWeight: 600 }}>Снимки</div>
+							</Cell>
+						}
 					>
-						{!noPhotos ? (
+						{needEdit ? null : (
 							<>
-								{needEdit ? null : (
-									<Transition in={prevPhotosLen > 0} timeout={duration}>
-										{(state) => (
-											<div
-												style={{
-													...allStyles[state],
-												}}
-											>
-												<File
-													multiple={true}
-													before={<Icon24Camera />}
-													disabled={inputData.photosUrl && inputData.photosUrl.length == 3}
-													mode={inputData.photosUrl && inputData.photosUrl.length == 3 ? 'secondary' : 'primary'}
-													onChange={loadPhoto}
-													style={{
-														cursor: 'pointer',
-														transition: `${duration}ms ease-in-out`,
-													}}
-												>
-													Загрузить
-												</File>
-												<InfoRow
-													style={{
-														color: 'var(--text_secondary)',
-														marginTop: '6px',
-														paddingLeft: '6px',
-														paddingRight: '6px',
-													}}
-												>
-													{inputData.photoText}
-												</InfoRow>
-											</div>
-										)}
-									</Transition>
-								)}
-
-								<HorizontalScroll>
-									<div style={{ display: 'flex', marginLeft: '10px', marginRight: '10px' }}>
-										{inputData.photosUrl && inputData.photosUrl.map((img, i) => {
-											if (needEdit) {
-												img.src = img.PhotoUrl;
-												img.id = img.AdPhotoId;
-											}
-
-											const v = (
-												<div className="create-photo-panel">
-													<img
-														onClick={() => openPhotos(i)}
-														src={img.src}
-														className="create-photo"
-													/>
-													{needEdit ? null : (
-														<div
-															onClick={() => {
-																setPhotosDelete(i);
-																setTimeout(() => {
-																	setPhotosDelete(-1);
-																	deletePhoto(i);
-																}, duration);
-															}}
-															className="create-photo-delete"
-														>
-															<Icon24Cancel />
-														</div>
-													)}
-												</div>
-											);
-											return (
-												<div key={img.id} style={{ padding: '4px' }}>
-													{
-														<Transition in={photosDelete != i} timeout={duration}>
-															{(state) => (
-																<div
-																	style={{
-																		...allStyles[state],
-																	}}
-																>
-																	{v}
-																</div>
-															)}
-														</Transition>
-													}
-												</div>
-											);
-										})}
-										{loading ? <Spinner size="medium" /> : null}
-									</div>
-								</HorizontalScroll>
-							</>
-						) : (
-							<Transition in={noPhotosA} timeout={duration}>
-								{(state) => (
-									<div
-										style={{
-											...allStyles[state],
-										}}
-									>
-										<Placeholder
-											header="Загрузи снимок"
-											icon={<Icon48Camera />}
-											action={
-												<File
-													style={{ cursor: 'pointer' }}
-													top="Снимки вещей"
-													disabled={inputData.photosUrl && inputData.photosUrl.length == 3}
-													mode={
-														inputData.photosUrl && inputData.photosUrl.length == 3
-															? 'secondary'
-															: 'primary'
-													}
-													onChange={loadPhoto}
-												>
-													Загрузить
-												</File>
-											}
+								{photosComponent}
+								<Transition in={prevPhotosLen > 0} timeout={duration}>
+									{(state) => (
+										<div
+											style={{
+												...allStyles[state],
+												textAlign: 'center',
+												color: 'var(--text_secondary)',
+											}}
 										>
-											{inputData.photoText
-												? inputData.photoText
-												: 'Снимки должны передавать реальное состояние вещи, не используй чужие картинки или отредактированные фотографии'}
-										</Placeholder>
-									</div>
-								)}
-							</Transition>
+											{inputData.photoText}
+										</div>
+									)}
+								</Transition>
+							</>
 						)}
 					</Group>
 				</FormLayout>

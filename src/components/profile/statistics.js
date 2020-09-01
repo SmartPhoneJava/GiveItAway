@@ -10,6 +10,7 @@ const COLOR_FAILED = '#FF9933';
 export const Statistics = (props) => {
 	const { backuser } = props;
 	const width = document.body.clientWidth;
+	const smallWidth = width < 330
 
 	function counter(background, text, value) {
 		return (
@@ -23,6 +24,7 @@ export const Statistics = (props) => {
 
 	function radialChart(data) {
 		return (
+			<div style={{paddingLeft: smallWidth ? width / 4 : null}}>
 			<RadialChart
 				data={data}
 				showLabels={true}
@@ -34,6 +36,7 @@ export const Statistics = (props) => {
 				labelsRadiusMultiplier={2}
 				colorType="literal"
 			/>
+			</div>
 		);
 	}
 
@@ -68,7 +71,7 @@ export const Statistics = (props) => {
 			  ]
 			: [
 					{
-						angle: backuser.total_given_ads - backuser.total_aborted_ads,
+						angle: backuser.total_given_ads + backuser.total_received_ads - backuser.total_aborted_ads,
 						color: COLOR_SUCCESS,
 					},
 					{
@@ -77,9 +80,10 @@ export const Statistics = (props) => {
 					},
 			  ];
 
+	// добавить ползунок к просмотру отданных полученных, проверить, что на айфонах все умещается везде
 	return backuser.total_received_ads + backuser.total_given_ads == 0 ? null : (
 		<Group header={<Header mode="secondary">Статистика</Header>}>
-			<div className="infographics-main">
+			<div style={{ textAlign: 'center', display: smallWidth ? 'block' : 'flex' }}>
 				<div className="infographics-column">
 					<div style={{ position: 'relative' }}>
 						{radialChart(dataGivenReceived)}
@@ -98,7 +102,11 @@ export const Statistics = (props) => {
 							<Title level="2">Обменов</Title>
 						</div>
 					</div>
-					{counter(COLOR_SUCCESS, 'Проведено', backuser.total_given_ads - backuser.total_aborted_ads)}
+					{counter(
+						COLOR_SUCCESS,
+						'Проведено',
+						backuser.total_given_ads + backuser.total_received_ads - backuser.total_aborted_ads
+					)}
 					{counter(COLOR_FAILED, 'Сорвано', backuser.total_aborted_ads)}
 				</div>
 			</div>

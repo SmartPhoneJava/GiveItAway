@@ -141,7 +141,7 @@ const GroupsPanel = (props) => {
 	};
 
 	const saveClick = () => {
-		onCellClick({ ...UserGroup, array: [myVariant] }, myVariant);
+		onCellClick({ ...UserGroup, array: [myVariant.trim()] }, myVariant.trim());
 	};
 
 	const hideMyVariant = () => {
@@ -254,9 +254,12 @@ const GroupsPanel = (props) => {
 	const ShowList = (gr) => {
 		const getImage = gr.getImageFunc || ((v) => null);
 		const getText = gr.getTextFunc || ((v) => v);
-		return gr.data
+
+		const arr = gr.data
 			.filter((v) => filter(v).toLowerCase().indexOf(search) != -1)
 			.map((v) => ShowCell(gr, v, getText, getImage));
+
+		return arr.length > 0 ? arr : placeholder;
 	};
 
 	const ShowGroups = () => {
@@ -321,7 +324,7 @@ const GroupsPanel = (props) => {
 		) : null;
 	};
 
-	const isValid = () => myVariant && myVariant.length > 2 && myVariant.length < 30;
+	const isValid = () => myVariant && myVariant.trim().length > 2 && myVariant.trim().length < 30;
 
 	const grouping = Groups.grouping;
 	const filter = props.filterFunc || ((v) => v);
@@ -364,7 +367,7 @@ const GroupsPanel = (props) => {
 				</>
 			) : (
 				<>
-					<Search value={search} onChange={handleSearch} />
+					<Search value={search} onChange={handleSearch} after={null} />
 					{grouping ? (
 						choosenGroup ? (
 							ShowChoosenGroup()

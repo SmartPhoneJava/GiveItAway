@@ -14,7 +14,7 @@ import { Subcategories } from './Subcategories';
 const CategoriesPanel = (props) => {
 	return (
 		<>
-			<PanelHeader left={<PanelHeaderBack onClick={props.goBack} />}>Выберите категорию</PanelHeader>
+			<PanelHeader left={<PanelHeaderBack onClick={props.goBack} />}>Категории</PanelHeader>
 			<GroupsPanel
 				Groups={CategoriesStruct}
 				choosenGroup={CategoriesStruct.data[0]}

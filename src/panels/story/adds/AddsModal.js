@@ -100,7 +100,7 @@ const AddsModal = (props) => {
 			<ModalPage
 				id={MODAL_ADS_CATEGORIES}
 				onClose={closeModal}
-				header={<ModalHeader isBack={true} name="Выберите категорию" back={closeModal} />}
+				header={<ModalHeader isBack={true} name="Категории" back={closeModal} />}
 			></ModalPage>
 			<ModalPage
 				id={MODAL_ADS_GEO}

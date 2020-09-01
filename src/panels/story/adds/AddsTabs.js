@@ -65,7 +65,7 @@ const AddsTabs = (props) => {
 					}
 					onClick={onTabAdsClick}
 				>
-					{mode == MODE_ALL ? 'Все объявления' : mode == MODE_WANTED ? 'Хочу забрать' : 'Отдаю'}
+					{mode == MODE_ALL ? 'Все' : mode == MODE_WANTED ? 'Хочу забрать' : 'Отдаю'}
 				</PanelHeaderContent>
 				{/* <Tabs>
 					<TabsItem

@@ -214,7 +214,13 @@ const AddMore2r = (props) => {
 			) : (
 				<Group header={rcell}>
 					<CardScroll>
-						<div style={{ display: 'flex' }}>
+						<div
+							style={{
+								display: 'flex',
+								overflowX:
+									props.platform == 'desktop_web' || props.platform == 'mobile_web' ? 'scroll' : null,
+							}}
+						>
 							{pathes_to_photo.map((img, i) => (
 								<Card
 									key={i}
@@ -758,6 +764,7 @@ const mapStateToProps = (state) => {
 		AD: state.ad,
 		direction: state.router.direction,
 		myID: state.vkui.myID,
+		platform: state.vkui.platform,
 	};
 };
 

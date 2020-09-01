@@ -38,24 +38,26 @@ const SubsLabelInner = (props) => {
 						</Header>
 					}
 				>
-					<UsersStack style={{ padding: '4px' }} onClick={openSubs} visibleCount={3} photos={photos} size="m">
-						<Text>
-							{subs.length == 1
-								? subs[0].name + ' ' + subs[0].surname
-								: subs.length == 2
-								? subs[0].name + ' и ' + subs[1].name
-								: subs.length == 3
-								? subs[0].name + ', ' + subs[1].name + ' и ' + subs[2].name
-								: subs[0].name +
-								  ', ' +
-								  subs[1].name +
-								  ', ' +
-								  subs[2].name +
-								  'и еще ' +
-								  (subs.length - 3) +
-								  ' человек'}
-						</Text>
-					</UsersStack>
+					<div style={{ paddingLeft: '4px', paddingRight: '4px' }}>
+						<UsersStack onClick={openSubs} visibleCount={3} photos={photos} size="m">
+							<Text>
+								{subs.length == 1
+									? subs[0].name + ' ' + subs[0].surname
+									: subs.length == 2
+									? subs[0].name + ' и ' + subs[1].name
+									: subs.length == 3
+									? subs[0].name + ', ' + subs[1].name + ' и ' + subs[2].name
+									: subs[0].name +
+									  ', ' +
+									  subs[1].name +
+									  ', ' +
+									  subs[2].name +
+									  'и еще ' +
+									  (subs.length - 3) +
+									  ' человек'}
+							</Text>
+						</UsersStack>
+					</div>
 				</Group>
 			)
 		);

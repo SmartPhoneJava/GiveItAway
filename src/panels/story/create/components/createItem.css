@@ -34,9 +34,9 @@ img.create-photo {
 
 .create-geodata-status {
 	position: absolute;
-	bottom: 0px;
-	
-	right: -20px;
+	bottom: -8px;
+
+	right: -32px;
 	align-items: flex-end;
 	/* 
 	top: 4px;
@@ -47,7 +47,6 @@ img.create-photo {
 	cursor: pointer; */
 }
 
-
 .geo-position-icon {
 	padding: 0px;
 	margin: 0px;
@@ -55,4 +54,32 @@ img.create-photo {
 
 .geo-position-label {
 	width: 90%;
+}
+
+.scrolling-block {
+	overflow: hidden;
+	overflow-x: auto;
+	white-space: nowrap;
+}
+
+.scrolling-child {
+	display: inline-block;
+	vertical-align: top;
+	width: 60px;
+	height: 60px;
+	background: red;
+}
+
+.photo-add {
+	margin: 4px;
+	border-radius: 10px;
+	width: 120px;
+	height: 120px;
+
+	
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }

@@ -26,6 +26,7 @@ import { STATUS_ABORTED, STATUS_CLOSED, STATUS_CHOSEN, STATUS_OFFER } from '../.
 import { ImageCache } from '../../components/image/image_cache';
 import { Collapse } from 'react-collapse';
 import { CardWithPadding } from '../../App';
+import { shortText } from '../../utils/short_text';
 
 const duration = 300;
 
@@ -161,7 +162,7 @@ const Add7 = (props) => {
 				{image}
 				{(ad.district || ad.region) && (
 					<div className="acity">
-						<Icon16Place /> {ad.district ? ad.district : ad.region}
+						<Icon16Place /> {ad.district ? shortText(ad.district, 13) : shortText(ad.region, 13)}
 					</div>
 				)}
 

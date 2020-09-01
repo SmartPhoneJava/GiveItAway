@@ -61,6 +61,7 @@ const AddsTab = (props) => {
 	const activeModal = props.activeModals[STORY_ADS];
 
 	const [tagsLabel, setTags] = useState([]);
+	const [tagsNum, setTagsNum] = useState(0);
 
 	const [geoType, setGeoType] = useState(GEO_TYPE_FILTERS);
 	const [radius, setRadius] = useState(0);
@@ -244,7 +245,7 @@ const AddsTab = (props) => {
 						setFormData(ADS_FILTERS, {
 							...inputData[ADS_FILTERS],
 							city: null,
-							geoType: GEO_TYPE_NO,
+							geotype: GEO_TYPE_NO,
 						});
 					},
 					<Icon16Clear
@@ -252,7 +253,7 @@ const AddsTab = (props) => {
 							setFormData(ADS_FILTERS, {
 								...inputData[ADS_FILTERS],
 								city: null,
-								geoType: GEO_TYPE_NO,
+								geotype: GEO_TYPE_NO,
 							});
 						}}
 						style={{ paddingLeft: '4px', cursor: 'pointer' }}
@@ -261,6 +262,7 @@ const AddsTab = (props) => {
 				)
 			);
 		}
+		console.log("gt is ", gt)
 		if (gt == GEO_TYPE_NEAR && rad != 0) {
 			tags.push(
 				tag(
@@ -271,14 +273,16 @@ const AddsTab = (props) => {
 					() => {
 						setFormData(ADS_FILTERS, {
 							...inputData[ADS_FILTERS],
-							geoType: GEO_TYPE_NO,
+							geotype: GEO_TYPE_NO,
+							radius: 0.5,
 						});
 					},
 					<Icon16Clear
 						onClick={() => {
 							setFormData(ADS_FILTERS, {
 								...inputData[ADS_FILTERS],
-								geoType: GEO_TYPE_NO,
+								geotype: GEO_TYPE_NO,
+								radius: 0.5,
 							});
 						}}
 						style={{ paddingLeft: '4px', cursor: 'pointer' }}
@@ -288,6 +292,7 @@ const AddsTab = (props) => {
 			);
 		}
 
+		setTagsNum(tags.length);
 		setTags(
 			tags.length == 0 ? null : (
 				<div style={{ paddingLeft: '8px', paddingRight: '8px' }}>
@@ -640,20 +645,20 @@ const AddsTab = (props) => {
 									width: `${filtersOn ? '100%' : '90%'}`,
 								}}
 							> */}
-								<Search
-									style={{
-										transition: '0.3s',
-									}}
-									key="search"
-									// onBlur={() => searchRef.current.focus }
-									value={search}
-									onChange={handleSearch}
-									icon={<Icon24Filter style={{ cursor: 'pointer' }} />}
-									onIconClick={props.onFiltersClick}
-									after={null}
-								/>
+							<Search
+								style={{
+									transition: '0.3s',
+								}}
+								key="search"
+								// onBlur={() => searchRef.current.focus }
+								value={search}
+								onChange={handleSearch}
+								icon={<Icon24Filter style={{ cursor: 'pointer' }} />}
+								onIconClick={props.onFiltersClick}
+								after={null}
+							/>
 							{/* </div> */}
-							{filtersOn && (
+							{tagsNum > 1 && (
 								<div
 									style={{
 										cursor: filtersOn ? 'pointer' : null,
@@ -701,6 +706,7 @@ const AddsTab = (props) => {
 		props.inputData,
 		props.activeModals,
 		cols,
+		tagsNum,
 	]);
 
 	return body;

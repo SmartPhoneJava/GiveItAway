@@ -10,13 +10,13 @@ import {
 	Spinner,
 	Snackbar,
 	Avatar,
-	PanelHeaderButton,
 	Cell,
 	Banner,
 	Checkbox,
 	FormLayout,
 	SimpleCell,
 	Placeholder,
+	platform,
 } from '@vkontakte/vkui';
 import { ReactDadata } from 'react-dadata';
 
@@ -228,7 +228,7 @@ const CreateAddRedux = (props) => {
 	}, [dadataB]);
 
 	function saveCancel() {
-		console.log('clicking to me');
+		
 		openSnackbar(
 			<Snackbar
 				duration={SNACKBAR_DURATION_DEFAULT}
@@ -239,7 +239,7 @@ const CreateAddRedux = (props) => {
 					</Avatar>
 				}
 			>
-				Пожалуйста, заполните все обязательные поля.
+				Пожалуйста, заполните все поля корректно.
 			</Snackbar>
 		);
 	}
@@ -387,7 +387,7 @@ const CreateAddRedux = (props) => {
 	const [mapsComponent, setMapsComponent] = useState(<></>);
 	useEffect(() => {
 		setMapsComponent(
-			<div style={{ marginTop: '10px' }}>
+			<div style={{ marginTop: '14px' }}>
 				<div style={{ display: place == NO_PLACE ? 'none' : null }}>
 					<YMaps
 						style={{ display: 'none' }}
@@ -395,7 +395,7 @@ const CreateAddRedux = (props) => {
 						query={{ apikey: '7f6269fb-0f48-4182-bd23-13b3cb155a06' }}
 					>
 						<Map
-							width={width}
+							width={width - 16}
 							state={mapState}
 							modules={['geocode']}
 							onLoad={(ymaps) => {
@@ -446,6 +446,7 @@ const CreateAddRedux = (props) => {
 					separator="hide"
 					header={
 						<Cell
+							style={{ padding: '0px' }}
 							multiline
 							description="Кликни по полю ввода, чтобы указать свое местоположение, или по иконке, чтобы определить его автоматически"
 						>
@@ -455,23 +456,29 @@ const CreateAddRedux = (props) => {
 				>
 					<>
 						<Div>
-							<div style={{ display: 'flex', position: 'relative' }}>
-								<PanelHeaderButton
-									className="geo-position-icon"
-									onClick={() => {
-										setDadataB(ON_REFRESH_CLICK);
-									}}
-								>
-									<Icon24Place style={{ cursor: 'pointer' }} fill="var(--accent)" />
-								</PanelHeaderButton>
+							<div style={{ display: 'flex', position: 'relative', alignItems: 'center' }}>
+								<div style={{ marginTop: '12px' }}>
+									<Icon24Place
+										onClick={() => {
+											setDadataB(ON_REFRESH_CLICK);
+										}}
+										width={32}
+										height={32}
+										style={{ cursor: 'pointer', marginRight: '12px' }}
+										fill="var(--accent)"
+									/>
+								</div>
+
 								{dadataComponent}
 								{isGeoDataOkComponent}
 
 								<div
 									style={{
 										transition: '0.3s',
-										width: isLoading ? '10%' : '0%',
 										opacity: isLoading ? '1' : '0',
+										height: '40px',
+										paddingTop: '14px',
+										paddingLeft: '10px',
 									}}
 								>
 									<Spinner size="small" />

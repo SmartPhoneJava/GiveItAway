@@ -108,6 +108,8 @@ const DealLabelInner = (props) => {
 
 		let button = <></>;
 
+		console.log("width is ", width)
+
 		if (isAuthor) {
 			if (dealer) {
 				button = (
@@ -118,7 +120,7 @@ const DealLabelInner = (props) => {
 							</Header>
 						}
 					>
-						<div style={{ display: width < 330 ? 'block' : 'flex' }}>
+						<div style={{ display: width < 415 ? 'block' : 'flex' }}>
 							<CellButton
 								mode="danger"
 								onClick={() => {
@@ -171,7 +173,7 @@ const DealLabelInner = (props) => {
 							</Header>
 						}
 					>
-						<div style={{ display: width < 330 ? 'block' : 'flex' }}>
+						<div style={{ display: width < 415 ? 'block' : 'flex' }}>
 							<CellButton
 								disabled={disable}
 								style={{ cursor: disable ? null : 'pointer' }}
@@ -204,7 +206,7 @@ const DealLabelInner = (props) => {
 				);
 			} else {
 				button = (
-					<div style={{ display: width < 330 ? 'block' : 'flex' }}>
+					<div style={{ display: width < 415 ? 'block' : 'flex' }}>
 						<div>
 							<CellButton
 								style={{ cursor: disable ? null : 'pointer' }}
