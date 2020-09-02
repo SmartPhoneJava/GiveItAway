@@ -80,11 +80,10 @@ const ModalPageAdsGeoInner = (props) => {
 
 	useEffect(() => {
 		props.updateModalHeight();
-	}, [changed, valid, props.direction]);
+	}, [changed, valid, radius, props.direction]);
 
 	useEffect(() => {
 		if (props.direction == DIRECTION_BACK) {
-			console.log("ADS_FILTERS_B", inputData[ADS_FILTERS_B])
 			load(ADS_FILTERS_B);
 		} else if (props.to != PANEL_CITIES) {
 			setFormData(ADS_FILTERS_B, {
@@ -264,7 +263,7 @@ const ModalPageAdsGeoInner = (props) => {
 						</FormStatus>
 					</Div>
 				)}
-				{changed && SaveCancelButtons(save, closeModal)}
+				{changed && SaveCancelButtons(save, closeModal, !isRadiusValid())}
 			</div>
 		</>
 	);

@@ -34,7 +34,7 @@ const ChooseType = (props) => {
 			}
 		>
 			<Radio
-				style={{ cursor: !edited ? 'pointer' : null }}
+				style={{ cursor: !edited ? 'pointer' : null, paddingBottom: '2px', paddingTop: '2px' }}
 				disabled={edited}
 				name="radio"
 				value={TYPE_CHOICE}
@@ -45,7 +45,7 @@ const ChooseType = (props) => {
 				Сделка
 			</Radio>
 			<Radio
-				style={{ cursor: !edited ? 'pointer' : null }}
+				style={{ cursor: !edited ? 'pointer' : null, paddingBottom: '2px', paddingTop: '2px' }}
 				disabled={edited}
 				name="radio"
 				value={TYPE_RANDOM}
@@ -56,7 +56,7 @@ const ChooseType = (props) => {
 				Лотерея
 			</Radio>
 			<Radio
-				style={{ cursor: !edited ? 'pointer' : null }}
+				style={{ cursor: !edited ? 'pointer' : null, paddingBottom: '2px', paddingTop: '2px' }}
 				disabled={edited}
 				name="radio"
 				value={TYPE_AUCTION}

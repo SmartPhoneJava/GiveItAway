@@ -50,6 +50,7 @@ const Subs = (props) => {
 	}
 
 	function onClickWrite(vk_id) {
+		console.log('open/tab https://vk.com/im?sel=', vk_id);
 		openTab('https://vk.com/im?sel=' + vk_id);
 	}
 
@@ -72,7 +73,12 @@ const Subs = (props) => {
 						<ActionSheetItem autoclose onClick={() => onClickOpen(v.vk_id)}>
 							Перейти в профиль
 						</ActionSheetItem>
-						<ActionSheetItem autoclose onClick={() => onClickWrite(v.vk_id)}>
+						<ActionSheetItem
+							autoclose
+							onClick={() => {
+								openTab('https://vk.com/im?sel=' + v.vk_id);
+							}}
+						>
 							Написать
 						</ActionSheetItem>
 						{osname === IOS && (
@@ -118,9 +124,47 @@ const Subs = (props) => {
 		);
 	}, [props.AD.dealer]);
 
-	function showSubs(lastAdElementRef, close, cancel) {
+	function close_ad(subscriber) {
+		Close(
+			ad_id,
+			ad_type,
+			subscriber.vk_id,
+			(data) => {},
+			(e) => {
+				console.log('Close error', e);
+			}
+		);
+	}
+
+	function cancel_ad(subscriber, need_close) {
+		CancelClose(
+			ad_id,
+			(data) => {
+				if (need_close) {
+					close_ad(subscriber);
+				}
+			},
+			(e) => {},
+			true
+		);
+	}
+
+	const [subsComponent, setSubsComponent] = useState(<></>);
+	useEffect(() => {
 		const { ad_type, isAuthor } = props.AD;
-		return (
+
+		const close = (subscriber) => {
+			if (dealer) {
+				cancel_ad(subscriber, true);
+				return;
+			}
+			close_ad(subscriber);
+		};
+		const cancel = (subscriber) => {
+			cancel_ad(subscriber, false);
+		};
+
+		setSubsComponent(
 			<>
 				<Group header={<Header mode="secondary">Получатель</Header>}>
 					<AnimationChange ignoreFirst={true} controll={newGiven} duration={300} />
@@ -167,32 +211,7 @@ const Subs = (props) => {
 				</Group>
 			</>
 		);
-	}
-
-	function close_ad(subscriber) {
-		Close(
-			ad_id,
-			ad_type,
-			subscriber.vk_id,
-			(data) => {},
-			(e) => {
-				console.log('Close error', e);
-			}
-		);
-	}
-
-	function cancel_ad(subscriber, need_close) {
-		CancelClose(
-			ad_id,
-			(data) => {
-				if (need_close) {
-					close_ad(subscriber);
-				}
-			},
-			(e) => {},
-			true
-		);
-	}
+	}, [subs, dealer]);
 
 	let { inited, loading, error, hasMore, newPage } = useSubsGet(
 		props.mini,
@@ -262,19 +281,7 @@ const Subs = (props) => {
 					"Подтвердить".`}
 				</Div>
 			</Collapse>
-			{showSubs(
-				lastAdElementRef,
-				(subscriber) => {
-					if (dealer) {
-						cancel_ad(subscriber, true);
-						return;
-					}
-					close_ad(subscriber);
-				},
-				(subscriber) => {
-					cancel_ad(subscriber, false);
-				}
-			)}
+			{subsComponent}
 		</div>
 	);
 };

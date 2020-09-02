@@ -34,9 +34,8 @@ img.create-photo {
 
 .create-geodata-status {
 	position: absolute;
-	bottom: -8px;
-
-	right: -32px;
+	bottom: 4px;
+	right: -6px;
 	align-items: flex-end;
 	/* 
 	top: 4px;

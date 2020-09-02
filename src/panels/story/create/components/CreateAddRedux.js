@@ -228,7 +228,6 @@ const CreateAddRedux = (props) => {
 	}, [dadataB]);
 
 	function saveCancel() {
-		
 		openSnackbar(
 			<Snackbar
 				duration={SNACKBAR_DURATION_DEFAULT}
@@ -312,16 +311,11 @@ const CreateAddRedux = (props) => {
 			<div className="create-geodata-status">
 				<div style={{ display: needEdit || isLoading ? 'none' : null }}>
 					{animateOnChange(
-						<SimpleCell
-							before={
-								validPlace ? (
-									<Icon24DoneOutline style={{ color: 'var(--button_commerce_background)' }} />
-								) : (
-									<Icon24Cancel style={{ color: 'var(--destructive)' }} />
-								)
-							}
-							mode="secondary"
-						/>
+						validPlace ? (
+							<Icon24DoneOutline style={{ color: 'var(--button_commerce_background)' }} />
+						) : (
+							<Icon24Cancel style={{ color: 'var(--destructive)' }} />
+						)
 					)}
 				</div>
 			</div>
@@ -365,7 +359,7 @@ const CreateAddRedux = (props) => {
 						});
 
 						findMetro(ymapsL, e.value);
-						setIsLoading(false)
+						setIsLoading(false);
 
 						// if (!e.data.geo_lat) {
 						// 	getMetro(e.data.postal_code);
@@ -445,6 +439,7 @@ const CreateAddRedux = (props) => {
 			) : (
 				<Group
 					separator="hide"
+					style={{ padding: '0px' }}
 					header={
 						<Cell
 							style={{ padding: '0px' }}
@@ -455,40 +450,38 @@ const CreateAddRedux = (props) => {
 						</Cell>
 					}
 				>
-					<>
-						<Div>
-							<div style={{ display: 'flex', position: 'relative', alignItems: 'center' }}>
-								<div style={{ marginTop: '12px' }}>
-									<Icon24Place
-										onClick={() => {
-											setDadataB(ON_REFRESH_CLICK);
-										}}
-										width={32}
-										height={32}
-										style={{ cursor: 'pointer', marginRight: '12px' }}
-										fill="var(--accent)"
-									/>
-								</div>
-
-								{dadataComponent}
-								{isGeoDataOkComponent}
-
-								<div
-									style={{
-										transition: '0.3s',
-										opacity: isLoading ? '1' : '0',
-										height: '40px',
-										paddingTop: '14px',
-										paddingLeft: '10px',
+					<Div>
+						<div style={{ display: 'flex', position: 'relative', alignItems: 'center' }}>
+							<div style={{ marginTop: '12px' }}>
+								<Icon24Place
+									onClick={() => {
+										setDadataB(ON_REFRESH_CLICK);
 									}}
-								>
-									<Spinner size="small" />
-								</div>
+									width={32}
+									height={32}
+									style={{ cursor: 'pointer', marginRight: '12px' }}
+									fill="var(--accent)"
+								/>
 							</div>
 
-							{mapsComponent}
-						</Div>
-					</>
+							{dadataComponent}
+							{isGeoDataOkComponent}
+
+							<div
+								style={{
+									transition: '0.3s',
+									opacity: isLoading ? '1' : '0',
+									height: '40px',
+									paddingTop: '14px',
+									paddingLeft: '10px',
+								}}
+							>
+								<Spinner size="small" />
+							</div>
+						</div>
+
+						{mapsComponent}
+					</Div>
 				</Group>
 			)}
 

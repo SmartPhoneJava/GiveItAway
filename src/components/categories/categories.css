@@ -69,3 +69,11 @@
 	-webkit-user-select: none;
 	-ms-user-select: none;
 }
+
+.tag-container {
+	display: flex;
+	flex-flow: row wrap;
+  }
+  .tag-item {
+	display: contents;
+  }

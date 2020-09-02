@@ -34,34 +34,78 @@ export const AdFiltersInner = (props) => {
 		props.updateModalHeight();
 	});
 
-	const [component, setComponent] = useState(<></>);
-	useEffect(() => {
-		setComponent(
-			<>
-				<CategoriesLabel redux_form={ADS_FILTERS} leftMargin="10px" open={openCategories} />
-				<List>
-					<Cell
-						style={{ cursor: 'pointer' }}
-						asideContent={<Icon24BrowserForward />}
-						onClick={openGeoSearch}
-						indicator={getGeoFilters(props.inputData[ADS_FILTERS])}
-					>
-						Искать
-					</Cell>
-					<Cell
-						style={{ cursor: 'pointer' }}
-						asideContent={<Icon24BrowserForward />}
-						onClick={openSort}
-						indicator={sort == SORT_TIME ? 'по времени' : 'по близости'}
-					>
-						Сортировка
-					</Cell>
-				</List>
-			</>
-		);
-	}, [props.inputData]);
+	const [component, setComponent] = useState(
+		<>
+			<CategoriesLabel redux_form={ADS_FILTERS} leftMargin="10px" open={openCategories} />
+			<List>
+				<Cell
+					style={{ cursor: 'pointer' }}
+					asideContent={<Icon24BrowserForward />}
+					onClick={openGeoSearch}
+					indicator={getGeoFilters(props.inputData[ADS_FILTERS])}
+				>
+					Искать
+				</Cell>
+				<Cell
+					style={{ cursor: 'pointer' }}
+					asideContent={<Icon24BrowserForward />}
+					onClick={openSort}
+					indicator={sort == SORT_TIME ? 'по времени' : 'по близости'}
+				>
+					Сортировка
+				</Cell>
+			</List>
+		</>
+	);
+	// useEffect(() => {
+	// 	setComponent(
+	// 		<>
+	// 			<CategoriesLabel redux_form={ADS_FILTERS} leftMargin="10px" open={openCategories} />
+	// 			<List>
+	// 				<Cell
+	// 					style={{ cursor: 'pointer' }}
+	// 					asideContent={<Icon24BrowserForward />}
+	// 					onClick={openGeoSearch}
+	// 					indicator={getGeoFilters(props.inputData[ADS_FILTERS])}
+	// 				>
+	// 					Искать
+	// 				</Cell>
+	// 				<Cell
+	// 					style={{ cursor: 'pointer' }}
+	// 					asideContent={<Icon24BrowserForward />}
+	// 					onClick={openSort}
+	// 					indicator={sort == SORT_TIME ? 'по времени' : 'по близости'}
+	// 				>
+	// 					Сортировка
+	// 				</Cell>
+	// 			</List>
+	// 		</>
+	// 	);
+	// }, [props.inputData]);
 
-	return component;
+	return (
+		<>
+			<CategoriesLabel redux_form={ADS_FILTERS} leftMargin="10px" open={openCategories} />
+			<List>
+				<Cell
+					style={{ cursor: 'pointer' }}
+					asideContent={<Icon24BrowserForward />}
+					onClick={openGeoSearch}
+					indicator={getGeoFilters(props.inputData[ADS_FILTERS])}
+				>
+					Искать
+				</Cell>
+				<Cell
+					style={{ cursor: 'pointer' }}
+					asideContent={<Icon24BrowserForward />}
+					onClick={openSort}
+					indicator={sort == SORT_TIME ? 'по времени' : 'по близости'}
+				>
+					Сортировка
+				</Cell>
+			</List>
+		</>
+	);
 };
 
 const mapStateToProps = (state) => {

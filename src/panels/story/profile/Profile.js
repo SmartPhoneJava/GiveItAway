@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Avatar, Link, Button, Cell, Header, Group, Placeholder, Banner, Spinner, Card } from '@vkontakte/vkui';
+import { Avatar, Link, Button, Cell, Header, Group, Placeholder, Banner, Spinner, Card, Title } from '@vkontakte/vkui';
 
 import { connect } from 'react-redux';
 
@@ -111,7 +111,7 @@ const Profile = (props) => {
 							url={backuser.photo_url}
 						/>
 					}
-					style={{ cursor: 'pointer' }} 
+					style={{ cursor: 'pointer' }}
 					description={getUserOnline()}
 				>
 					{withLoadingIf(
@@ -169,13 +169,15 @@ const Profile = (props) => {
 				<Group
 					separator="hide"
 					header={
-						<Header
-							style={{ cursor: 'pointer' }}
+						<Cell
+							style={{
+								cursor: 'pointer',
+							}}
 							onClick={() => {
 								setCollapseOpen((prev) => !prev);
 							}}
 							mode="primary"
-							aside={
+							indicator={
 								profileID == myID && (
 									<Icon16Dropdown
 										fill="var(--accent)"
@@ -188,8 +190,10 @@ const Profile = (props) => {
 								)
 							}
 						>
-							Карма - {backuser.carma} Ҝ
-						</Header>
+							<Title level="3" weight="semibold">
+								Карма - {backuser.carma} Ҝ
+							</Title>
+						</Cell>
 					}
 				>
 					{profileID == myID && v}

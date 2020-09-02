@@ -43,40 +43,71 @@ export const tag = (text, color, background, borderColor, onClick, right) => {
 export const TagsLabel = (props) => {
 	const tagsUpdate = props.tagsUpdate || true;
 	return (
-		<DraggableArea
-			// isList={props.Y ? true : null}
-			disable={true}
-			tags={props.tags}
-			// style={{ display: 'block' }}
-			render={({ tag, index }) => (
-				<div style={{ display: 'flex' }}>
-					<Transition in={tagsUpdate} timeout={duration}>
-						{(state) => {
-							const s = (
-								<div
-									className="categories-tag-row"
-									onClick={tag.onClick || props.onClick}
-									style={{
-										...transitionStyles[state],
-										background: tag.background,
-										color: tag.color,
-										borderColor: tag.borderColor,
-									}}
-								>
-									<div className="flex-center">
-										{tag.content}
-										{tag.right}
+		<div className="tag-container">
+			{' '}
+			{props.tags.map((tag, index) => (
+				<div className="tag-item">
+					<div style={{ display: 'flex' }}>
+						<Transition in={tagsUpdate} timeout={duration}>
+							{(state) => {
+								const s = (
+									<div
+										className="categories-tag-row"
+										onClick={tag.onClick || props.onClick}
+										style={{
+											...transitionStyles[state],
+											background: tag.background,
+											color: tag.color,
+											borderColor: tag.borderColor,
+										}}
+									>
+										<div className="flex-center">
+											{tag.content}
+											{tag.right}
+										</div>
 									</div>
-								</div>
-							);
-							return s;
-						}}
-					</Transition>
+								);
+								return s;
+							}}
+						</Transition>
+					</div>
 				</div>
-			)}
-			onChange={(tags) => console.log(tags)}
-		/>
+			))}
+		</div>
 	);
+	// <DraggableArea
+	// 	// isList={props.Y ? true : null}
+	// 	disable={true}
+	// 	tags={props.tags}
+	// 	// style={{ display: 'block' }}
+	// 	render={({ tag, index }) => (
+	// 		<div style={{ display: 'flex' }}>
+	// 			<Transition in={tagsUpdate} timeout={duration}>
+	// 				{(state) => {
+	// 					const s = (
+	// 						<div
+	// 							className="categories-tag-row"
+	// 							onClick={tag.onClick || props.onClick}
+	// 							style={{
+	// 								...transitionStyles[state],
+	// 								background: tag.background,
+	// 								color: tag.color,
+	// 								borderColor: tag.borderColor,
+	// 							}}
+	// 						>
+	// 							<div className="flex-center">
+	// 								{tag.content}
+	// 								{tag.right}
+	// 							</div>
+	// 						</div>
+	// 					);
+	// 					return s;
+	// 				}}
+	// 			</Transition>
+	// 		</div>
+	// 	)}
+	// 	onChange={(tags) => console.log(tags)}
+	// />
 };
 
 const CategoriesLabel = (props) => {

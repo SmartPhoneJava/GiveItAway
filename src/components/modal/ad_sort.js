@@ -23,7 +23,7 @@ import { fail } from '../../requests';
 
 const { SORT_TIME, SORT_GEO } = require('../../const/ads');
 
-export const SaveCancelButtons = (save, cancel) => {
+export const SaveCancelButtons = (save, cancel, disabled) => {
 	return (
 		<div className="flex-center">
 			<div className="filters-button">
@@ -32,7 +32,7 @@ export const SaveCancelButtons = (save, cancel) => {
 				</Button>
 			</div>
 			<div className="filters-button">
-				<Button style={{ cursor: 'pointer' }} stretched size="xl" mode="primary" onClick={save} before={<Icon24Done />}>
+				<Button disabled={disabled} style={{ cursor: 'pointer' }} stretched size="xl" mode="primary" onClick={save} before={<Icon24Done />}>
 					Сохранить
 				</Button>
 			</div>

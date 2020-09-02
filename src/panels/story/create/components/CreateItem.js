@@ -283,39 +283,33 @@ const CreateItem = (props) => {
 			platform != '' ? <div className="scrolling-block">{v}</div> : <HorizontalScroll>{v}</HorizontalScroll>;
 
 		const disabled = inputData.photosUrl && inputData.photosUrl.length == 3;
-		const FileComponent = forwardRef((props, ref) => (
-			<>
-				<File
-					ref={ref}
-					multiple={true}
-					disabled={disabled}
-					mode={disabled ? 'secondary' : 'primary'}
-					onChange={loadPhoto}
-					value={filesArr}
-					style={{
-						cursor: 'pointer',
-						transition: `${duration}ms ease-in-out`,
-					}}
-				>
-					Загрузить
-				</File>
-				{/* <input ref={ref}></input> */}
-			</>
-		));
+		const FileComponent = (
+			<File
+				multiple={true}
+				disabled={disabled}
+				mode={disabled ? 'secondary' : 'primary'}
+				onChange={loadPhoto}
+				value={filesArr}
+				style={{
+					cursor: 'pointer',
+					transition: `${duration}ms ease-in-out`,
+				}}
+			>
+				Загрузить
+			</File>
+		);
 
 		const addNewButton = () => {
-			return disabled ? null : (
-				<div>
-					<div className="photo-add">
-						{loading ? (
-							<Spinner size="large" />
-						) : (
-							<>
-								<Icon48Camera height={64} width={64} fill={disabled ? 'grey' : 'var(--accent)'} />
-								<FileComponent ref={fileRef} />
-							</>
-						)}
-					</div>
+			return disabled || needEdit ? null : (
+				<div className="photo-add">
+					{loading ? (
+						<Spinner size="large" />
+					) : (
+						<>
+							<Icon48Camera height={64} width={64} fill={disabled ? 'grey' : 'var(--accent)'} />
+							{FileComponent}
+						</>
+					)}
 				</div>
 			);
 		};
@@ -394,24 +388,22 @@ const CreateItem = (props) => {
 							</Cell>
 						}
 					>
-						{needEdit ? null : (
-							<>
-								{photosComponent}
-								<Transition in={prevPhotosLen > 0} timeout={duration}>
-									{(state) => (
-										<div
-											style={{
-												...allStyles[state],
-												textAlign: 'center',
-												color: 'var(--text_secondary)',
-											}}
-										>
-											{inputData.photoText}
-										</div>
-									)}
-								</Transition>
-							</>
-						)}
+						<>
+							{photosComponent}
+							<Transition in={prevPhotosLen > 0} timeout={duration}>
+								{(state) => (
+									<div
+										style={{
+											...allStyles[state],
+											textAlign: 'center',
+											color: 'var(--text_secondary)',
+										}}
+									>
+										{inputData.photoText}
+									</div>
+								)}
+							</Transition>
+						</>
 					</Group>
 				</FormLayout>
 			)}
