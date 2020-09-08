@@ -26,12 +26,17 @@ export const formDataReducer = (state = initialState, action) => {
 
 		case SET_GEO_DATA: {
 			const geodata = action.payload.geodata;
+			if (!geodata || !geodata.lat) {
+				return state;
+			}
+			const activeStory = action.payload.activeStory;
+			console.log('geodata is', activeStory, geodata);
 			return {
 				...state,
 				forms: {
 					...state.forms,
-					[GEO_DATA]: {
-						...state.forms[GEO_DATA],
+					[activeStory + GEO_DATA]: {
+						...state.forms[activeStory + GEO_DATA],
 						geodata,
 					},
 				},
@@ -40,12 +45,13 @@ export const formDataReducer = (state = initialState, action) => {
 
 		case SET_GEO_DATA_STRING: {
 			const geodata_string = action.payload.geodata_string;
+			const activeStory = action.payload.activeStory;
 			return {
 				...state,
 				forms: {
 					...state.forms,
-					[GEO_DATA]: {
-						...state.forms[GEO_DATA],
+					[activeStory + GEO_DATA]: {
+						...state.forms[activeStory + GEO_DATA],
 						geodata_string,
 					},
 				},

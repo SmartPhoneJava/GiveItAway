@@ -8,6 +8,7 @@ import useAdReceived from '../adds/tabs/adds/useAdReceived';
 const ReceivedPanel = (props) => {
 	return (
 		<AdsPanel
+			cache={props.cache}
 			pack={ReceivedPack}
 			useGet={useAdReceived}
 			profileID={props.profileID}

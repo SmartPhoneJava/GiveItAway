@@ -25,10 +25,52 @@ export const NT_STATISTICS = 'statistics'; // приходит автору
 export const NT_SUB_CANCEL = 'subscriberCancel'; // приходит автору
 export const NT_STATUS = 'status'; // приходит подписчикам
 export const NT_DELETED = 'deleted'; // приходит подписчикам
-export const NT_COMMENT = 'new_comment'; // приходит всем
+export const NT_COMMENT_NEW = 'new_comment'; // приходит всем
+export const NT_COMMENT_EDIT = 'edit_comment'; // приходит всем
 export const NT_COMMENT_DELETED = 'delete_comment'; // приходит всем
+export const NT_SUB = 'new_subscriber'; // приходит автору
+export const NT_UNSUB = 'unsubscribed'; // приходит автору
 export const NT_AD_STATUS = 'status_changed';
 export const NT_MAX_BID = 'max_bid_upd';
+
+export function removeDuplicates(arr) {
+	const result = [];
+	const duplicatesIndices = [];
+
+	// Перебираем каждый элемент в исходном массиве
+	arr.forEach((current, index) => {
+		if (duplicatesIndices.includes(index)) return;
+
+		result.push(current);
+
+		// Сравниваем каждый элемент в массиве после текущего
+		for (let comparisonIndex = index + 1; comparisonIndex < arr.length; comparisonIndex++) {
+			const comparison = arr[comparisonIndex];
+			const currentKeys = Object.keys(current);
+			const comparisonKeys = Object.keys(comparison);
+
+			// Проверяем длину массивов
+			if (currentKeys.length !== comparisonKeys.length) continue;
+
+			// Проверяем значение ключей
+			const currentKeysString = currentKeys.sort().join('').toLowerCase();
+			const comparisonKeysString = comparisonKeys.sort().join('').toLowerCase();
+			if (currentKeysString !== comparisonKeysString) continue;
+
+			// Проверяем индексы ключей
+			let valuesEqual = true;
+			for (let i = 0; i < currentKeys.length; i++) {
+				const key = currentKeys[i];
+				if (current[key] !== comparison[key]) {
+					valuesEqual = false;
+					break;
+				}
+			}
+			if (valuesEqual) duplicatesIndices.push(comparisonIndex);
+		} // Конец цикла
+	});
+	return result;
+}
 
 export function handleNotifications(note) {
 	switch (note.data.notification_type) {
@@ -50,7 +92,7 @@ export function handleNotifications(note) {
 		case NT_FULFILL:
 			sendSnack('Объявление завершено');
 			return;
-		case NT_COMMENT:
+		case NT_COMMENT_NEW:
 			sendSnack('Обьявление прокомментировано');
 			return;
 		case NT_MAX_BID:
@@ -149,7 +191,7 @@ function getNotifications(bigarr, lastAdElementRef) {
 									/>
 								);
 								break;
-							case NT_COMMENT:
+							case NT_COMMENT_NEW:
 								inner = (
 									<Notification
 										date={v.creation_date_time}
@@ -241,45 +283,6 @@ const Notifications = (props) => {
 		[loading, hasMore]
 	);
 
-	function removeDuplicates(arr) {
-		const result = [];
-		const duplicatesIndices = [];
-
-		// Перебираем каждый элемент в исходном массиве
-		arr.forEach((current, index) => {
-			if (duplicatesIndices.includes(index)) return;
-
-			result.push(current);
-
-			// Сравниваем каждый элемент в массиве после текущего
-			for (let comparisonIndex = index + 1; comparisonIndex < arr.length; comparisonIndex++) {
-				const comparison = arr[comparisonIndex];
-				const currentKeys = Object.keys(current);
-				const comparisonKeys = Object.keys(comparison);
-
-				// Проверяем длину массивов
-				if (currentKeys.length !== comparisonKeys.length) continue;
-
-				// Проверяем значение ключей
-				const currentKeysString = currentKeys.sort().join('').toLowerCase();
-				const comparisonKeysString = comparisonKeys.sort().join('').toLowerCase();
-				if (currentKeysString !== comparisonKeysString) continue;
-
-				// Проверяем индексы ключей
-				let valuesEqual = true;
-				for (let i = 0; i < currentKeys.length; i++) {
-					const key = currentKeys[i];
-					if (current[key] !== comparison[key]) {
-						valuesEqual = false;
-						break;
-					}
-				}
-				if (valuesEqual) duplicatesIndices.push(comparisonIndex);
-			} // Конец цикла
-		});
-		return result;
-	}
-
 	const [arrNotRead, setArrNotRead] = useState([]);
 	const [arrRead, setArrRead] = useState([]);
 
@@ -309,9 +312,9 @@ const Notifications = (props) => {
 		arrRead.forEach((e) => {
 			ar.push(...e);
 		});
-		ar = [...ar, ...nots.filter((v) => v.is_read)]
+		ar = [...ar, ...nots.filter((v) => v.is_read)];
 		console.log('arrrr', ar);
-		ar = removeDuplicates(ar)
+		ar = removeDuplicates(ar);
 		console.log('arrrr2', ar);
 		let newArrRead = [];
 
@@ -330,18 +333,21 @@ const Notifications = (props) => {
 
 	function handleChecked(e) {
 		const newValue = e.currentTarget.checked;
+		setNotsPMLoaded(false);
 		if (newValue) {
-			console.log('aaaa');
 			allowMessages(
 				() => {
 					setPermissionPM(props.myID, newValue);
+					setNotsPMLoaded(true);
 				},
 				() => {
 					setNotsPM(false);
+					setNotsPMLoaded(true);
 				}
 			);
 		} else {
 			setPermissionPM(props.myID, newValue);
+			setNotsPMLoaded(true);
 		}
 		setNotsPM(newValue);
 	}
@@ -371,13 +377,14 @@ const Notifications = (props) => {
 					multiline
 					asideContent={withLoadingIf(
 						notsPMLoaded,
-						<Switch style={{ cursor: 'pointer' }} checked={notsPM} onChange={handleChecked} />
+						<Switch style={{ cursor: 'pointer' }} checked={notsPM} onChange={handleChecked} />,
+						'regular'
 					)}
 				>
 					Отправлять уведомления в Личные Сообщения
 				</Cell>
 				{arrNotRead.length > 0 ? (
-					<Group header={<Header mode="primary">Непрочитанные</Header>}>
+					<Group separator="hide" header={<Header mode="primary">Непрочитанные</Header>}>
 						{getNotifications(arrNotRead, lastAdElementRef)}
 					</Group>
 				) : null}

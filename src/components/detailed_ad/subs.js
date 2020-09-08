@@ -16,7 +16,10 @@ const SubsLabelInner = (props) => {
 	}
 
 	useEffect(() => {
-		const subs = props.ad.subs;
+		const subs = props.activeContext[props.activeStory].subs;
+		if (!subs) {
+			return;
+		}
 		const photos = subs.map((v) => v.photo_url);
 		setComponentSubs(
 			subs.length == 0 ? (
@@ -61,13 +64,14 @@ const SubsLabelInner = (props) => {
 				</Group>
 			)
 		);
-	}, [props.ad]);
+	}, [props.activeContext[props.activeStory]]);
 	return componentSubs;
 };
 
 const mapStateToPropsSubs = (state) => {
 	return {
-		ad: state.ad,
+		activeStory: state.router.activeStory,
+		activeContext: state.router.activeContext,
 	};
 };
 

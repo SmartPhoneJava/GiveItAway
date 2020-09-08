@@ -2,17 +2,14 @@ import React, { useState, useEffect, useRef, createRef, forwardRef } from 'react
 import {
 	FormLayout,
 	Input,
-	Header,
 	Card,
 	CardGrid,
-	InfoRow,
 	Group,
 	Textarea,
 	File,
 	HorizontalScroll,
 	Avatar,
 	Snackbar,
-	Placeholder,
 	Spinner,
 	Div,
 	Cell,
@@ -46,6 +43,7 @@ import { PHOTO_TEXT } from '../../../../const/create';
 import './createItem.css';
 import { closeSnackbar, openSnackbar, setDummy } from '../../../../store/router/actions';
 import { CategoryOnline } from '../../../../components/categories/const';
+import { store } from '../../../..';
 
 const nameLabel = 'Название';
 const descriptionLabel = 'Описание';
@@ -60,17 +58,17 @@ const allStyles = {
 };
 
 const CreateItem = (props) => {
-	const { AD, defaultInputData, category } = props;
+	const { activeStory, defaultInputData, category } = props;
 	const { setFormData, openSnackbar, closeSnackbar, setDummy } = props;
-	const inputData = props.inputData[CREATE_AD_ITEM] || defaultInputData;
-	const name = props.inputData[CREATE_AD_ITEM].name || '';
-	const description = props.inputData[CREATE_AD_ITEM].description || '';
+	const inputData = props.inputData[activeStory + CREATE_AD_ITEM] || defaultInputData;
+	const name = inputData.name || '';
+	const description = inputData.description || '';
 
 	// const [inputData, setInputData] = useState(props.inputData[CREATE_AD_ITEM] || props.defaultInputData);
-	const needEdit = props.inputData[EDIT_MODE] ? props.inputData[EDIT_MODE].mode : false;
+	const needEdit = props.inputData[activeStory + EDIT_MODE] ? props.inputData[activeStory + EDIT_MODE].mode : false;
 	const handleInput = (e) => {
 		let value = e.currentTarget.value;
-		setFormData(CREATE_AD_ITEM, {
+		setFormData(activeStory + CREATE_AD_ITEM, {
 			...inputData,
 			[e.currentTarget.name]: value,
 		});
@@ -137,7 +135,7 @@ const CreateItem = (props) => {
 			(value) => {
 				const photosUrl = !inputData.photosUrl ? [value] : [...inputData.photosUrl, value];
 				const photoText = '' + PHOTO_TEXT + 'Загружено ' + photosUrl.length + '/3 снимков';
-				setFormData(CREATE_AD_ITEM, {
+				setFormData(activeStory + CREATE_AD_ITEM, {
 					...inputData,
 					photosUrl,
 					photoText,
@@ -155,7 +153,7 @@ const CreateItem = (props) => {
 		}
 		const photoText = PHOTO_TEXT + 'Загружено ' + (inputData.photosUrl.length - 1) + '/3 снимков';
 		const photosUrl = [...inputData.photosUrl.slice(0, i), ...inputData.photosUrl.slice(i + 1)];
-		setFormData(CREATE_AD_ITEM, {
+		setFormData(activeStory + CREATE_AD_ITEM, {
 			...inputData,
 			photoText,
 			photosUrl,
@@ -368,7 +366,7 @@ const CreateItem = (props) => {
 					<div style={{ paddingBottom: '8px' }}>
 						<CategoriesLabel
 							open={props.openCategories}
-							redux_form={FORM_CREATE}
+							redux_form={activeStory + FORM_CREATE}
 							notChoosenElement={{ id: -1, content: 'Не выбрано' }}
 						/>
 					</div>
@@ -416,7 +414,7 @@ const mapStateToProps = (state) => {
 		platform: state.vkui.platform,
 		inputData: state.formData.forms,
 
-		AD: state.ad,
+		activeStory: state.router.activeStory,
 	};
 };
 

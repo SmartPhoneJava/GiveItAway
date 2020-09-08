@@ -1,13 +1,7 @@
 import { connect } from 'react-redux';
 
-import { setPage, openPopout, openSnackbar, closeSnackbar, setStory, setAd } from '../../store/router/actions';
-import {
-	PANEL_CATEGORIES,
-	PANEL_CITIES,
-	PANEL_COUNTRIES,
-	PANEL_ONE,
-	PANEL_LICENCE,
-} from '../../store/router/panelTypes';
+import { setPage, openSnackbar, closeSnackbar, updateContext } from '../../store/router/actions';
+import { PANEL_ONE, PANEL_LICENCE } from '../../store/router/panelTypes';
 
 import { setFormData, setGeoDataString, setGeoData } from '../../store/create_post/actions';
 import { CREATE_AD_MAIN, CREATE_AD_ITEM, GEO_DATA } from '../../store/create_post/types';
@@ -23,40 +17,44 @@ import { setExtraInfo } from '../../store/detailed_ad/actions';
 import { STORY_ADS } from '../../store/router/storyTypes';
 import { store } from '../..';
 import { defaultInputData } from '../../components/create/default';
+import { now } from 'moment';
 
-const clearForm = (dispatch) => {
-	dispatch(setFormData(FORM_CREATE, null));
-	dispatch(setFormData(CREATE_AD_MAIN, { ...defaultInputData }));
-	dispatch(setFormData(CREATE_AD_ITEM, { ...defaultInputData }));
+const clearForm = (activeStory, dispatch) => {
+	dispatch(setFormData(activeStory + FORM_CREATE, null));
+	dispatch(setFormData(activeStory + CREATE_AD_MAIN, { ...defaultInputData }));
+	dispatch(setFormData(activeStory + CREATE_AD_ITEM, { ...defaultInputData }));
 };
 
-const getMainInfo = (inputData) => {
-	return inputData[CREATE_AD_MAIN];
+const getMainInfo = (activeStory, inputData) => {
+	return inputData[activeStory + CREATE_AD_MAIN];
 };
 
-const getItemInfo = (inputData) => {
-	return inputData[CREATE_AD_ITEM];
+const getItemInfo = (activeStory, inputData) => {
+	return inputData[activeStory + CREATE_AD_ITEM];
 };
 
-const getCategoryInfo = (inputData) => {
-	return inputData[FORM_CREATE];
+const getCategoryInfo = (activeStory, inputData) => {
+	return inputData[activeStory + FORM_CREATE];
 };
 
-const getLocationInfo = (inputData) => {
-	return inputData[FORM_LOCATION_CREATE];
+const getLocationInfo = (activeStory, inputData) => {
+	return inputData[activeStory + FORM_LOCATION_CREATE];
 };
 
-const getAd = (myUser, inputData) => {
-	const location = getLocationInfo(inputData);
-	const main = getMainInfo(inputData);
-	const item = getItemInfo(inputData);
-	const category = getCategoryInfo(inputData);
+const getAd = (activeStory, myUser, inputData) => {
+	console.log('myUser is', myUser); //{"vk_id":45863670,"name":"Артём","surname":"Ягами","photo_url":"ht
+	const location = getLocationInfo(activeStory, inputData) || {};
+	const main = getMainInfo(activeStory, inputData);
+	console.log('main is', activeStory, inputData[activeStory + CREATE_AD_MAIN]);
+	const item = getItemInfo(activeStory, inputData);
+	const category = getCategoryInfo(activeStory, inputData);
 	const ad_id = store.getState().ad ? store.getState().ad.ad_id : 0;
-	const geodata = inputData[GEO_DATA] ? inputData[GEO_DATA].geodata : { long: 0, lat: 0 };
-	const geodata_string = inputData[GEO_DATA] ? inputData[GEO_DATA].geodata_string : '';
+	const geodata = inputData[activeStory + GEO_DATA] ? inputData[activeStory + GEO_DATA].geodata : { long: 0, lat: 0 };
+	const geodata_string = inputData[activeStory + GEO_DATA] ? inputData[activeStory + GEO_DATA].geodata_string : '';
+	console.log('location is', location);
 	return {
 		ad_id,
-		author: { vk_id: myUser.id, name: myUser.name },
+		author: { vk_id: myUser.id, name: myUser.first_name, surname: myUser.last_name, photo_url: myUser.photo_100 },
 		author_id: myUser.id,
 		header: item.name,
 		text: item.description,
@@ -69,11 +67,11 @@ const getAd = (myUser, inputData) => {
 		subcat_list: category.subcategory,
 		subcat: category.incategory,
 		category: category.category,
-		region: location.country.title,
-		district: location.city.title,
+		region: location && location.country && location.country.title,
+		district: location && location.city && location.city.title,
 		geo_position: {
-			long: geodata.long,
-			lat: geodata.lat,
+			long: geodata && geodata.long,
+			lat: geodata && geodata.lat,
 		},
 	};
 };
@@ -83,23 +81,18 @@ const openLicence = (dispatch) => {
 };
 
 const openAd = (ad, dispatch) => {
-	// ? не обьединять эту функцию в одну, оно специально
-	// ? вызывается так. Первая функция ставит историю и панель,
-	// ? вторая простая ставит панель. Благодаря этому работает
-	// ? кнопка назад
-
-	dispatch(setExtraInfo(ad, store.getState().vkui.myID));
-	dispatch(setStory(STORY_ADS));
 	dispatch(setPage(PANEL_ONE));
+	dispatch(updateContext(ad));
 };
 const loadAd = (ad, dispatch) => {
 	dispatch(setExtraInfo(ad, store.getState().vkui.myID));
 };
 
-const createAd = (myUser, inputData, dispatch) => {
-	const ad = getAd(myUser, inputData);
+const createAd = (activeStory, myUser, inputData, dispatch) => {
+	const ad = getAd(activeStory, myUser, inputData);
 	const obj = JSON.stringify(ad);
-	const photos = getItemInfo(inputData).photosUrl;
+	const photos = getItemInfo(activeStory, inputData).photosUrl;
+	console.log('create categories', ad);
 	CreateAd(
 		ad,
 		obj,
@@ -109,13 +102,13 @@ const createAd = (myUser, inputData, dispatch) => {
 			loadAd(ad, dispatch);
 		},
 		() => {
-			clearForm(dispatch);
+			clearForm(activeStory, dispatch);
 		}
 	);
 };
 
-const editAd = (myUser, inputData, dispatch) => {
-	const ad = getAd(myUser, inputData);
+const editAd = (activeStory, myUser, inputData, dispatch) => {
+	const ad = getAd(activeStory, myUser, inputData);
 	const obj = JSON.stringify(ad);
 
 	EditAd(
@@ -123,14 +116,15 @@ const editAd = (myUser, inputData, dispatch) => {
 		obj,
 		(ad) => openAd(ad, dispatch),
 		() => {
-			clearForm(dispatch);
+			clearForm(activeStory, dispatch);
 		}
 	);
 };
 
-const isValid = (inputData) => {
+const isValid = (activeStory, inputData) => {
 	let category = CategoryNo;
-	const itemInfo = getItemInfo(inputData);
+	const itemInfo = getItemInfo(activeStory, inputData);
+	console.log('itemInfo is', itemInfo, activeStory);
 	if (itemInfo) {
 		let { name, description, photosUrl } = itemInfo;
 		name = name ? name.trim() : '';
@@ -142,7 +136,7 @@ const isValid = (inputData) => {
 				text: 'Вы пропустили самый важный пункт!',
 			};
 		}
-		if (name.length < 3) {
+		if (name.length < 5) {
 			return {
 				v: false,
 				header: 'Название предмета слишком короткое',
@@ -178,21 +172,21 @@ const isValid = (inputData) => {
 			};
 		}
 
-		const categoryInfo = getCategoryInfo(inputData);
+		const categoryInfo = getCategoryInfo(activeStory, inputData);
 		if (categoryInfo) {
 			category = categoryInfo.category;
 			if (category == CategoryNo) {
 				return {
 					v: false,
 					header: 'Категория предмета не указана',
-					text: 'Выберите категорию предметов в выпадающем списке в начале страницы',
+					text: 'Выберите категорию предмета, кликнув по соответствующей панели',
 				};
 			}
 		} else {
 			return {
 				v: false,
 				header: 'Категория предмета не указана',
-				text: 'Выберите категорию предметов в выпадающем списке в начале страницы',
+				text: 'Выберите категорию предмета, кликнув по соответствующей панели',
 			};
 		}
 
@@ -225,30 +219,33 @@ const isValid = (inputData) => {
 	}
 
 	if (category != CategoryOnline) {
-		const locationInfo = getLocationInfo(inputData);
+		const locationInfo = getLocationInfo(activeStory, inputData);
+		console.log('locationInfo is', locationInfo);
 		if (locationInfo) {
 			const { city, country } = locationInfo;
 			if (city.id < 0 || country.id < 0) {
 				return {
 					v: false,
-					header: 'Местоположение не указано',
-					text: 'Укажите свою страну и город с помощью выпадающих списков выше',
+					header: 'Место получения вещи не указано',
+					text: 'Введите адрес в поле ввода в пунтке "Где забрать вещь"',
 				};
 			}
 		} else {
 			return {
 				v: false,
-				header: 'Местоположение не указано',
-				text: 'Укажите свою страну и город с помощью выпадающих списков выше',
+				header: 'Место получения вещи не указано',
+				text: 'Введите адрес в поле ввода в пунтке "Где забрать вещь"',
 			};
 		}
 
-		const geodata_string = inputData[GEO_DATA] ? inputData[GEO_DATA].geodata_string : '';
+		const geodata_string = inputData[activeStory + GEO_DATA]
+			? inputData[activeStory + GEO_DATA].geodata_string
+			: '';
 		if (!geodata_string || geodata_string.trim() == '') {
 			return {
 				v: false,
-				header: 'Местоположение не указано',
-				text: 'Укажите район, где получатель сможет забрать вещь',
+				header: 'Место получения вещи не указано',
+				text: 'Введите адрес в поле ввода в пунтке "Где забрать вещь"',
 			};
 		}
 	}
@@ -259,29 +256,62 @@ const isValid = (inputData) => {
 	};
 };
 
+const isSame = (activeStory, first, second) => {
+	const itemInfo1 = getItemInfo(activeStory, first);
+	const itemInfo2 = getItemInfo(activeStory, second);
+	if (itemInfo1 != itemInfo2) {
+		return false;
+	}
+
+	const categoryInfo1 = getCategoryInfo(activeStory, first);
+	const categoryInfo2 = getCategoryInfo(activeStory, second);
+	if (categoryInfo1 != categoryInfo2) {
+		return false;
+	}
+	if (!categoryInfo1) {
+		return true;
+	}
+
+	const category = categoryInfo1.category;
+	if (category != CategoryOnline) {
+		const locationInfo1 = getLocationInfo(activeStory, first);
+		const locationInfo2 = getLocationInfo(activeStory, second);
+		if (locationInfo1 != locationInfo2) {
+			return false;
+		}
+
+		const geodata_string1 = first[activeStory + GEO_DATA] ? first[activeStory + GEO_DATA].geodata_string : '';
+		const geodata_string2 = second[activeStory + GEO_DATA] ? second[activeStory + GEO_DATA].geodata_string : '';
+		if (geodata_string1 != geodata_string2) {
+			return false;
+		}
+	}
+	return true;
+};
+
 const mapStateToProps = (state) => {
 	return {
 		inputData: state.formData.forms,
+		activeStory: state.router.activeStory,
 		myUser: state.vkui.myUser,
-
-		AD: state.ad,
 
 		defaultInputData,
 		isValid,
+		isSame,
 	};
 };
 
 const mapDispatchToProps = (dispatch) => {
 	return {
-		setGeoData: (s) => dispatch(setGeoData(s)),
-		setGeoDataString: (s) => dispatch(setGeoDataString(s)),
+		setGeoData: (activeStory, s) => dispatch(setGeoData(activeStory, s)),
+		setGeoDataString: (activeStory, s) => dispatch(setGeoDataString(activeStory, s)),
 		setFormData: (p, s) => dispatch(setFormData(p, s)),
 		setPage: (p) => dispatch(setPage(p)),
 		openLicence: () => openLicence(dispatch),
 		openSnackbar: (p) => dispatch(openSnackbar(p)),
 		closeSnackbar: () => dispatch(closeSnackbar()),
-		createAd: (myUser, inputData) => createAd(myUser, inputData, dispatch),
-		editAd: (myUser, inputData) => editAd(myUser, inputData, dispatch),
+		createAd: (activeStory, myUser, inputData) => createAd(activeStory, myUser, inputData, dispatch),
+		editAd: (activeStory, myUser, inputData) => editAd(activeStory, myUser, inputData, dispatch),
 	};
 };
 

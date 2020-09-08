@@ -7,8 +7,9 @@ import { Addr, BASE_AD, BASE_COMMENT } from './../../../../../store/addr';
 
 import { fail, failEasy, success } from './../../../../../requests';
 import { store } from '../../../../..';
-import { openPopout, closePopout } from '../../../../../store/router/actions';
+import { openPopout, closePopout, updateContext } from '../../../../../store/router/actions';
 import { addComment } from '../../../../../store/detailed_ad/actions';
+import { now } from 'moment';
 
 let request_id = 0;
 
@@ -31,20 +32,14 @@ export async function postComment(ad_id, comment, comment_text, successCallback,
 		.then(function (response) {
 			store.dispatch(closePopout());
 
-			var comment = {};
-			comment.comment_id = store.getState().ad.comments_count;
-			const vkUser = store.getState().vkui.myUser;
-			comment.author = {
-				vk_id: vkUser.id,
-				name: vkUser.first_name,
-				surname: vkUser.last_name,
-				photo_url: vkUser.photo_100,
-			};
-			comment.creation_date_time = new Date();
-			comment.text = comment_text;
+			const comment = response;
 
-			//store.dispatch(addComment(comment));
-			successCallback(response);
+			const router = store.getState().router;
+			let newComments = router.activeContext[router.activeStory].comments || [];
+			newComments = [...newComments.filter((v) => v.comment_id != comment.comment_id), comment];
+			store.dispatch(updateContext({ comments: newComments }));
+
+			successCallback(comment);
 			end();
 			return response;
 		})
@@ -89,6 +84,11 @@ export async function deleteComment(comment, successCallback, failCallback, end)
 		})
 		.then(function (response) {
 			success('Комментарий удален', null, end);
+			const router = store.getState().router;
+			let newComments = router.activeContext[router.activeStory].comments || [];
+			newComments = [...newComments.filter((v) => v.comment_id != comment.comment_id)];
+			store.dispatch(updateContext({ comments: newComments }));
+
 			successCallback(response);
 			store.dispatch(closePopout());
 			return response;
@@ -108,7 +108,7 @@ export async function deleteComment(comment, successCallback, failCallback, end)
 	return err;
 }
 
-export async function editComment(id, comment, successCallback, failCallback, end) {
+export async function editComment(real_comment, id, comment, successCallback, failCallback, end) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;
@@ -126,6 +126,17 @@ export async function editComment(id, comment, successCallback, failCallback, en
 		.then(function (response) {
 			successCallback(response);
 			success('Комментарий отредактирован', null, end);
+			const router = store.getState().router;
+			let newComments = router.activeContext[router.activeStory].comments || [];
+			newComments = newComments.map((v) => {
+				if (v.comment_id == real_comment.comment_id) {
+					v.text = real_comment.text;
+				}
+				return v;
+			});
+
+			store.dispatch(updateContext({ comments: newComments, comments_update: now() }));
+
 			store.dispatch(closePopout());
 			return response;
 		})
@@ -135,7 +146,7 @@ export async function editComment(id, comment, successCallback, failCallback, en
 			fail(
 				'Комментарий не отредактирован',
 				() => {
-					editComment(id, comment, successCallback, failCallback, end);
+					editComment(real_comment, id, comment, successCallback, failCallback, end);
 				},
 				end
 			);

@@ -1,72 +1,61 @@
-import React, { useState } from 'react';
+import React, { Suspense, lazy } from 'react';
 
-import Animal from './../../img/animal.png';
-import Another from './../../img/another.png';
-import Book from './../../img/book.png';
-import Build from './../../img/build.png';
-import Child from './../../img/child.png';
-import Clothers from './../../img/clothers.png';
-import Cosmetic from './../../img/cosmetic.png';
-import Electronics from './../../img/electronics.png';
-import Flora from './../../img/flora.png';
-import Food from './../../img/food.png';
-import Furniture from './../../img/furniture.png';
-import Music from './../../img/music.png';
-import Old from './../../img/old.png';
-import Pencil from './../../img/pencil.png';
-import Play from './../../img/play.png';
-import Sport from './../../img/sport.png';
-import Question from './../../img/question.png';
+// const Animals400 = lazy(() => import('./../../img/400/animals.png'));
+// const Auto400 = lazy(() => import('./../../img/400/auto.png'));
+// const Another400 = lazy(() => import('./../../img/400/another.png'));
+// const Book400 = lazy(() => import('./../../img/400/book.png'));
+// const Child400 = lazy(() => import('./../../img/400/child.png'));
+// const Clothers400 = lazy(() => import('./../../img/400/clothers.png'));
+// const Electronics400 = lazy(() => import('./../../img/400/electronics.png'));
+// const Flora400 = lazy(() => import('./../../img/400/flora.png'));
+// const Furniture400 = lazy(() => import('./../../img/400/furniture.png'));
+// const Music400 = lazy(() => import('./../../img/400/music.png'));
+// const Old400 = lazy(() => import('./../../img/400/old.png'));
+// const Home400 = lazy(() => import('./../../img/400/home.png'));
+// const Repair400 = lazy(() => import('./../../img/400/repair.png'));
+// const Pencil400 = lazy(() => import('./../../img/400/pencil.png'));
+// const Sports400 = lazy(() => import('./../../img/400/sports.png'));
+// const Technic400 = lazy(() => import('./../../img/400/technic.png'));
+// const Question400 = lazy(() => import('./../../img/400/question.png'));
+// const Online400 = lazy(() => import('./../../img/400/online.png'));
 
-import Animal400 from './../../img/400/animal.png';
-import Animals400 from './../../img/400/animals.png';
-import Auto400 from './../../img/400/auto.png';
-import Another400 from './../../img/400/another.png';
-import Book400 from './../../img/400/book.png';
-import Build400 from './../../img/400/build.png';
-import Child400 from './../../img/400/child.png';
-import Clothers400 from './../../img/400/clothers.png';
-import Cosmetic400 from './../../img/400/cosmetic.png';
-import Electronics400 from './../../img/400/electronics.png';
-import Flora400 from './../../img/400/flora.png';
-import Food400 from './../../img/400/food.png';
-import Furniture400 from './../../img/400/furniture.png';
-import Music400 from './../../img/400/music.png';
-import Old400 from './../../img/400/old.png';
-import Home400 from './../../img/400/home.png';
-import Repair400 from './../../img/400/repair.png';
-import Pencil400 from './../../img/400/pencil.png';
-import Play400 from './../../img/400/play.png';
-import Sport400 from './../../img/400/sport.png';
-import Sports400 from './../../img/400/sports.png';
-import Technic400 from './../../img/400/technic.png';
-import Question400 from './../../img/400/question.png';
-import Online400 from './../../img/400/online.png';
+const Animals400 = 'src/img/400/animals.png';
+const Auto400 = 'src/img/400/auto.png';
+const Another400 = 'src/img/400/another.png';
+const Book400 ='src/img/400/book.png';
+const Child400 = 'src/img/400/child.png';
+const Clothers400 = 'src/img/400/clothers.png';
+const Electronics400 = 'src/img/400/electronics.png';
+const Flora400 ='src/img/400/flora.png';
+const Furniture400 = 'src/img/400/furniture.png';
+const Music400 ='src/img/400/music.png';
+const Old400 = 'src/img/400/old.png';
+const Home400 = 'src/img/400/home.png';
+const Repair400 = 'src/img/400/repair.png';
+const Pencil400 ='src/img/400/pencil.png';
+const Sports400 = 'src/img/400/sports.png';
+const Technic400 = 'src/img/400/technic.png';
+const Question400 = 'src/img/400/question.png';
+const Online400 ='src/img/400/online.png';
 
-import Animal100 from './../../img/100/animal.png';
-import Animals100 from './../../img/100/animals.png';
-import Auto100 from './../../img/100/auto.png';
-import Another100 from './../../img/100/another.png';
-import Book100 from './../../img/100/book.png';
-import Build100 from './../../img/100/build.png';
-import Child100 from './../../img/100/child.png';
-import Clothers100 from './../../img/100/clothers.png';
-import Cosmetic100 from './../../img/100/cosmetic.png';
-import Electronics100 from './../../img/100/electronics.png';
-import Flora100 from './../../img/100/flora.png';
-import Food100 from './../../img/100/food.png';
-import Furniture100 from './../../img/100/furniture.png';
-import Music100 from './../../img/100/music.png';
-import Old100 from './../../img/100/old.png';
-import Home100 from './../../img/100/home.png';
-import Repair100 from './../../img/100/repair.png';
-import Pencil100 from './../../img/100/pencil.png';
-import Play100 from './../../img/100/play.png';
-import Sport100 from './../../img/100/sport.png';
-import Sports100 from './../../img/100/sports.png';
-import Technic100 from './../../img/100/technic.png';
-import Question100 from './../../img/100/question.png';
-import Online100 from './../../img/100/online.png';
+// const Animals100 = lazy(() => import('./../../img/100/animals.png'));
+// const Auto100 = lazy(() => import('./../../img/100/auto.png'));
+// const Another100 = lazy(() => import('./../../img/100/another.png'));
+// const Book100 = lazy(() => import('./../../img/100/book.png'));
+// const Child100 = lazy(() => import('./../../img/100/child.png'));
+// const Clothers100 = lazy(() => import('./../../img/100/clothers.png'));
+// const Electronics100 = lazy(() => import('./../../img/100/electronics.png'));
+// const Flora100 = lazy(() => import('./../../img/100/flora.png'));
+// const Furniture100 = lazy(() => import('./../../img/100/furniture.png'));
+// const Music100 = lazy(() => import('./../../img/100/music.png'));
+// const Old100 = lazy(() => import('./../../img/100/old.png'));
+// const Home100 = lazy(() => import('./../../img/100/home.png'));
+// const Repair100 = lazy(() => import('./../../img/100/repair.png'));
+// const Pencil100 = lazy(() => import('./../../img/100/pencil.png'));
+// const Sports100 = lazy(() => import('./../../img/100/sports.png'));
+// const Technic100 = lazy(() => import('./../../img/100/technic.png'));
+// const Question100 = lazy(() => import('./../../img/100/question.png'));
+// const Online100 = lazy(() => import('./../../img/100/online.png'));
 
 import Animal50 from './../../img/50/animal.png';
 import Another50 from './../../img/50/another.png';
@@ -195,72 +184,72 @@ export function GetCategory400(category) {
 	return image;
 }
 
-export function GetCategory100(category) {
-	let image = Another100;
-	switch (category) {
-		case CategoryAnimals:
-			image = Animals100;
-			break;
-		case CategoryBooks:
-			image = Book100;
-			break;
-		case CategoryBuild:
-			image = Repair100;
-			break;
-		case CategoryChildren:
-			image = Child100;
-			break;
-		case CategoryClothers:
-			image = Clothers100;
-			break;
-		// case CategoryCosmetic:
-		// 	image = Cosmetic100;
-		// 	break;
-		case CategoryElectronics:
-			image = Electronics100;
-			break;
-		case CategoryTechnic:
-			image = Technic100;
-			break;
-		case CategoryGarden:
-			image = Flora100;
-			break;
-		// case CategoryFood:
-		// 	image = Food100;
-		// 	break;
-		case CategoryFurniture:
-			image = Furniture100;
-			break;
-		case CategoryHobby:
-			image = Music100;
-			break;
-		case CategoryHealth:
-			image = Old100;
-			break;
-		case CategoryAuto:
-			image = Auto100;
-			break;
-		case CategorySport:
-			image = Sports100;
-			break;
-		// case CategoryPlay:
-		// 	image = Play100;
-		// 	break;
-		case CategoryOffice:
-			image = Pencil100;
-			break;
-		case CategoryHome:
-			image = Home100;
-			break;
-		case CategoryOnline:
-			image = Online100;
-			break;
-		case CategoryNo:
-			image = Question100;
-			break;
-	}
-	return image;
-}
+// export function GetCategory100(category) {
+// 	let image = Another100;
+// 	switch (category) {
+// 		case CategoryAnimals:
+// 			image = Animals100;
+// 			break;
+// 		case CategoryBooks:
+// 			image = Book100;
+// 			break;
+// 		case CategoryBuild:
+// 			image = Repair100;
+// 			break;
+// 		case CategoryChildren:
+// 			image = Child100;
+// 			break;
+// 		case CategoryClothers:
+// 			image = Clothers100;
+// 			break;
+// 		// case CategoryCosmetic:
+// 		// 	image = Cosmetic100;
+// 		// 	break;
+// 		case CategoryElectronics:
+// 			image = Electronics100;
+// 			break;
+// 		case CategoryTechnic:
+// 			image = Technic100;
+// 			break;
+// 		case CategoryGarden:
+// 			image = Flora100;
+// 			break;
+// 		// case CategoryFood:
+// 		// 	image = Food100;
+// 		// 	break;
+// 		case CategoryFurniture:
+// 			image = Furniture100;
+// 			break;
+// 		case CategoryHobby:
+// 			image = Music100;
+// 			break;
+// 		case CategoryHealth:
+// 			image = Old100;
+// 			break;
+// 		case CategoryAuto:
+// 			image = Auto100;
+// 			break;
+// 		case CategorySport:
+// 			image = Sports100;
+// 			break;
+// 		// case CategoryPlay:
+// 		// 	image = Play100;
+// 		// 	break;
+// 		case CategoryOffice:
+// 			image = Pencil100;
+// 			break;
+// 		case CategoryHome:
+// 			image = Home100;
+// 			break;
+// 		case CategoryOnline:
+// 			image = Online100;
+// 			break;
+// 		case CategoryNo:
+// 			image = Question100;
+// 			break;
+// 	}
+// 	return image;
+// }
 
 export function GetCategory50(category) {
 	let image = Another50;
@@ -396,73 +385,6 @@ export function GetCategory30(category) {
 	return image;
 }
 
-export function GetCategory(category) {
-	let image = Another;
-	switch (category) {
-		case CategoryAnimals:
-			image = Animal;
-			break;
-		case CategoryBooks:
-			image = Book;
-			break;
-		case CategoryBuild:
-			image = Build;
-			break;
-		case CategoryChildren:
-			image = Child;
-			break;
-		case CategoryClothers:
-			image = Clothers;
-			break;
-		// case CategoryCosmetic:
-		// 	image = Cosmetic;
-		// 	break;
-		case CategoryElectronics:
-			image = Electronics;
-			break;
-		case CategoryTechnic:
-			image = Electronics;
-			break;
-		case CategoryGarden:
-			image = Flora;
-			break;
-		// case CategoryFood:
-		// 	image = Food;
-		// 	break;
-		case CategoryFurniture:
-			image = Furniture;
-			break;
-		case CategoryHobby:
-			image = Music;
-			break;
-		case CategoryHealth:
-			image = Old;
-			break;
-		case CategoryAuto:
-			image = Pencil;
-			break;
-		case CategoryOffice:
-			image = Pencil;
-			break;
-		case CategoryHome:
-			image = Pencil;
-			break;
-		case CategoryOnline:
-			image = Pencil;
-			break;
-		// case CategoryPlay:
-		// 	image = Play;
-		// 	break;
-		case CategorySport:
-			image = Sport;
-			break;
-		case CategoryNo:
-			image = Question;
-			break;
-	}
-	return image;
-}
-
 export function GetCategoryText(category) {
 	switch (category) {
 		case CategoryAnimals:
@@ -511,13 +433,14 @@ export function GetCategoryText(category) {
 
 export function GetCategoryImageBig(category) {
 	let image = GetCategory400(category);
+
 	return <img src={image} className="category100" />;
 }
 
 export function GetCategoryImage100(category) {
 	let image = GetCategory400(category);
 
-	return <img src={image} className="category100v"  width="80" height="80" />;
+	return <img src={image} className="category100v" width="80" height="80" />;
 }
 
 export function GetCategoryImageSmall(category) {

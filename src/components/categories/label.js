@@ -5,8 +5,6 @@ import { connect } from 'react-redux';
 
 import { CategoryNo } from './const';
 
-import { DraggableArea } from 'react-draggable-tags';
-
 import { Transition } from 'react-transition-group';
 
 import { randomColor } from 'randomcolor';

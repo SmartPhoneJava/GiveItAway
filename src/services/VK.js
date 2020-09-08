@@ -305,7 +305,7 @@ export const postStoryApp = () => {
 		});
 };
 
-export const getGeodata = (successCallback, failCallback) => {
+export const getGeodata = (activeStory, successCallback, failCallback) => {
 	let cleanupFunction = false;
 	const s = successCallback || (() => {});
 	const f = failCallback || (() => {});
@@ -315,7 +315,7 @@ export const getGeodata = (successCallback, failCallback) => {
 			if (!cleanupFunction) {
 				if (geodata.available) {
 					s(geodata);
-					store.dispatch(setGeoData(geodata));
+					store.dispatch(setGeoData(activeStory, geodata));
 				} else {
 					f(error);
 					fail('Не удалось получить местоположение. Проверьте, включен ли GPS');

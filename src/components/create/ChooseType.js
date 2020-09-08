@@ -10,16 +10,17 @@ import { CREATE_AD_MAIN, EDIT_MODE } from '../../store/create_post/types';
 import { TYPE_CHOICE, TYPE_RANDOM, TYPE_AUCTION } from '../../const/ads';
 
 const ChooseType = (props) => {
-	const [inputData, setInputData] = useState(props.inputData[CREATE_AD_MAIN] || defaultInputData);
-	const edited = props.inputData[EDIT_MODE] ? props.inputData[EDIT_MODE].mode : false;
+	const { activeStory } = props;
+	const [inputData, setInputData] = useState(props.inputData[activeStory + CREATE_AD_MAIN] || defaultInputData);
+	const edited = props.inputData[activeStory + EDIT_MODE] ? props.inputData[activeStory + EDIT_MODE].mode : false;
 
 	function handleChecked(e) {
 		setInputData({
 			...inputData,
 			type: e.currentTarget.value,
 		});
-		props.setFormData(CREATE_AD_MAIN, {
-			...inputData,
+		props.setFormData(activeStory + CREATE_AD_MAIN, {
+			...props.inputData[activeStory + CREATE_AD_MAIN],
 			type: e.currentTarget.value,
 		});
 	}
@@ -73,6 +74,7 @@ const ChooseType = (props) => {
 const mapStateToProps = (state) => {
 	return {
 		inputData: state.formData.forms,
+		activeStory: state.router.activeStory,
 	};
 };
 

@@ -15,9 +15,9 @@ import { defaultInputData } from './default';
 import { closeSnackbar, openSnackbar } from '../../store/router/actions';
 
 const ChooseFeedback = (props) => {
-	const [inputData, setInputData] = useState(props.inputData[CREATE_AD_MAIN] || defaultInputData);
+	const { closeSnackbar, openSnackbar, activeStory } = props;
+	const [inputData, setInputData] = useState(props.inputData[activeStory + CREATE_AD_MAIN] || defaultInputData);
 
-	const { closeSnackbar, openSnackbar } = props;
 	function warningClosedProfile() {
 		openSnackbar(
 			<Snackbar
@@ -39,8 +39,8 @@ const ChooseFeedback = (props) => {
 			...inputData,
 			[e.currentTarget.name]: e.currentTarget.checked,
 		});
-		props.setFormData(CREATE_AD_MAIN, {
-			...inputData,
+		props.setFormData(activeStory + CREATE_AD_MAIN, {
+			...props.inputData[activeStory + CREATE_AD_MAIN],
 			[e.currentTarget.name]: e.currentTarget.checked,
 		});
 	}
@@ -97,6 +97,7 @@ const ChooseFeedback = (props) => {
 const mapStateToProps = (state) => {
 	return {
 		inputData: state.formData.forms,
+		activeStory: state.router.activeStory,
 	};
 };
 

@@ -69,10 +69,10 @@ const ModalCardCaptionAdsTypeInner = (props) => {
 
 	useEffect(() => {
 		if (!activeModal || !currentAdType) {
-			setInfo(props.ad.ad_type);
-			setCurrentAdType(props.ad.ad_type);
+			setInfo(props.activeContext[props.activeStory].ad_type);
+			setCurrentAdType(props.activeContext[props.activeStory].ad_type);
 		}
-	}, [props.ad, activeModal]);
+	}, [props.activeContext[props.activeStory], activeModal]);
 	useEffect(() => {
 		if (moveAdType == 0) {
 			return;
@@ -188,7 +188,8 @@ const ModalCardCaptionAdsTypeInner = (props) => {
 const mapStateToProps = (state) => {
 	return {
 		activeModals: state.router.activeModals,
-		ad: state.ad,
+		activeStory: state.router.activeStory,
+		activeContext: state.router.activeContext,
 	};
 };
 

@@ -21,12 +21,13 @@ import { MODAL_ADS_TYPES, MODAL_ADS_FROZEN, MODAL_ADS_COST } from '../../store/r
 import { SubsLabel } from './subs';
 import { K } from '../../panels/story/profile/const';
 import { AdHeader, isFinished } from './faq';
-import { PANEL_SUBS } from '../../store/router/panelTypes';
+import { PANEL_SUBS, PANEL_ONE } from '../../store/router/panelTypes';
 
 const DealLabelInner = (props) => {
 	const [componentStatus, setComponentStatus] = useState(<></>);
+	const activePanel = props.activePanels[props.activeStory];
 	useEffect(() => {
-		const { status, ad_type } = props.ad;
+		const { status } = props.activeContext[props.activeStory];
 		setComponentStatus(
 			<InfoRow header="Статус">
 				{
@@ -39,13 +40,16 @@ const DealLabelInner = (props) => {
 				}
 			</InfoRow>
 		);
-	}, [props.ad.status]);
+	}, [activePanel, props.activeContext[props.activeStory].status]);
 
 	const [myRate, setMyRate] = useState(0);
 	const [mrDone, setMrDone] = useState(false);
 	const [mrUpdate, setMrUpdate] = useState(false);
 	useEffect(() => {
-		const { isAuthor, ad_id } = props.ad;
+		const { isAuthor, ad_id } = props.activeContext[props.activeStory];
+		if (activePanel != PANEL_ONE) {
+			return;
+		}
 		if (isAuthor) {
 			setMrDone(true);
 			return;
@@ -62,11 +66,21 @@ const DealLabelInner = (props) => {
 				setMyRate(0);
 			}
 		);
-	}, [props.ad.isSub, props.ad.isAuthor, mrUpdate]);
+	}, [
+		activePanel,
+		props.activeContext[props.activeStory].isSub,
+		props.activeContext[props.activeStory].isAuthor,
+		mrUpdate,
+	]);
 
 	const [componentChosen, setComponentChosen] = useState(<></>);
 	useEffect(() => {
-		const { dealer } = props.ad;
+		if (activePanel != PANEL_ONE) {
+			return;
+		}
+		const { dealer } = props.activeContext[props.activeStory];
+		const dealer_text = dealer != null && dealer != undefined ? dealer.name + ' ' + dealer.surname : 'Не выбран';
+		console.log('dealer is', dealer, dealer_text);
 		setComponentChosen(
 			withLoadingIf(
 				props.dealRequestSuccess,
@@ -81,14 +95,14 @@ const DealLabelInner = (props) => {
 					key={dealer ? dealer.vk_id : ''}
 					before={dealer ? <Avatar size={36} src={dealer.photo_url} /> : <Icon24User />}
 				>
-					<InfoRow header="Получатель">{dealer ? dealer.name + ' ' + dealer.surname : 'Не выбран'}</InfoRow>
+					<InfoRow header="Получатель">{dealer_text}</InfoRow>
 				</Cell>,
 				'middle',
 				null,
-				{ marginTop: '20px' }
+				{ flex: 1, justifyContent: 'center', alignItems: 'center', marginRight: '24px' }
 			)
 		);
-	}, [props.ad.dealer, props.dealRequestSuccess]);
+	}, [activePanel, props.activeContext[props.activeStory].dealer, props.dealRequestSuccess]);
 
 	const onTypesClick = () => props.openModal(MODAL_ADS_TYPES);
 	const onFreezeClick = () => props.openModal(MODAL_ADS_FROZEN);
@@ -97,18 +111,74 @@ const DealLabelInner = (props) => {
 
 	const width = document.body.clientWidth;
 
+	const subPanel = (disable) => {
+		if (activePanel != PANEL_ONE) {
+			return;
+		}
+		const { sub, unsub } = props;
+		const { isSub, ad_type } = props.activeContext[props.activeStory];
+		const cost = props.activeContext[props.activeStory].cost || '';
+		return (
+			<Group
+				header={
+					<Header mode="secondary">
+						{ad_type == TYPE_RANDOM
+							? isSub
+								? 'Вы участвуете'
+								: 'Вы не участвуете'
+							: isSub
+							? 'Вы откликнулись'
+							: 'Вы не откликнулись'}
+					</Header>
+				}
+			>
+				<div style={{ display: width < 415 ? 'block' : 'flex', alignItems: 'center' }}>
+					<CellButton
+						disabled={disable}
+						style={{ cursor: disable ? null : 'pointer' }}
+						onClick={isSub ? unsub : sub}
+						mode={isSub ? 'danger' : 'primary'}
+						before={<Icon24MarketOutline />}
+					>
+						{isSub ? 'Отказаться' : 'Откликнуться'}
+					</CellButton>
+					<div style={{ display: 'flex', flex: 1, alignItems: 'center' }}>
+						<Cell
+							indicator={
+								<Counter
+									mode={isSub ? 'primary' : 'prominent'}
+									onClick={onCarmaClick}
+									style={{ fontWeight: 600, cursor: 'pointer' }}
+								>
+									{cost + ' ' + K}
+								</Counter>
+							}
+						>
+							{isSub ? 'Вам вернётся' : 'Стоимость'}
+						</Cell>
+						<Cell style={{ cursor: 'pointer' }} onClick={onFreezeClick}>
+							<Icon24Help fill={'var(--counter_secondary_background)'} />
+						</Cell>
+					</div>
+				</div>
+			</Group>
+		);
+	};
+
 	const [componentSub, setComponentSub] = useState(<></>);
 	useEffect(() => {
-		const { sub, unsub } = props;
-		const { cost, subs, status, isAuthor, isDealer, isSub, dealer, ad_id, ad_type } = props.ad;
+		if (activePanel != PANEL_ONE) {
+			return;
+		}
+		const { status, isAuthor, isDealer, isSub, dealer, ad_id, ad_type } = props.activeContext[props.activeStory];
+		const subs = props.activeContext[props.activeStory].subs || [];
+
 		const disable =
 			isFinished(status) || isAuthor
 				? subs.length == 0 // автор не может выбрать получателя, если нет подписчиков
 				: status != STATUS_OFFER && (!isSub || isDealer); // если ты не подписан, то уже не сможешь подписаться. Если ты получатель, отписываться нельзя
 
 		let button = <></>;
-
-		console.log("width is ", width)
 
 		if (isAuthor) {
 			if (dealer) {
@@ -164,93 +234,31 @@ const DealLabelInner = (props) => {
 				);
 			}
 		} else {
-			if (isSub) {
-				button = (
-					<Group
-						header={
-							<Header mode="secondary">
-								{ad_type == TYPE_RANDOM ? 'Вы участвуете' : 'Вы отклинулись'}
-							</Header>
-						}
-					>
-						<div style={{ display: width < 415 ? 'block' : 'flex' }}>
-							<CellButton
-								disabled={disable}
-								style={{ cursor: disable ? null : 'pointer' }}
-								onClick={unsub}
-								mode="danger"
-								before={<Icon24MarketOutline />}
-							>
-								Отказаться
-							</CellButton>
-							<div style={{ display: 'flex', flex: 1 }}>
-								<Cell
-									indicator={
-										<Counter
-											mode="primary"
-											onClick={onCarmaClick}
-											style={{ fontWeight: 600, cursor: 'pointer' }}
-										>
-											{cost + ' ' + K}
-										</Counter>
-									}
-								>
-									Вам вернётся
-								</Cell>
-								<Cell style={{ cursor: 'pointer' }} onClick={onFreezeClick}>
-									<Icon24Help fill={'var(--counter_secondary_background)'} />
-								</Cell>
-							</div>
-						</div>
-					</Group>
-				);
-			} else {
-				button = (
-					<div style={{ display: width < 415 ? 'block' : 'flex' }}>
-						<div>
-							<CellButton
-								style={{ cursor: disable ? null : 'pointer' }}
-								onClick={sub}
-								disabled={disable}
-								before={<Icon24MarketOutline />}
-							>
-								Откликнуться
-							</CellButton>
-						</div>
-						<div style={{ display: 'flex', flex: 1 }}>
-							<Cell
-								indicator={
-									<Counter
-										style={{ cursor: 'pointer' }}
-										mode="prominent"
-										onClick={onCarmaClick}
-										style={{ fontWeight: 600 }}
-									>
-										{cost + ' ' + K}
-									</Counter>
-								}
-							>
-								Стоимость
-							</Cell>
-							<Cell style={{ cursor: 'pointer' }} onClick={onFreezeClick}>
-								<Icon24Help fill={'var(--counter_secondary_background)'} />
-							</Cell>
-						</div>
-					</div>
-				);
-			}
+			button = subPanel(disable);
 		}
 
 		setComponentSub(button);
-	}, [props.ad.isAuthor, props.ad.isSub, props.ad.cost, props.ad.dealer]);
+	}, [
+		activePanel,
+		props.activeStory,
+		props.activeContext[props.activeStory].isAuthor,
+		props.activeContext[props.activeStory].isSub,
+		props.activeContext[props.activeStory].cost,
+		props.activeContext[props.activeStory].dealer,
+	]);
 
 	const [componentSubs, setComponentSubs] = useState(<></>);
 	useEffect(() => {
+		if (activePanel != PANEL_ONE) {
+			return;
+		}
 		setComponentSubs(<SubsLabel />);
-	}, [props.ad.isSub]);
+	}, [activePanel, props.activeContext[props.activeStory].isSub]);
 
 	return (
-		<Group header={<AdHeader onTypesClick={onTypesClick} ad_type={props.ad.ad_type} />}>
+		<Group
+			header={<AdHeader onTypesClick={onTypesClick} ad_type={props.activeContext[props.activeStory].ad_type} />}
+		>
 			<div style={{ display: 'block' }}>
 				<div style={{ display: 'flex' }}>
 					<SimpleCell>
@@ -264,7 +272,10 @@ const DealLabelInner = (props) => {
 					</AnimateOnChange>
 				</div>
 				{/* {componentAuthor} */}
-				{!(props.ad.status == STATUS_ABORTED || props.ad.status == STATUS_CLOSED) && (
+				{!(
+					props.activeContext[props.activeStory].status == STATUS_ABORTED ||
+					props.activeContext[props.activeStory].status == STATUS_CLOSED
+				) && (
 					<>
 						<AnimateOnChange style={{ width: '100%' }} animation="bounce">
 							{componentSubs}
@@ -282,7 +293,9 @@ const DealLabelInner = (props) => {
 const mapStateToProps = (state) => {
 	return {
 		myUser: state.vkui.myUser,
-		ad: state.ad,
+		activeContext: state.router.activeContext,
+		activeStory: state.router.activeStory,
+		activePanels: state.router.activePanels,
 	};
 };
 
@@ -294,4 +307,4 @@ const mapDispatchToProps = {
 
 export const DealLabel = connect(mapStateToProps, mapDispatchToProps)(DealLabelInner);
 
-// 202 -> 247
+// 202 -> 247 -> 308

@@ -30,13 +30,14 @@ import { AdFilters } from '../../../components/modal/ad_filters';
 import { ADS_FILTERS, ADS_FILTERS_ON } from '../../../store/create_post/types';
 
 const AddsModal = (props) => {
-	const { closeModal, openCarma, inputData } = props;
+	const { closeModal, openCarma, inputData, activeStory } = props;
 	const [backUser, setBackUser] = useState();
 
-	const activeModal = props.activeModals[STORY_ADS];
+	const activeModal = props.activeModals[activeStory];
 
-	const cost = props.ad.cost || 0;
-	const isSubscriber = props.ad.isSub || 0;
+
+	const cost = props.activeContext[props.activeStory].cost || 0;
+	const isSubscriber = props.activeContext[props.activeStory].isSub || 0;
 
 	useEffect(() => {
 		let cleanupFunction = false;
@@ -56,7 +57,7 @@ const AddsModal = (props) => {
 	}, [isSubscriber]);
 
 	function getCost() {
-		if (!(props.ad && backUser)) {
+		if (!(backUser)) {
 			return 'Информация недоступна';
 		}
 
@@ -78,12 +79,12 @@ const AddsModal = (props) => {
 						name="Фильтры"
 						back={closeModal}
 						right={
-							inputData[ADS_FILTERS_ON] &&
-							inputData[ADS_FILTERS_ON].filtersOn && (
+							inputData[activeStory + ADS_FILTERS_ON] &&
+							inputData[activeStory + ADS_FILTERS_ON].filtersOn && (
 								<CellButton
 									onClick={() => {
 										props.closeModal();
-										props.setFormData(ADS_FILTERS, null);
+										props.setFormData(activeStory + ADS_FILTERS, null);
 									}}
 									mode="danger"
 									style={{ cursor: 'pointer' }}
@@ -160,7 +161,7 @@ const AddsModal = (props) => {
 				}
 				header={cost + K}
 				caption={
-					'Карма будет списана после того как вы ' +
+					'Карма будет списана после того, как вы ' +
 					'подтвердите получение вещи. До тех пор ' +
 					'указанная сумма будет заморожена. Откажитесь ' +
 					'от объявления, чтобы разморозить её.'

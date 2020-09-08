@@ -31,14 +31,19 @@ import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 import Icon24Place from '@vkontakte/icons/dist/24/place';
 import Icon56PlaceOutline from '@vkontakte/icons/dist/56/place_outline';
 
-import { PANEL_CITIES, PANEL_CATEGORIES, PANEL_COUNTRIES } from './../../../../store/router/panelTypes';
+import {
+	PANEL_CITIES,
+	PANEL_CATEGORIES,
+	PANEL_COUNTRIES,
+	PANEL_CATEGORIES_B,
+} from './../../../../store/router/panelTypes';
 
 import { Transition } from 'react-transition-group';
 
 // import { canWritePrivateMessage } from '../../../../requests';
 import { FORM_LOCATION_CREATE } from '../../../../components/location/redux';
 import { SNACKBAR_DURATION_DEFAULT } from '../../../../store/const';
-import { EDIT_MODE, CREATE_AD_ITEM, GEO_DATA, CREATE_AD_MAIN } from '../../../../store/create_post/types';
+import { EDIT_MODE, CREATE_AD_MAIN } from '../../../../store/create_post/types';
 import { getGeodata } from '../../../../services/VK';
 import { getAdress, getMetro } from '../../../../services/geodata';
 import { NoRegion } from '../../../../components/location/const';
@@ -46,6 +51,7 @@ import { CategoryNo, CategoryOnline } from '../../../../components/categories/co
 import { FORM_CREATE } from '../../../../components/categories/redux';
 import { GetCategory400 } from '../../../../components/categories/Categories';
 import { animateOnChange } from '../../../../components/image/image_cache';
+import { defaultInputData } from '../../../../components/create/default';
 
 const duration = 300;
 
@@ -56,50 +62,49 @@ const defaultStyle = {
 	opacity: 0,
 };
 
-const transitionStyles = {
-	entering: { opacity: 1 },
-	entered: { opacity: 1 },
-	exiting: {
-		opacity: 0,
-		transform: 'scale(0.1)',
-	},
-	exited: { opacity: 0, transform: 'scale(0.1)' },
-};
-
 const CreateAddRedux = (props) => {
-	const { myUser, inputData } = props;
+	const { myUser, inputData, activeStory } = props;
 
 	const { openSnackbar, closeSnackbar, setGeoDataString, setGeoData, setFormData, setPage, openLicence } = props;
 
 	const [geodata_string, set_geodata_string_i] = useState(
-		(inputData[CREATE_AD_MAIN] && inputData[CREATE_AD_MAIN].geo_data_string) || ''
+		(inputData[activeStory + CREATE_AD_MAIN] && inputData[activeStory + CREATE_AD_MAIN].geo_data_string) || ''
 	);
 
 	const set_geodata_string = (value) => {
-		setFormData(CREATE_AD_MAIN, {
-			...inputData[CREATE_AD_MAIN],
+		setFormData(activeStory + CREATE_AD_MAIN, {
+			...props.inputData[activeStory + CREATE_AD_MAIN],
+			...defaultInputData,
 			geo_data_string: value,
 		});
 		set_geodata_string_i(value);
 	};
 
+	useEffect(() => {
+		console.log('activeStory + CREATE_AD_MAIN', inputData);
+	}, [props.inputData]);
+
+	useEffect(() => {
+		console.log('geodata_string', geodata_string);
+	}, [geodata_string]);
+
 	// refs
 	const agreeRef = useRef();
 
 	const [licenceAgree, setLicenceAgreeI] = useState(
-		(inputData[CREATE_AD_MAIN] && inputData[CREATE_AD_MAIN].licenceAgree) || false
+		(inputData[activeStory + CREATE_AD_MAIN] && inputData[activeStory + CREATE_AD_MAIN].licenceAgree) || false
 	);
 	const [category, setCategory] = useState(CategoryNo);
 	useEffect(() => {
-		if (!inputData[FORM_CREATE]) {
+		if (!inputData[activeStory + FORM_CREATE]) {
 			return;
 		}
-		setCategory(inputData[FORM_CREATE].category);
-	}, [inputData[FORM_CREATE]]);
+		setCategory(inputData[activeStory + FORM_CREATE].category);
+	}, [inputData[activeStory + FORM_CREATE]]);
 
 	const setLicenceAgree = (value) => {
-		setFormData(CREATE_AD_MAIN, {
-			...inputData[CREATE_AD_MAIN],
+		setFormData(activeStory + CREATE_AD_MAIN, {
+			...inputData[activeStory + CREATE_AD_MAIN],
 			licenceAgree: value,
 		});
 		setLicenceAgreeI(value);
@@ -108,8 +113,13 @@ const CreateAddRedux = (props) => {
 	const [errorHeader, setErrorHeader] = useState('');
 	const [errorText, setErrorText] = useState('');
 	const [valid, setValid] = useState(false);
+
+	const [origin, setOrigin] = useState(inputData);
+	const [changed, setChanged] = useState(false);
+	const [firstChanged, setFirstChanged] = useState(false);
+
 	const [addOffset, setAddOffset] = useState(0);
-	const needEdit = inputData[EDIT_MODE] ? inputData[EDIT_MODE].mode : false;
+	const needEdit = inputData[activeStory + EDIT_MODE] ? inputData[activeStory + EDIT_MODE].mode : false;
 
 	const [notShow, setNotShow] = useState(false);
 
@@ -117,13 +127,18 @@ const CreateAddRedux = (props) => {
 	const [saveValidPlace, setSaveValidPlace] = useState('');
 
 	useEffect(() => {
+		console.log('category is', category);
+
+		const newChange = !props.isSame(activeStory, origin, inputData);
+		setChanged(newChange);
+
 		let cleanupFunction = false;
-		let { v, header, text } = props.isValid(inputData);
+		let { v, header, text } = props.isValid(activeStory, inputData);
 		var l = needEdit ? true : licenceAgree;
 		var p = needEdit || category == CategoryOnline ? true : validPlace;
 		if (v && !l) {
 			v = l;
-			text = 'Прочтите и согласитель с правилами использования';
+			text = 'Прочтите и согласитесь с правилами использования';
 		} else if (v && !p) {
 			v = p;
 			header = 'Указанное место не существует';
@@ -149,7 +164,7 @@ const CreateAddRedux = (props) => {
 			}
 		}
 		return () => (cleanupFunction = true);
-	}, [inputData, licenceAgree, validPlace]);
+	}, [inputData, licenceAgree, category, validPlace]);
 
 	const ON_REFRESH_CLICK = 'ON_REFRESH_CLICK';
 	const ON_SUGGESTION_CLICK = 'ON_SUGGESTION_CLICK';
@@ -178,6 +193,7 @@ const CreateAddRedux = (props) => {
 		setIsLoading(true);
 		setTimeout(() => {
 			getGeodata(
+				activeStory,
 				(data) => {
 					if (cancelFunc) {
 						return;
@@ -186,19 +202,27 @@ const CreateAddRedux = (props) => {
 					setMapState({ ...mapState, center });
 					setPlace(center);
 					setIsLoading(false);
+					console.log('getGeodata wtfffff');
 					getAdress(
 						data,
-						(data_string) => {
+						(data) => {
 							if (cancelFunc) {
 								return;
 							}
+							const data_string = data.value;
 							set_geodata_string(data_string);
+
 							setValidPlace(true);
 							setSaveValidPlace(data_string);
 							setNeedRefreshL(true);
 							setTimeout(() => {
 								setNeedRefreshL(false);
 							}, 50);
+							setFormData(activeStory + FORM_LOCATION_CREATE, {
+								...inputData[activeStory + FORM_LOCATION_CREATE],
+								country: { id: 1, title: data.data.country },
+								city: { id: 1, title: data.data.city },
+							});
 
 							setDadataB(NO_CLICK);
 							// getMetro((l) => {
@@ -245,15 +269,17 @@ const CreateAddRedux = (props) => {
 
 	function createAd() {
 		if (valid) {
-			props.createAd(myUser, inputData);
+			props.createAd(activeStory, myUser, inputData);
 		} else {
+			setFirstChanged(true);
 			saveCancel();
 		}
 	}
 	function editAd() {
 		if (valid) {
-			props.editAd(myUser, inputData);
+			props.editAd(activeStory, myUser, inputData);
 		} else {
+			setFirstChanged(true);
 			saveCancel();
 		}
 	}
@@ -266,7 +292,8 @@ const CreateAddRedux = (props) => {
 				const lom = result.geoObjects.get(0).geometry.getCoordinates();
 
 				const center = [lom[0], lom[1]];
-				setGeoData({ lat: lom[0], long: lom[1] });
+				console.log('findMetro wtfffff');
+				setGeoData(activeStory, { lat: lom[0], long: lom[1] });
 				setPlace(center);
 				setMapState({ center, zoom: 9 });
 			})
@@ -297,8 +324,8 @@ const CreateAddRedux = (props) => {
 	const styleAdd = () => {
 		var m = addOffset || 0;
 		return {
-			entered: { transform: `translateY(-${m}px)`, opacity: 1 },
-			exited: { transform: `translateY(1px)`, opacity: 1 },
+			// entered: { transform: `translateY(-${m}px)`, opacity: 1 },
+			// exited: { transform: `translateY(1px)`, opacity: 1 },
 		};
 	};
 
@@ -345,15 +372,15 @@ const CreateAddRedux = (props) => {
 					token={'efb37d1dc6b04c11116d3ab7ef9482fa13e0b664'}
 					query={geodata_string}
 					onChange={(e) => {
-						setGeoDataString(e.value);
+						setGeoDataString(activeStory, e.value);
 						set_geodata_string(e.value);
 						setDadataB(ON_SUGGESTION_CLICK);
 						setValidPlace(true);
 						setSaveValidPlace(e.value);
 
 						const city_title = e.data.city ? e.data.city : e.data.region ? e.data.region : NoRegion.title;
-						setFormData(FORM_LOCATION_CREATE, {
-							...inputData[FORM_LOCATION_CREATE],
+						setFormData(activeStory + FORM_LOCATION_CREATE, {
+							...inputData[activeStory + FORM_LOCATION_CREATE],
 							country: { id: 1, title: e.data.country },
 							city: { id: 1, title: city_title },
 						});
@@ -379,6 +406,28 @@ const CreateAddRedux = (props) => {
 			</div>
 		);
 	}, [needRefreshL, isLoading, ymapsL, validPlace, saveValidPlace]);
+
+	const [errorComponent, setErrorComponent] = useState(<></>);
+	useEffect(() => {
+		console.log('block', errorText, errorHeader, valid);
+		if (!firstChanged) {
+			setErrorComponent(null);
+		} else {
+			setErrorComponent(
+				<Div
+					style={{
+						transition: '0.3s',
+						display: !valid ? 'block' : 'none',
+					}}
+				>
+					<FormStatus header={errorHeader} mode={valid ? 'default' : 'error'}>
+						{errorText}
+					</FormStatus>
+				</Div>
+			);
+		}
+	}, [errorText, errorHeader, valid, firstChanged]);
+
 	const [mapsComponent, setMapsComponent] = useState(<></>);
 	useEffect(() => {
 		setMapsComponent(
@@ -426,7 +475,7 @@ const CreateAddRedux = (props) => {
 					category={category}
 					defaultInputData={props.defaultInputData}
 					openCategories={() => {
-						setPage(PANEL_CATEGORIES);
+						setPage(PANEL_CATEGORIES_B);
 					}}
 				/>
 			</Group>
@@ -503,21 +552,8 @@ const CreateAddRedux = (props) => {
 					</FormLayout>
 				</div>
 			)}
-			<Transition in={!valid} timeout={duration}>
-				{(state) => (
-					<div
-						style={{
-							...defaultStyle,
-							...transitionStyles[state],
-							padding: '10px',
-						}}
-					>
-						<FormStatus header={errorHeader} mode={valid ? 'default' : 'error'}>
-							{errorText}
-						</FormStatus>
-					</div>
-				)}
-			</Transition>
+			{errorComponent}
+
 			<Transition in={valid} timeout={duration}>
 				{(state) => (
 					<Div
@@ -532,7 +568,7 @@ const CreateAddRedux = (props) => {
 							<Button
 								style={{ cursor: 'pointer' }}
 								onClick={editAd}
-								mode={valid ? 'commerce' : 'secondary'}
+								mode={valid && changed ? 'commerce' : 'secondary'}
 								size="l"
 								stretched
 							>

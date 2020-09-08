@@ -17,8 +17,11 @@ import { setPage } from '../../store/router/actions';
 import { CategoryOnline } from '../categories/const';
 
 const AdMainInfoInner = (props) => {
-	if (props.ad.hidden && !props.ad.isAuthor) {
-		return <></>;
+	if (!props.activeContext[props.activeStory]) {
+		return null;
+	}
+	if (props.activeContext[props.activeStory].hidden && !props.activeContext[props.activeStory].isAuthor) {
+		return null;
 	}
 	function tableElement(Icon, text, value, After, onClick) {
 		return (
@@ -54,17 +57,17 @@ const AdMainInfoInner = (props) => {
 		let r = region != undefined ? region : null || '';
 		let d = district != undefined ? district : null || '';
 		var place = r && d ? r + ', ' + d : r + d;
-		if (place == "") {
-			place = "Россия"
+		if (place == '') {
+			place = 'Россия';
 		}
-		console.log("region isss", r,d)
-		return place
+		console.log('region isss', r, d);
+		return place;
 	}
 
 	const [componentItemTable, setComponentItemTable] = useState(<></>);
 	useEffect(() => {
-		const { views_count, status, region, district, category } = props.ad;
-		let subscribers_num = props.ad.subscribers_num || '0';
+		const { views_count, status, region, district, category } = props.activeContext[props.activeStory];
+		let subscribers_num = props.activeContext[props.activeStory].subscribers_num || '0';
 
 		setComponentItemTable(
 			<div className="details-table-outter">
@@ -76,14 +79,15 @@ const AdMainInfoInner = (props) => {
 					tableElement(Icon24Place, 'Где забрать', getGeoPosition(region, district), Icon24Chevron, openMap)}
 			</div>
 		);
-	}, [props.ad]);
+	}, [props.activeContext[props.activeStory]]);
 
 	return componentItemTable;
 };
 
 const mapStateToProps = (state) => {
 	return {
-		ad: state.ad,
+		activeStory: state.router.activeStory,
+		activeContext: state.router.activeContext,
 	};
 };
 

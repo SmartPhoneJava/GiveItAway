@@ -1,22 +1,19 @@
 import { connect } from 'react-redux';
 
-import { setGeoDataString, setGeoData } from '../../store/create_post/actions';
-
 import AdMap, { ON_REFRESH_CLICK } from './../../components/location/map';
 
 const mapStateToProps = (state) => {
 	return {
 		inputData: state.formData.forms,
-		AD: state.ad,
+		activeStory: state.router.activeStory,
+		activeContext: state.router.activeContext,
+		
 		dadataB: ON_REFRESH_CLICK,
 	};
 };
 
 const mapDispatchToProps = (dispatch) => {
-	return {
-		setGeoData: (s) => dispatch(setGeoData(s)),
-		setGeoDataString: (s) => dispatch(setGeoDataString(s)),
-	};
+	return {};
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AdMap);

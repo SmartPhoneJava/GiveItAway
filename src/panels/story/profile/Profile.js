@@ -16,7 +16,7 @@ import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 
 import './profile.css';
 import { setFormData } from '../../../store/create_post/actions';
-import { setStory } from '../../../store/router/actions';
+import { setStory, updateContext, setPage } from '../../../store/router/actions';
 import { STORY_ADS, STORY_CREATE } from '../../../store/router/storyTypes';
 import { ADS_FILTERS } from '../../../store/create_post/types';
 import { MODE_WANTED } from '../../../const/ads';
@@ -29,6 +29,8 @@ import { withLoading, withLoadingIf, ImageCache } from '../../../components/imag
 import { Collapse } from 'react-collapse';
 import { CardWithPadding } from '../../../App';
 import { openTab } from '../../../services/_functions';
+import { DIRECTION_BACK } from '../../../store/router/directionTypes';
+import { PANEL_ADS } from '../../../store/router/panelTypes';
 
 function getImage(backuser) {
 	if (!backuser || !backuser.photo_url) {
@@ -56,16 +58,40 @@ function getAuthorHref(backuser) {
 }
 
 const Profile = (props) => {
-	const { myID, inputData } = props;
-	const { setFormData, setStory } = props;
-	const profileID = props.activeProfile || myID;
-
+	const { myID, inputData, direction, activeContext, activePanels, story } = props;
+	const { setFormData, setStory, updateContext, setPage } = props;
+	const [profileID, setProfileID] = useState(myID);
 	const [userRequestSucess, setUserRequestSucess] = useState(false);
 
 	const [backuser, setBackUser] = useState(NO_USER);
 	const [vkUser, setVkUser] = useState(NO_VK_USER);
-
 	const [failed, setFailed] = useState(false);
+
+	useEffect(() => {
+		const newProfile = activeContext[story];
+		if (!newProfile) {
+			return;
+		}
+		let newProfileID = newProfile.vk_id || -1;
+		console.log('activeProfile', activeContext, activePanels);
+		if (isNaN(newProfileID)) {
+			return;
+		}
+		if (newProfileID == -1) {
+			updateContext({ vk_id: myID });
+			newProfileID = myID;
+		}
+		setProfileID(newProfileID);
+		console.log('profile is', newProfile);
+		if (newProfile.backUser) {
+			setBackUser(newProfile.backUser);
+			setFailed(false);
+			setUserRequestSucess(true);
+		}
+		if (newProfile.vkUser) {
+			setVkUser(newProfile.vkUser);
+		}
+	}, [props.activeContext[props.story]]);
 
 	const width = document.body.clientWidth;
 
@@ -208,6 +234,25 @@ const Profile = (props) => {
 		setGivenPanel(
 			backuser.null || backuser.total_given_ads > 0 ? (
 				<GivenPanel
+					cache={{
+						restore: direction == DIRECTION_BACK,
+						to: (given) => {
+							updateContext({ given });
+						},
+						from: (page, perPage) => {
+							const given = activeContext[story].given;
+							console.log('we have given', given);
+							if (page < 0) {
+								return given;
+							}
+							const p = page;
+
+							if (given && p * perPage <= given.length) {
+								return given.slice(0, p * perPage);
+							}
+							return [];
+						},
+					}}
 					profileID={profileID}
 					openAd={props.setReduxAd}
 					amount={withLoadingIf(userRequestSucess, backuser.total_given_ads, 'small')}
@@ -237,6 +282,25 @@ const Profile = (props) => {
 		setReceivedPanel(
 			backuser.null || backuser.total_received_ads > 0 ? (
 				<ReceivedPanel
+					cache={{
+						restore: direction == DIRECTION_BACK,
+						to: (received) => {
+							updateContext({ received });
+						},
+						from: (page, perPage) => {
+							const received = activeContext[story].received || [];
+							console.log('we have received', received);
+							if (page < 0) {
+								return received;
+							}
+							const p = page;
+
+							if (received && p * perPage <= received.length) {
+								return received.slice(0, p * perPage);
+							}
+							return [];
+						},
+					}}
 					profileID={profileID}
 					openAd={props.setReduxAd}
 					amount={withLoadingIf(userRequestSucess, backuser.total_received_ads, 'small')}
@@ -262,6 +326,10 @@ const Profile = (props) => {
 	}, [backuser, profileID, userRequestSucess]);
 
 	useEffect(() => {
+		console.log('direction is', direction);
+		if (direction == DIRECTION_BACK) {
+			return;
+		}
 		if (profileID == -1) {
 			return;
 		}
@@ -273,8 +341,8 @@ const Profile = (props) => {
 				if (cleanupFunction) {
 					return;
 				}
-				console.log('we log you v!', v);
-				setBackUser(v);
+
+				updateContext({ backUser: v });
 				if (profileID == myID) {
 					props.setProfileName('Мой профиль');
 				} else {
@@ -298,22 +366,25 @@ const Profile = (props) => {
 				if (cleanupFunction) {
 					return;
 				}
-				setVkUser(r);
+				//setVkUser(r);
+				updateContext({ vkUser: r });
 			},
 			(e) => {
-				setVkUser(NO_VK_USER);
+				//setVkUser(NO_VK_USER);
+				updateContext({ vkUser: NO_VK_USER });
 			}
 		);
 		return () => (cleanupFunction = true);
-	}, [profileID]);
+	}, [direction, profileID]);
 
 	function openFreeze() {
 		if (profileID == myID) {
-			setFormData(ADS_FILTERS, {
-				...inputData[ADS_FILTERS],
+			setFormData(story+ADS_FILTERS, {
+				...inputData[story+ADS_FILTERS],
 				mode: MODE_WANTED,
 			});
-			setStory(STORY_ADS);
+			setPage(PANEL_ADS);
+			//setStory(STORY_ADS);
 		}
 	}
 
@@ -363,8 +434,6 @@ const Profile = (props) => {
 		);
 	}, [profileID]);
 
-	console.log('activeProfile', profileID, props.activeProfile);
-
 	if (failed) {
 		return <Error />;
 	}
@@ -383,7 +452,10 @@ const Profile = (props) => {
 const mapStateToProps = (state) => {
 	return {
 		myID: state.vkui.myID,
-		activeProfile: state.router.activeProfile,
+		story: state.router.activeStory,
+		activeContext: state.router.activeContext,
+		direction: state.router.direction,
+		activePanels: state.router.activePanels,
 
 		inputData: state.formData.forms,
 	};
@@ -392,8 +464,10 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
 	setFormData,
 	setStory,
+	setPage,
+	updateContext,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);
 
-// 337 -> 431 -> 368 -> 400
+// 337 -> 431 -> 368 -> 400 -> 473

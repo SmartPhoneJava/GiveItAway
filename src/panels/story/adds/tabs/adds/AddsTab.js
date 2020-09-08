@@ -30,7 +30,7 @@ import {
 	GEO_TYPE_NO,
 } from '../../../../../const/ads';
 import { ADS_FILTERS, ADS_FILTERS_ON, GEO_DATA, ADS_FILTERS_S } from '../../../../../store/create_post/types';
-import { openPopout, closePopout, setStory } from '../../../../../store/router/actions';
+import { openPopout, closePopout } from '../../../../../store/router/actions';
 import AdNoWanted from '../../../../placeholders/adNoWanted';
 import { setFormData } from '../../../../../store/create_post/actions';
 import AdNoGiven from '../../../../placeholders/adNoGiven';
@@ -56,7 +56,7 @@ const SEARCH_WAIT = 650;
 
 const AddsTab = (props) => {
 	const width = document.body.clientWidth;
-	const { inputData, openPopout, closePopout, setFormData, dropFilters } = props;
+	const { inputData, openPopout, closePopout, setFormData, dropFilters, activeStory } = props;
 
 	const activeModal = props.activeModals[STORY_ADS];
 
@@ -81,8 +81,8 @@ const AddsTab = (props) => {
 		}
 		setSoftLoading(false);
 		let s =
-			inputData[ADS_FILTERS_S] && inputData[ADS_FILTERS_S].search != undefined
-				? inputData[ADS_FILTERS_S].search
+			inputData[activeStory + ADS_FILTERS_S] && inputData[activeStory + ADS_FILTERS_S].search != undefined
+				? inputData[activeStory + ADS_FILTERS_S].search
 				: '';
 
 		setSearch(s);
@@ -90,34 +90,45 @@ const AddsTab = (props) => {
 			setSearchR(s);
 		}
 
-		const gt = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].geotype : null) || GEO_TYPE_FILTERS;
+		const gt =
+			(inputData[activeStory + ADS_FILTERS] ? inputData[activeStory + ADS_FILTERS].geotype : null) ||
+			GEO_TYPE_FILTERS;
 		setGeoType(gt);
 
-		const rad = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].radius : null) || 0;
+		const rad = (inputData[activeStory + ADS_FILTERS] ? inputData[activeStory + ADS_FILTERS].radius : null) || 0;
 		setRadius(rad);
 
-		const geod = (inputData[GEO_DATA] ? inputData[GEO_DATA].geodata : null) || null;
-		setGeodata(geod);
+		const geod = (inputData[activeStory + GEO_DATA] ? inputData[activeStory + GEO_DATA].geodata : null) || null;
+		setGeodata(activeStory, geod);
 
-		const count = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].country : null) || NoRegion;
+		const count =
+			(inputData[activeStory + ADS_FILTERS] ? inputData[activeStory + ADS_FILTERS].country : null) || NoRegion;
 		setCountry(count);
 
-		const cit = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].city : null) || NoRegion;
+		const cit =
+			(inputData[activeStory + ADS_FILTERS] ? inputData[activeStory + ADS_FILTERS].city : null) || NoRegion;
 		setCity(cit);
 
-		const categor = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].category : null) || CategoryNo;
+		const categor =
+			(inputData[activeStory + ADS_FILTERS] ? inputData[activeStory + ADS_FILTERS].category : null) || CategoryNo;
 		setCategory(categor);
 
-		const subcategor = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].subcategory : null) || CategoryNo;
+		const subcategor =
+			(inputData[activeStory + ADS_FILTERS] ? inputData[activeStory + ADS_FILTERS].subcategory : null) ||
+			CategoryNo;
 		setSubcategory(subcategor);
 
-		const incategor = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].incategory : null) || CategoryNo;
+		const incategor =
+			(inputData[activeStory + ADS_FILTERS] ? inputData[activeStory + ADS_FILTERS].incategory : null) ||
+			CategoryNo;
 		setIncategory(incategor);
 
-		const sor = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].sort : null) || SORT_TIME;
+		const sor =
+			(inputData[activeStory + ADS_FILTERS] ? inputData[activeStory + ADS_FILTERS].sort : null) || SORT_TIME;
 		setSort(sor);
 
-		const mod = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].mode : null) || MODE_ALL;
+		const mod =
+			(inputData[activeStory + ADS_FILTERS] ? inputData[activeStory + ADS_FILTERS].mode : null) || MODE_ALL;
 		setMode(mod);
 
 		const hasFilters =
@@ -126,8 +137,8 @@ const AddsTab = (props) => {
 			(gt == GEO_TYPE_NEAR && rad != 0) ||
 			(s != undefined && s != '');
 		setFiltersOn(hasFilters);
-		setFormData(ADS_FILTERS_ON, {
-			...inputData[ADS_FILTERS],
+		setFormData(activeStory + ADS_FILTERS_ON, {
+			...inputData[activeStory + ADS_FILTERS],
 			filtersOn: hasFilters,
 		});
 		let tags = [];
@@ -140,11 +151,17 @@ const AddsTab = (props) => {
 					null,
 					null,
 					() => {
-						setFormData(ADS_FILTERS, { ...inputData[ADS_FILTERS], category: null });
+						setFormData(activeStory + ADS_FILTERS, {
+							...inputData[activeStory + ADS_FILTERS],
+							category: null,
+						});
 					},
 					<Icon16Clear
 						onClick={() => {
-							setFormData(ADS_FILTERS, { ...inputData[ADS_FILTERS], category: null });
+							setFormData(activeStory + ADS_FILTERS, {
+								...inputData[activeStory + ADS_FILTERS],
+								category: null,
+							});
 						}}
 						style={{ paddingLeft: '4px', cursor: 'pointer' }}
 						fill="var(--accent)"
@@ -160,16 +177,16 @@ const AddsTab = (props) => {
 					null,
 					null,
 					() => {
-						setFormData(ADS_FILTERS, {
-							...inputData[ADS_FILTERS],
+						setFormData(activeStory + ADS_FILTERS, {
+							...inputData[activeStory + ADS_FILTERS],
 							incategory: null,
 							subcategory: null,
 						});
 					},
 					<Icon16Clear
 						onClick={() => {
-							setFormData(ADS_FILTERS, {
-								...inputData[ADS_FILTERS],
+							setFormData(activeStory + ADS_FILTERS, {
+								...inputData[activeStory + ADS_FILTERS],
 								incategory: null,
 								subcategory: null,
 							});
@@ -187,16 +204,16 @@ const AddsTab = (props) => {
 					null,
 					null,
 					() => {
-						setFormData(ADS_FILTERS, {
-							...inputData[ADS_FILTERS],
+						setFormData(activeStory + ADS_FILTERS, {
+							...inputData[activeStory + ADS_FILTERS],
 							incategory: null,
 							subcategory: null,
 						});
 					},
 					<Icon16Clear
 						onClick={() => {
-							setFormData(ADS_FILTERS, {
-								...inputData[ADS_FILTERS],
+							setFormData(activeStory + ADS_FILTERS, {
+								...inputData[activeStory + ADS_FILTERS],
 								incategory: null,
 								subcategory: null,
 							});
@@ -216,15 +233,15 @@ const AddsTab = (props) => {
 					null,
 					null,
 					() => {
-						setFormData(ADS_FILTERS_S, {
-							...inputData[ADS_FILTERS_S],
+						setFormData(activeStory + ADS_FILTERS_S, {
+							...inputData[activeStory + ADS_FILTERS_S],
 							search: '',
 						});
 					},
 					<Icon16Clear
 						onClick={() => {
-							setFormData(ADS_FILTERS_S, {
-								...inputData[ADS_FILTERS_S],
+							setFormData(activeStory + ADS_FILTERS_S, {
+								...inputData[activeStory + ADS_FILTERS_S],
 								search: '',
 							});
 						}}
@@ -242,16 +259,16 @@ const AddsTab = (props) => {
 					null,
 					null,
 					() => {
-						setFormData(ADS_FILTERS, {
-							...inputData[ADS_FILTERS],
+						setFormData(activeStory + ADS_FILTERS, {
+							...inputData[activeStory + ADS_FILTERS],
 							city: null,
 							geotype: GEO_TYPE_NO,
 						});
 					},
 					<Icon16Clear
 						onClick={() => {
-							setFormData(ADS_FILTERS, {
-								...inputData[ADS_FILTERS],
+							setFormData(activeStory + ADS_FILTERS, {
+								...inputData[activeStory + ADS_FILTERS],
 								city: null,
 								geotype: GEO_TYPE_NO,
 							});
@@ -262,7 +279,7 @@ const AddsTab = (props) => {
 				)
 			);
 		}
-		console.log("gt is ", gt)
+		console.log('gt is ', gt);
 		if (gt == GEO_TYPE_NEAR && rad != 0) {
 			tags.push(
 				tag(
@@ -271,16 +288,16 @@ const AddsTab = (props) => {
 					null,
 					null,
 					() => {
-						setFormData(ADS_FILTERS, {
-							...inputData[ADS_FILTERS],
+						setFormData(activeStory + ADS_FILTERS, {
+							...inputData[activeStory + ADS_FILTERS],
 							geotype: GEO_TYPE_NO,
 							radius: 0.5,
 						});
 					},
 					<Icon16Clear
 						onClick={() => {
-							setFormData(ADS_FILTERS, {
-								...inputData[ADS_FILTERS],
+							setFormData(activeStory + ADS_FILTERS, {
+								...inputData[activeStory + ADS_FILTERS],
 								geotype: GEO_TYPE_NO,
 								radius: 0.5,
 							});
@@ -309,7 +326,7 @@ const AddsTab = (props) => {
 				</div>
 			)
 		);
-	}, [props.inputData[ADS_FILTERS], searchValid]);
+	}, [props.inputData[activeStory + ADS_FILTERS], searchValid]);
 
 	const [searchValid, setSearchValid] = useState(true);
 	const [searchR, setSearchR] = useState('');
@@ -330,7 +347,7 @@ const AddsTab = (props) => {
 		setTimeout(() => {
 			if (j == i && !cleanupFunction) {
 				setSearchR(s);
-				setFormData(ADS_FILTERS_S, { ...inputData[ADS_FILTERS_S], search });
+				setFormData(activeStory + ADS_FILTERS_S, { ...inputData[activeStory + ADS_FILTERS_S], search });
 			}
 		}, SEARCH_WAIT);
 		return () => (cleanupFunction = true);
@@ -347,6 +364,19 @@ const AddsTab = (props) => {
 			setIsMounted(false);
 		};
 	}, []);
+
+	const searchRef = useRef();
+	useEffect(() => {
+		//var input = document.getElementById('searchMain');
+		if (!searchRef || !searchRef.current) {
+			console.log('no searchRef');
+			return;
+		}
+		console.log('found searchRef', searchRef);
+		searchRef.current.addEventListener('focusout', function () {
+			console.log('Sending data to server...');
+		});
+	}, [searchRef]);
 
 	const [inited, setInited] = useState(false);
 	const [loading, setLoading] = useState(true);
@@ -395,9 +425,8 @@ const AddsTab = (props) => {
 	}, [rads]);
 
 	useEffect(() => {
-		if (activeModal) {
-			return;
-		}
+		console.log('props.deleteID', props.deleteID);
+
 		if (props.deleteID > 0) {
 			setRads(
 				(rads) =>
@@ -605,11 +634,21 @@ const AddsTab = (props) => {
 
 	function handleSearch(e) {
 		setSearch(e.target.value);
+		var input = document.getElementById('searchMain');
+		if (input) {
+			const focus = function () {
+				input.focus();
+			};
+			input.removeEventListener('focusout', focus);
+			input.addEventListener('focusout', focus);
+		} else {
+			console.log('searchMain baaad');
+		}
 		closePopout();
 	}
 
 	const setAllMode = () => {
-		setFormData(ADS_FILTERS, { ...inputData, mode: MODE_ALL });
+		setFormData(activeStory + ADS_FILTERS, { ...inputData[activeStory + ADS_FILTERS], mode: MODE_ALL });
 	};
 
 	function Ad(ad) {
@@ -646,6 +685,8 @@ const AddsTab = (props) => {
 								}}
 							> */}
 							<Search
+								ref={searchRef}
+								id="searchMain"
 								style={{
 									transition: '0.3s',
 								}}
@@ -716,6 +757,7 @@ const mapStateToProps = (state) => {
 	return {
 		appID: state.vkui.appID,
 		myID: state.vkui.myID,
+		activeStory: state.router.activeStory,
 		apiVersion: state.vkui.apiVersion,
 		platform: state.vkui.platform,
 
@@ -731,7 +773,6 @@ const mapDispatchToProps = {
 	openPopout,
 	closePopout,
 	setFormData,
-	setStory,
 	pushToCache,
 };
 

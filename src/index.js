@@ -3,9 +3,9 @@ import 'core-js/features/set';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import * as eruda from 'eruda';
-import * as erudaCode from 'eruda-code';
-import * as erudaDom from 'eruda-dom';
+// import * as eruda from 'eruda';
+// import * as erudaCode from 'eruda-code';
+// import * as erudaDom from 'eruda-dom';
 
 import { applyMiddleware, createStore } from 'redux';
 import thunk from 'redux-thunk';
@@ -33,8 +33,8 @@ ReactDOM.render(
 	</Provider>,
 	document.getElementById('root')
 );
-if (process.env.NODE_ENV === 'development') {
-	eruda.init();
-	eruda.add(erudaCode);
-	eruda.add(erudaDom);
-}
+// if (process.env.NODE_ENV === 'development') {
+// 	eruda.init();
+// 	eruda.add(erudaCode);
+// 	eruda.add(erudaDom);
+// }

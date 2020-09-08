@@ -5,8 +5,7 @@ import { store } from './../../../../../index';
 import { ScreenSpinner } from '@vkontakte/vkui';
 
 import { Addr, BASE_AD } from '../../../../../store/addr';
-import { setComments, addComment } from '../../../../../store/detailed_ad/actions';
-import { openPopout, closePopout } from '../../../../../store/router/actions';
+import { openPopout, closePopout, updateContext } from '../../../../../store/router/actions';
 
 export default function useCommentsGet(ignorePopout, pageNumber, rowsPerPage, ad_id, maxAmount) {
 	const [inited, setInited] = useState(false);
@@ -15,7 +14,8 @@ export default function useCommentsGet(ignorePopout, pageNumber, rowsPerPage, ad
 	const [hasMore, setHasMore] = useState(false);
 
 	useEffect(() => {
-		store.dispatch(setComments([]));
+		store.dispatch(updateContext({ comments: [] }));
+
 		pageNumber = 1;
 	}, []);
 
@@ -37,6 +37,8 @@ export default function useCommentsGet(ignorePopout, pageNumber, rowsPerPage, ad
 			page: pageNumber,
 		};
 
+		const router = store.getState().router;
+
 		axios({
 			method: 'GET',
 			url: Addr.getState() + BASE_AD + ad_id + '/comments',
@@ -47,9 +49,22 @@ export default function useCommentsGet(ignorePopout, pageNumber, rowsPerPage, ad
 			.then((res) => {
 				const newNots = res.data;
 
+				let newComments = router.activeContext[router.activeStory].comments || [];
 				newNots.forEach((comment) => {
-					store.dispatch(addComment(comment));
+					//store.dispatch(addComment(comment));
+					//store.dispatch(updateContext([...store.getState().comments, ...newNots]));
+					newComments = [...newComments.filter((v) => v.comment_id != comment.comment_id), comment];
 				});
+				//const oldComments = router.activeContext[router.activeStory].comments || [];
+
+				// newComments.filter((v, i) => i == newComments.indexOf(v));
+				// console.log(
+				// 	'new and old',
+				// 	newComments,
+				// 	[...oldComments, ...newNots],
+				// 	removeDuplicates([...oldComments, ...newNots])
+				// );
+				store.dispatch(updateContext({ comments: newComments }));
 
 				setHasMore(newNots.length > 0);
 				setLoading(false);
@@ -57,7 +72,7 @@ export default function useCommentsGet(ignorePopout, pageNumber, rowsPerPage, ad
 					store.dispatch(closePopout());
 				}
 				setInited(true);
-				console.log("success get comments", newNots)
+				console.log('success get comments', newNots);
 			})
 			.catch((e) => {
 				console.log('fail comments', e);

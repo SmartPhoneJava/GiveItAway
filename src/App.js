@@ -12,7 +12,7 @@ import {
 	Card,
 } from '@vkontakte/vkui';
 
-import { STORY_ADS, STORY_CREATE, STORY_NOTIFICATIONS } from './store/router/storyTypes';
+import { STORY_ADS, STORY_CREATE, STORY_NOTIFICATIONS, STORY_PROFILE } from './store/router/storyTypes';
 import {
 	PANEL_ADS,
 	PANEL_ONE,
@@ -31,6 +31,9 @@ import {
 	PANEL_ADVICES,
 	PANEL_LICENCE,
 	PANEL_NOTIFICATIONS,
+	PANEL_CATEGORIES_B,
+	PANEL_SUBCATEGORIES_B,
+	PANEL_SUBSUBCATEGORIES_B,
 } from './store/router/panelTypes';
 
 import { MODAL_ADS_FILTERS, MODAL_ADS_GEO } from './store/router/modalTypes';
@@ -45,9 +48,10 @@ import {
 	openModal,
 	setProfile,
 	setAd,
-	addProfile,
 	openPopout,
 	setPage,
+	setStoryProfile,
+	updateContext,
 } from './store/router/actions';
 import * as VK from './services/VK';
 import { setAppID, setPlatform } from './store/vk/actions';
@@ -79,11 +83,16 @@ import Icon28Notification from '@vkontakte/icons/dist/28/notification';
 
 import {
 	handleNotifications,
-	NT_COMMENT,
+	NT_COMMENT_NEW,
+	NT_COMMENT_EDIT,
 	NT_RESPOND,
 	NT_STATUS,
 	NT_AD_STATUS,
 	NT_CLOSE,
+	NT_SUB_CANCEL,
+	NT_COMMENT_DELETED,
+	NT_UNSUB,
+	NT_SUB,
 } from './panels/story/adds/tabs/notifications/notifications';
 
 import AddMore2 from './panels/template/AddMore2';
@@ -121,7 +130,9 @@ import LicencePanel from './panels/licence';
 import SubcategoriesPanel from './components/categories/subcategory_panel';
 import { DIRECTION_BACK, DIRECTION_FORWARD } from './store/router/directionTypes';
 import { pushToCache } from './store/cache/actions';
-import { AdsTabV2 } from './panels/story/adds/tabs/adds/AddsTab';
+import { CategoryNo } from './components/categories/const';
+import { EDIT_COMMENT } from './store/detailed_ad/actionTypes';
+import { now } from 'moment';
 
 const adsText = 'Объявления';
 const notText = 'Уведомления';
@@ -150,29 +161,29 @@ export const scrollWindow = (to) => {
 };
 
 const App = (props) => {
-	const { colorScheme, myUser, myID, inputData, AD } = props;
-	const { activeStory, activePanels, panelsHistory, popouts, snackbars, scrollPosition, activeAd } = props;
+	const { colorScheme, myUser, myID, inputData } = props;
+	const { activeStory, activePanels, panelsHistory, popouts, snackbars, scrollPosition } = props;
 	const {
 		goBack,
 		setAd,
 		setStory,
+		setStoryProfile,
 		setProfile,
 		setStatus,
 		openModal,
-		addProfile,
 		setFormData,
 		openPopout,
 		addComment,
 		addSub,
 		clearAds,
 		setPage,
+		updateContext,
 	} = props;
-
-	const needEdit = inputData[EDIT_MODE] ? inputData[EDIT_MODE].mode : false;
 
 	const adPopout = popouts[STORY_ADS];
 	const createPopout = popouts[STORY_CREATE];
 	const notsPopout = popouts[STORY_NOTIFICATIONS];
+	const profilePopout = popouts[STORY_PROFILE];
 
 	const [inited, setInited] = useState(false);
 
@@ -180,41 +191,66 @@ const App = (props) => {
 
 	const [deleteID, SetDeleteID] = useState(-1);
 
-	const historyLen = panelsHistory ? (panelsHistory[STORY_ADS] ? panelsHistory[STORY_ADS].length : 0) : 0;
+	useEffect(() => {
+		console.log('deleteID is', deleteID);
+	}, [deleteID]);
+
+	const historyLen = panelsHistory ? (panelsHistory[activeStory] ? panelsHistory[activeStory].length : 0) : 0;
 
 	function dropFilters() {
-		store.dispatch(setFormData(ADS_FILTERS, null));
+		store.dispatch(setFormData(activeStory + ADS_FILTERS, null));
 	}
 
 	const onStoryChange = (e) => {
 		const isProfile = e.currentTarget.dataset.text == profileText;
 		const story = e.currentTarget.dataset.story;
+
+		console.log('storystorystorystory', story);
+		if (!story) {
+			return;
+		}
+
 		if (story == STORY_CREATE) {
 			setStory(story);
-			setFormData(EDIT_MODE, null);
-			setFormData(FORM_LOCATION_CREATE, {
-				...inputData[FORM_LOCATION_CREATE],
+			if (story != activeStory) {
+				return;
+			}
+			setFormData(activeStory + EDIT_MODE, null);
+			setFormData(activeStory + FORM_LOCATION_CREATE, {
+				...inputData[activeStory + FORM_LOCATION_CREATE],
 				country: myUser.country,
 				city: myUser.city,
 			});
-			setFormData(FORM_CREATE, null);
-			setFormData(CREATE_AD_MAIN, { ...defaultInputData });
-			setFormData(CREATE_AD_ITEM, { ...defaultInputData });
+
+			setFormData(activeStory + FORM_CREATE, { category: CategoryNo });
+			setFormData(activeStory + CREATE_AD_MAIN, defaultInputData);
+			setFormData(activeStory + CREATE_AD_ITEM, defaultInputData);
 		} else {
-			setStory(story, isProfile ? PANEL_USER : null);
+			if (story == STORY_PROFILE) {
+				setStoryProfile(myID);
+				return;
+			}
+			setStory(story);
+			if (story != activeStory) {
+				return;
+			}
+
 			if (story == STORY_ADS) {
 				clearAds();
 			}
 		}
 
-		addProfile(myID);
-		if (e.currentTarget.dataset.story == STORY_ADS) {
+		if (story == STORY_ADS && story == activeStory) {
 			if (isProfile) {
 			} else {
 				dropFilters();
 			}
 		}
 	};
+
+	useEffect(() => {
+		console.log('props.panelsHistory are', props.panelsHistory);
+	}, [props.panelsHistory]);
 
 	useEffect(() => {
 		if (props.direction == DIRECTION_BACK) {
@@ -267,7 +303,8 @@ const App = (props) => {
 	}
 
 	useEffect(() => {
-		if (AD.ad_id <= 0) {
+		const ad = props.activeContext[props.activeStory];
+		if (ad.ad_id <= 0) {
 			return;
 		}
 
@@ -275,25 +312,79 @@ const App = (props) => {
 			subscription.unsubscribe();
 			subscription.removeAllListeners();
 		}
+		console.log('look at ad', ad);
 		setSubscription(
-			centrifuge.subscribe('ad_' + AD.ad_id, (note) => {
+			centrifuge.subscribe('ad_' + ad.ad_id, (note) => {
 				const noteType = note.data.type;
 				const noteValue = note.data.payload;
-				console.log('look at', noteType, noteValue);
+				console.log('look at', note, noteType, noteValue);
 				switch (noteType) {
-					case NT_COMMENT: {
-						addComment(noteValue);
+					case NT_COMMENT_NEW: {
+						const router = store.getState().router;
+						let newComments = router.activeContext[router.activeStory].comments || [];
+						newComments = [...newComments.filter((v) => v.comment_id != noteValue.comment_id), noteValue];
+
+						updateContext({ comments: newComments });
+						break;
+					}
+					case NT_COMMENT_EDIT: {
+						const router = store.getState().router;
+						let newComments = router.activeContext[router.activeStory].comments || [];
+						console.log('before newComments', newComments);
+						newComments = newComments.map((v) => {
+							if (v.comment_id == noteValue.comment_id) {
+								v.text = noteValue.text;
+							}
+							return v;
+						});
+						updateContext({ comments: newComments });
+						break;
+					}
+					case NT_COMMENT_DELETED: {
+						const router = store.getState().router;
+						let newComments = router.activeContext[router.activeStory].comments || [];
+						newComments = newComments.filter((v) => v.comment_id != noteValue.comment_id);
+
+						updateContext({ comments: newComments });
+						break;
+					}
+					case NT_SUB: {
+						const router = store.getState().router;
+						let newSubs = router.activeContext[router.activeStory].subs || [];
+						newSubs = [...newSubs.filter((v) => v.vk_id != noteValue.user_id), noteValue];
+
+						console.log('new_subs', newSubs);
+						updateContext({ subs: newSubs, subscribers_num: newSubs.length });
+						break;
+					}
+					case NT_UNSUB: {
+						const router = store.getState().router;
+						let newSubs = router.activeContext[router.activeStory].subs || [];
+						newSubs = newSubs.filter((v, i) => {
+							console.log('newSubs iter', v, noteValue);
+							return v.vk_id != noteValue.user_id;
+						});
+
+						console.log('delete_subs', newSubs);
+						updateContext({ subs: newSubs, subscribers_num: newSubs.length });
 						break;
 					}
 					case NT_CLOSE: {
+						updateContext({ status: STATUS_CHOSEN });
+						setStatus(STATUS_CHOSEN);
+						updateDealInfo();
+						break;
+					}
+					case NT_SUB_CANCEL: {
+						updateContext({ status: STATUS_CHOSEN });
 						setStatus(STATUS_CHOSEN);
 						updateDealInfo();
 						break;
 					}
 					case NT_AD_STATUS: {
 						const noteValue = note.data.payload.new_status;
-						console.log('noteValue ', noteValue);
 						setStatus(noteValue);
+						updateContext({ status: noteValue });
 						if (noteValue == STATUS_CHOSEN) {
 							updateDealInfo();
 						}
@@ -303,7 +394,7 @@ const App = (props) => {
 				console.log('centrifugu notenote', note);
 			})
 		);
-	}, [AD.ad_id]);
+	}, [props.activeContext[props.activeStory].ad_id]);
 
 	useEffect(() => {
 		openPopout(<ScreenSpinner size="large" />);
@@ -337,7 +428,6 @@ const App = (props) => {
 					(v) => {
 						console.log('FAILED');
 						setInited(true);
-						dispatch(addProfile(us.id));
 						getToken((v) => {
 							centrifuge.setToken(v.token);
 							centrifuge.connect();
@@ -364,9 +454,9 @@ const App = (props) => {
 		);
 	}, []);
 
-	function setReduxAd(ad) {
+	function setReduxAd(ad, clearAll) {
 		store.dispatch(setExtraInfo(ad));
-		setAd(ad);
+		setAd(ad, clearAll);
 	}
 
 	function backToAdsFilters() {
@@ -382,10 +472,183 @@ const App = (props) => {
 	let adPanels = panelsHistory[STORY_ADS];
 	let adActivePanel = activePanels[STORY_ADS];
 
+	const [adsScheme, setAdsScheme] = useState([]);
+	useEffect(() => {
+		setSchemeToView(STORY_ADS, setAdsScheme, deleteID, snackbars, historyLen);
+	}, [deleteID, snackbars, historyLen]);
+
 	let createPanels = panelsHistory[STORY_CREATE];
 	let createActivePanel = activePanels[STORY_CREATE];
-	let choosen = activeAd;
 
+	const [createScheme, setCreateScheme] = useState([]);
+	useEffect(() => {
+		setSchemeToView(STORY_CREATE, setCreateScheme, deleteID, snackbars, historyLen);
+	}, [deleteID, snackbars, historyLen]);
+
+	let notsPanels = panelsHistory[STORY_NOTIFICATIONS];
+	let notsActivePanel = activePanels[STORY_NOTIFICATIONS];
+
+	const [notsScheme, setNotsScheme] = useState([]);
+	useEffect(() => {
+		setSchemeToView(STORY_NOTIFICATIONS, setNotsScheme, deleteID, snackbars, historyLen);
+	}, [deleteID, snackbars, historyLen]);
+
+	let profilePanels = panelsHistory[STORY_PROFILE];
+	let profileActivePanel = activePanels[STORY_PROFILE];
+
+	const [profileScheme, setProfileScheme] = useState([]);
+	useEffect(() => {
+		setSchemeToView(STORY_PROFILE, setProfileScheme, deleteID, snackbars, historyLen);
+	}, [deleteID, snackbars, historyLen]);
+
+	function setSchemeToView(story, setScheme, deleteID, snackbars, historyLen) {
+		const needEdit = inputData[story + EDIT_MODE] ? inputData[story + EDIT_MODE].mode : false;
+		setScheme([
+			<Panel id={PANEL_ADS} separator={false}>
+				<AddsTabs
+					notsCounter={notsCounterrr}
+					zeroNots={() => {
+						notsCounterrr = 0;
+					}}
+					refresh={(v) => {
+						console.log('SetDeleteID(v)', v);
+						SetDeleteID(v);
+					}}
+					deleteID={deleteID}
+					openUser={setProfile}
+					dropFilters={dropFilters}
+					openAd={setReduxAd}
+				/>
+				{snackbars[PANEL_ADS]}
+			</Panel>,
+			<Panel id={PANEL_CREATE}>
+				<PanelHeader
+					left={historyLen <= 1 ? null : <PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}
+				>
+					{needEdit ? 'Редактировать' : addText}
+				</PanelHeader>
+				<Create />
+				{snackbars[PANEL_CREATE]}
+			</Panel>,
+			<Panel id={PANEL_ONE}>
+				<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
+					<p className="panel-header">Объявление</p>
+				</PanelHeader>
+
+				<AddMore2
+					refresh={(id) => {
+						setStory(story, PANEL_ADS);
+						SetDeleteID(id);
+					}}
+				/>
+
+				{snackbars[PANEL_ONE]}
+			</Panel>,
+			<Panel id={PANEL_USER}>
+				<ProfilePanel setReduxAd={setReduxAd} />
+			</Panel>,
+			<Panel id={PANEL_ABOUT}>
+				<AboutPanel />
+			</Panel>,
+			<Panel id={PANEL_FAQ}>
+				<FAQPanel />
+			</Panel>,
+			<Panel id={PANEL_ADVICES}>
+				<AdvicePanel />
+			</Panel>,
+			<Panel id={PANEL_LICENCE}>
+				<LicencePanel />
+			</Panel>,
+			<Panel id={PANEL_COMMENTS}>
+				<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
+					<p className="panel-header">Комментарии</p>
+				</PanelHeader>
+				<Comments amount={5} maxAmount={-1} openUser={setProfile} />
+				{snackbars[PANEL_COMMENTS]}
+			</Panel>,
+			<Panel id={PANEL_SUBS}>
+				<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
+					<p className="panel-header">Откликнувшиеся</p>
+				</PanelHeader>
+				<Subs openUser={setProfile} amount={5} maxAmount={-1} />
+				{snackbars[PANEL_SUBS]}
+			</Panel>,
+			<Panel id={PANEL_CATEGORIES_B}>
+				<CategoriesPanel
+					redux_form={story + FORM_CREATE_B}
+					goBack={goBack}
+					afterClick={() => {
+						props.setPage(PANEL_SUBCATEGORIES_B);
+					}}
+				/>
+			</Panel>,
+			<Panel id={PANEL_SUBCATEGORIES_B}>
+				<SubcategoriesPanel
+					goNext={() => {
+						setPage(PANEL_SUBSUBCATEGORIES_B);
+					}}
+					goBack={goBack}
+					redux_form={story + FORM_CREATE_B}
+				/>
+			</Panel>,
+			<Panel id={PANEL_SUBSUBCATEGORIES_B}>
+				<SubcategoriesPanel
+					goNext={() => setPage(PANEL_CREATE)}
+					goBack={goBack}
+					redux_form={story + FORM_CREATE_B}
+					redux_main_form={story + FORM_CREATE}
+				/>
+			</Panel>,
+			<Panel id={PANEL_CATEGORIES}>
+				<CategoriesPanel redux_form={story + ADS_FILTERS_B} goBack={backToAdsFilters} />
+			</Panel>,
+			<Panel id={PANEL_SUBCATEGORIES}>
+				<SubcategoriesPanel
+					goNext={() => {
+						setPage(PANEL_SUBSUBCATEGORIES);
+					}}
+					goBack={goBack}
+					redux_form={story + ADS_FILTERS_B}
+				/>
+			</Panel>,
+			<Panel id={PANEL_SUBSUBCATEGORIES}>
+				<SubcategoriesPanel
+					goNext={() => {
+						props.pushToCache(true, 'ignore_cache');
+						goBack();
+						goBack();
+						goBack();
+					}}
+					goBack={goBack}
+					redux_form={story + ADS_FILTERS_B}
+					redux_main_form={story + ADS_FILTERS}
+				/>
+			</Panel>,
+			<Panel id={PANEL_COUNTRIES}>
+				<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={backToGeoFilters} />}>
+					Выберите страну
+				</PanelHeader>
+				<Countries goBack={backToGeoFilters} redux_form={story + ADS_FILTERS_B} />
+			</Panel>,
+			<Panel id={PANEL_CITIES}>
+				<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={backToGeoFilters} />}>
+					Выберите город
+				</PanelHeader>
+				<Cities goBack={backToGeoFilters} redux_form={story + ADS_FILTERS_B} />
+			</Panel>,
+			<Panel id={PANEL_MAP}>
+				<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
+					Местоположение
+				</PanelHeader>
+				<AdMap max={true} />
+			</Panel>,
+			<Panel id={PANEL_NOTIFICATIONS}>
+				<PanelHeader>Уведомления</PanelHeader>
+				<Notifications zeroNots={() => (notsCounterrr = 0)} />
+				{snackbars[PANEL_NOTIFICATIONS]}
+			</Panel>,
+		]);
+	}
 	if (!inited) {
 		return <ScreenSpinner size="large" />;
 	}
@@ -403,7 +666,7 @@ const App = (props) => {
 						<TabbarItem
 							style={{ cursor: 'pointer' }}
 							onClick={onStoryChange}
-							selected={activeStory === STORY_ADS && adActivePanel != PANEL_USER}
+							selected={activeStory === STORY_ADS}
 							data-story={STORY_ADS}
 							data-text={adsText}
 							text={adsText}
@@ -435,8 +698,8 @@ const App = (props) => {
 						<TabbarItem
 							style={{ cursor: 'pointer' }}
 							onClick={onStoryChange}
-							selected={activeStory === STORY_ADS && adActivePanel == PANEL_USER}
-							data-story={STORY_ADS}
+							selected={activeStory === STORY_PROFILE}
+							data-story={STORY_PROFILE}
 							data-text={profileText}
 							text={profileText}
 						>
@@ -454,115 +717,7 @@ const App = (props) => {
 					modal={<AdsModal />}
 					header={false}
 				>
-					<Panel id={PANEL_ADS} separator={false}>
-						<AddsTabs
-							notsCounter={notsCounterrr}
-							zeroNots={() => {
-								notsCounterrr = 0;
-							}}
-							refresh={SetDeleteID}
-							deleteID={deleteID}
-							openUser={setProfile}
-							dropFilters={dropFilters}
-							openAd={setReduxAd}
-						/>
-
-						{snackbars[PANEL_ADS]}
-					</Panel>
-					<Panel id={PANEL_ONE}>
-						<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
-							<p className="panel-header">Объявление</p>
-							{/* {choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошибка'} */}
-						</PanelHeader>
-						{choosen ? (
-							<AddMore2
-								refresh={(id) => {
-									setStory(STORY_ADS, PANEL_ADS);
-									SetDeleteID(id);
-								}}
-							/>
-						) : (
-							Error
-						)}
-						{snackbars[PANEL_ONE]}
-					</Panel>
-					<Panel id={PANEL_USER}>
-						<ProfilePanel setReduxAd={setReduxAd} />
-					</Panel>
-					<Panel id={PANEL_ABOUT}>
-						<AboutPanel />
-					</Panel>
-					<Panel id={PANEL_FAQ}>
-						<FAQPanel />
-					</Panel>
-					<Panel id={PANEL_ADVICES}>
-						<AdvicePanel />
-					</Panel>
-					<Panel id={PANEL_LICENCE}>
-						<LicencePanel />
-					</Panel>
-					<Panel id={PANEL_COMMENTS}>
-						<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
-							<p className="panel-header">Комментарии</p>
-							{/* {choosen ? <p className="panel-header">{choosen.header}</p> : 'Произошла ошибка'} */}
-						</PanelHeader>
-						{choosen ? <Comments amount={5} maxAmount={-1} openUser={setProfile} /> : Error}
-						{snackbars[PANEL_COMMENTS]}
-					</Panel>
-					<Panel id={PANEL_SUBS}>
-						<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
-							<p className="panel-header">Откликнувшиеся</p>
-						</PanelHeader>
-						{choosen ? <Subs openUser={setProfile} amount={5} maxAmount={-1} /> : Error}
-						{snackbars[PANEL_SUBS]}
-					</Panel>
-					<Panel id={PANEL_CATEGORIES}>
-						<CategoriesPanel redux_form={ADS_FILTERS_B} goBack={backToAdsFilters} />
-					</Panel>
-					<Panel id={PANEL_SUBCATEGORIES}>
-						<SubcategoriesPanel
-							goNext={() => {
-								setPage(PANEL_SUBSUBCATEGORIES);
-							}}
-							goBack={goBack}
-							redux_form={ADS_FILTERS_B}
-						/>
-					</Panel>
-					<Panel id={PANEL_SUBSUBCATEGORIES}>
-						<SubcategoriesPanel
-							goNext={() => {
-								props.pushToCache(true, 'ignore_cache');
-								goBack();
-								goBack();
-								goBack();
-							}}
-							goBack={goBack}
-							redux_form={ADS_FILTERS_B}
-							redux_main_form={ADS_FILTERS}
-						/>
-					</Panel>
-					<Panel id={PANEL_COUNTRIES}>
-						<PanelHeader
-							left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={backToGeoFilters} />}
-						>
-							Выберите страну
-						</PanelHeader>
-						<Countries goBack={backToGeoFilters} redux_form={ADS_FILTERS_B} />
-					</Panel>
-					<Panel id={PANEL_CITIES}>
-						<PanelHeader
-							left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={backToGeoFilters} />}
-						>
-							Выберите город
-						</PanelHeader>
-						<Cities goBack={backToGeoFilters} redux_form={ADS_FILTERS_B} />
-					</Panel>
-					<Panel id={PANEL_MAP}>
-						<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
-							Местоположение
-						</PanelHeader>
-						<AdMap max={true} />
-					</Panel>
+					{adsScheme}
 				</View>
 
 				<View
@@ -570,64 +725,32 @@ const App = (props) => {
 					activePanel={createActivePanel}
 					popout={createPopout}
 					onSwipeBack={goBack}
+					modal={<AdsModal />}
 					history={createPanels}
 				>
-					<Panel id={PANEL_CREATE}>
-						<PanelHeader
-							left={
-								historyLen <= 1 ? null : (
-									<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />
-								)
-							}
-						>
-							{needEdit ? 'Редактировать' : addText}
-						</PanelHeader>
-						<Create />
-						{snackbars[PANEL_CREATE]}
-					</Panel>
-					<Panel id={PANEL_LICENCE}>
-						<LicencePanel />
-					</Panel>
-					<Panel id={PANEL_CATEGORIES}>
-						<CategoriesPanel redux_form={FORM_CREATE_B} goBack={goBack} />
-					</Panel>
-					<Panel id={PANEL_SUBCATEGORIES}>
-						<SubcategoriesPanel
-							goNext={() => {
-								setPage(PANEL_SUBSUBCATEGORIES);
-							}}
-							goBack={goBack}
-							redux_form={FORM_CREATE_B}
-						/>
-					</Panel>
-					<Panel id={PANEL_SUBSUBCATEGORIES}>
-						<SubcategoriesPanel
-							goNext={() => setPage(PANEL_CREATE)}
-							goBack={goBack}
-							redux_form={FORM_CREATE_B}
-							redux_main_form={FORM_CREATE}
-						/>
-					</Panel>
-
-					<Panel id={PANEL_COUNTRIES}>
-						<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
-							Выберите страну
-						</PanelHeader>
-						<Countries redux_form={FORM_LOCATION_CREATE} goBack={goBack} />
-					</Panel>
-					<Panel id={PANEL_CITIES}>
-						<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={goBack} />}>
-							Выберите город
-						</PanelHeader>
-						<Cities redux_form={FORM_LOCATION_CREATE} goBack={goBack} />
-					</Panel>
+					{createScheme}
 				</View>
-				<View id={STORY_NOTIFICATIONS} activePanel={PANEL_NOTIFICATIONS} popout={notsPopout}>
-					<Panel id={PANEL_NOTIFICATIONS}>
-						<PanelHeader>Уведомления</PanelHeader>
-						<Notifications zeroNots={() => (notsCounterrr = 0)} />
-						{snackbars[PANEL_NOTIFICATIONS]}
-					</Panel>
+				<View
+					id={STORY_NOTIFICATIONS}
+					popout={notsPopout}
+					activePanel={notsActivePanel}
+					popout={createPopout}
+					onSwipeBack={goBack}
+					modal={<AdsModal />}
+					history={notsPanels}
+				>
+					{notsScheme}
+				</View>
+				<View
+					popout={profilePopout}
+					id={STORY_PROFILE}
+					activePanel={profileActivePanel}
+					onSwipeBack={profilePanels}
+					modal={<AdsModal />}
+					history={adPanels}
+					header={false}
+				>
+					{profileScheme}
 				</View>
 			</Epic>
 		</ConfigProvider>
@@ -638,19 +761,14 @@ const mapStateToProps = (state) => {
 	return {
 		activePanels: state.router.activePanels,
 		activeStory: state.router.activeStory,
+		activeContext: state.router.activeContext,
 		panelsHistory: state.router.panelsHistory,
 		activeModals: state.router.activeModals,
-		activeAd: state.router.activeAd,
 		popouts: state.router.popouts,
 		scrollPosition: state.router.scrollPosition,
-		scrollHistory: state.router.scrollHistory,
 
-		profileHistory: state.router.profileHistory,
-		activeProfile: state.router.activeProfile,
 		snackbars: state.router.snackbars,
 		inputData: state.formData.forms,
-
-		AD: state.ad,
 
 		colorScheme: state.vkui.colorScheme,
 		myID: state.vkui.myID,
@@ -667,11 +785,11 @@ function mapDispatchToProps(dispatch) {
 		...bindActionCreators(
 			{
 				setStory,
+				setStoryProfile,
 				setProfile,
 				setAd,
 				goBack,
 				openModal,
-				addProfile,
 				setFormData,
 				openPopout,
 				addComment,
@@ -683,6 +801,7 @@ function mapDispatchToProps(dispatch) {
 
 				setToHistory,
 				backToPrevAd,
+				updateContext,
 			},
 			dispatch
 		),
@@ -698,4 +817,4 @@ export const CardWithPadding = (value, mode) => (
 );
 
 // 477 -> 516 -> 674 -> 703 -> 795 -> 749 -> 587 -> 524 -> 583
-// 722 -> 645
+// 722 -> 645 -> 930 -> 754

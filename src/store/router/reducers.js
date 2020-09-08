@@ -1,6 +1,4 @@
 import {
-	ADD_PROFILE,
-	ADD_AD,
 	SET_PAGE,
 	GO_BACK,
 	OPEN_POPOUT,
@@ -15,12 +13,22 @@ import {
 	SET_AD,
 	SET_DUMMY,
 	SET_TAB,
+	SET_STORY_PROFILE,
+	UPDATE_CONTEXT,
 } from './actionTypes';
 
 import * as VK from '../../services/VK';
 import { smoothScrollToTop } from '../../services/_functions';
-import { STORY_ADS, STORY_CREATE } from './storyTypes';
-import { PANEL_ADS, PANEL_CREATE, PANEL_USER, PANEL_ONE } from './panelTypes';
+import { STORY_ADS, STORY_CREATE, STORY_NOTIFICATIONS, STORY_PROFILE } from './storyTypes';
+import {
+	PANEL_ADS,
+	PANEL_CREATE,
+	PANEL_USER,
+	PANEL_NOTIFICATIONS,
+	PANEL_SUBS,
+	PANEL_COMMENTS,
+	PANEL_MAP,
+} from './panelTypes';
 import { AdDefault, TAB_ADS } from '../../const/ads';
 import { NO_DIRECTION, DIRECTION_BACK, DIRECTION_FORWARD } from './directionTypes';
 
@@ -34,40 +42,70 @@ const initialState = {
 	activePanels: {
 		[STORY_ADS]: PANEL_ADS,
 		[STORY_CREATE]: PANEL_CREATE,
+		[STORY_NOTIFICATIONS]: PANEL_NOTIFICATIONS,
+		[STORY_PROFILE]: PANEL_USER,
 	},
 	panelsHistory: {
-		[STORY_ADS]: [PANEL_ADS],
-		[STORY_CREATE]: [PANEL_CREATE],
+		[STORY_ADS]: [],
+		[STORY_CREATE]: [],
+		[STORY_NOTIFICATIONS]: [],
+		[STORY_PROFILE]: [],
 	},
+	activeContext: {
+		[STORY_ADS]: {},
+		[STORY_CREATE]: {},
+		[STORY_NOTIFICATIONS]: {},
+		[STORY_PROFILE]: {},
+	},
+	historyContext: {
+		[STORY_ADS]: [],
+		[STORY_CREATE]: [],
+		[STORY_NOTIFICATIONS]: [],
+		[STORY_PROFILE]: [],
+	},
+
 	activeTabs: {
 		[STORY_ADS]: TAB_ADS,
+		[STORY_CREATE]: TAB_ADS,
+		[STORY_NOTIFICATIONS]: TAB_ADS,
+		[STORY_PROFILE]: TAB_ADS,
 	},
-
-	activeProfile: -1,
-	profileHistory: [],
-
-	activeAd: AdDefault,
-	adHistory: [],
 
 	activeModals: {
 		[STORY_ADS]: null,
 		[STORY_CREATE]: null,
+		[STORY_NOTIFICATIONS]: null,
+		[STORY_PROFILE]: null,
 	},
 	modalHistory: {
 		[STORY_ADS]: [],
 		[STORY_CREATE]: [],
+		[STORY_NOTIFICATIONS]: [],
+		[STORY_PROFILE]: [],
 	},
 
 	popouts: {
 		[STORY_ADS]: null,
 		[STORY_CREATE]: null,
+		[STORY_NOTIFICATIONS]: null,
+		[STORY_PROFILE]: null,
 	},
 	snackbars: {},
 
 	dummies: {},
 
-	scrollHistory: [],
-	scrollPosition: { x: 0, y: 0 },
+	scrollHistory: {
+		[STORY_ADS]: [],
+		[STORY_CREATE]: [],
+		[STORY_NOTIFICATIONS]: [],
+		[STORY_PROFILE]: [],
+	},
+	scrollPosition: {
+		[STORY_ADS]: { x: 0, y: 0 },
+		[STORY_CREATE]: { x: 0, y: 0 },
+		[STORY_NOTIFICATIONS]: { x: 0, y: 0 },
+		[STORY_PROFILE]: { x: 0, y: 0 },
+	},
 };
 
 export const routerReducer = (state = initialState, action) => {
@@ -77,11 +115,12 @@ export const routerReducer = (state = initialState, action) => {
 			window.history.pushState(null, null);
 			smoothScrollToTop();
 
-			let panel = action.payload.panel;
+			const panel = action.payload.panel;
+			const Story = state.activeStory;
 
-			let Story = state.activeStory;
-			let Panels = state.panelsHistory[Story] || [];
-			Panels = [...Panels, panel];
+			const newContext =
+				panel == PANEL_SUBS || panel == PANEL_COMMENTS || panel == PANEL_MAP ? state.activeContext[Story] : {};
+
 			VK.swipeBackOn();
 
 			return {
@@ -93,22 +132,36 @@ export const routerReducer = (state = initialState, action) => {
 				},
 				panelsHistory: {
 					...state.panelsHistory,
-					[Story]: Panels,
+					[Story]: [...state.panelsHistory[Story], state.activePanels[Story]],
 				},
+
+				activeContext: {
+					...state.activeContext,
+					[Story]: newContext,
+				},
+				historyContext: {
+					...state.historyContext,
+					[Story]: [...state.historyContext[Story], state.activeContext[Story]],
+				},
+
 				direction: DIRECTION_FORWARD,
 				from: state.activePanels[Story],
 				to: panel,
 
-				scrollHistory: [...state.scrollHistory, pos],
-				scrollPosition: { x: 0, y: 0 },
+				scrollHistory: {
+					...state.scrollHistory,
+					[Story]: [...state.scrollHistory[Story], pos],
+				},
+				scrollPosition: {
+					...state.scrollPosition,
+					[Story]: { x: 0, y: 0 },
+				},
 			};
 		}
 
 		case SET_DUMMY: {
-			const pos = { x: window.pageXOffset, y: window.pageYOffset };
 			let dummy = action.payload.dummy;
-
-			let Story = state.activeStory;
+			const Story = state.activeStory;
 
 			return {
 				...state,
@@ -116,23 +169,6 @@ export const routerReducer = (state = initialState, action) => {
 					...state.dummies,
 					[Story]: [dummy],
 				},
-				scrollHistory: [...state.scrollHistory, pos],
-				scrollPosition: { x: 0, y: 0 },
-			};
-		}
-
-		case ADD_PROFILE: {
-			let profile = action.payload.profile;
-			let Profile = state.activeProfile;
-			let Profiles = state.profileHistory;
-			if (Profile == -1) {
-				Profile = profile;
-			}
-			Profiles = Profile ? [...Profiles, Profile] : Profiles;
-			return {
-				...state,
-				activeProfile: profile,
-				profileHistory: Profiles,
 			};
 		}
 
@@ -141,17 +177,10 @@ export const routerReducer = (state = initialState, action) => {
 			window.history.pushState(null, null);
 			smoothScrollToTop();
 
-			let panel = action.payload.panel;
-			let profile = action.payload.profile;
+			const panel = action.payload.panel;
+			const profile = { vk_id: action.payload.profile };
 
-			let Story = state.activeStory;
-			let Panels = state.panelsHistory[Story] || [];
-			let Profiles = state.profileHistory;
-
-			Panels = [...Panels, panel];
-			Profiles = state.activeProfile ? [...Profiles, state.activeProfile] : Profiles;
-
-			console.log('SET_PROFILE', state.activeProfile, Profiles);
+			const Story = state.activeStory;
 
 			VK.swipeBackOn();
 
@@ -164,18 +193,44 @@ export const routerReducer = (state = initialState, action) => {
 				},
 				panelsHistory: {
 					...state.panelsHistory,
-					[Story]: Panels,
+					[Story]: [...state.panelsHistory[Story], state.activePanels[Story]],
 				},
 
-				activeProfile: profile,
-				profileHistory: Profiles,
+				activeContext: {
+					...state.activeContext,
+					[Story]: profile,
+				},
+				historyContext: {
+					...state.historyContext,
+					[Story]: [...state.historyContext[Story], state.activeContext[Story]],
+				},
 
 				direction: DIRECTION_FORWARD,
 				from: state.activePanels[Story],
 				to: panel,
 
-				scrollHistory: [...state.scrollHistory, pos],
-				scrollPosition: { x: 0, y: 0 },
+				scrollHistory: {
+					...state.scrollHistory,
+					[Story]: [...state.scrollHistory[Story], pos],
+				},
+				scrollPosition: {
+					...state.scrollPosition,
+					[Story]: { x: 0, y: 0 },
+				},
+			};
+		}
+
+		case UPDATE_CONTEXT: {
+			const Story = state.activeStory;
+			const info = action.payload.info;
+
+			return {
+				...state,
+
+				activeContext: {
+					...state.activeContext,
+					[Story]: { ...state.activeContext[Story], ...info },
+				},
 			};
 		}
 
@@ -184,19 +239,12 @@ export const routerReducer = (state = initialState, action) => {
 			window.history.pushState(null, null);
 			smoothScrollToTop();
 
-			let panel = action.payload.panel;
-			let ad = action.payload.ad;
+			const panel = action.payload.panel;
+			const ad = action.payload.ad;
 
-			let Story = state.activeStory;
-			let Panels = state.panelsHistory[Story] || [];
-			let Ads = state.adHistory;
-
-			Panels = [...Panels, panel];
-			Ads = state.activeAd ? [...Ads, state.activeAd] : Ads;
+			const Story = state.activeStory;
 
 			VK.swipeBackOn();
-
-			const scrollHistory = [...state.scrollHistory, pos];
 
 			return {
 				...state,
@@ -207,28 +255,43 @@ export const routerReducer = (state = initialState, action) => {
 				},
 				panelsHistory: {
 					...state.panelsHistory,
-					[Story]: Panels,
+					[Story]: [...state.panelsHistory[Story], state.activePanels[Story]],
+				},
+
+				activeContext: {
+					...state.activeContext,
+					[Story]: ad,
+				},
+				historyContext: {
+					...state.historyContext,
+					[Story]: [...state.historyContext[Story], state.activeContext[Story]],
 				},
 
 				direction: DIRECTION_FORWARD,
 				from: state.activePanels[Story],
 				to: panel,
 
-				activeAd: ad,
-				adHistory: Ads,
-
-				scrollHistory,
-				scrollPosition: { x: 0, y: 0 },
+				scrollHistory: {
+					...state.scrollHistory,
+					[Story]: [...state.scrollHistory[Story], pos],
+				},
+				scrollPosition: {
+					...state.scrollPosition,
+					[Story]: { x: 0, y: 0 },
+				},
 			};
 		}
 
 		case SET_STORY: {
+			const pos = { x: window.pageXOffset, y: window.pageYOffset };
 			window.history.pushState(null, null);
 			smoothScrollToTop();
 
-			let story = action.payload.story;
-			let save_to_history = action.payload.save_to_history;
-			let panel = action.payload.panel || initialState.activePanels[story];
+			const story = action.payload.story;
+			const save_to_history = action.payload.save_to_history;
+			const panel = action.payload.panel || initialState.activePanels[story];
+
+			const the_same_story = story == state.activeStory;
 
 			let storiesHistory = state.storiesHistory || [];
 			if (save_to_history) {
@@ -237,49 +300,123 @@ export const routerReducer = (state = initialState, action) => {
 				VK.swipeBackOff();
 			}
 
-			const newState = save_to_history ? state : initialState;
-			const scrollHistory = save_to_history
-				? [
-						...state.scrollHistory,
-						{
-							x: window.pageXOffset,
-							y: window.pageYOffset,
-						},
-				  ]
-				: [];
+			const newPanel = the_same_story ? panel : state.activePanels[story];
+			const newPanelsHistory = the_same_story ? [] : state.panelsHistory[story];
+
+			const newContext = the_same_story ? {} : state.activeContext[story];
+			const newContextHistory = the_same_story ? [] : state.historyContext[story];
 
 			return {
-				...newState,
+				...state,
 				activeStory: story,
 				storiesHistory,
 				activePanels: {
-					...newState.activePanels,
-					[story]: panel,
+					...state.activePanels,
+					[story]: newPanel,
 				},
 				panelsHistory: {
-					...newState.panelsHistory,
-					[story]: [panel],
+					...state.panelsHistory,
+					[story]: newPanelsHistory,
 				},
 
-				direction: DIRECTION_FORWARD,
+				activeContext: {
+					...state.activeContext,
+					[story]: newContext,
+				},
+				historyContext: {
+					...state.historyContext,
+					[story]: newContextHistory,
+				},
+
+				direction: the_same_story ? DIRECTION_FORWARD : DIRECTION_BACK,
+
 				from: state.activePanels[state.activeStory],
 				to: panel,
 
-				scrollHistory,
-				scrollPosition: { x: 0, y: 0 },
+				scrollHistory: {
+					...state.scrollHistory,
+					[story]: the_same_story ? [] : state.scrollHistory[story],
+				},
+				scrollPosition: {
+					...state.scrollPosition,
+					[story]: the_same_story
+						? { x: 0, y: 0 }
+						: state.scrollHistory[story][state.scrollHistory[story].length - 1],
+				},
+			};
+		}
+
+		case SET_STORY_PROFILE: {
+			window.history.pushState(null, null);
+			smoothScrollToTop();
+
+			let story = STORY_PROFILE;
+			let panel = PANEL_USER;
+			const Story = state.activeStory;
+			let storiesHistory = state.storiesHistory || [];
+			storiesHistory = [...storiesHistory, Story];
+
+			let panelsHistory = state.panelsHistory[story] || [];
+
+			const the_same_story = story == state.activeStory;
+
+			const newPanel = the_same_story ? panel : state.activePanels[story];
+			const newPanelsHistory = the_same_story ? [panel] : panelsHistory;
+
+			const activeContext = the_same_story
+				? { vk_id: action.payload.profileID }
+				: state.activeContext[STORY_PROFILE];
+			const is_inited = activeContext.backUser != null;
+
+			const newContextHistory = the_same_story ? [] : state.historyContext[story];
+
+			return {
+				...state,
+				activeStory: story,
+				storiesHistory,
+				activePanels: {
+					...state.activePanels,
+					[story]: newPanel,
+				},
+				panelsHistory: {
+					...state.panelsHistory,
+					[story]: newPanelsHistory,
+				},
+
+				activeContext: {
+					...state.activeContext,
+					[story]: activeContext,
+				},
+				historyContext: {
+					...state.historyContext,
+					[story]: newContextHistory,
+				},
+
+				direction: the_same_story || !is_inited ? DIRECTION_FORWARD : DIRECTION_BACK,
+				from: state.activePanels[state.activeStory],
+				to: panel,
+
+				scrollHistory: {
+					...state.scrollHistory,
+					[story]: the_same_story ? [] : state.scrollHistory[Story],
+				},
+				scrollPosition: {
+					...state.scrollPosition,
+					[story]: the_same_story
+						? { x: 0, y: 0 }
+						: state.scrollHistory[story][state.scrollHistory[story].length - 1],
+				},
 			};
 		}
 
 		case GO_BACK: {
-			let Story = state.activeStory;
+			const Story = state.activeStory;
 			let Popout = state.popouts[Story];
 			let Dummies = state.dummies[Story] || [];
 
 			// если были открытые заглушки
 			if (Dummies.length > 0) {
 				Dummies.pop();
-				const scrollHistory = state.scrollHistory;
-				const scrollPosition = scrollHistory.length > 0 ? scrollHistory.pop() : state.scrollPosition;
 
 				return {
 					...state,
@@ -292,8 +429,6 @@ export const routerReducer = (state = initialState, action) => {
 						...state.dummies,
 						[Story]: Dummies,
 					},
-					scrollHistory,
-					scrollPosition,
 				};
 			}
 
@@ -336,77 +471,60 @@ export const routerReducer = (state = initialState, action) => {
 				};
 			}
 
-			let Panels = state.panelsHistory[Story] || [Story];
-			let Stories = state.storiesHistory;
-			Panels.pop();
+			// обновляем панель
 
-			let finish = false;
-			let Panel = state.activePanels[Story];
-			let storyChange = false;
+			// убрать все setStory
 
-			if (Panels.length > 0) {
-				Panel = Panels[Panels.length - 1];
-			} else {
-				Stories.pop();
-				storyChange = true;
-				if (Stories.length > 0) {
-					Story = Stories[Stories.length - 1];
-
-					Panels = state.panelsHistory[Story];
-					Panel = Panels[Panels.length - 1];
-				} else {
-					finish = true;
-				}
-			}
-
-			if (finish) {
+			let Panels = state.panelsHistory[Story];
+			if (Panels.length == 0) {
 				VK.closeApp();
 				return state;
 			}
-			// VK.swipeBackOff();
 
-			let Profile = state.activeProfile;
-			let Profiles = state.profileHistory;
-			if (state.activePanels[Story] == PANEL_USER && !storyChange) {
-				Profiles.pop();
-				Profile = Profiles[Profiles.length - 1];
-			}
+			const oldPanel = state.activePanels[Story];
+			const newPanel = state.panelsHistory[Story][state.panelsHistory[Story].length - 1];
 
-			let Ad = state.activeAd;
-			let Ads = state.adHistory;
-			if (state.activePanels[Story] == PANEL_ONE && !storyChange) {
-				Ads.pop();
-				Ad = Ads[Ads.length - 1];
-			}
+			let newContext = state.historyContext[Story][state.historyContext[Story].length - 1];
+			newContext =
+				oldPanel == PANEL_COMMENTS || oldPanel == PANEL_SUBS
+					? { ...newContext, ...state.activeContext[Story] }
+					: newContext;
 
-			const scrollHistory = state.scrollHistory;
-			const scrollPosition = scrollHistory.length > 0 ? scrollHistory.pop() : state.scrollPosition;
+			const newScroll = state.scrollHistory[Story][state.scrollHistory[Story].length - 1];
 
 			return {
 				...state,
 
 				activePanels: {
 					...state.activePanels,
-					[Story]: Panel,
+					[Story]: newPanel,
 				},
 				panelsHistory: {
 					...state.panelsHistory,
-					[Story]: Panels,
+					[Story]: state.panelsHistory[Story].slice(0, state.panelsHistory[Story].length - 1),
 				},
 
-				activeStory: Story,
+				activeContext: {
+					...state.activeContext,
+					[Story]: newContext,
+				},
+				historyContext: {
+					...state.historyContext,
+					[Story]: state.historyContext[Story].slice(0, state.historyContext[Story].length - 1),
+				},
 
 				direction: DIRECTION_BACK,
 				from: state.activePanels[Story],
-				to: Panel,
+				to: state.panelsHistory[state.panelsHistory[Story].length - 1],
 
-				activeAd: Ad,
-				activeProfile: Profile,
-
-				profileHistory: Profiles,
-				adHistory: Ads,
-				scrollHistory,
-				scrollPosition,
+				scrollHistory: {
+					...state.scrollHistory,
+					[Story]: state.scrollHistory[Story].slice(0, state.scrollHistory[Story].length - 1),
+				},
+				scrollPosition: {
+					...state.scrollPosition,
+					[Story]: newScroll,
+				},
 			};
 		}
 
@@ -461,8 +579,6 @@ export const routerReducer = (state = initialState, action) => {
 			const Panel = state.activePanels[Story];
 			const snackbar = action.payload.snackbar;
 
-			// console.log('we set snackbar', snackbar)
-
 			return {
 				...state,
 				snackbars: {
@@ -473,8 +589,6 @@ export const routerReducer = (state = initialState, action) => {
 		}
 
 		case CLOSE_SNACKBAR: {
-			const Story = state.activeStory;
-			const Panel = state.activePanels[Story];
 			return {
 				...state,
 				snackbars: {},
@@ -488,8 +602,6 @@ export const routerReducer = (state = initialState, action) => {
 			let modal = action.payload.modal;
 			let Modals = state.modalHistory[Story] || [];
 			const direction = action.payload.direction ? action.payload.direction : DIRECTION_FORWARD;
-
-			// console.log("OPEN_MODAL ", Story, activeModals, modalHistory)
 
 			return {
 				...state,
@@ -557,3 +669,5 @@ export const routerReducer = (state = initialState, action) => {
 		}
 	}
 };
+
+// 740 -> 850 -> 665

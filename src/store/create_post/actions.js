@@ -10,20 +10,22 @@ export const setFormData = (formName, inputData) => (
     }
 );
 
-export const setGeoData = (geodata) => (
+export const setGeoData = (activeStory, geodata) => (
     {
         type: SET_GEO_DATA,
         payload: {
             geodata,
+            activeStory,
         }
     }
 );
 
-export const setGeoDataString = (geodata_string) => (
+export const setGeoDataString = (activeStory, geodata_string) => (
     {
         type: SET_GEO_DATA_STRING,
         payload: {
             geodata_string,
+            activeStory,
         }
     }
 );

@@ -1,11 +1,3 @@
-import Man from '../img/man.jpeg';
-import Cat from '../img/cat.jpg';
-import Kitten from '../img/kitten.jpeg';
-import Jins from '../img/jins.jpg';
-import Tea from '../img/tea.jpg';
-import Playstein from '../img/playstein.jpg';
-import Bb from '../img/bb.jpg';
-
 export const addsArrDD = [
 	{
 		ad_id: 3201,
@@ -20,16 +12,11 @@ export const addsArrDD = [
 		category: 'animals',
 		district: 'Яблочная улица',
 		region: 'Барнаул',
-		pathes_to_photo: [
-			{ AdPhotoId: 1, PhotoUrl: Cat },
-			{ AdPhotoId: 2, PhotoUrl: Bb },
-			{ AdPhotoId: 3, PhotoUrl: Tea },
-		],
+		pathes_to_photo: [],
 		author: {
 			vk_id: 45863670,
 			name: 'Семен',
 			surname: 'Eфимов',
-			photo_url: Man,
 		},
 	},
 	{
@@ -45,16 +32,11 @@ export const addsArrDD = [
 		extra_field: '',
 		district: 'Гусевский переулок',
 		region: 'Екатеринбург',
-		pathes_to_photo: [
-			{ AdPhotoId: 1, PhotoUrl: Kitten },
-			{ AdPhotoId: 2, PhotoUrl: Bb },
-			{ AdPhotoId: 3, PhotoUrl: Tea },
-		],
+		pathes_to_photo: [],
 		author: {
 			vk_id: 2,
 			name: 'Алёна',
 			surname: 'Чернышева',
-			photo_url: Man,
 		},
 	},
 	{
@@ -72,16 +54,11 @@ export const addsArrDD = [
 		extra_field: 'Звоните по номеру 89268923412',
 		district: 'Ленинский район',
 		region: 'Урюпинск',
-		pathes_to_photo: [
-			{ AdPhotoId: 1, PhotoUrl: Jins },
-			{ AdPhotoId: 2, PhotoUrl: Bb },
-			{ AdPhotoId: 3, PhotoUrl: Tea },
-		],
+		pathes_to_photo: [],
 		author: {
 			vk_id: 3,
 			name: 'Иришка',
 			surname: 'Воронина',
-			photo_url: Man,
 		},
 	},
 	{
@@ -108,16 +85,11 @@ export const addsArrDD = [
 		category: 'build',
 		district: 'Улица строителей',
 		region: 'Могилев',
-		pathes_to_photo: [
-			{ AdPhotoId: 1, PhotoUrl: Bb },
-			{ AdPhotoId: 2, PhotoUrl: Jins },
-			{ AdPhotoId: 3, PhotoUrl: Tea },
-		],
+		pathes_to_photo: [],
 		author: {
 			vk_id: 4,
 			name: 'Ирина',
 			surname: 'Черыжкина',
-			photo_url: Man,
 		},
 	},
 	{
@@ -135,16 +107,11 @@ export const addsArrDD = [
 		category: 'play',
 		district: 'Алматы',
 		region: 'Алматы',
-		pathes_to_photo: [
-			{ AdPhotoId: 1, PhotoUrl: Playstein },
-			{ AdPhotoId: 2, PhotoUrl: Jins },
-			{ AdPhotoId: 3, PhotoUrl: Tea },
-		],
+		pathes_to_photo: [],
 		author: {
 			vk_id: 5,
 			name: 'Нурмухаммед',
 			surname: 'Нурдаулет',
-			photo_url: Man,
 		},
 	},
 	{
@@ -158,11 +125,7 @@ export const addsArrDD = [
 		feedback_type: 'comments',
 		extra_field: '87016073540',
 		category: 'products, electronics, books, clothers',
-		pathes_to_photo: [
-			{ AdPhotoId: 1, PhotoUrl: Tea },
-			{ AdPhotoId: 2, PhotoUrl: Jins },
-			{ AdPhotoId: 3, PhotoUrl: Tea },
-		],
+		pathes_to_photo: [],
 		location: '',
 		district: '',
 		region: '',
@@ -170,7 +133,6 @@ export const addsArrDD = [
 			vk_id: 6,
 			name: 'Петя',
 			surname: 'Сидоров',
-			photo_url: Man,
 		},
 	},
 ];

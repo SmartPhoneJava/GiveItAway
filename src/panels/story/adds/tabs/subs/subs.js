@@ -34,13 +34,12 @@ import { updateDealInfo } from '../../../../../store/detailed_ad/update';
 import { AnimationChange } from '../../../../../components/image/image_cache';
 import { Collapse } from 'react-collapse';
 import { openTab } from '../../../../../services/_functions';
+import { PANEL_ONE, PANEL_SUBS, PANEL_COMMENTS } from '../../../../../store/router/panelTypes';
 
 const Subs = (props) => {
 	const osname = usePlatform();
-	const { openPopout, closePopout, setProfile, setPage, AD } = props;
-	console.log('ADDDDDD IS', AD);
-	const { dealer, subs, ad_id, isAuthor, ad_type, subscribers_num } = AD;
-	const status = AD.status || STATUS_OFFER;
+	const { openPopout, closePopout, setProfile, setPage } = props;
+	const activePanel = props.activePanels[props.activeStory];
 
 	const [openFAQ, setOpenFAQ] = useState(false);
 	const [pageNumber, setPageNumber] = useState(1);
@@ -55,6 +54,7 @@ const Subs = (props) => {
 	}
 
 	function userClick(v, close, cancel) {
+		const { dealer, isAuthor, ad_type } = props.activeContext[props.activeStory];
 		if (v) {
 			if (isAuthor) {
 				openPopout(
@@ -98,12 +98,15 @@ const Subs = (props) => {
 		return Math.floor(Math.random() * Math.floor(max));
 	}
 
-	const [newGiven, setNewGiven] = useState([]);
+	const [newGiven, setNewGiven] = useState(null);
 	useEffect(() => {
-		if (!props.AD) {
+		console.log('12d activePanel is', activePanel);
+		if (activePanel != PANEL_ONE && activePanel != PANEL_SUBS && activePanel != PANEL_COMMENTS) {
 			return;
 		}
-		const { dealer } = props.AD;
+		const { dealer } = props.activeContext[props.activeStory];
+		const dealer_text = dealer ? dealer.name + ' ' + dealer.surname : 'Никто не выбран'
+		console.log('12d dealer is', dealer, dealer_text);
 
 		setNewGiven(
 			<Cell
@@ -119,12 +122,14 @@ const Subs = (props) => {
 				before={dealer ? <Avatar size={36} src={dealer.photo_url} /> : <Icon24User />}
 				asideContent={dealer ? <Icon24Dismiss /> : ''}
 			>
-				<div>{dealer ? dealer.name + ' ' + dealer.surname : 'Никто не выбран'}</div>
+				<div>{dealer_text}</div>
 			</Cell>
 		);
-	}, [props.AD.dealer]);
+	}, [props.activeContext[props.activeStory].dealer]);
 
 	function close_ad(subscriber) {
+		const { ad_id, ad_type } = props.activeContext[props.activeStory];
+
 		Close(
 			ad_id,
 			ad_type,
@@ -137,6 +142,7 @@ const Subs = (props) => {
 	}
 
 	function cancel_ad(subscriber, need_close) {
+		const { ad_id } = props.activeContext[props.activeStory];
 		CancelClose(
 			ad_id,
 			(data) => {
@@ -151,7 +157,11 @@ const Subs = (props) => {
 
 	const [subsComponent, setSubsComponent] = useState(<></>);
 	useEffect(() => {
-		const { ad_type, isAuthor } = props.AD;
+		if (activePanel != PANEL_ONE && activePanel != PANEL_SUBS && activePanel != PANEL_COMMENTS) {
+			return;
+		}
+		console.log('activePanel is', activePanel, props.activeContext[props.activeStory]);
+		const { ad_type, isAuthor, dealer, subs, subscribers_num } = props.activeContext[props.activeStory];
 
 		const close = (subscriber) => {
 			if (dealer) {
@@ -211,7 +221,10 @@ const Subs = (props) => {
 				</Group>
 			</>
 		);
-	}, [subs, dealer]);
+	}, [props.activeContext[props.activeStory].subs, props.activeContext[props.activeStory].dealer, newGiven]);
+
+	const { ad_id, isAuthor, ad_type } = props.activeContext[props.activeStory];
+	const status = props.activeContext[props.activeStory].status || STATUS_OFFER;
 
 	let { inited, loading, error, hasMore, newPage } = useSubsGet(
 		props.mini,
@@ -288,8 +301,10 @@ const Subs = (props) => {
 
 const mapStateToProps = (state) => {
 	return {
-		AD: state.ad,
 		myID: state.vkui.myID,
+		activeContext: state.router.activeContext,
+		activeStory: state.router.activeStory,
+		activePanels: state.router.activePanels,
 	};
 };
 

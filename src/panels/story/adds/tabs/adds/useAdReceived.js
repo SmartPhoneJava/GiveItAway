@@ -5,7 +5,7 @@ import { Spinner } from '@vkontakte/vkui';
 
 import { Addr, BASE_USER } from '../../../../../store/addr';
 
-export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_id) {
+export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_id, cache) {
 	const [inited, setInited] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
@@ -15,6 +15,7 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 	useEffect(() => {
 		setAds([]);
 		pageNumber = 1;
+		console.log('fuuuuun');
 	}, [user_id]);
 
 	useEffect(() => {
@@ -22,6 +23,7 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 		setLoading(true);
 		setError(false);
 		setInited(false);
+
 		let cancel;
 		let clear = false;
 
@@ -29,6 +31,23 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 			rows_per_page: rowsPerPage,
 			page: pageNumber,
 		};
+
+		console.log("access one", pageNumber, cache.restore, cache.from(pageNumber, rowsPerPage).length)
+		if (cache.restore && cache.from(pageNumber, rowsPerPage).length != 0) {
+			setTimeout(() => {
+				if (clear) {
+					return;
+				}
+				console.log("received restore")
+				setAds((prev) => [...new Set([...prev, ...cache.from(pageNumber, rowsPerPage)])]);
+				setHasMore(true);
+				setLoading(false);
+				setPopout(null);
+				setInited(true);
+			}, 20);
+
+			return;
+		}
 
 		axios({
 			method: 'GET',
@@ -41,11 +60,15 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 				if (clear) {
 					return;
 				}
+				
 				const newAds = res.data;
+				console.log("real one", pageNumber, cache.restore, cache.from(pageNumber, rowsPerPage).length)
 				setAds((prev) => {
+					cache.to([...new Set([...prev, ...newAds])]);
 					return [...new Set([...prev, ...newAds])];
 				});
 				setHasMore(newAds.length > 0);
+
 				setLoading(false);
 				setPopout(null);
 				setInited(true);

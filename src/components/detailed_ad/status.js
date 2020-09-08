@@ -132,6 +132,7 @@ export const showStatus = (status, isDealer, isAuthor, dealer, hidden, acceptCli
 	if (hidden) {
 		return showHidden();
 	}
+	console.log("status is", status)
 	switch (status) {
 		case STATUS_CHOSEN:
 			return showChosen(isDealer, isAuthor, dealer, acceptClick, cancelClick, openUser);

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { setFormData } from './../../store/create_post/actions';
 import { SelectMimicry, FormLayout } from '@vkontakte/vkui';
 import { connect } from 'react-redux';
-import { EDIT_MODE } from '../../store/create_post/types';
 
 const Location = (props) => {
 	const { redux_form } = props;

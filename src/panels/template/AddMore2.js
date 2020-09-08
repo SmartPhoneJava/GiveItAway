@@ -58,15 +58,14 @@ import {
 	openModal,
 	setPage,
 	openPopout,
-	setStory,
 	closePopout,
 	setProfile,
 	goBack,
+	updateContext,
 } from '../../store/router/actions';
 import { setIsSub, setIsHidden, setExtraInfo, setIsAuthor } from '../../store/detailed_ad/actions';
 import { AdDefault, AD_LOADING, STATUS_CLOSED, STATUS_ABORTED, TYPE_CHOICE, TYPE_AUCTION } from '../../const/ads';
 import { shareInVK } from '../../services/VK';
-import { STORY_CREATE, STORY_ADS } from '../../store/router/storyTypes';
 import { EDIT_MODE, CREATE_AD_MAIN, CREATE_AD_ITEM } from '../../store/create_post/types';
 import { setFormData } from '../../store/create_post/actions';
 import { FORM_CREATE } from '../../components/categories/redux';
@@ -83,6 +82,8 @@ import { AdMainInfo } from '../../components/detailed_ad/table';
 import { CardWithPadding } from '../../App';
 import { openTab } from '../../services/_functions';
 import Icon from './../../img/icon278.png';
+import { PANEL_ADS, PANEL_CREATE } from '../../store/router/panelTypes';
+import { now } from 'moment';
 
 let current_i = 0;
 
@@ -116,8 +117,18 @@ export const deleteAlert = (deleteAd, closePopout) => (
 );
 
 const AddMore2r = (props) => {
-	const { myID, dispatch } = props;
-	const { setIsSub, setIsAuthor, setIsHidden, setExtraInfo, openPopout, setStory, setFormData, closePopout } = props;
+	const { myID, dispatch, activeContext, story } = props;
+	const {
+		setIsSub,
+		setIsAuthor,
+		setIsHidden,
+		setPage,
+		setExtraInfo,
+		openPopout,
+		setFormData,
+		updateContext,
+		closePopout,
+	} = props;
 	const { setDummy, direction, AD } = props;
 
 	const [isOpen, setIsOpen] = useState(false);
@@ -130,12 +141,15 @@ const AddMore2r = (props) => {
 	const [detailsRequestSuccess, setDetailsRequestSuccess] = useState(false);
 
 	useEffect(() => {
-		setrAd(AD);
-	}, [AD]);
+		const contextInfo = activeContext[story];
+		setrAd({ ...AD, ...contextInfo });
+		isNotValid()
+		console.log('addInfo is ', { ...AD, ...contextInfo });
+	}, [AD, props.activeContext[props.story]]);
 
 	const [componentStatus, setComponentStatus] = useState();
 	useEffect(() => {
-		const { isAuthor, isDealer, dealer, deal, status, hidden } = rAd;
+		const { isAuthor, isDealer, dealer, deal, status, hidden } = props.activeContext[props.story];
 
 		setComponentStatus(
 			showStatus(
@@ -147,7 +161,7 @@ const AddMore2r = (props) => {
 				() =>
 					acceptDeal(
 						deal.deal_id,
-						(v) => setStory(STORY_ADS),
+						(v) => setPage(PANEL_ADS),
 						(e) => {
 							console.log('acceptDeal err', e);
 						}
@@ -155,7 +169,7 @@ const AddMore2r = (props) => {
 				() =>
 					denyDeal(
 						deal.deal_id,
-						(v) => setStory(STORY_ADS),
+						(v) => setPage(PANEL_ADS),
 						(e) => {
 							console.log('denyDeal error', e);
 						}
@@ -163,11 +177,15 @@ const AddMore2r = (props) => {
 				props.setProfile
 			)
 		);
-	}, [rAd]);
+	}, [props.activeContext[props.story]]);
+
+	useEffect(() => {
+		console.log('props.activeContext[props.story]', props.activeContext[props.story]);
+	}, [props.activeContext[props.story]]);
 
 	const [componentCategories, setComponentCategories] = useState();
 	useEffect(() => {
-		const { category, subcat_list, subcat, hidden } = rAd;
+		const { category, subcat_list, subcat, hidden } = props.activeContext[props.story];
 
 		if (hidden) {
 			setComponentCategories();
@@ -178,7 +196,7 @@ const AddMore2r = (props) => {
 				tags={[tag(category, col, null, col), tag(subcat_list, col, null, col), tag(subcat, col, null, col)]}
 			/>
 		);
-	}, [rAd]);
+	}, [props.activeContext[props.story]]);
 
 	const [componentPhotoSwipe, setComponentPhotoSwipe] = useState();
 	useEffect(() => {
@@ -218,7 +236,7 @@ const AddMore2r = (props) => {
 							style={{
 								display: 'flex',
 								overflowX:
-									(props.platform == 'desktop_web' || props.platform == 'mobile_web') ? 'auto' : null,
+									props.platform == 'desktop_web' || props.platform == 'mobile_web' ? 'auto' : null,
 							}}
 						>
 							{pathes_to_photo.map((img, i) => (
@@ -291,7 +309,23 @@ const AddMore2r = (props) => {
 	};
 
 	function isNotValid() {
-		return AD == null || AD.ad_id == AD_LOADING.ad_id || AD.ad_id == AdDefault.ad_id;
+		if (props.activeContext[props.story] == null) {
+			console.log('isNotValid full');
+			return;
+		}
+		console.log(
+			'isNotValid',
+			props.activeContext[props.story] == null,
+			props.activeContext[props.story].ad_id == null,
+			props.activeContext[props.story].ad_id == AD_LOADING.ad_id,
+			props.activeContext[props.story].ad_id == AdDefault.ad_id
+		);
+		return (
+			props.activeContext[props.story] == null ||
+			props.activeContext[props.story].ad_id == null ||
+			props.activeContext[props.story].ad_id == AD_LOADING.ad_id ||
+			props.activeContext[props.story].ad_id == AdDefault.ad_id
+		);
 	}
 
 	const width = document.body.clientWidth;
@@ -310,42 +344,54 @@ const AddMore2r = (props) => {
 			}
 		);
 		setIsSub(isSubs);
+		updateContext({ isSub: isSubs });
 	}
 
 	useEffect(() => {
 		let cancelFunc = false;
-		const myPlace = props.AD.history.length;
+
+		const routerAd = props.activeContext[props.story];
+		console.log('routerAd create', routerAd);
+		if (!routerAd || isNaN(routerAd.ad_id)) {
+			return;
+		}
+		setExtraInfo(routerAd);
 		const init = () => () => {
-			const id = AD.ad_id;
-			setIsAuthor(AD.author.vk_id == myID);
+			const id = routerAd.ad_id;
+			console.log('wtf is', myID, routerAd);
+
 			setDealRequestSuccess(false);
 			updateDealInfo(
-				() => {
+				(deal, isDealer, dealer) => {
 					if (cancelFunc) {
 						return;
 					}
 					setDealRequestSuccess(true);
+					updateContext({ deal, isDealer, dealer });
 				},
 				() => {
 					if (cancelFunc) {
 						return;
 					}
 					setDealRequestSuccess(true);
+					updateContext({ deal: null, isDealer: false, dealer: null });
 				}
 			);
 
 			setSubsRequestSuccess(false);
 			updateSubs(
-				() => {
+				(subs) => {
 					if (cancelFunc) {
 						return;
 					}
+					updateContext({ subs });
 					setSubsRequestSuccess(true);
 				},
 				() => {
 					if (cancelFunc) {
 						return;
 					}
+					updateContext({ subs: [] });
 					setSubsRequestSuccess(true);
 				}
 			);
@@ -357,26 +403,35 @@ const AddMore2r = (props) => {
 					if (cancelFunc) {
 						return;
 					}
+					details.isSub = details.is_subscriber;
+					details.isAuthor = details.author.vk_id == myID;
+					details.ad_type = details.ad_type || TYPE_CHOICE;
+					console.log('loook at details', details);
+					updateContext(details);
 					setExtraInfo(details, myID, true);
+					setIsAuthor(details.author.vk_id == myID);
 					setCostRequestSuccess(false);
 					updateCost(
 						details.is_subscriber,
-						() => {
+						(cost) => {
+							console.log('cost is', cost);
 							if (cancelFunc) {
 								return;
 							}
+							updateContext({ cost });
 							setCostRequestSuccess(true);
 						},
 						() => {
 							if (cancelFunc) {
 								return;
 							}
+							updateContext({ cost: 0 });
 							setCostRequestSuccess(false);
 						}
 					);
 					setDetailsRequestSuccess(true);
 					details.isAuthor = details.author.vk_id == myID;
-					setrAd(details);
+					//setrAd(details);
 				},
 				(e) => {
 					if (cancelFunc) {
@@ -401,7 +456,7 @@ const AddMore2r = (props) => {
 		return () => {
 			cancelFunc = true;
 		};
-	}, []);
+	}, [props.activeContext[props.story].ad_id]);
 
 	const [imgs, setImgs] = useState([]);
 
@@ -526,7 +581,12 @@ const AddMore2r = (props) => {
 
 	const [componentComments, setComponentComments] = useState();
 	useEffect(() => {
-		const { comments_enabled, hidden, isAuthor } = props.AD;
+		if (isNotValid()) {
+			return;
+		}
+		const ad = props.activeContext[props.story];
+
+		const { comments_enabled, hidden, isAuthor } = ad;
 		if (hidden) {
 			if (!isAuthor) {
 				setComponentComments();
@@ -544,11 +604,11 @@ const AddMore2r = (props) => {
 			v = <Comments mini={true} amount={1} maxAmount={1} openUser={props.setProfile} />;
 		}
 		setComponentComments(<Card mode="outline">{v}</Card>);
-	}, [props.AD]);
+	}, [props.activeContext[props.story]]);
 
 	const [componentChosenSub, setComponentChosenSub] = useState();
 	useEffect(() => {
-		const { ad_type, ad_id, hidden, isAuthor } = props.AD;
+		const { ad_type, ad_id, hidden, isAuthor } = props.activeContext[props.story];
 		if (hidden) {
 			if (!isAuthor) {
 				setComponentChosenSub();
@@ -577,11 +637,12 @@ const AddMore2r = (props) => {
 				</div>
 			</Card>
 		);
-	}, [props.AD, dealRequestSuccess, costRequestSuccess]);
+	}, [props.activeContext[props.story], dealRequestSuccess, costRequestSuccess]);
 
 	const [componentAuthor, setComponentAuthor] = useState();
 	useEffect(() => {
-		const { author, creation_date } = rAd;
+		const { author } = rAd;
+		const creation_date = rAd.creation_date || now();
 		setComponentAuthor(
 			<Cell
 				onClick={() => props.setProfile(author.vk_id)}
@@ -598,7 +659,7 @@ const AddMore2r = (props) => {
 
 	const [secondaryInfo, setSecondaryInfo] = useState(<></>);
 	useEffect(() => {
-		const { hidden, isAuthor } = props.AD;
+		const { hidden, isAuthor } = props.activeContext[props.story];
 		if (hidden && !isAuthor) {
 			setSecondaryInfo(<></>);
 			return;
@@ -614,7 +675,7 @@ const AddMore2r = (props) => {
 				)}
 			</div>
 		);
-	}, [props.AD]);
+	}, [componentCategories, props.activeContext[props.story]]);
 
 	const [allActions, setAllActions] = useState();
 	useEffect(() => {
@@ -651,18 +712,6 @@ const AddMore2r = (props) => {
 			),
 		];
 		if (!isAuthor) {
-			const color = isSub ? 'var(--destructive)' : 'var(--header_tint)';
-			// const subBtn = buttonAction(
-			// 	<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-			// 		<Icon24MarketOutline style={{ color }} />
-			// 		{subButton}
-			// 	</div>,
-			// 	isSub ? 'Перестать отслеживать' : 'Откликнуться',
-			// 	() => (isSub ? unsub(ad_id) : sub(ad_id)),
-			// 	isSub,
-			// 	isFinished(status) || isDealer
-			// );
-
 			const helpBtn = buttonAction(
 				<Icon28Messages />,
 				'Связаться с автором',
@@ -694,32 +743,33 @@ const AddMore2r = (props) => {
 	}, [rAd, subButton, costRequestSuccess]);
 
 	function onEditClick() {
-		setFormData(EDIT_MODE, {
+		setFormData(story + EDIT_MODE, {
 			mode: true,
 		});
 
-		setFormData(FORM_LOCATION_CREATE, {
-			country: { id: 1, title: AD.region },
-			city: { id: 1, title: AD.district },
+		setFormData(story + FORM_LOCATION_CREATE, {
+			country: { id: 1, title: rAd.region },
+			city: { id: 1, title: rAd.district },
 		});
-		setFormData(CREATE_AD_ITEM, {
-			name: AD.header,
-			description: AD.text,
-			photosUrl: AD.pathes_to_photo,
+		setFormData(story + CREATE_AD_ITEM, {
+			name: rAd.header,
+			description: rAd.text,
+			photosUrl: rAd.pathes_to_photo,
 		});
-		setFormData(FORM_CREATE, {
-			category: AD.category,
-			subcategory: AD.subcat_list,
-			incategory: AD.subcat,
-		});
-
-		setFormData(CREATE_AD_MAIN, {
-			type: AD.ad_type,
-			ls_enabled: AD.ls_enabled,
-			comments_enabled: AD.comments_enabled,
+		setFormData(story + FORM_CREATE, {
+			category: rAd.category,
+			subcategory: rAd.subcat_list,
+			incategory: rAd.subcat,
 		});
 
-		setStory(STORY_CREATE, null, true);
+		console.log('wwwwwwwwwwwwwwwww');
+		setFormData(story + CREATE_AD_MAIN, {
+			type: rAd.ad_type,
+			ls_enabled: rAd.ls_enabled,
+			comments_enabled: rAd.comments_enabled,
+		});
+
+		setPage(PANEL_CREATE);
 	}
 
 	if (isNotValid(AD)) {
@@ -765,6 +815,9 @@ const mapStateToProps = (state) => {
 		direction: state.router.direction,
 		myID: state.vkui.myID,
 		platform: state.vkui.platform,
+
+		story: state.router.activeStory,
+		activeContext: state.router.activeContext,
 	};
 };
 
@@ -785,6 +838,7 @@ const mapDispatchToProps = (dispatch) => {
 				goBack,
 				acceptDeal,
 				denyDeal,
+				updateContext,
 
 				setIsSub,
 
@@ -792,7 +846,6 @@ const mapDispatchToProps = (dispatch) => {
 				setIsAuthor,
 				setExtraInfo,
 
-				setStory,
 				setFormData,
 
 				openPopout,
@@ -809,4 +862,4 @@ const AddMore2 = connect(mapStateToProps, mapDispatchToProps)(AddMore2r);
 export default AddMore2;
 
 // 857 -> 936 -> 838 -> 923 -> 1016 -> 935 -> 987 -> 897 -> 953 -> 899
-// 830 -> 780 -> 756
+// 830 -> 780 -> 756 -> 841

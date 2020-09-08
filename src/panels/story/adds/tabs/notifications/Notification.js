@@ -12,9 +12,8 @@ import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Gift from './../../../../../img/icon278.png';
 
 import { SNACKBAR_DURATION_DEFAULT } from '../../../../../store/const';
-import { openSnackbar, closeSnackbar, setAd, setStory } from '../../../../../store/router/actions';
+import { openSnackbar, closeSnackbar, setAd } from '../../../../../store/router/actions';
 import { setExtraInfo } from '../../../../../store/detailed_ad/actions';
-import { STORY_ADS } from '../../../../../store/router/storyTypes';
 
 function getImage(props) {
 	let photoURL = Gift;
@@ -39,7 +38,7 @@ function getImage(props) {
 }
 
 const NotificationInner = (props) => {
-	const { openSnackbar, closeSnackbar, setExtraInfo, setAd, setStory } = props;
+	const { openSnackbar, closeSnackbar, setExtraInfo, setAd } = props;
 
 	return (
 		<>
@@ -47,7 +46,6 @@ const NotificationInner = (props) => {
 				style={{ cursor: 'pointer' }}
 				onClick={() => {
 					if (props.ad) {
-						setStory(STORY_ADS);
 						setExtraInfo(props.ad);
 						setAd(props.ad);
 					} else {
@@ -101,7 +99,6 @@ const mapDispatchToProps = {
 	closeSnackbar,
 	setExtraInfo,
 	setAd,
-	setStory,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(NotificationInner);

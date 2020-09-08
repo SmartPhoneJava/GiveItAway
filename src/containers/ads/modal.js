@@ -14,8 +14,10 @@ function openCarma(dispatch) {
 const mapStateToProps = (state) => {
 	return {
 		activeModals: state.router.activeModals,
+		activeStory: state.router.activeStory,
+		activeContext: state.router.activeContext,
 		inputData: state.formData.forms,
-		ad: state.ad,
+
 		myID: state.vkui.myID,
 	};
 };

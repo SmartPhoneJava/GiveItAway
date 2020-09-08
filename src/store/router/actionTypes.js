@@ -1,11 +1,15 @@
 export const SET_PAGE = 'SET_PAGE';
 export const SET_PROFILE = 'SET_PROFILE';
+
+export const UPDATE_CONTEXT = 'UPDATE_CONTEXT';
+
 export const SET_AD = 'SET_AD';
-export const ADD_PROFILE = 'ADD_PROFILE';
 
 export const SET_TAB = 'SET_TAB';
 export const SET_STORY = 'SET_STORY';
 export const GO_BACK = 'GO_BACK';
+
+export const SET_STORY_PROFILE = 'SET_STORY_PROFILE';
 
 export const OPEN_POPOUT = 'OPEN_POPOUT';
 export const CLOSE_POPOUT = 'CLOSE_POPOUT';

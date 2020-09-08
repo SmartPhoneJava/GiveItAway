@@ -5,7 +5,7 @@ import { Spinner } from '@vkontakte/vkui';
 
 import { Addr, BASE_USER } from '../../../../../store/addr';
 
-export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) {
+export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id, cache) {
 	const [inited, setInited] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
@@ -18,6 +18,7 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 	}, [user_id]);
 
 	useEffect(() => {
+		
 		setPopout(<Spinner size="small" />);
 		setLoading(true);
 		setError(false);
@@ -29,6 +30,22 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 			rows_per_page: rowsPerPage,
 			page: pageNumber,
 		};
+
+		if (cache.restore && cache.from(pageNumber, rowsPerPage).length != 0) {
+			setTimeout(() => {
+				if (clear) {
+					return;
+				}
+				console.log("given restore")
+				setAds((prev) => [...new Set([...prev, ...cache.from(pageNumber, rowsPerPage)])]);
+				setHasMore(true);
+				setLoading(false);
+				setPopout(null);
+				setInited(true);
+			}, 20);
+
+			return;
+		}
 
 		axios({
 			method: 'GET',
@@ -42,9 +59,12 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id) 
 					return;
 				}
 				const newAds = res.data;
+				console.log("real given one", pageNumber, cache.restore, cache.from(pageNumber, rowsPerPage).length)
 				setAds((prev) => {
+					cache.to([...new Set([...prev, ...newAds])]);
 					return [...new Set([...prev, ...newAds])];
 				});
+
 				setHasMore(newAds.length > 0);
 				setLoading(false);
 				setPopout(null);

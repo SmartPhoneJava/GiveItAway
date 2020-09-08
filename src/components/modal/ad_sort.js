@@ -8,15 +8,7 @@ import { setFormData } from '../../store/create_post/actions';
 import { ADS_FILTERS } from '../../store/create_post/types';
 import { closeAllModals, closeModal } from '../../store/router/actions';
 
-import {
-	Radio,
-	Button,
-	Group,
-	FormStatus,
-	withModalRootContext,
-	Div,
-	Spinner,
-} from '@vkontakte/vkui';
+import { Radio, Button, Group, FormStatus, withModalRootContext, Div, Spinner } from '@vkontakte/vkui';
 import { getGeodata } from '../../services/VK';
 import { pushToCache } from '../../store/cache/actions';
 import { fail } from '../../requests';
@@ -27,12 +19,27 @@ export const SaveCancelButtons = (save, cancel, disabled) => {
 	return (
 		<div className="flex-center">
 			<div className="filters-button">
-				<Button style={{ cursor: 'pointer' }} stretched size="xl" mode="secondary" onClick={cancel} before={<Icon24Cancel />}>
+				<Button
+					style={{ cursor: 'pointer' }}
+					stretched
+					size="xl"
+					mode="secondary"
+					onClick={cancel}
+					before={<Icon24Cancel />}
+				>
 					Назад
 				</Button>
 			</div>
 			<div className="filters-button">
-				<Button disabled={disabled} style={{ cursor: 'pointer' }} stretched size="xl" mode="primary" onClick={save} before={<Icon24Done />}>
+				<Button
+					disabled={disabled}
+					style={{ cursor: 'pointer' }}
+					stretched
+					size="xl"
+					mode="primary"
+					onClick={save}
+					before={<Icon24Done />}
+				>
 					Сохранить
 				</Button>
 			</div>
@@ -41,7 +48,7 @@ export const SaveCancelButtons = (save, cancel, disabled) => {
 };
 
 const ModalPageAdsSortInner = (props) => {
-	const { setFormData, closeAllModals, inputData, pushToCache, closeModal } = props;
+	const { setFormData, closeAllModals, inputData, pushToCache, closeModal, activeStory } = props;
 
 	const [changed, setChanged] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -50,11 +57,11 @@ const ModalPageAdsSortInner = (props) => {
 	const [sort, setSort] = useState(SORT_TIME);
 	const [geodata, setGeodata] = useState();
 	useEffect(() => {
-		if (!inputData[ADS_FILTERS] || inputData[ADS_FILTERS].sort == undefined) {
+		if (!inputData[activeStory + ADS_FILTERS] || inputData[activeStory + ADS_FILTERS].sort == undefined) {
 			return;
 		}
-		setSort(inputData[ADS_FILTERS].sort);
-		setIsTimeSort(inputData[ADS_FILTERS].sort == SORT_TIME);
+		setSort(inputData[activeStory + ADS_FILTERS].sort);
+		setIsTimeSort(inputData[activeStory + ADS_FILTERS].sort == SORT_TIME);
 	}, []);
 
 	useEffect(() => {
@@ -79,6 +86,7 @@ const ModalPageAdsSortInner = (props) => {
 	function applyGeoSort() {
 		setLoading(true);
 		getGeodata(
+			activeStory,
 			(value) => {
 				setLoading(false);
 				setGeodata(value);
@@ -94,10 +102,10 @@ const ModalPageAdsSortInner = (props) => {
 	}
 
 	function save() {
-		setFormData(ADS_FILTERS, {
-			...inputData[ADS_FILTERS],
+		setFormData(activeStory + ADS_FILTERS, {
+			...inputData[activeStory + ADS_FILTERS],
 			sort,
-			geodata: geodata ? geodata : inputData[ADS_FILTERS].geodata,
+			geodata: geodata ? geodata : inputData[activeStory + ADS_FILTERS].geodata,
 		});
 		pushToCache(true, 'ignore_cache');
 		closeAllModals();
@@ -137,7 +145,7 @@ const ModalPageAdsSortInner = (props) => {
 				{!valid && (
 					<Div>
 						<FormStatus header="Нет доступа к GPS" mode={valid ? 'default' : 'error'}>
-							Проверьте, что у вас включена геолокация и вы предоставили сервису доступ к нему.
+							Проверьте, что у вас включена геолокация и вы предоставили сервису доступ к ней.
 						</FormStatus>
 					</Div>
 				)}
@@ -151,6 +159,7 @@ const mapStateToProps = (state) => {
 	return {
 		inputData: state.formData.forms,
 		direction: state.router.direction,
+		activeStory: state.router.activeStory,
 	};
 };
 

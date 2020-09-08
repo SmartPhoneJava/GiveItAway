@@ -1,12 +1,3 @@
-
-import Cat from './../img/cat.jpg'
-import Man from './../img/man.jpeg';
-import Kitten from './../img/kitten.jpeg';
-import Jins from './../img/jins.jpg';
-import Tea from './../img/tea.jpg';
-import Playstein from './../img/playstein.jpg';
-import Bb from './../img/bb.jpg';
-
 export const GEO_TYPE_FILTERS = 'filters';
 export const GEO_TYPE_NEAR = 'near';
 export const GEO_TYPE_NO = 'no';
@@ -49,7 +40,6 @@ export const AD_LOADING = {
 		vk_id: -1,
 		name: 'Загрузка',
 		surname: 'Загрузка',
-		photo_url: Man,
 	},
 };
 
@@ -70,16 +60,11 @@ export const AdDefault = {
 	extra_field: '',
 	views_count: '87',
 	location: 'Барнаул, Яблочная улица',
-	pathes_to_photo: [
-		{ AdPhotoId: 1, PhotoUrl: Kitten },
-		{ AdPhotoId: 2, PhotoUrl: Jins },
-		{ AdPhotoId: 3, PhotoUrl: Tea },
-	],
+	pathes_to_photo: [],
 	author: {
 		vk_id: 2,
 		name: 'Алёна',
 		surname: 'Чернышева',
-		photo_url: Man,
 	},
 };
 
@@ -89,6 +74,6 @@ export const TAB_ADS_TEXT = 'Объявления';
 export const TAB_NOTIFICATIONS = 'notifications';
 export const TAB_NOTIFICATIONS_TEXT = 'Уведомления';
 
-export const MODE_ALL = "all"
-export const MODE_WANTED = "wanted"
-export const MODE_GIVEN = "managed"
+export const MODE_ALL = 'all';
+export const MODE_WANTED = 'wanted';
+export const MODE_GIVEN = 'managed';

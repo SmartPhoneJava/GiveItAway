@@ -20,13 +20,21 @@ import {
 	RichCell,
 	CellButton,
 	SimpleCell,
+	Cell,
 } from '@vkontakte/vkui';
 
 import { AnimateGroup, AnimateOnChange } from 'react-animation';
 
 import { connect } from 'react-redux';
 
-import { setPage, openPopout, openSnackbar, closeSnackbar, closePopout } from './../../../../../store/router/actions';
+import {
+	setPage,
+	openPopout,
+	openSnackbar,
+	closeSnackbar,
+	closePopout,
+	updateContext,
+} from './../../../../../store/router/actions';
 
 import useCommentsGet from './useCommentsGet';
 
@@ -42,9 +50,7 @@ import { WHITE_LIST } from './../../../../template/Add7';
 
 import './comment.css';
 import Comment from './comment';
-import { SNACKBAR_DURATION_DEFAULT } from '../../../../../store/const';
 import { PANEL_COMMENTS } from '../../../../../store/router/panelTypes';
-import { deleteCommentByID } from '../../../../../store/detailed_ad/actions';
 import { scrollWindow } from '../../../../../App';
 import { Collapse } from 'react-collapse';
 import { withLoadingIf } from '../../../../../components/image/image_cache';
@@ -57,7 +63,7 @@ const MAX_COMMENT_LENGTH = 500;
 
 const CommentsI = (props) => {
 	const osname = usePlatform();
-	const { AD, deleteCommentByID, myID, openPopout, openSnackbar, closeSnackbar, closePopout } = props;
+	const { myID, openPopout, openSnackbar, closeSnackbar, closePopout, updateContext } = props;
 
 	const [nots, setNots] = useState([]);
 
@@ -67,15 +73,18 @@ const CommentsI = (props) => {
 	const [hide, setHide] = useState(false);
 
 	const [editableID, setEditableID] = useState(NO_ID);
+	const [editableText, setEditableText] = useState('');
 
 	const [pageNumber, setPageNumber] = useState(1);
 	const observer = useRef();
+
+	const { ad_id } = props.activeContext[props.activeStory];
 
 	let { inited, loading, error, hasMore, newPage } = useCommentsGet(
 		props.mini,
 		pageNumber,
 		10,
-		AD.ad_id,
+		ad_id,
 		props.maxAmount
 	);
 
@@ -94,8 +103,10 @@ const CommentsI = (props) => {
 	);
 
 	useEffect(() => {
-		setNots(AD.comments);
-	}, [AD.comments]);
+		const comments = props.activeContext[props.activeStory].comments || [];
+		console.log('comments are', comments);
+		setNots(comments);
+	}, [props.activeContext[props.activeStory].comments, props.activeContext[props.activeStory].comments_update]);
 
 	function trySetText(text) {
 		let vtext = text;
@@ -110,15 +121,17 @@ const CommentsI = (props) => {
 	function onEditClick(v) {
 		setText(v.text);
 		setEditableID(v.comment_id);
+		setEditableText(v.text);
 	}
 
 	function onDeleteClick(v) {
+		setText('');
+		setEditableText('');
+		setEditableID(NO_ID);
 		setHide(true);
 		deleteComment(
 			v,
-			(vv) => {
-				deleteCommentByID(v.comment_id);
-			},
+			(vv) => {},
 			(e) => {},
 			() => {
 				setHide(false);
@@ -175,6 +188,7 @@ const CommentsI = (props) => {
 
 	const [commentsComponent, setCommentsComponent] = useState(<></>);
 	useEffect(() => {
+		const AD = props.activeContext[props.activeStory];
 		if (!AD || !AD.comments || AD.comments.length == 0) {
 			setCommentsComponent(<></>);
 			return;
@@ -213,7 +227,7 @@ const CommentsI = (props) => {
 				</AnimateGroup>
 			)
 		);
-	}, [nots, lastAdElementRef, loading, hasMore]);
+	}, [nots, props.activeContext[props.activeStory].comments_update, lastAdElementRef, loading, hasMore]);
 
 	function sendComment() {
 		setHide(true);
@@ -226,11 +240,13 @@ const CommentsI = (props) => {
 				text: text,
 			});
 			editComment(
+				comment,
 				comment.comment_id,
 				obj,
 				(v) => {
 					setEditableID(NO_ID);
 					setText('');
+					setEditableText('');
 				},
 				(e) => {},
 				() => {
@@ -263,7 +279,7 @@ const CommentsI = (props) => {
 				text: text,
 			});
 			postComment(
-				AD.ad_id,
+				props.activeContext[props.activeStory].ad_id,
 				obj,
 				text,
 				(v) => {
@@ -312,27 +328,7 @@ const CommentsI = (props) => {
 							/>
 						</div>
 					)),
-				// <RichCell
-				// 	actions={
-				// 		<CellButton before={<Icon24Write />} size="l" onClick={openCommentaries}>
-				// 			Написать
-				// 		</CellButton>
-				// 	}
-				// >
-				// 	Комментариев нет
-				// </RichCell>
-				// <Placeholder
-				// 	style={{ width: '100%', backgroundColor: 'red' }}
-				// 	action={
-				// 		props.mini ? (
-				// 			<Button size="l" onClick={openCommentaries}>
-				// 				Написать
-				// 			</Button>
-				// 		) : null
-				// 	}
-				// 	icon={<Icon56WriteOutline />}
-				// 	header="Комментариев нет"
-				// />
+
 				'large',
 				null,
 				{ padding: '10px' }
@@ -343,28 +339,7 @@ const CommentsI = (props) => {
 	return (
 		<div>
 			{placeholder}
-			{/* {props.mini ? (
-				<Group
-					header={<Header aside={<Link onClick={openCommentaries}>Показать все</Link>}>Комментарии</Header>}
-				>
-					<Comment onClick={openCommentaries} v={nots[0]} />
-				</Group>
-			) : (
-				<AnimateGroup className="comments-element-outter">
-					{nots.map((v, index) => (
-						<div
-							className="comments-element-inner"
-							key={v.comment_id + index}
-							ref={lastAdElementRef}
-							// ref={nots.length == index + 1 ? lastAdElementRef : null}
-						>
-							<Card mode="outline">
-								<Comment onClick={() => onUserClick(v)} v={v} />
-							</Card>
-						</div>
-					))}
-				</AnimateGroup>
-			)} */}
+
 			{commentsComponent}
 
 			{props.mini || hide ? null : (
@@ -377,6 +352,34 @@ const CommentsI = (props) => {
 							>{`Максимально допустимая длина комментария: ${MAX_COMMENT_LENGTH} символов`}</FormStatus>
 						</Collapse>
 					</Div>
+					<div className="write-comment-input-before">
+						<Cell
+							style={{ margin: '0px', padding: '0px' }}
+							description={editableID != NO_ID && editableText}
+							indicator={
+								<div className="write-comment-input-before-inner">
+									<CellButton
+										mode={editableID == NO_ID ? 'primary' : 'danger'}
+										disabled={editableID == NO_ID && text == ''}
+										style={{ cursor: 'pointer', margin: '0px', padding: '0px', transition: '0.3s' }}
+										onClick={() => {
+											setText('');
+											if (editableID == NO_ID) {
+												return;
+											}
+											setEditableID(NO_ID);
+											setEditableText('');
+										}}
+									>
+										{editableID == NO_ID ? 'Очистить' : 'Отменить'}
+									</CellButton>
+								</div>
+							}
+						>
+							{editableID == NO_ID ? 'Новый комментарий' : 'Редактирование'}
+						</Cell>
+					</div>
+					{/* {helpButton} */}
 					<div className="write-comment-panel">
 						<div className="write-comment-input">
 							<Input
@@ -386,7 +389,7 @@ const CommentsI = (props) => {
 									}
 								}}
 								style={{ transition: '0.3s' }}
-								placeholder="Комментарий"
+								placeholder="Текст"
 								value={text}
 								onChange={(e) => {
 									trySetText(e.currentTarget.value);
@@ -413,22 +416,23 @@ const CommentsI = (props) => {
 
 const mapStateToProps = (state) => {
 	return {
-		AD: state.ad,
 		myID: state.vkui.myID,
+		activeStory: state.router.activeStory,
+		activeContext: state.router.activeContext,
 	};
 };
 
 const mapDispatchToProps = {
 	setPage,
-	deleteCommentByID,
 	openPopout,
 	openSnackbar,
 	closeSnackbar,
 	closePopout,
+	updateContext,
 };
 
 const Comments = connect(mapStateToProps, mapDispatchToProps)(CommentsI);
 
 export default Comments;
 
-// 279
+// 279 -> 445

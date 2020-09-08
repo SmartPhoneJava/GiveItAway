@@ -19,14 +19,14 @@ import { updateDealInfo } from '../../store/detailed_ad/update';
 const AuctionLabelInner = (props) => {
 	const [componentStatus, setComponentStatus] = useState(<></>);
 	useEffect(() => {
-		setComponentStatus(<InfoRow header="Статус">{props.ad.dealer ? 'Завершен' : 'Активен'}</InfoRow>);
-	}, [props.ad.dealer]);
+		setComponentStatus(<InfoRow header="Статус">{props.activeContext[props.activeStory].dealer ? 'Завершен' : 'Активен'}</InfoRow>);
+	}, [props.activeContext[props.activeStory].dealer]);
 
 	const [myRate, setMyRate] = useState(0);
 	const [mrDone, setMrDone] = useState(false);
 	const [mrUpdate, setMrUpdate] = useState(false);
 	useEffect(() => {
-		const { isAuthor, ad_id } = props.ad;
+		const { isAuthor, ad_id } = props.activeContext[props.activeStory];
 		if (isAuthor) {
 			setMrDone(true);
 			return;
@@ -43,13 +43,13 @@ const AuctionLabelInner = (props) => {
 				setMyRate(0);
 			}
 		);
-	}, [props.ad.ad_id, props.ad.isSub, props.ad.isAuthor, mrUpdate]);
+	}, [props.activeContext[props.activeStory].ad_id, props.activeContext[props.activeStory].isSub, props.activeContext[props.activeStory].isAuthor, mrUpdate]);
 
 	const [actionMaxUser, setActionMaxUser] = useState();
 	const [amuDone, setAmuDone] = useState(false);
 	const [amuUpdate, setAmuUpdate] = useState(false);
 	useEffect(() => {
-		const { ad_id } = props.ad;
+		const { ad_id } = props.activeContext[props.activeStory];
 		setAmuDone(false);
 		getAuctionMaxUser(
 			ad_id,
@@ -64,11 +64,11 @@ const AuctionLabelInner = (props) => {
 				setActionMaxUser(null);
 			}
 		);
-	}, [props.ad.isSub, amuUpdate]);
+	}, [props.activeContext[props.activeStory].isSub, props.activeContext[props.activeStory].subs, amuUpdate]);
 
 	const [componentMaxUser, setComponentMaxUser] = useState(<></>);
 	useEffect(() => {
-		const { dealer, status } = props.ad;
+		const { dealer, status } = props.activeContext[props.activeStory];
 		let amu = actionMaxUser;
 		if (status == STATUS_CLOSED || status == STATUS_ABORTED) {
 			if (!dealer) {
@@ -99,11 +99,11 @@ const AuctionLabelInner = (props) => {
 				</Cell>
 			)
 		);
-	}, [props.ad.dealer, actionMaxUser]);
+	}, [props.activeContext[props.activeStory].dealer, props.activeContext[props.activeStory].subs, actionMaxUser]);
 
 	const [componentMyRate, setComponentMyRate] = useState(<></>);
 	useEffect(() => {
-		const { isAuthor, isDealer, status, dealer, ad_id, ad_type, isSub, cost } = props.ad;
+		const { isAuthor, isDealer, status, dealer, ad_id, ad_type, isSub, cost } = props.activeContext[props.activeStory];
 
 		if (isDealer && status == STATUS_CHOSEN) {
 			setComponentMyRate(null);
@@ -215,7 +215,7 @@ const AuctionLabelInner = (props) => {
 				<RichCell
 					before={<Avatar size={48} src={props.myUser.photo_100} />}
 					after={
-						<Counter style={{ width: '40px', cursor: 'pointer' }} onClick={onCarmaClick} mode="primary">
+						<Counter style={{ minWidth: '40px', cursor: 'pointer' }} onClick={onCarmaClick} mode="primary">
 							{cost + ' K'}
 						</Counter>
 					}
@@ -231,14 +231,14 @@ const AuctionLabelInner = (props) => {
 				</RichCell>
 			)
 		);
-	}, [props.ad.isSub, props.ad.dealer, props.ad.cost, actionMaxUser, myRate]);
+	}, [props.activeContext[props.activeStory].isSub, props.activeContext[props.activeStory].dealer, props.activeContext[props.activeStory].cost, actionMaxUser, myRate]);
 
 	const onTypesClick = () => props.openModal(MODAL_ADS_TYPES);
 	const onFreezeClick = () => props.openModal(MODAL_ADS_FROZEN);
 	const onCarmaClick = () => props.openModal(MODAL_ADS_COST);
 
 	return (
-		<Group header={<AdHeader onTypesClick={onTypesClick} ad_type={props.ad.ad_type} />}>
+		<Group header={<AdHeader onTypesClick={onTypesClick} ad_type={props.activeContext[props.activeStory].ad_type} />}>
 			<div style={{ display: 'block', width: '100%' }}>
 				<div style={{ display: 'flex', width: '100%' }}>
 					<SimpleCell>
@@ -269,7 +269,8 @@ const AuctionLabelInner = (props) => {
 const mapStateToProps = (state) => {
 	return {
 		myUser: state.vkui.myUser,
-		ad: state.ad,
+		activeStory: state.router.activeStory,
+		activeContext: state.router.activeContext,
 	};
 };
 

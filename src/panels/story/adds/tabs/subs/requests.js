@@ -5,6 +5,7 @@ import { Addr, BASE_AD } from '../../../../../store/addr';
 import { fail, success } from '../../../../../requests';
 import { store } from '../../../../..';
 import { deleteSub, addSub } from '../../../../../store/detailed_ad/actions';
+import { updateContext } from '../../../../../store/router/actions';
 
 export function getMyUser() {
 	const vkUser = store.getState().vkui.myUser;
@@ -34,7 +35,15 @@ export function subscribe(ad_id, clCancel, s, f, e) {
 		.then(function (response) {
 			successCallback(response);
 
-			store.dispatch(addSub(getMyUser()));
+			const router = store.getState().router;
+			const myUser = getMyUser();
+			store.dispatch(addSub(myUser));
+			store.dispatch(
+				updateContext({
+					isSub: true,
+					// subs: [...router.activeContext[router.activeStory].subs.filter((v) => v.vk_id != myUser.vk_id), myUser],
+				})
+			);
 			success('Теперь вы будете получать уведомления, связанные с этим постом', clCancel, end);
 			return response;
 		})
@@ -73,7 +82,15 @@ export function unsubscribe(ad_id, clCancel, s, f, e) {
 		})
 		.then(function (response) {
 			successCallback(response);
-			store.dispatch(deleteSub(getMyUser().vk_id));
+			const router = store.getState().router;
+			const myID = getMyUser().vk_id;
+			store.dispatch(deleteSub(myID));
+			store.dispatch(
+				updateContext({
+					isSub: false,
+					//subs: router.activeContext[router.activeStory].subs.filter((v) => v.vk_id != myID),
+				})
+			);
 			success('Больше вы не будете получать связанные с этим постом уведомления', clCancel, end);
 			return response;
 		})

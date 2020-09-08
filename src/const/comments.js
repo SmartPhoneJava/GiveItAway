@@ -1,11 +1,3 @@
-import Man from './../../../../../img/man.jpeg';
-import Cat from './../../../../../img/cat.jpg';
-import Kitten from './../../../../../img/kitten.jpeg';
-import Jins from './../../../../../img/jins.jpg';
-import Tea from './../../../../../img/tea.jpg';
-import Playstein from './../../../../../img/playstein.jpg';
-import Bb from './../../../../../img/bb.jpg';
-
 export const commentsArray = [
 	{
 		comment_id: 1,
@@ -15,7 +7,6 @@ export const commentsArray = [
 			carma: 0,
 			name: 'Семен',
 			surname: 'Ефимов',
-			photo_url: Man,
 		},
 		text: 'будет ли здесь какой то текст?',
 	},
@@ -27,7 +18,6 @@ export const commentsArray = [
 			carma: 0,
 			name: 'Семен',
 			surname: 'Ефимов',
-			photo_url: Man,
 		},
 		text: 'будет ли здесь какой то текст?',
 	},
@@ -39,7 +29,6 @@ export const commentsArray = [
 			carma: 0,
 			name: 'Семен',
 			surname: 'Ефимов',
-			photo_url: Man,
 		},
 		text: 'будет ли здесь какой то текст?',
 	},
@@ -51,7 +40,6 @@ export const commentsArray = [
 			carma: 0,
 			name: 'Семен',
 			surname: 'Ефимов',
-			photo_url: Man,
 		},
 		text: 'будет ли здесь какой то текст?',
 	},
@@ -63,7 +51,6 @@ export const commentsArray = [
 			carma: 0,
 			name: 'Семен',
 			surname: 'Ефимов',
-			photo_url: Man,
 		},
 		text: 'будет ли здесь какой то текст?',
 	},
@@ -75,7 +62,6 @@ export const commentsArray = [
 			carma: 0,
 			name: 'Семен',
 			surname: 'Ефимов',
-			photo_url: Man,
 		},
 		text: 'будет ли здесь какой то текст?',
 	},
@@ -87,7 +73,6 @@ export const commentsArray = [
 			carma: 0,
 			name: 'Семен',
 			surname: 'Ефимов',
-			photo_url: Man,
 		},
 		text: 'будет ли здесь какой то текст?',
 	},
@@ -99,7 +84,6 @@ export const commentsArray = [
 			carma: 0,
 			name: 'Семен',
 			surname: 'Ефимов',
-			photo_url: Man,
 		},
 		text: 'будет ли здесь какой то текст?',
 	},
@@ -111,7 +95,6 @@ export const commentsArray = [
 			carma: 0,
 			name: 'Семен',
 			surname: 'Ефимов',
-			photo_url: Man,
 		},
 		text: 'будет ли здесь какой то текст?',
 	},
@@ -123,7 +106,6 @@ export const commentsArray = [
 			carma: 0,
 			name: 'Семен',
 			surname: 'Ефимов',
-			photo_url: Man,
 		},
 		text: 'будет ли здесь какой то текст?',
 	},

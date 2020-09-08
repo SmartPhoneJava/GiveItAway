@@ -12,7 +12,7 @@ import Icon24DoneOutline from '@vkontakte/icons/dist/24/done_outline';
 import { AD_LOADING, STATUS_OFFER, STATUS_CHOSEN } from './const/ads';
 import { SNACKBAR_DURATION_DEFAULT } from './store/const';
 import { store } from '.';
-import { openPopout, closePopout, openSnackbar, closeSnackbar } from './store/router/actions';
+import { openPopout, closePopout, openSnackbar, closeSnackbar, updateContext } from './store/router/actions';
 import { setCost, setDealer, setDeal, setStatus } from './store/detailed_ad/actions';
 import { updateDealInfo } from './store/detailed_ad/update';
 
@@ -433,6 +433,7 @@ export async function CancelClose(ad_id, s, f, blockSnackbar) {
 					store.dispatch(setDealer(null));
 					store.dispatch(setDeal(null));
 					store.dispatch(setStatus(STATUS_OFFER));
+					store.dispatch(updateContext({ dealer: null, deal: null, status: STATUS_OFFER }));
 					successCallback(v);
 				},
 				(e) => failCallback(e),
@@ -467,6 +468,7 @@ export function Close(ad_id, ad_type, subscriber_id, s, f) {
 		.then(function (response) {
 			store.dispatch(closePopout());
 			store.dispatch(setStatus(STATUS_CHOSEN));
+			store.dispatch(updateContext({ status: STATUS_CHOSEN }));
 			updateDealInfo();
 			console.log('response from Close:', response);
 			success('Спасибо, что делаете других людей счастливыми :) Ждем подтверждения от второй стороны!', () => {
@@ -715,7 +717,9 @@ export function CreateAd(ad, obj, photos, openAd, loadAd, successcallback) {
 			console.log('Request failed', error);
 
 			if (error.response.status === 429) {
-				failEasy('Вы создали слишком много объявлений за короткий промежуток времени, поэтому в ближайший час вы не можете создать новое.');
+				failEasy(
+					'Вы создали слишком много объявлений за короткий промежуток времени, поэтому в ближайший час вы не можете создать новое.'
+				);
 			} else {
 				fail('Нет соединения с сервером', () => createAd(ad, obj, photos, openAd, loadAd, successcallback));
 			}
@@ -764,6 +768,7 @@ export const deleteAd = (ad_id, refresh) => {
 	})
 		.then(function (response) {
 			store.dispatch(closePopout());
+			console.log('wanna delete', response.status);
 			if (response.status != 200) {
 				fail(response.status + ' - ' + response.statusText, () => deleteAd(ad_id, refresh));
 			} else {

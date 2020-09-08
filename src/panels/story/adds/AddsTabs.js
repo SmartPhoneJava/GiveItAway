@@ -19,26 +19,38 @@ import Icon28UserCircleOutline from '@vkontakte/icons/dist/28/user_circle_outlin
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 
-import AddsTab, { AdsTabV2 } from './tabs/adds/AddsTab';
+import AddsTab from './tabs/adds/AddsTab';
 import { setFormData } from '../../../store/create_post/actions';
 import { ADS_FILTERS } from '../../../store/create_post/types';
 import { TAB_ADS, TAB_NOTIFICATIONS, MODE_ALL, MODE_WANTED, MODE_GIVEN } from '../../../const/ads';
 import { setTab, openModal } from '../../../store/router/actions';
 import { MODAL_ADS_FILTERS, MODAL_ADS_SUBS } from '../../../store/router/modalTypes';
+import { scrollWindow } from '../../../App';
 
 const AddsTabs = (props) => {
 	const { setFormData, setTab, openModal, inputData, activeTabs, activeStory } = props;
-	const mode = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].mode : null) || MODE_ALL;
+	const mode = (inputData[activeStory+ADS_FILTERS] ? inputData[activeStory+ADS_FILTERS].mode : null) || MODE_ALL;
 	const activeTab = activeTabs[activeStory] || TAB_ADS;
 	const [contextOpened, setContextOpened] = useState(false);
 
+	useEffect(() => {
+		const listener = function () {
+			setContextOpened(false);
+		};
+		window.addEventListener('scroll', listener);
+		return () => {
+			window.removeEventListener('scroll', listener);
+		};
+	}, []);
+
 	function select(e) {
 		props.dropFilters();
-		setFormData(ADS_FILTERS, {
+		setFormData(activeStory+ADS_FILTERS, {
 			...inputData,
 			mode: e.currentTarget.dataset.mode,
 		});
 		setContextOpened(false);
+		scrollWindow(0)
 	}
 
 	function onTabAdsClick() {

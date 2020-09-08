@@ -9,7 +9,9 @@ export const ON_SUGGESTION_CLICK = 'ON_SUGGESTION_CLICK';
 export const NO_CLICK = 'NO_CLICK';
 
 const AdMap = (props) => {
-	const { setGeoData, setGeoDataString, inputData, max, AD } = props;
+	
+	const AD = props.activeContext[props.activeStory]
+	const { inputData, max } = props;
 	const geodata = (max
 		? AD.geo_position && AD.geo_position.lat
 			? AD.geo_position
@@ -26,7 +28,7 @@ const AdMap = (props) => {
 	const width = document.body.clientWidth - 40;
 	const height = document.body.clientHeight - 110;
 
-	console.log('gleodata', geodata, center);
+	console.log('gleodata', AD, geodata, center);
 
 	if (max && geodata.lat == 1 && geodata.long == 1) {
 		return <Placeholder>Положение на карте не указано</Placeholder>;

@@ -24,9 +24,12 @@ const CategoriesPanel = (props) => {
 				none_value={CategoryNo}
 				defaultInputData={CategoryNo}
 				clear={true}
-				afterClick={(group, cat) => {
-					props.setPage(PANEL_SUBCATEGORIES);
-				}}
+				afterClick={
+					props.afterClick ||
+					((group, cat) => {
+						props.setPage(PANEL_SUBCATEGORIES);
+					})
+				}
 				allowCustom={true}
 				customText="Нет нужного варианта?"
 				userFieldName="Подкатегория"

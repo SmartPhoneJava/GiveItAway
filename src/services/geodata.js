@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 import { store } from '..';
-import { GEO_DATA } from '../store/create_post/types';
 import { setGeoDataString, setFias, setGeoData } from '../store/create_post/actions';
+import { FORM_LOCATION_CREATE } from '../components/location/redux';
 
 const DADATA = 'https://suggestions.dadata.ru/';
 const GEOLOCATE = 'suggestions/api/4_1/rs/geolocate/address';
@@ -26,16 +26,19 @@ export function getAdress(geodata, successCallback, failCallBack) {
 			return response.data.suggestions[0];
 		})
 		.then(function (response) {
-			store.dispatch(setGeoDataString(response.value));
+			const story = store.getState().router.activeStory;
+			store.dispatch(setGeoDataString(story, response.value));
+			console.log('get address done', response);
+			
 			store.dispatch(
-				setGeoData({
+				setGeoData(story, {
 					lat: response.geo_lat,
 					long: response.geo_lon,
 				})
 			);
 			store.dispatch(setFias(response.data.street_fias_id));
 			if (successCallback) {
-				successCallback(response.value);
+				successCallback(response);
 			}
 			return response;
 		})
@@ -48,7 +51,7 @@ export function getAdress(geodata, successCallback, failCallBack) {
 }
 
 export function getMetro(addr, successCallback, failCallBack) {
-    let cancel;
+	let cancel;
 	axios({
 		method: 'get',
 		headers: { Authorization: TOKEN },

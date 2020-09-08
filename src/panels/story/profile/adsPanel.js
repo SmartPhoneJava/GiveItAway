@@ -12,32 +12,46 @@ import './profile.css';
 const AdsPanel = (props) => {
 	const { pack, useGet, profileID, platform } = props;
 
+	const cache = props.cache ? props.cache : { restore: false, to: () => {}, from: () => {} };
+
 	const [pageNumber, setPageNumber] = useState(1);
 	const [spinner, setSpinner] = useState(null);
 
-	let { loading, ads, hasMore, newPage } = useGet(setSpinner, pageNumber, pack, profileID);
+	let { loading, ads, hasMore, newPage } = useGet(setSpinner, pageNumber, pack, profileID, cache);
 
+	
+	console.log("newPage is", loading, newPage)
 	const observer = useRef();
 	const lastElementRef = useCallback(
 		(node) => {
-			if (loading) return;
+		if (loading) return;
 			if (observer.current) observer.current.disconnect();
 			observer.current = new IntersectionObserver((entries) => {
+				console.log("helloworld")
 				if (entries[0].isIntersecting && hasMore) {
-					setPageNumber((prevPageNumber) => newPage + 1);
+					console.log("byworld", pageNumber, newPage)
+					setPageNumber(newPage + 1);
 				}
 			});
 			if (node) observer.current.observe(node);
 		},
-		[loading, hasMore]
+		[loading, hasMore, newPage, pageNumber]
 	);
 
 	useEffect(() => {
 		if (profileID == -1) {
 			return;
 		}
+		console.log("arrrrrr")
 		setPageNumber(1);
 	}, [profileID]);
+
+	useEffect(()=>{
+		console.log("pageNumber is", pageNumber)
+	}, [pageNumber])
+	useEffect(()=>{
+		console.log("newPagePAge is", newPage)
+	}, [newPage])
 
 	function Ad(ad) {
 		const image = ad.pathes_to_photo ? ad.pathes_to_photo[0].PhotoUrl : Icon;
@@ -71,7 +85,7 @@ const AdsPanel = (props) => {
 							<div
 								style={{
 									display: 'flex',
-									overflowY:"hidden",
+									overflowY: 'hidden',
 									overflowX:
 										platform == 'desktop_web' || props.platform == 'mobile_web' ? 'auto' : null,
 								}}
@@ -94,7 +108,7 @@ const AdsPanel = (props) => {
 				</Gradient>
 			)
 		);
-	}, [spinner]);
+	}, [spinner, loading]);
 
 	return body;
 };

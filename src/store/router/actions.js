@@ -1,5 +1,4 @@
 import {
-	ADD_PROFILE,
 	SET_PAGE,
 	SET_STORY,
 	GO_BACK,
@@ -15,6 +14,8 @@ import {
 	CLOSE_ALL_MODALS,
 	SET_TAB,
 	SET_SCROLL,
+	SET_STORY_PROFILE,
+	UPDATE_CONTEXT,
 } from './actionTypes';
 import { PANEL_USER, PANEL_ONE } from './panelTypes';
 
@@ -27,6 +28,13 @@ export const setStory = (story, panel, save_to_history) => ({
 	},
 });
 
+export const setStoryProfile = (profileID) => ({
+	type: SET_STORY_PROFILE,
+	payload: {
+		profileID,
+	},
+});
+
 export const setDummy = (dummy) => ({
 	type: SET_DUMMY,
 	payload: {
@@ -34,17 +42,11 @@ export const setDummy = (dummy) => ({
 	},
 });
 
-export const setPage = (panel) => ({
+export const setPage = (panel, clearAll) => ({
 	type: SET_PAGE,
 	payload: {
 		panel,
-	},
-});
-
-export const addProfile = (profile) => ({
-	type: ADD_PROFILE,
-	payload: {
-		profile,
+		clearAll,
 	},
 });
 
@@ -56,10 +58,18 @@ export const setProfile = (profile) => ({
 	},
 });
 
-export const setAd = (ad) => ({
+export const updateContext = (info) => ({
+	type: UPDATE_CONTEXT,
+	payload: {
+		info,
+	},
+});
+
+export const setAd = (ad, clearAll) => ({
 	type: SET_AD,
 	payload: {
 		panel: PANEL_ONE,
+		clearAll,
 		ad,
 	},
 });

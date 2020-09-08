@@ -8,6 +8,7 @@ import useAdGiven from '../adds/tabs/adds/useAdGiven';
 const GivenPanel = (props) => {
 	return (
 		<AdsPanel
+			cache={props.cache}
 			pack={GivenPack}
 			useGet={useAdGiven}
 			profileID={props.profileID}

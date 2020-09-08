@@ -15,8 +15,8 @@ import { MODAL_ADS_SORT, MODAL_ADS_GEO } from '../../store/router/modalTypes';
 import { SORT_TIME } from '../../const/ads';
 
 export const AdFiltersInner = (props) => {
-	const { openModal, setPage, inputData, closeModal } = props;
-	const sort = (inputData[ADS_FILTERS] ? inputData[ADS_FILTERS].sort : null) || SORT_TIME;
+	const { openModal, setPage, inputData, closeModal, activeStory } = props;
+	const sort = (inputData[activeStory + ADS_FILTERS] ? inputData[activeStory + ADS_FILTERS].sort : null) || SORT_TIME;
 	function openCategories() {
 		closeModal();
 		setPage(PANEL_CATEGORIES);
@@ -34,64 +34,15 @@ export const AdFiltersInner = (props) => {
 		props.updateModalHeight();
 	});
 
-	const [component, setComponent] = useState(
-		<>
-			<CategoriesLabel redux_form={ADS_FILTERS} leftMargin="10px" open={openCategories} />
-			<List>
-				<Cell
-					style={{ cursor: 'pointer' }}
-					asideContent={<Icon24BrowserForward />}
-					onClick={openGeoSearch}
-					indicator={getGeoFilters(props.inputData[ADS_FILTERS])}
-				>
-					Искать
-				</Cell>
-				<Cell
-					style={{ cursor: 'pointer' }}
-					asideContent={<Icon24BrowserForward />}
-					onClick={openSort}
-					indicator={sort == SORT_TIME ? 'по времени' : 'по близости'}
-				>
-					Сортировка
-				</Cell>
-			</List>
-		</>
-	);
-	// useEffect(() => {
-	// 	setComponent(
-	// 		<>
-	// 			<CategoriesLabel redux_form={ADS_FILTERS} leftMargin="10px" open={openCategories} />
-	// 			<List>
-	// 				<Cell
-	// 					style={{ cursor: 'pointer' }}
-	// 					asideContent={<Icon24BrowserForward />}
-	// 					onClick={openGeoSearch}
-	// 					indicator={getGeoFilters(props.inputData[ADS_FILTERS])}
-	// 				>
-	// 					Искать
-	// 				</Cell>
-	// 				<Cell
-	// 					style={{ cursor: 'pointer' }}
-	// 					asideContent={<Icon24BrowserForward />}
-	// 					onClick={openSort}
-	// 					indicator={sort == SORT_TIME ? 'по времени' : 'по близости'}
-	// 				>
-	// 					Сортировка
-	// 				</Cell>
-	// 			</List>
-	// 		</>
-	// 	);
-	// }, [props.inputData]);
-
 	return (
 		<>
-			<CategoriesLabel redux_form={ADS_FILTERS} leftMargin="10px" open={openCategories} />
+			<CategoriesLabel redux_form={activeStory + ADS_FILTERS} leftMargin="10px" open={openCategories} />
 			<List>
 				<Cell
 					style={{ cursor: 'pointer' }}
 					asideContent={<Icon24BrowserForward />}
 					onClick={openGeoSearch}
-					indicator={getGeoFilters(props.inputData[ADS_FILTERS])}
+					indicator={getGeoFilters(props.inputData[activeStory + ADS_FILTERS])}
 				>
 					Искать
 				</Cell>
@@ -111,6 +62,7 @@ export const AdFiltersInner = (props) => {
 const mapStateToProps = (state) => {
 	return {
 		inputData: state.formData.forms,
+		activeStory: state.router.activeStory,
 	};
 };
 

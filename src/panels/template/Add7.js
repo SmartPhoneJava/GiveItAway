@@ -127,18 +127,21 @@ const Add7 = (props) => {
 	useEffect(() => {
 		const { status } = props.ad;
 		let newLabel = null;
+
 		switch (status) {
 			case STATUS_ABORTED:
 				newLabel = statusText('Отменено', 'failed', Icon16Clear);
-
+				break;
 			case STATUS_CLOSED:
 				newLabel = statusText('Вещь отдана', 'success', Icon16CheckCircle);
-
+				break;
 			case STATUS_CHOSEN:
 				if (isAuthor()) {
 					newLabel = statusText('Ожидание ответа', 'deal', Icon12Fire);
 				}
+				break;
 		}
+		console.log('props.ad', props.ad, newLabel, status);
 
 		if (!isVisible) {
 			if (isAuthor()) {

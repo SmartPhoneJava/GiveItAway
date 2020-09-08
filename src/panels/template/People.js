@@ -8,7 +8,11 @@ import { getSubscribers, Close } from './../../requests';
 
 export const PeopleRBI = withModalRootContext((props) => {
 	const [subs, setSubs] = useState([]);
-	const { ad_id, ad_type } = props.ad;
+	const { ad_id, ad_type } = props.activeContext[props.activeStory];
+
+	useEffect(() => {
+		console.log('fun are', props.activeContext[props.activeStory]);
+	}, [props.activeContext[props.activeStory]]);
 
 	useEffect(() => {
 		let cancelFunc = false;
@@ -56,7 +60,8 @@ export const PeopleRBI = withModalRootContext((props) => {
 
 const mapStateToProps = (state) => {
 	return {
-		ad: state.ad,
+		activeStory: state.router.activeStory,
+		activeContext: state.router.activeContext,
 	};
 };
 

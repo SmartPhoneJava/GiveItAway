@@ -48,7 +48,7 @@ export const getGeoFilters = (data) => {
 };
 
 const ModalPageAdsGeoInner = (props) => {
-	const { setFormData, closeAllModals, setPage, inputData, pushToCache, closeModal } = props;
+	const { setFormData, closeAllModals, setPage, inputData, pushToCache, closeModal, activeStory } = props;
 
 	const [geoType, setGeoType] = useState(GEO_TYPE_NO);
 	const [changed, setChanged] = useState(false);
@@ -84,36 +84,34 @@ const ModalPageAdsGeoInner = (props) => {
 
 	useEffect(() => {
 		if (props.direction == DIRECTION_BACK) {
-			load(ADS_FILTERS_B);
+			load(activeStory + ADS_FILTERS_B);
 		} else if (props.to != PANEL_CITIES) {
-			setFormData(ADS_FILTERS_B, {
-				...inputData[ADS_FILTERS],
+			setFormData(activeStory + ADS_FILTERS_B, {
+				...inputData[activeStory + ADS_FILTERS],
 			});
-			load(ADS_FILTERS);
+			load(activeStory + ADS_FILTERS);
 		}
 	}, [props.direction]);
 
-
-	const numbersAfterDor = x => ( (x.toString().includes('.')) ? (x.toString().split('.').pop().length) : (0) );
+	const numbersAfterDor = (x) => (x.toString().includes('.') ? x.toString().split('.').pop().length : 0);
 
 	function isRadiusValid() {
-		
 		return radius >= 0.5 && radius <= 100 && numbersAfterDor(radius) < 4;
 	}
 
 	function radiusError() {
 		if (!(radius >= 0.5 && radius <= 100)) {
-			return 1
+			return 1;
 		}
 		if (numbersAfterDor(radius) > 3) {
-			return 2
-		} 
-		return 0
+			return 2;
+		}
+		return 0;
 	}
 
 	function setGeoFilters() {
-		setFormData(ADS_FILTERS_B, {
-			...inputData[ADS_FILTERS_B],
+		setFormData(activeStory + ADS_FILTERS_B, {
+			...inputData[activeStory + ADS_FILTERS_B],
 			geotype: GEO_TYPE_FILTERS,
 			changed: true,
 		});
@@ -123,8 +121,8 @@ const ModalPageAdsGeoInner = (props) => {
 	}
 
 	function setGeoNo() {
-		setFormData(ADS_FILTERS_B, {
-			...inputData[ADS_FILTERS_B],
+		setFormData(activeStory + ADS_FILTERS_B, {
+			...inputData[activeStory + ADS_FILTERS_B],
 			geotype: GEO_TYPE_NO,
 		});
 		setChanged(geoType != GEO_TYPE_NO);
@@ -135,10 +133,11 @@ const ModalPageAdsGeoInner = (props) => {
 	function setGeoNear() {
 		setLoading(true);
 		getGeodata(
+			activeStory,
 			(success) => {
 				setValid(true);
-				setFormData(ADS_FILTERS_B, {
-					...inputData[ADS_FILTERS_B],
+				setFormData(activeStory + ADS_FILTERS_B, {
+					...inputData[activeStory + ADS_FILTERS_B],
 					geotype: GEO_TYPE_NEAR,
 				});
 				setChanged(geoType != GEO_TYPE_NEAR);
@@ -163,8 +162,8 @@ const ModalPageAdsGeoInner = (props) => {
 	}
 
 	function save() {
-		const to = ADS_FILTERS;
-		const from = ADS_FILTERS_B;
+		const to = activeStory + ADS_FILTERS;
+		const from = activeStory + ADS_FILTERS_B;
 
 		setFormData(to, {
 			...inputData[to],
@@ -220,7 +219,7 @@ const ModalPageAdsGeoInner = (props) => {
 			<div>
 				{geoType == GEO_TYPE_FILTERS ? (
 					<Location
-						redux_form={ADS_FILTERS_B}
+						redux_form={activeStory + ADS_FILTERS_B}
 						openCountries={openCountries}
 						openCities={() => {
 							setGeoFilters();
@@ -259,7 +258,7 @@ const ModalPageAdsGeoInner = (props) => {
 				{!valid && (
 					<Div>
 						<FormStatus header="Нет доступа к GPS" mode={valid ? 'default' : 'error'}>
-							Проверьте, что у вас включена геолокация и вы предоставили сервису доступ к нему.
+							Проверьте, что у вас включена геолокация и вы предоставили сервису доступ к ней.
 						</FormStatus>
 					</Div>
 				)}
@@ -274,6 +273,7 @@ const mapStateToProps = (state) => {
 		inputData: state.formData.forms,
 		direction: state.router.direction,
 		to: state.router.to,
+		activeStory: state.router.activeStory,
 	};
 };
 

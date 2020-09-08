@@ -12,9 +12,9 @@ import Profile from './story/profile/Profile';
 const ProfilePanel = (props) => {
 	const [profileName, setProfileName] = useState('Профиль');
 
-	const { panelsHistory, snackbars } = props;
+	const { panelsHistory, snackbars, activeStory } = props;
 	const { setReduxAd, goBack, setPage } = props;
-	const historyLen = panelsHistory ? (panelsHistory[STORY_ADS] ? panelsHistory[STORY_ADS].length : 0) : 0;
+	const historyLen = panelsHistory ? (panelsHistory[activeStory] ? panelsHistory[activeStory].length : 0) : 0;
 
 	const openAboutPanel = () => {
 		setPage(PANEL_ABOUT);
@@ -41,6 +41,7 @@ const ProfilePanel = (props) => {
 const mapStateToProps = (state) => {
 	return {
 		panelsHistory: state.router.panelsHistory,
+		activeStory: state.router.activeStory,
 		snackbars: state.router.snackbars,
 	};
 };
