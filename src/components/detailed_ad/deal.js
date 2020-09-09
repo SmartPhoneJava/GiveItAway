@@ -240,11 +240,11 @@ const DealLabelInner = (props) => {
 		setComponentSub(button);
 	}, [
 		activePanel,
-		props.activeStory,
 		props.activeContext[props.activeStory].isAuthor,
 		props.activeContext[props.activeStory].isSub,
 		props.activeContext[props.activeStory].cost,
 		props.activeContext[props.activeStory].dealer,
+		props.activeContext[props.activeStory].subs,
 	]);
 
 	const [componentSubs, setComponentSubs] = useState(<></>);

@@ -55,7 +55,7 @@ const SubsLabelInner = (props) => {
 									  subs[1].name +
 									  ', ' +
 									  subs[2].name +
-									  'и еще ' +
+									  ' и еще ' +
 									  (subs.length - 3) +
 									  ' человек'}
 							</Text>

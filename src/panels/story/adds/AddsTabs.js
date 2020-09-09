@@ -29,7 +29,7 @@ import { scrollWindow } from '../../../App';
 
 const AddsTabs = (props) => {
 	const { setFormData, setTab, openModal, inputData, activeTabs, activeStory } = props;
-	const mode = (inputData[activeStory+ADS_FILTERS] ? inputData[activeStory+ADS_FILTERS].mode : null) || MODE_ALL;
+	const mode = (inputData[activeStory + ADS_FILTERS] ? inputData[activeStory + ADS_FILTERS].mode : null) || MODE_ALL;
 	const activeTab = activeTabs[activeStory] || TAB_ADS;
 	const [contextOpened, setContextOpened] = useState(false);
 
@@ -45,12 +45,12 @@ const AddsTabs = (props) => {
 
 	function select(e) {
 		props.dropFilters();
-		setFormData(activeStory+ADS_FILTERS, {
+		setFormData(activeStory + ADS_FILTERS, {
 			...inputData,
 			mode: e.currentTarget.dataset.mode,
 		});
 		setContextOpened(false);
-		scrollWindow(0)
+		scrollWindow(0);
 	}
 
 	function onTabAdsClick() {
@@ -62,7 +62,7 @@ const AddsTabs = (props) => {
 
 	return (
 		<React.Fragment>
-			<PanelHeader left={<PanelHeaderButton />} separator={false}>
+			<PanelHeader left={<PanelHeaderButton />}>
 				<PanelHeaderContent
 					style={{ cursor: 'pointer' }}
 					aside={

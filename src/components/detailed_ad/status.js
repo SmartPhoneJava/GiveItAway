@@ -102,16 +102,16 @@ export const showChosen = (isDealer, isAuthor, dealer, acceptClick, cancelClick,
 				<div style={{ padding: width > 500 && dealer ? null : '5px' }}>
 					{dealer ? (
 						<div className="status-waiting-panel" onClick={() => openUser(dealer.vk_id)}>
-							<Avatar
+							<div
 								style={{
 									marginLeft: '16px',
 								}}
-								size={20}
-								src={dealer ? dealer.photo_url : ''}
-							/>
+							>
+								<Avatar size={20} src={dealer ? dealer.photo_url : ''} />
+							</div>
 							<div
 								style={{
-									marginLeft: '18px',
+									marginLeft: '6px',
 								}}
 							>
 								{dealer ? dealer.name + ' ' + dealer.surname + '  ' : ''}
@@ -132,7 +132,7 @@ export const showStatus = (status, isDealer, isAuthor, dealer, hidden, acceptCli
 	if (hidden) {
 		return showHidden();
 	}
-	console.log("status is", status)
+	console.log('status is', status);
 	switch (status) {
 		case STATUS_CHOSEN:
 			return showChosen(isDealer, isAuthor, dealer, acceptClick, cancelClick, openUser);

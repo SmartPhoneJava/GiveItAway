@@ -62,6 +62,7 @@ import {
 	setProfile,
 	goBack,
 	updateContext,
+	closeAllModals,
 } from '../../store/router/actions';
 import { setIsSub, setIsHidden, setExtraInfo, setIsAuthor } from '../../store/detailed_ad/actions';
 import { AdDefault, AD_LOADING, STATUS_CLOSED, STATUS_ABORTED, TYPE_CHOICE, TYPE_AUCTION } from '../../const/ads';
@@ -128,6 +129,7 @@ const AddMore2r = (props) => {
 		setFormData,
 		updateContext,
 		closePopout,
+		closeAllModals,
 	} = props;
 	const { setDummy, direction, AD } = props;
 
@@ -143,7 +145,7 @@ const AddMore2r = (props) => {
 	useEffect(() => {
 		const contextInfo = activeContext[story];
 		setrAd({ ...AD, ...contextInfo });
-		isNotValid()
+		isNotValid();
 		console.log('addInfo is ', { ...AD, ...contextInfo });
 	}, [AD, props.activeContext[props.story]]);
 
@@ -222,9 +224,9 @@ const AddMore2r = (props) => {
 		}
 
 		const rcell = (
-			<RichCell multiline text={<AnimateOnChange>{text}</AnimateOnChange>}>
+			<Cell multiline description={<AnimateOnChange>{text}</AnimateOnChange>}>
 				<Subhead weight="bold">{header}</Subhead>
-			</RichCell>
+			</Cell>
 		);
 		const imgDivs =
 			pathes_to_photo.length == 0 ? (
@@ -309,17 +311,6 @@ const AddMore2r = (props) => {
 	};
 
 	function isNotValid() {
-		if (props.activeContext[props.story] == null) {
-			console.log('isNotValid full');
-			return;
-		}
-		console.log(
-			'isNotValid',
-			props.activeContext[props.story] == null,
-			props.activeContext[props.story].ad_id == null,
-			props.activeContext[props.story].ad_id == AD_LOADING.ad_id,
-			props.activeContext[props.story].ad_id == AdDefault.ad_id
-		);
 		return (
 			props.activeContext[props.story] == null ||
 			props.activeContext[props.story].ad_id == null ||
@@ -458,6 +449,16 @@ const AddMore2r = (props) => {
 		};
 	}, [props.activeContext[props.story].ad_id]);
 
+	useEffect(() => {
+		const listener = function () {
+			closeAllModals();
+		};
+		window.addEventListener('scroll', listener);
+		return () => {
+			window.removeEventListener('scroll', listener);
+		};
+	}, []);
+
 	const [imgs, setImgs] = useState([]);
 
 	const [localPhotos, setLocalPhotos] = useState([]);
@@ -579,6 +580,7 @@ const AddMore2r = (props) => {
 		);
 	}
 
+	const [componentCommentsValid, setComponentCommentsValid] = useState(true);
 	const [componentComments, setComponentComments] = useState();
 	useEffect(() => {
 		if (isNotValid()) {
@@ -597,11 +599,15 @@ const AddMore2r = (props) => {
 					</Placeholder>
 				);
 			}
+			setComponentCommentsValid(false);
 			return;
 		}
 		let v = <Placeholder icon={<Icon56WriteOutline />} header="Комментарии закрыты"></Placeholder>;
 		if (comments_enabled) {
 			v = <Comments mini={true} amount={1} maxAmount={1} openUser={props.setProfile} />;
+			setComponentCommentsValid(true);
+		} else {
+			setComponentCommentsValid(false);
 		}
 		setComponentComments(<Card mode="outline">{v}</Card>);
 	}, [props.activeContext[props.story]]);
@@ -664,8 +670,10 @@ const AddMore2r = (props) => {
 			setSecondaryInfo(<></>);
 			return;
 		}
+		let pathes_to_photo = rAd.pathes_to_photo || [];
+		pathes_to_photo = pathes_to_photo.filter((img) => img.PhotoUrl != Icon);
 		setSecondaryInfo(
-			<div style={{ display: 'block', flex: 1 }}>
+			<div style={{ display: 'block', flex: 1, marginTop: pathes_to_photo.length > 0 ? '8px' : null }}>
 				{CardWithPadding(
 					<>
 						<Div>{componentCategories}</Div>
@@ -762,7 +770,6 @@ const AddMore2r = (props) => {
 			incategory: rAd.subcat,
 		});
 
-		console.log('wwwwwwwwwwwwwwwww');
 		setFormData(story + CREATE_AD_MAIN, {
 			type: rAd.ad_type,
 			ls_enabled: rAd.ls_enabled,
@@ -802,7 +809,9 @@ const AddMore2r = (props) => {
 					}}
 				>
 					<div style={{ flex: 1, padding: '4px' }}>{componentChosenSub}</div>
-					<div style={{ flex: 1, padding: '4px', paddingTop: '12px' }}>{componentComments}</div>
+					<div style={{ flex: 1, padding: '4px', paddingTop: componentCommentsValid ? '12px' : '4px' }}>
+						{componentComments}
+					</div>
 				</div>
 			</>
 		</div>
@@ -851,6 +860,7 @@ const mapDispatchToProps = (dispatch) => {
 				openPopout,
 
 				closePopout,
+				closeAllModals,
 			},
 			dispatch
 		),

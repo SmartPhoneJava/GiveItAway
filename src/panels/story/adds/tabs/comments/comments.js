@@ -21,6 +21,7 @@ import {
 	CellButton,
 	SimpleCell,
 	Cell,
+	Textarea,
 } from '@vkontakte/vkui';
 
 import { AnimateGroup, AnimateOnChange } from 'react-animation';
@@ -69,6 +70,7 @@ const CommentsI = (props) => {
 
 	const [commentValid, setCommentValid] = useState(false);
 	const [tooBigComment, setTooBigComment] = useState(false);
+	const [isEditting, setIsEditting] = useState(false);
 	const [text, setText] = useState('');
 	const [hide, setHide] = useState(false);
 
@@ -119,15 +121,17 @@ const CommentsI = (props) => {
 	}
 
 	function onEditClick(v) {
-		setText(v.text);
+		trySetText(v.text);
 		setEditableID(v.comment_id);
+		setIsEditting(true);
 		setEditableText(v.text);
 	}
 
 	function onDeleteClick(v) {
-		setText('');
+		trySetText('');
 		setEditableText('');
 		setEditableID(NO_ID);
+		setIsEditting(false);
 		setHide(true);
 		deleteComment(
 			v,
@@ -245,7 +249,8 @@ const CommentsI = (props) => {
 				obj,
 				(v) => {
 					setEditableID(NO_ID);
-					setText('');
+					setIsEditting(false);
+					trySetText('');
 					setEditableText('');
 				},
 				(e) => {},
@@ -283,7 +288,7 @@ const CommentsI = (props) => {
 				obj,
 				text,
 				(v) => {
-					setText('');
+					trySetText('');
 
 					scrollWindow(document.body.scrollHeight);
 				},
@@ -305,35 +310,37 @@ const CommentsI = (props) => {
 			setPlaceholder(null);
 			return;
 		}
-		setPlaceholder(
+
+		const elem = props.mini ? (
 			withLoadingIf(
 				!loading,
-				nots.length == 0 &&
-					(props.mini ? (
-						<CellButton style={{ cursor: 'pointer' }} onClick={openCommentaries} before={<Icon24Write />}>
-							Написать первый комментарий
-						</CellButton>
-					) : (
-						<div className="flex-center" style={{ width: '100%' }}>
-							<Placeholder
-								action={
-									props.mini ? (
-										<Button size="l" onClick={openCommentaries} style={{ cursor: 'pointer' }}>
-											Написать
-										</Button>
-									) : null
-								}
-								icon={<Icon56WriteOutline />}
-								header="Комментариев нет"
-							/>
-						</div>
-					)),
+				nots.length == 0 ? (
+					<CellButton style={{ cursor: 'pointer' }} onClick={openCommentaries} before={<Icon24Write />}>
+						Написать первый комментарий
+					</CellButton>
+				) : null,
 
 				'large',
 				null,
 				{ padding: '10px' }
 			)
-		);
+		) : nots.length == 0 && !loading ? (
+			<div className="flex-center" style={{ width: '100%' }}>
+				<Placeholder
+					action={
+						props.mini ? (
+							<Button size="l" onClick={openCommentaries} style={{ cursor: 'pointer' }}>
+								Написать
+							</Button>
+						) : null
+					}
+					icon={<Icon56WriteOutline />}
+					header="Комментариев нет"
+				/>
+			</div>
+		) : null;
+
+		setPlaceholder(elem);
 	}, [nots, loading]);
 
 	return (
@@ -344,70 +351,102 @@ const CommentsI = (props) => {
 
 			{props.mini || hide ? null : (
 				<FixedLayout vertical="bottom">
-					<Div>
-						<Collapse isOpened={tooBigComment}>
-							<FormStatus
-								mode="error"
-								header={'Слишком много текста'}
-							>{`Максимально допустимая длина комментария: ${MAX_COMMENT_LENGTH} символов`}</FormStatus>
-						</Collapse>
-					</Div>
 					<div className="write-comment-input-before">
 						<Cell
-							style={{ margin: '0px', padding: '0px' }}
-							description={editableID != NO_ID && editableText}
-							indicator={
-								<div className="write-comment-input-before-inner">
-									<CellButton
-										mode={editableID == NO_ID ? 'primary' : 'danger'}
-										disabled={editableID == NO_ID && text == ''}
-										style={{ cursor: 'pointer', margin: '0px', padding: '0px', transition: '0.3s' }}
-										onClick={() => {
-											setText('');
-											if (editableID == NO_ID) {
-												return;
-											}
-											setEditableID(NO_ID);
-											setEditableText('');
-										}}
-									>
-										{editableID == NO_ID ? 'Очистить' : 'Отменить'}
-									</CellButton>
-								</div>
+							style={{ padding: '0px' }}
+							multiline
+							description={
+								<>
+									<Collapse isOpened={isEditting}>{editableText}</Collapse>
+									<div className="write-comment-panel">
+										<div className="write-comment-input">
+											<Collapse isOpened={!isEditting}>
+												<Input
+													onKeyPress={(target) => {
+														if (target.charCode == 13) {
+															sendComment();
+														}
+													}}
+													style={{ transition: '0.3s' }}
+													placeholder="Текст"
+													value={text}
+													onChange={(e) => {
+														trySetText(e.currentTarget.value);
+													}}
+												/>
+											</Collapse>
+
+											<Collapse isOpened={isEditting}>
+												<Textarea
+													onKeyPress={(target) => {
+														if (target.charCode == 13) {
+															sendComment();
+														}
+													}}
+													style={{ transition: '0.3s' }}
+													placeholder="Текст"
+													value={text}
+													onChange={(e) => {
+														trySetText(e.currentTarget.value);
+													}}
+												/>
+											</Collapse>
+										</div>
+										<div className="write-comment-button">
+											<PanelHeaderButton
+												style={{ cursor: commentValid ? 'pointer' : null }}
+												disabled={!commentValid}
+												onClick={sendComment}
+											>
+												<Avatar size="20">
+													<Icon24Send className="write-comment-button-color" size="24" />
+												</Avatar>
+											</PanelHeaderButton>
+										</div>
+									</div>
+								</>
 							}
 						>
-							{editableID == NO_ID ? 'Новый комментарий' : 'Редактирование'}
+							<div>
+								<div style={{ display: 'flex', alignItems: 'center' }}>
+									<div className="write-comment-input-left">
+										{editableID == NO_ID ? 'Новый комментарий' : 'Редактирование'}
+									</div>
+									<div className="write-comment-input-right">
+										<CellButton
+											mode={editableID == NO_ID ? 'primary' : 'danger'}
+											disabled={editableID == NO_ID && text == ''}
+											style={{
+												cursor: 'pointer',
+												margin: '0px',
+												padding: '0px',
+												transition: '0.3s',
+											}}
+											onClick={() => {
+												trySetText('');
+												if (editableID == NO_ID) {
+													return;
+												}
+												setEditableID(NO_ID);
+												setIsEditting(false);
+												setEditableText('');
+											}}
+										>
+											{editableID == NO_ID ? 'Очистить' : 'Отменить'}
+										</CellButton>
+									</div>
+								</div>
+
+								<Collapse isOpened={tooBigComment}>
+									<FormStatus
+										mode="error"
+										header={'Слишком много текста'}
+									>{`Максимально допустимая длина комментария: ${MAX_COMMENT_LENGTH} символов`}</FormStatus>
+								</Collapse>
+							</div>
 						</Cell>
 					</div>
 					{/* {helpButton} */}
-					<div className="write-comment-panel">
-						<div className="write-comment-input">
-							<Input
-								onKeyPress={(target) => {
-									if (target.charCode == 13) {
-										sendComment();
-									}
-								}}
-								style={{ transition: '0.3s' }}
-								placeholder="Текст"
-								value={text}
-								onChange={(e) => {
-									trySetText(e.currentTarget.value);
-								}}
-							/>
-						</div>
-						<div className="write-comment-button">
-							<PanelHeaderButton
-								style={{ cursor: commentValid ? 'pointer' : null }}
-								disabled={!commentValid}
-								onClick={sendComment}
-							>
-								<Avatar size="20">
-									<Icon24Send className="write-comment-button-color" size="24" />
-								</Avatar>
-							</PanelHeaderButton>
-						</div>
-					</div>
 				</FixedLayout>
 			)}
 		</div>

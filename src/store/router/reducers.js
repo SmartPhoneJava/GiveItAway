@@ -414,6 +414,7 @@ export const routerReducer = (state = initialState, action) => {
 			let Popout = state.popouts[Story];
 			let Dummies = state.dummies[Story] || [];
 
+			console.log("fast GO_BACK", state)
 			// если были открытые заглушки
 			if (Dummies.length > 0) {
 				Dummies.pop();
@@ -470,6 +471,7 @@ export const routerReducer = (state = initialState, action) => {
 					},
 				};
 			}
+			VK.swipeBackOn()
 
 			// обновляем панель
 
@@ -602,7 +604,8 @@ export const routerReducer = (state = initialState, action) => {
 			let modal = action.payload.modal;
 			let Modals = state.modalHistory[Story] || [];
 			const direction = action.payload.direction ? action.payload.direction : DIRECTION_FORWARD;
-
+			
+			VK.swipeBackOff()
 			return {
 				...state,
 				direction,
@@ -627,6 +630,8 @@ export const routerReducer = (state = initialState, action) => {
 
 			if (Modals.length > 0) {
 				modal = Modals[Modals.length - 1];
+			} else {
+				VK.swipeBackOn()
 			}
 
 			return {
@@ -647,6 +652,7 @@ export const routerReducer = (state = initialState, action) => {
 
 		case CLOSE_ALL_MODALS: {
 			let Story = state.activeStory;
+			VK.swipeBackOn()
 
 			return {
 				...state,

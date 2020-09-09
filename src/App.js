@@ -421,6 +421,27 @@ const App = (props) => {
 			goBack();
 		};
 
+		// $(function(){
+		// 	$('body').append('<form id="cookiesHackForm" action="http://example.com/" method="get"></form>');
+		// 	$('#cookiesHackForm').submit();
+		// });
+
+		// var form = window.document.createElement('form');
+		// form.id = "cookiesHackForm";
+		// form.action = 'https://giveitaway.ru/api/user/auth';
+		// form.method = 'GET';
+		// form.innerHTML = '<input name="q" value="test">';
+
+		// // перед отправкой формы, её нужно вставить в документ
+		// document.body.append(form);
+
+		// form.submit();
+
+		// // Dispatch fake click
+		// var e = window.document.createEvent("MouseEvents");
+		// e.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+		// a.dispatchEvent(e);
+
 		dispatch(
 			VK.getuser((us) => {
 				Auth(
@@ -504,7 +525,7 @@ const App = (props) => {
 	function setSchemeToView(story, setScheme, deleteID, snackbars, historyLen) {
 		const needEdit = inputData[story + EDIT_MODE] ? inputData[story + EDIT_MODE].mode : false;
 		setScheme([
-			<Panel id={PANEL_ADS} separator={false}>
+			<Panel id={PANEL_ADS}>
 				<AddsTabs
 					notsCounter={notsCounterrr}
 					zeroNots={() => {

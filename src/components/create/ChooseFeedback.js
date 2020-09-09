@@ -49,7 +49,7 @@ const ChooseFeedback = (props) => {
 		<Group
 			separator="hide"
 			header={
-				<Cell multiline description="Как откликнувшиеся смогут связаться с тобой?">
+				<Cell multiline description="Как откликнувшиеся смогут связаться с вами?">
 					<div style={{ fontWeight: 600 }}>Обратная связь</div>
 				</Cell>
 			}

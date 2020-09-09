@@ -199,7 +199,7 @@ const ModalPageAdsGeoInner = (props) => {
 			</Radio>
 			<div style={{ display: 'flex' }}>
 				<Radio
-					style={{ cursor: 'pointer' }}
+					style={{ cursor: 'pointer', flex: 1 }}
 					name="radio"
 					checked={geoType == GEO_TYPE_NEAR}
 					value={GEO_TYPE_NEAR}
@@ -209,11 +209,11 @@ const ModalPageAdsGeoInner = (props) => {
 					Недалеко от меня
 				</Radio>
 
-				{loading && (
+				{loading ? (
 					<Div className="right">
 						<Spinner size="small" />
 					</Div>
-				)}
+				) : null}
 			</div>
 
 			<div>

@@ -52,8 +52,11 @@
 }
 
 .comments-element-outter {
-	padding-bottom: 100px;
+	padding-bottom: 125px;
 	background-color: var(--background_content);
+}
+
+.write-comment-formstatus {
 }
 
 .write-comment-panel {
@@ -65,21 +68,20 @@
 }
 
 .write-comment-input-before {
-	position: absolute;
 	top: -28px;
 	width: 100%;
 	background-color: var(--background_content);
 }
 
 .write-comment-input-before-inner {
-	display: flex;
 	margin-right: 28px;
-	padding: 0px;
+	width: 90%;
 }
 
 .write-comment-input {
-	padding: 8px;
-	width: 90%;
+	padding-top: 4px;
+	padding-right: 8px;
+	width: 100%;
 }
 
 .write-comment-button {
@@ -100,4 +102,13 @@
 	bottom: 0;
 	right: 0;
 	z-index: 101; */
+}
+
+.write-comment-input-left {
+	flex: 4;
+	margin-right: auto;
+}
+.write-comment-input-right {
+	flex: 1;
+	text-align: right;
 }

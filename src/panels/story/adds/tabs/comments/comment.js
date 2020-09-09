@@ -23,16 +23,21 @@ const Comment = (props) => {
 	}
 	const photoURL = author.photo_url;
 	return (
-		<RichCell
-			style={{ cursor: 'pointer' }}
-			onClick={props.onClick}
-			text={props.v.text}
-			caption={time(props.v.creation_date_time)}
-			multiline
-			before={<Avatar size={44} src={photoURL} />}
-		>
-			{getAuthorHref(props)}
-		</RichCell>
+		<>
+			{/* {" какая                      то           магия"}
+			<div>{props.v.text}</div>
+			{props.v.text} */}
+			<RichCell
+				style={{ cursor: 'pointer' }}
+				onClick={props.onClick}
+				text={<div>{props.v.text}</div>}
+				caption={time(props.v.creation_date_time)}
+				multiline
+				before={<Avatar size={44} src={photoURL} />}
+			>
+				{getAuthorHref(props)}
+			</RichCell>
+		</>
 	);
 };
 

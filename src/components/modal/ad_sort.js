@@ -6,7 +6,7 @@ import Icon24Done from '@vkontakte/icons/dist/24/done';
 
 import { setFormData } from '../../store/create_post/actions';
 import { ADS_FILTERS } from '../../store/create_post/types';
-import { closeAllModals, closeModal } from '../../store/router/actions';
+import { closeAllModals, closeModal, updateContext } from '../../store/router/actions';
 
 import { Radio, Button, Group, FormStatus, withModalRootContext, Div, Spinner } from '@vkontakte/vkui';
 import { getGeodata } from '../../services/VK';
@@ -90,6 +90,7 @@ const ModalPageAdsSortInner = (props) => {
 			(value) => {
 				setLoading(false);
 				setGeodata(value);
+				console.log("we wanna set geodata", value)
 				applyGeoSortInner();
 				setValid(true);
 			},
@@ -126,7 +127,7 @@ const ModalPageAdsSortInner = (props) => {
 				</Radio>
 				<div style={{ display: 'flex' }}>
 					<Radio
-						style={{ cursor: 'pointer' }}
+						style={{ cursor: 'pointer', flex: 1 }}
 						checked={!isTimeSort}
 						key={SORT_GEO}
 						value={SORT_GEO}
@@ -136,11 +137,11 @@ const ModalPageAdsSortInner = (props) => {
 						По близости
 					</Radio>
 
-					{loading && (
+					{loading ? (
 						<Div className="right">
 							<Spinner size="small" />
 						</Div>
-					)}
+					) : null}
 				</div>
 				{!valid && (
 					<Div>

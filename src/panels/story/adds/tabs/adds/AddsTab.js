@@ -98,9 +98,10 @@ const AddsTab = (props) => {
 		const rad = (inputData[activeStory + ADS_FILTERS] ? inputData[activeStory + ADS_FILTERS].radius : null) || 0;
 		setRadius(rad);
 
+		
 		const geod = (inputData[activeStory + GEO_DATA] ? inputData[activeStory + GEO_DATA].geodata : null) || null;
-		setGeodata(activeStory, geod);
-
+		setGeodata(geod);
+	
 		const count =
 			(inputData[activeStory + ADS_FILTERS] ? inputData[activeStory + ADS_FILTERS].country : null) || NoRegion;
 		setCountry(count);
