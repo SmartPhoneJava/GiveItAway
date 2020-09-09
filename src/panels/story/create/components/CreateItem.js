@@ -348,7 +348,7 @@ const CreateItem = (props) => {
 							top={nameLabel}
 							name="name"
 							size="50"
-							placeholder="футбольный мяч"
+							placeholder="Футбольный мяч"
 							value={name}
 							onChange={handleInput}
 						/>
@@ -380,7 +380,7 @@ const CreateItem = (props) => {
 								style={{ padding: '0px' }}
 								multiline
 								description="Снимки должны передавать реальное состояние вещи, не используй чужие картинки или
-							отредактированные фотографии. Ограничения: размер фотографии не болеее 4мб, всего снимков не более 3."
+							отредактированные фотографии. Ограничения: размер фотографии не более 4мб, всего снимков не более 3."
 							>
 								<div style={{ fontWeight: 600 }}>Снимки</div>
 							</Cell>

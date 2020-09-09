@@ -18,6 +18,7 @@ import { STORY_ADS } from '../../store/router/storyTypes';
 import { store } from '../..';
 import { defaultInputData } from '../../components/create/default';
 import { now } from 'moment';
+import { TYPE_CHOICE } from '../../const/ads';
 
 const clearForm = (activeStory, dispatch) => {
 	dispatch(setFormData(activeStory + FORM_CREATE, null));
@@ -45,6 +46,12 @@ const getAd = (activeStory, myUser, inputData) => {
 	console.log('myUser is', myUser); //{"vk_id":45863670,"name":"Артём","surname":"Ягами","photo_url":"ht
 	const location = getLocationInfo(activeStory, inputData) || {};
 	const main = getMainInfo(activeStory, inputData);
+	if (main.comments_enabled === null) {
+		main.comments_enabled = true
+	}
+	if (main.type === null) {
+		main.type = TYPE_CHOICE
+	}
 	console.log('main is', activeStory, inputData[activeStory + CREATE_AD_MAIN]);
 	const item = getItemInfo(activeStory, inputData);
 	const category = getCategoryInfo(activeStory, inputData);

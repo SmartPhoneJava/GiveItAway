@@ -119,16 +119,16 @@ export const getuser = (success) => (dispatch) => {
 };
 
 export const allowMessages = (success, fail) => {
-	return bridge
-		.send('VKWebAppAllowMessagesFromGroup', { group_id: 194671970, key:"dBuBKe1kFcdemzB" })
+	bridge
+		.send('VKWebAppAllowMessagesFromGroup', { group_id: 194671970, key: 'dBuBKe1kFcdemzB' })
 		.then((data) => {
-			console.log("daaata", data)
-			success()
+			console.log('allowMessages success', data);
+			success();
 			return data;
 		})
 		.catch((error) => {
-			console.log("error", error)
-			fail()
+			console.log('allowMessages fail', error);
+			fail();
 			return error;
 		});
 };

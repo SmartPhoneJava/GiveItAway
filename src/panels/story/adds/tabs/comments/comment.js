@@ -28,7 +28,7 @@ const Comment = (props) => {
 			<div>{props.v.text}</div>
 			{props.v.text} */}
 			<RichCell
-				style={{ cursor: 'pointer' }}
+				style={{ cursor: 'pointer', wordBreak: 'break-word' }}
 				onClick={props.onClick}
 				text={<div>{props.v.text}</div>}
 				caption={time(props.v.creation_date_time)}

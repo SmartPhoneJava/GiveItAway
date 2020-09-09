@@ -50,9 +50,13 @@ export function subscribe(ad_id, clCancel, s, f, e) {
 		.catch(function (error) {
 			err = true;
 			failCallback(error);
+			
 			if (error == 'Error: Request failed with status code 409') {
-				fail('недостаточно кармы. Откажитесь от другой вещи, чтобы получить эту!', null, end);
+				fail('Недостаточно кармы. Откажитесь от другой вещи, чтобы получить эту!', null, end);
 			} else {
+				if (error.response.status === 429) {
+					failEasy('Вы не можете откликнуться на это объявление, поскольку отписались от него несколько раз');
+				} else {
 				fail(
 					'Нет соединения с сервером',
 					() => {
@@ -60,6 +64,7 @@ export function subscribe(ad_id, clCancel, s, f, e) {
 					},
 					end
 				);
+				}
 			}
 		});
 	return err;

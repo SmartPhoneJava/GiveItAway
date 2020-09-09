@@ -82,7 +82,7 @@ const Profile = (props) => {
 			newProfileID = myID;
 		}
 		setProfileID(newProfileID);
-		console.log('profile is', newProfile);
+		console.log('profile is', newProfile, newProfileID);
 		if (newProfile.backUser) {
 			setBackUser(newProfile.backUser);
 			setFailed(false);
@@ -326,24 +326,28 @@ const Profile = (props) => {
 	}, [backuser, profileID, userRequestSucess]);
 
 	useEffect(() => {
-		console.log('direction is', direction);
+		console.log('START');
+		console.log('direction is', direction, props.from, props.to);
 		if (direction == DIRECTION_BACK) {
 			return;
 		}
-		if (profileID == -1) {
+		if (activeContext[story].vk_id == -1 || !activeContext[story].vk_id) {
 			return;
 		}
 		let cleanupFunction = false;
 		setUserRequestSucess(false);
+		console.log('getUser become');
 		getUser(
-			profileID,
+			activeContext[story].vk_id,
 			(v) => {
+				console.log('getUser cleanupFunction', cleanupFunction);
 				if (cleanupFunction) {
 					return;
 				}
+				console.log('getUser done', v);
 
 				updateContext({ backUser: v });
-				if (profileID == myID) {
+				if (activeContext[story].vk_id == myID) {
 					props.setProfileName('Мой профиль');
 				} else {
 					props.setProfileName('Профиль');
@@ -352,6 +356,7 @@ const Profile = (props) => {
 				setUserRequestSucess(true);
 			},
 			(e) => {
+				console.log('getUser failed', e);
 				if (cleanupFunction) {
 					return;
 				}
@@ -374,13 +379,16 @@ const Profile = (props) => {
 				updateContext({ vkUser: NO_VK_USER });
 			}
 		);
-		return () => (cleanupFunction = true);
-	}, [direction, profileID]);
+		return () => {
+			cleanupFunction = true;
+			console.log('STOP');
+		};
+	}, [direction, activeContext[story].vk_id]);
 
 	function openFreeze() {
 		if (profileID == myID) {
-			setFormData(story+ADS_FILTERS, {
-				...inputData[story+ADS_FILTERS],
+			setFormData(story + ADS_FILTERS, {
+				...inputData[story + ADS_FILTERS],
 				mode: MODE_WANTED,
 			});
 			setPage(PANEL_ADS);
@@ -455,6 +463,8 @@ const mapStateToProps = (state) => {
 		story: state.router.activeStory,
 		activeContext: state.router.activeContext,
 		direction: state.router.direction,
+		to: state.router.to,
+		from: state.router.from,
 		activePanels: state.router.activePanels,
 
 		inputData: state.formData.forms,

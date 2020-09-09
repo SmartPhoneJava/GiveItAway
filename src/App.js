@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useMutex } from 'react-context-mutex';
 import {
 	View,
 	Panel,
@@ -160,6 +161,8 @@ export const scrollWindow = (to) => {
 	}, 10);
 };
 
+let GO_BACK_DO = 0
+
 const App = (props) => {
 	const { colorScheme, myUser, myID, inputData } = props;
 	const { activeStory, activePanels, panelsHistory, popouts, snackbars, scrollPosition } = props;
@@ -179,6 +182,9 @@ const App = (props) => {
 		setPage,
 		updateContext,
 	} = props;
+
+	const MutexRunner = useMutex();
+	const mutex = new MutexRunner('GO_BACK');
 
 	const adPopout = popouts[STORY_ADS];
 	const createPopout = popouts[STORY_CREATE];
@@ -205,7 +211,6 @@ const App = (props) => {
 		const isProfile = e.currentTarget.dataset.text == profileText;
 		const story = e.currentTarget.dataset.story;
 
-		console.log('storystorystorystory', story);
 		if (!story) {
 			return;
 		}
@@ -418,8 +423,20 @@ const App = (props) => {
 
 		window.history.pushState({ currPanel: PANEL_ADS, ad: AdDefault }, PANEL_ADS);
 		window.onpopstate = function (event) {
-			goBack();
+			mutex.lock();
+			GO_BACK_DO++
+			mutex.unlock();
 		};
+
+		setInterval(()=>{
+			mutex.lock();
+			if (GO_BACK_DO > 0) {
+				goBack();
+				GO_BACK_DO--
+			}
+			mutex.unlock();
+			
+		}, 500)
 
 		// $(function(){
 		// 	$('body').append('<form id="cookiesHackForm" action="http://example.com/" method="get"></form>');
@@ -490,8 +507,12 @@ const App = (props) => {
 		openModal(MODAL_ADS_GEO, DIRECTION_BACK);
 	}
 
-	let adPanels = panelsHistory[STORY_ADS];
-	let adActivePanel = activePanels[STORY_ADS];
+	const adPanels = panelsHistory[STORY_ADS];
+	const adActivePanel = activePanels[STORY_ADS];
+	useEffect(() => {
+		console.log('adActivePanel is', adActivePanel);
+		console.log('adPanels is', adPanels);
+	}, [adActivePanel]);
 
 	const [adsScheme, setAdsScheme] = useState([]);
 	useEffect(() => {
@@ -732,7 +753,7 @@ const App = (props) => {
 				<View
 					popout={adPopout}
 					id={STORY_ADS}
-					activePanel={adActivePanel}
+					activePanel={activePanels[STORY_ADS]}
 					onSwipeBack={goBack}
 					history={adPanels}
 					modal={<AdsModal />}

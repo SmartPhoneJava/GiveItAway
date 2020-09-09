@@ -716,6 +716,12 @@ export function CreateAd(ad, obj, photos, openAd, loadAd, successcallback) {
 			store.dispatch(closePopout());
 			console.log('Request failed', error);
 
+			
+			if (error.message == "Network Error") {
+				fail('Нет соединения с интернетом', () => createAd(ad, obj, photos, openAd, loadAd, successcallback));
+				return
+			}
+
 			if (error.response.status === 429) {
 				failEasy(
 					'Вы создали слишком много объявлений за короткий промежуток времени, поэтому в ближайший час вы не можете создать новое.'

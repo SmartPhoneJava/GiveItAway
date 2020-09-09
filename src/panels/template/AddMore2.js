@@ -62,7 +62,6 @@ import {
 	setProfile,
 	goBack,
 	updateContext,
-	closeAllModals,
 } from '../../store/router/actions';
 import { setIsSub, setIsHidden, setExtraInfo, setIsAuthor } from '../../store/detailed_ad/actions';
 import { AdDefault, AD_LOADING, STATUS_CLOSED, STATUS_ABORTED, TYPE_CHOICE, TYPE_AUCTION } from '../../const/ads';
@@ -83,7 +82,7 @@ import { AdMainInfo } from '../../components/detailed_ad/table';
 import { CardWithPadding } from '../../App';
 import { openTab } from '../../services/_functions';
 import Icon from './../../img/icon278.png';
-import { PANEL_ADS, PANEL_CREATE } from '../../store/router/panelTypes';
+import { PANEL_ADS, PANEL_CREATE, PANEL_ONE } from '../../store/router/panelTypes';
 import { now } from 'moment';
 
 let current_i = 0;
@@ -129,7 +128,6 @@ const AddMore2r = (props) => {
 		setFormData,
 		updateContext,
 		closePopout,
-		closeAllModals,
 	} = props;
 	const { setDummy, direction, AD } = props;
 
@@ -151,7 +149,7 @@ const AddMore2r = (props) => {
 
 	const [componentStatus, setComponentStatus] = useState();
 	useEffect(() => {
-		const { isAuthor, isDealer, dealer, deal, status, hidden } = props.activeContext[props.story];
+		const { isAuthor, isDealer, dealer, deal, status, hidden } = rAd;
 
 		setComponentStatus(
 			showStatus(
@@ -179,15 +177,11 @@ const AddMore2r = (props) => {
 				props.setProfile
 			)
 		);
-	}, [props.activeContext[props.story]]);
-
-	useEffect(() => {
-		console.log('props.activeContext[props.story]', props.activeContext[props.story]);
-	}, [props.activeContext[props.story]]);
+	}, [rAd]);
 
 	const [componentCategories, setComponentCategories] = useState();
 	useEffect(() => {
-		const { category, subcat_list, subcat, hidden } = props.activeContext[props.story];
+		const { category, subcat_list, subcat, hidden } = rAd;
 
 		if (hidden) {
 			setComponentCategories();
@@ -198,7 +192,7 @@ const AddMore2r = (props) => {
 				tags={[tag(category, col, null, col), tag(subcat_list, col, null, col), tag(subcat, col, null, col)]}
 			/>
 		);
-	}, [props.activeContext[props.story]]);
+	}, [rAd]);
 
 	const [componentPhotoSwipe, setComponentPhotoSwipe] = useState();
 	useEffect(() => {
@@ -206,8 +200,6 @@ const AddMore2r = (props) => {
 			<PhotoSwipe isOpen={isOpen} items={localPhotos} options={options} onClose={handleClose} />
 		);
 	}, [localPhotos, isOpen, options]);
-
-	// const [tooltip, setTooltip] = useState(false);
 
 	const [componentImages, setComponentImages] = useState();
 	useEffect(() => {
@@ -312,10 +304,10 @@ const AddMore2r = (props) => {
 
 	function isNotValid() {
 		return (
-			props.activeContext[props.story] == null ||
-			props.activeContext[props.story].ad_id == null ||
-			props.activeContext[props.story].ad_id == AD_LOADING.ad_id ||
-			props.activeContext[props.story].ad_id == AdDefault.ad_id
+			rAd == null ||
+			rAd.ad_id == null ||
+			rAd.ad_id == AD_LOADING.ad_id ||
+			rAd.ad_id == AdDefault.ad_id
 		);
 	}
 
@@ -435,6 +427,9 @@ const AddMore2r = (props) => {
 				}
 			);
 		};
+		if (props.activePanels[props.story] != PANEL_ONE) {
+			return
+		}
 		if (direction == DIRECTION_FORWARD) {
 			dispatch(init());
 		} else {
@@ -448,16 +443,6 @@ const AddMore2r = (props) => {
 			cancelFunc = true;
 		};
 	}, [props.activeContext[props.story].ad_id]);
-
-	useEffect(() => {
-		const listener = function () {
-			closeAllModals();
-		};
-		window.addEventListener('scroll', listener);
-		return () => {
-			window.removeEventListener('scroll', listener);
-		};
-	}, []);
 
 	const [imgs, setImgs] = useState([]);
 
@@ -586,7 +571,7 @@ const AddMore2r = (props) => {
 		if (isNotValid()) {
 			return;
 		}
-		const ad = props.activeContext[props.story];
+		const ad = rAd;
 
 		const { comments_enabled, hidden, isAuthor } = ad;
 		if (hidden) {
@@ -610,11 +595,11 @@ const AddMore2r = (props) => {
 			setComponentCommentsValid(false);
 		}
 		setComponentComments(<Card mode="outline">{v}</Card>);
-	}, [props.activeContext[props.story]]);
+	}, [rAd]);
 
 	const [componentChosenSub, setComponentChosenSub] = useState();
 	useEffect(() => {
-		const { ad_type, ad_id, hidden, isAuthor } = props.activeContext[props.story];
+		const { ad_type, ad_id, hidden, isAuthor } = rAd;
 		if (hidden) {
 			if (!isAuthor) {
 				setComponentChosenSub();
@@ -643,7 +628,7 @@ const AddMore2r = (props) => {
 				</div>
 			</Card>
 		);
-	}, [props.activeContext[props.story], dealRequestSuccess, costRequestSuccess]);
+	}, [rAd, dealRequestSuccess, costRequestSuccess]);
 
 	const [componentAuthor, setComponentAuthor] = useState();
 	useEffect(() => {
@@ -665,7 +650,7 @@ const AddMore2r = (props) => {
 
 	const [secondaryInfo, setSecondaryInfo] = useState(<></>);
 	useEffect(() => {
-		const { hidden, isAuthor } = props.activeContext[props.story];
+		const { hidden, isAuthor } = rAd;
 		if (hidden && !isAuthor) {
 			setSecondaryInfo(<></>);
 			return;
@@ -683,7 +668,7 @@ const AddMore2r = (props) => {
 				)}
 			</div>
 		);
-	}, [componentCategories, props.activeContext[props.story]]);
+	}, [componentCategories, rAd]);
 
 	const [allActions, setAllActions] = useState();
 	useEffect(() => {
@@ -827,6 +812,7 @@ const mapStateToProps = (state) => {
 
 		story: state.router.activeStory,
 		activeContext: state.router.activeContext,
+		activePanels:  state.router.activePanels,
 	};
 };
 
@@ -860,7 +846,6 @@ const mapDispatchToProps = (dispatch) => {
 				openPopout,
 
 				closePopout,
-				closeAllModals,
 			},
 			dispatch
 		),

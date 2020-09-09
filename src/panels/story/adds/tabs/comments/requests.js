@@ -124,6 +124,7 @@ export async function editComment(real_comment, id, comment, successCallback, fa
 			return response.data;
 		})
 		.then(function (response) {
+			console.log("success we are")
 			successCallback(response);
 			success('Комментарий отредактирован', null, end);
 			const router = store.getState().router;

@@ -19,7 +19,9 @@ import { updateDealInfo } from '../../store/detailed_ad/update';
 const AuctionLabelInner = (props) => {
 	const [componentStatus, setComponentStatus] = useState(<></>);
 	useEffect(() => {
-		setComponentStatus(<InfoRow header="Статус">{props.activeContext[props.activeStory].dealer ? 'Завершен' : 'Активен'}</InfoRow>);
+		setComponentStatus(
+			<InfoRow header="Статус">{props.activeContext[props.activeStory].dealer ? 'Завершен' : 'Активен'}</InfoRow>
+		);
 	}, [props.activeContext[props.activeStory].dealer]);
 
 	const [myRate, setMyRate] = useState(0);
@@ -43,7 +45,12 @@ const AuctionLabelInner = (props) => {
 				setMyRate(0);
 			}
 		);
-	}, [props.activeContext[props.activeStory].ad_id, props.activeContext[props.activeStory].isSub, props.activeContext[props.activeStory].isAuthor, mrUpdate]);
+	}, [
+		props.activeContext[props.activeStory].ad_id,
+		props.activeContext[props.activeStory].isSub,
+		props.activeContext[props.activeStory].isAuthor,
+		mrUpdate,
+	]);
 
 	const [actionMaxUser, setActionMaxUser] = useState();
 	const [amuDone, setAmuDone] = useState(false);
@@ -103,7 +110,9 @@ const AuctionLabelInner = (props) => {
 
 	const [componentMyRate, setComponentMyRate] = useState(<></>);
 	useEffect(() => {
-		const { isAuthor, isDealer, status, dealer, ad_id, ad_type, isSub, cost } = props.activeContext[props.activeStory];
+		const { isAuthor, isDealer, status, dealer, ad_id, ad_type, isSub, cost } = props.activeContext[
+			props.activeStory
+		];
 
 		if (isDealer && status == STATUS_CHOSEN) {
 			setComponentMyRate(null);
@@ -167,7 +176,7 @@ const AuctionLabelInner = (props) => {
 						</CellButton>
 					)
 				)
-			) : isSub ? (
+			) : !isActive ? null : isSub ? (
 				actionMaxUser && (
 					<RichCell
 						before={<Avatar size={48} src={props.myUser.photo_100} />}
@@ -186,7 +195,12 @@ const AuctionLabelInner = (props) => {
 						}
 						actions={
 							<div style={{ display: width > 370 ? 'flex' : 'block' }}>
-								<div style={{ paddingBottom: width < 370 ? '8px' : null, paddingRight: width > 370 ? '8px' : null  }}>
+								<div
+									style={{
+										paddingBottom: width < 370 ? '8px' : null,
+										paddingRight: width > 370 ? '8px' : null,
+									}}
+								>
 									<Button
 										stretched={width < 370}
 										style={{ cursor: 'pointer' }}
@@ -231,14 +245,22 @@ const AuctionLabelInner = (props) => {
 				</RichCell>
 			)
 		);
-	}, [props.activeContext[props.activeStory].isSub, props.activeContext[props.activeStory].dealer, props.activeContext[props.activeStory].cost, actionMaxUser, myRate]);
+	}, [
+		props.activeContext[props.activeStory].isSub,
+		props.activeContext[props.activeStory].dealer,
+		props.activeContext[props.activeStory].cost,
+		actionMaxUser,
+		myRate,
+	]);
 
 	const onTypesClick = () => props.openModal(MODAL_ADS_TYPES);
 	const onFreezeClick = () => props.openModal(MODAL_ADS_FROZEN);
 	const onCarmaClick = () => props.openModal(MODAL_ADS_COST);
 
 	return (
-		<Group header={<AdHeader onTypesClick={onTypesClick} ad_type={props.activeContext[props.activeStory].ad_type} />}>
+		<Group
+			header={<AdHeader onTypesClick={onTypesClick} ad_type={props.activeContext[props.activeStory].ad_type} />}
+		>
 			<div style={{ display: 'block', width: '100%' }}>
 				<div style={{ display: 'flex', width: '100%' }}>
 					<SimpleCell>

@@ -306,6 +306,7 @@ export const routerReducer = (state = initialState, action) => {
 			const newContext = the_same_story ? {} : state.activeContext[story];
 			const newContextHistory = the_same_story ? [] : state.historyContext[story];
 
+			console.log('set story from to ', state.activePanels[state.activeStory], newPanel);
 			return {
 				...state,
 				activeStory: story,
@@ -331,7 +332,7 @@ export const routerReducer = (state = initialState, action) => {
 				direction: the_same_story ? DIRECTION_FORWARD : DIRECTION_BACK,
 
 				from: state.activePanels[state.activeStory],
-				to: panel,
+				to: newPanel,
 
 				scrollHistory: {
 					...state.scrollHistory,
@@ -394,7 +395,7 @@ export const routerReducer = (state = initialState, action) => {
 
 				direction: the_same_story || !is_inited ? DIRECTION_FORWARD : DIRECTION_BACK,
 				from: state.activePanels[state.activeStory],
-				to: panel,
+				to: newPanel,
 
 				scrollHistory: {
 					...state.scrollHistory,
@@ -414,7 +415,7 @@ export const routerReducer = (state = initialState, action) => {
 			let Popout = state.popouts[Story];
 			let Dummies = state.dummies[Story] || [];
 
-			console.log("fast GO_BACK", state)
+			console.log('fast GO_BACK', state);
 			// если были открытые заглушки
 			if (Dummies.length > 0) {
 				Dummies.pop();
@@ -471,13 +472,14 @@ export const routerReducer = (state = initialState, action) => {
 					},
 				};
 			}
-			VK.swipeBackOn()
+			VK.swipeBackOn();
 
 			// обновляем панель
 
 			// убрать все setStory
 
 			let Panels = state.panelsHistory[Story];
+			console.log('PANELS SIZE', Panels, Panels.slice(0, 0));
 			if (Panels.length == 0) {
 				VK.closeApp();
 				return state;
@@ -493,6 +495,13 @@ export const routerReducer = (state = initialState, action) => {
 					: newContext;
 
 			const newScroll = state.scrollHistory[Story][state.scrollHistory[Story].length - 1];
+
+			console.log(
+				'we are from',
+				state.activePanels[Story],
+				' ',
+				state.panelsHistory[state.panelsHistory[Story].length - 1]
+			);
 
 			return {
 				...state,
@@ -604,8 +613,8 @@ export const routerReducer = (state = initialState, action) => {
 			let modal = action.payload.modal;
 			let Modals = state.modalHistory[Story] || [];
 			const direction = action.payload.direction ? action.payload.direction : DIRECTION_FORWARD;
-			
-			VK.swipeBackOff()
+
+			VK.swipeBackOff();
 			return {
 				...state,
 				direction,
@@ -631,7 +640,7 @@ export const routerReducer = (state = initialState, action) => {
 			if (Modals.length > 0) {
 				modal = Modals[Modals.length - 1];
 			} else {
-				VK.swipeBackOn()
+				VK.swipeBackOn();
 			}
 
 			return {
@@ -652,7 +661,7 @@ export const routerReducer = (state = initialState, action) => {
 
 		case CLOSE_ALL_MODALS: {
 			let Story = state.activeStory;
-			VK.swipeBackOn()
+			VK.swipeBackOn();
 
 			return {
 				...state,

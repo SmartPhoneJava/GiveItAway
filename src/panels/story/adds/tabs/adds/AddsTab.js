@@ -98,10 +98,9 @@ const AddsTab = (props) => {
 		const rad = (inputData[activeStory + ADS_FILTERS] ? inputData[activeStory + ADS_FILTERS].radius : null) || 0;
 		setRadius(rad);
 
-		
 		const geod = (inputData[activeStory + GEO_DATA] ? inputData[activeStory + GEO_DATA].geodata : null) || null;
 		setGeodata(geod);
-	
+
 		const count =
 			(inputData[activeStory + ADS_FILTERS] ? inputData[activeStory + ADS_FILTERS].country : null) || NoRegion;
 		setCountry(count);
@@ -366,19 +365,6 @@ const AddsTab = (props) => {
 		};
 	}, []);
 
-	const searchRef = useRef();
-	useEffect(() => {
-		//var input = document.getElementById('searchMain');
-		if (!searchRef || !searchRef.current) {
-			console.log('no searchRef');
-			return;
-		}
-		console.log('found searchRef', searchRef);
-		searchRef.current.addEventListener('focusout', function () {
-			console.log('Sending data to server...');
-		});
-	}, [searchRef]);
-
 	const [inited, setInited] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
@@ -495,6 +481,8 @@ const AddsTab = (props) => {
 				params.lat = geodata.lat;
 				params.long = geodata.long;
 			}
+
+			console.log('city is city', city);
 
 			if (geoType == GEO_TYPE_NEAR) {
 				params.radius = radius || 0.5;
@@ -679,14 +667,7 @@ const AddsTab = (props) => {
 				{mode != MODE_WANTED && (
 					<>
 						<div style={{ display: 'flex' }}>
-							{/* <div
-								style={{
-									transition: '0.3s',
-									width: `${filtersOn ? '100%' : '90%'}`,
-								}}
-							> */}
 							<Search
-								ref={searchRef}
 								id="searchMain"
 								style={{
 									transition: '0.3s',

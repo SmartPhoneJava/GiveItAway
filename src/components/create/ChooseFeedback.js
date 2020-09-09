@@ -86,7 +86,7 @@ const ChooseFeedback = (props) => {
 						onChange={handleChecked}
 					/>
 				}
-				description="Пользователи могут оставлять коментарии в обьявлении"
+				description="Пользователи могут оставлять комментарии в объявлении"
 			>
 				Комментарии
 			</Cell>

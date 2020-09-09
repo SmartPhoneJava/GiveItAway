@@ -57,6 +57,7 @@ import { Collapse } from 'react-collapse';
 import { withLoadingIf } from '../../../../../components/image/image_cache';
 import { openTab } from '../../../../../services/_functions';
 import { fail } from '../../../../../requests';
+import { DIRECTION_BACK } from '../../../../../store/router/directionTypes';
 
 const NO_ID = -1;
 
@@ -79,6 +80,49 @@ const CommentsI = (props) => {
 
 	const [pageNumber, setPageNumber] = useState(1);
 	const observer = useRef();
+
+	const [saveWriteText, setSaveWriteText] = useState('');
+	useEffect(() => {
+		if (props.to == PANEL_COMMENTS) {
+			const context = props.activeContext[props.activeStory];
+
+			if (context) {
+				setCommentValid(context.commentValid);
+				setTooBigComment(context.tooBigComment);
+				setIsEditting(context.isEditting);
+				setText(context.save_text);
+				setEditableID(context.editableID || -1);
+				setEditableText(context.editableText);
+				setSaveWriteText(context.saveWriteText);
+			}
+		}
+	}, [props.to]);
+
+	useEffect(() => {
+		updateContext({ saveWriteText });
+	}, [saveWriteText]);
+
+	useEffect(() => {
+		updateContext({ save_text: text });
+	}, [text]);
+
+	useEffect(() => {
+		updateContext({ isEditting });
+	}, [isEditting]);
+
+	useEffect(() => {
+		updateContext({ editableText });
+	}, [editableText]);
+
+	useEffect(() => {
+		updateContext({ editableID });
+	}, [editableID]);
+	useEffect(() => {
+		updateContext({ commentValid });
+	}, [commentValid]);
+	useEffect(() => {
+		updateContext({ tooBigComment });
+	}, [tooBigComment]);
 
 	const { ad_id } = props.activeContext[props.activeStory];
 
@@ -110,18 +154,24 @@ const CommentsI = (props) => {
 		setNots(comments);
 	}, [props.activeContext[props.activeStory].comments, props.activeContext[props.activeStory].comments_update]);
 
-	function trySetText(text) {
+	function trySetText(text, save) {
 		let vtext = text;
 		if (text) {
 			vtext = vtext.trim();
 		}
 		setCommentValid(vtext.length != 0 && text.length <= MAX_COMMENT_LENGTH);
 		setTooBigComment(text.length > MAX_COMMENT_LENGTH);
-		setText(text);
+		setText((prev) => {
+			if (save) {
+				setSaveWriteText(prev);
+				console.log('saaave', prev);
+			}
+			return text;
+		});
 	}
 
 	function onEditClick(v) {
-		trySetText(v.text);
+		trySetText(v.text, true);
 		setEditableID(v.comment_id);
 		setIsEditting(true);
 		setEditableText(v.text);
@@ -237,11 +287,12 @@ const CommentsI = (props) => {
 		setHide(true);
 		if (editableID != NO_ID) {
 			const comment = nots.filter((v) => v.comment_id == editableID)[0];
-			comment.text = text;
+			const saveCommentText = comment.text;
+			comment.text = text.replace(/\s+/g, ' ').trim();
 			const obj = JSON.stringify({
 				comment_id: comment.comment_id,
 				author_id: myID,
-				text: text,
+				text: text.replace(/\s+/g, ' ').trim(),
 			});
 			editComment(
 				comment,
@@ -250,10 +301,13 @@ const CommentsI = (props) => {
 				(v) => {
 					setEditableID(NO_ID);
 					setIsEditting(false);
-					trySetText('');
+					trySetText(saveWriteText);
 					setEditableText('');
+					setSaveWriteText('');
 				},
-				(e) => {},
+				(e) => {
+					comment.text = saveCommentText;
+				},
 				() => {
 					setHide(false);
 				}
@@ -281,12 +335,12 @@ const CommentsI = (props) => {
 			}
 			const obj = JSON.stringify({
 				author_id: props.myID,
-				text: text,
+				text: text.replace(/\s+/g, ' ').trim(),
 			});
 			postComment(
 				props.activeContext[props.activeStory].ad_id,
 				obj,
-				text,
+				text.replace(/\s+/g, ' ').trim(),
 				(v) => {
 					trySetText('');
 
@@ -430,6 +484,8 @@ const CommentsI = (props) => {
 												setEditableID(NO_ID);
 												setIsEditting(false);
 												setEditableText('');
+												trySetText(saveWriteText);
+												setSaveWriteText('');
 											}}
 										>
 											{editableID == NO_ID ? 'Очистить' : 'Отменить'}
@@ -458,6 +514,8 @@ const mapStateToProps = (state) => {
 		myID: state.vkui.myID,
 		activeStory: state.router.activeStory,
 		activeContext: state.router.activeContext,
+		to: state.router.to,
+		from: state.router.from,
 	};
 };
 
