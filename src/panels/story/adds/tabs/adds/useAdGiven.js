@@ -18,7 +18,6 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id, 
 	}, [user_id]);
 
 	useEffect(() => {
-		
 		setPopout(<Spinner size="small" />);
 		setLoading(true);
 		setError(false);
@@ -36,7 +35,7 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id, 
 				if (clear) {
 					return;
 				}
-				console.log("given restore")
+				console.log('given restore');
 				setAds((prev) => [...new Set([...prev, ...cache.from(pageNumber, rowsPerPage)])]);
 				setHasMore(true);
 				setLoading(false);
@@ -53,13 +52,14 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id, 
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
+			headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 		})
 			.then((res) => {
 				if (clear) {
 					return;
 				}
 				const newAds = res.data;
-				console.log("real given one", pageNumber, cache.restore, cache.from(pageNumber, rowsPerPage).length)
+				console.log('real given one', pageNumber, cache.restore, cache.from(pageNumber, rowsPerPage).length);
 				setAds((prev) => {
 					cache.to([...new Set([...prev, ...newAds])]);
 					return [...new Set([...prev, ...newAds])];

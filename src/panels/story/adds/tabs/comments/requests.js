@@ -25,6 +25,7 @@ export async function postComment(ad_id, comment, comment_text, successCallback,
 		data: comment,
 		url: Addr.getState() + BASE_AD + ad_id + '/comments',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			return response.data;
@@ -78,6 +79,7 @@ export async function deleteComment(comment, successCallback, failCallback, end)
 		}),
 		url: Addr.getState() + BASE_COMMENT + comment.comment_id,
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			return response.data;
@@ -119,12 +121,13 @@ export async function editComment(real_comment, id, comment, successCallback, fa
 		data: comment,
 		url: Addr.getState() + BASE_COMMENT + id,
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			return response.data;
 		})
 		.then(function (response) {
-			console.log("success we are")
+			console.log('success we are');
 			successCallback(response);
 			success('Комментарий отредактирован', null, end);
 			const router = store.getState().router;

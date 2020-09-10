@@ -389,6 +389,7 @@ const AddMore2r = (props) => {
 					details.isSub = details.is_subscriber;
 					details.isAuthor = details.author.vk_id == myID;
 					details.ad_type = details.ad_type || TYPE_CHOICE;
+					details.cost = details.cost || 0;
 					console.log('loook at details', details);
 					updateContext(details);
 					setExtraInfo(details, myID, true);

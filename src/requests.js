@@ -71,6 +71,7 @@ export function getToken(successCallback, failCallBack) {
 		withCredentials: true,
 		url: Addr.getState() + BASE + 'ws_token',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('response from getToken:', response);
@@ -132,6 +133,7 @@ export async function getNotificationCounter(successCallback, failCallBack) {
 		withCredentials: true,
 		url: Addr.getState() + BASE + 'notifications_count',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('response from getNotificationCounter:', response);
@@ -163,6 +165,7 @@ export async function adHide(ad_id, callback) {
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/set_hidden',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('response from adHide:', response);
@@ -192,6 +195,7 @@ export async function adVisible(ad_id, callback) {
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/set_visible',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('response from adVisible:', response);
@@ -219,6 +223,7 @@ export async function getDeal(ad_id, successCallback, failCallback) {
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/deal',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('response from getDeal:', response);
@@ -246,6 +251,7 @@ export async function getCost(ad_id, successCallback, failCallback) {
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/bid_for_user',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('getCost response:', response);
@@ -272,6 +278,7 @@ export async function getAuctionMaxUser(ad_id, successCallback, failCallback) {
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/max_bid_user',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('getAuctionMaxUser response:', response);
@@ -298,6 +305,7 @@ export async function increaseAuctionRate(ad_id, successCallback, failCallback) 
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/increase_bid',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('increaseAuctionRate response:', response);
@@ -324,6 +332,7 @@ export async function getCashback(ad_id, successCallback, failCallback) {
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/return_bid_size',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('getCashback response:', response);
@@ -358,6 +367,7 @@ export async function denyDeal(deal_id, successCallback, failCallback, end, text
 		withCredentials: true,
 		url: Addr.getState() + BASE_DEAL + deal_id + '/cancel',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('response from denyDeal:', response);
@@ -393,6 +403,7 @@ export function acceptDeal(deal_id, successCallback, failCallback, end) {
 		withCredentials: true,
 		url: Addr.getState() + BASE_DEAL + deal_id + '/fulfill',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('response from acceptDeal:', response);
@@ -464,6 +475,7 @@ export function Close(ad_id, ad_type, subscriber_id, s, f) {
 		params,
 		url: Addr.getState() + BASE_AD + ad_id + '/make_deal',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			store.dispatch(closePopout());
@@ -498,6 +510,7 @@ export async function getSubscribers(ad_id, successCallback, failCallback, count
 		params: { page: 1, rows_per_page: count },
 		url: Addr.getState() + BASE_AD + ad_id + '/subscribers',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('response from getSubscribes:', response);
@@ -529,6 +542,7 @@ export async function getDetails(ad_id, successCallback, failCallback) {
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/details',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('response from getDetails:', response);
@@ -609,6 +623,7 @@ export async function Auth(user, successCallback, failCallback) {
 		}),
 		url: Addr.getState() + BASE_USER + 'auth',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			return response.data;
@@ -616,7 +631,8 @@ export async function Auth(user, successCallback, failCallback) {
 		.then(function (data) {
 			store.dispatch(closePopout());
 			successCallback(data);
-			User.dispatch({ type: 'set', new_state: data });
+			User.dispatch({ type: 'set', new_state: data.user });
+			window.sessionStorage.setItem('jwtToken', data.token);
 			return data;
 		})
 		.catch(function (error) {
@@ -661,6 +677,7 @@ export async function CreateImages(photos, id, goToAds) {
 			withCredentials: true,
 			data: data,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
+			headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 		})
 			.then(function (response) {
 				console.log('success uploaded', s, photos.length - 1);
@@ -691,6 +708,7 @@ export function CreateAd(ad, obj, photos, openAd, loadAd, successcallback) {
 		withCredentials: true,
 		data: obj,
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(async function (response) {
 			store.dispatch(closePopout());
@@ -716,10 +734,9 @@ export function CreateAd(ad, obj, photos, openAd, loadAd, successcallback) {
 			store.dispatch(closePopout());
 			console.log('Request failed', error);
 
-			
-			if (error.message == "Network Error") {
+			if (error.message == 'Network Error') {
 				fail('Нет соединения с интернетом', () => createAd(ad, obj, photos, openAd, loadAd, successcallback));
-				return
+				return;
 			}
 
 			if (error.response.status === 429) {
@@ -743,6 +760,7 @@ export async function EditAd(ad, obj, openAd, successcallback) {
 		withCredentials: true,
 		data: obj,
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(async function (response) {
 			store.dispatch(closePopout());
@@ -771,6 +789,7 @@ export const deleteAd = (ad_id, refresh) => {
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/delete',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			store.dispatch(closePopout());
@@ -874,6 +893,7 @@ export async function getPermissionPM(user_id, successCallback, failCallback) {
 		withCredentials: true,
 		url: Addr.getState() + BASE_USER + user_id + '/nots_pm',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('response from getPermissionPM:', response);
@@ -906,6 +926,7 @@ export async function setPermissionPM(user_id, can_send, successCallback, failCa
 		}),
 		url: Addr.getState() + BASE_USER + user_id + '/nots_pm',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('response from setPermissionPM:', response);

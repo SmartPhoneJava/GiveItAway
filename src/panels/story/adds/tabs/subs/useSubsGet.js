@@ -29,7 +29,7 @@ export default function useSubsGet(
 	}, []);
 
 	useEffect(() => {
-		let cancelFunc = false
+		let cancelFunc = false;
 		if (maxAmount && maxAmount > 0 && maxAmount <= (pageNumber - 1) * rowsPerPage) {
 			setHasMore(false);
 			return;
@@ -53,6 +53,7 @@ export default function useSubsGet(
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
+			headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 		})
 			.then((res) => {
 				console.log('sucess subs', res);

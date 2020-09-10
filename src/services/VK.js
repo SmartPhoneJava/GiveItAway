@@ -106,6 +106,7 @@ export const getuser = (success) => (dispatch) => {
 	return bridge
 		.send('VKWebAppGetUserInfo')
 		.then((data) => {
+			console.log("user is data ", data)
 			dispatch(setMyID(data.id));
 			dispatch(setMyUser(data));
 			if (success) {

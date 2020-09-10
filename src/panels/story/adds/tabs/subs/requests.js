@@ -28,6 +28,7 @@ export function subscribe(ad_id, clCancel, s, f, e) {
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/subscribe',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			return response.data;
@@ -50,20 +51,20 @@ export function subscribe(ad_id, clCancel, s, f, e) {
 		.catch(function (error) {
 			err = true;
 			failCallback(error);
-			
+
 			if (error == 'Error: Request failed with status code 409') {
 				fail('Недостаточно кармы. Откажитесь от другой вещи, чтобы получить эту!', null, end);
 			} else {
 				if (error.response.status === 429) {
 					failEasy('Вы не можете откликнуться на это объявление, поскольку отписались от него несколько раз');
 				} else {
-				fail(
-					'Нет соединения с сервером',
-					() => {
-						subscribe(ad_id, clCancel, successCallback, failCallback, end);
-					},
-					end
-				);
+					fail(
+						'Нет соединения с сервером',
+						() => {
+							subscribe(ad_id, clCancel, successCallback, failCallback, end);
+						},
+						end
+					);
 				}
 			}
 		});
@@ -81,6 +82,7 @@ export function unsubscribe(ad_id, clCancel, s, f, e) {
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/unsubscribe',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			return response.data;

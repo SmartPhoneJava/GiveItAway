@@ -11,7 +11,7 @@ import Icon24Users from '@vkontakte/icons/dist/24/users';
 import { STATUS_CHOSEN, STATUS_CLOSED, STATUS_ABORTED } from '../../const/ads';
 import { getAuctionMaxUser, getCashback, increaseAuctionRate, fail, success, CancelClose, Close } from '../../requests';
 import { withLoadingIf, animateOnChangeIf, AnimationChange } from '../image/image_cache';
-import { openModal, setProfile } from '../../store/router/actions';
+import { openModal, setProfile, updateContext } from '../../store/router/actions';
 import { MODAL_ADS_TYPES, MODAL_ADS_FROZEN, MODAL_ADS_COST } from '../../store/router/modalTypes';
 import { AdHeader } from './faq';
 import { updateDealInfo } from '../../store/detailed_ad/update';
@@ -63,6 +63,7 @@ const AuctionLabelInner = (props) => {
 			(v) => {
 				const user = v.user;
 				user.cost = v.bid;
+				props.updateContext({ cost: v.bid + 1 });
 				setActionMaxUser(user);
 				setAmuDone(true);
 			},
@@ -299,6 +300,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
 	openModal,
 	setProfile,
+	updateContext,
 };
 
 export const AuctionLabel = connect(mapStateToProps, mapDispatchToProps)(AuctionLabelInner);

@@ -94,6 +94,7 @@ import {
 	NT_COMMENT_DELETED,
 	NT_UNSUB,
 	NT_SUB,
+	NT_MAX_BID,
 } from './panels/story/adds/tabs/notifications/notifications';
 
 import AddMore2 from './panels/template/AddMore2';
@@ -161,7 +162,7 @@ export const scrollWindow = (to) => {
 	}, 10);
 };
 
-let GO_BACK_DO = 0
+let GO_BACK_DO = 0;
 
 const App = (props) => {
 	const { colorScheme, myUser, myID, inputData } = props;
@@ -353,6 +354,9 @@ const App = (props) => {
 						updateContext({ comments: newComments });
 						break;
 					}
+					case NT_MAX_BID: {
+						updateContext({ cost: noteValue.new_bid + 1 });
+					}
 					case NT_SUB: {
 						const router = store.getState().router;
 						let newSubs = router.activeContext[router.activeStory].subs || [];
@@ -424,19 +428,18 @@ const App = (props) => {
 		window.history.pushState({ currPanel: PANEL_ADS, ad: AdDefault }, PANEL_ADS);
 		window.onpopstate = function (event) {
 			mutex.lock();
-			GO_BACK_DO++
+			GO_BACK_DO++;
 			mutex.unlock();
 		};
 
-		setInterval(()=>{
+		setInterval(() => {
 			mutex.lock();
 			if (GO_BACK_DO > 0) {
 				goBack();
-				GO_BACK_DO--
+				GO_BACK_DO--;
 			}
 			mutex.unlock();
-			
-		}, 500)
+		}, 500);
 
 		// $(function(){
 		// 	$('body').append('<form id="cookiesHackForm" action="http://example.com/" method="get"></form>');
@@ -483,7 +486,7 @@ const App = (props) => {
 					},
 					(e) => {
 						console.log('SUCCESS');
-						setInited(false);
+						setInited(true);
 						fail('Не удалось получить ваши данные');
 					}
 				);

@@ -366,7 +366,7 @@ const Profile = (props) => {
 			false
 		);
 		getUserVK(
-			profileID,
+			activeContext[story].vk_id,
 			(r) => {
 				if (cleanupFunction) {
 					return;

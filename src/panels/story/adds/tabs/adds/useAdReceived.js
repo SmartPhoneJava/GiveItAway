@@ -32,13 +32,13 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 			page: pageNumber,
 		};
 
-		console.log("access one", pageNumber, cache.restore, cache.from(pageNumber, rowsPerPage).length)
+		console.log('access one', pageNumber, cache.restore, cache.from(pageNumber, rowsPerPage).length);
 		if (cache.restore && cache.from(pageNumber, rowsPerPage).length != 0) {
 			setTimeout(() => {
 				if (clear) {
 					return;
 				}
-				console.log("received restore")
+				console.log('received restore');
 				setAds((prev) => [...new Set([...prev, ...cache.from(pageNumber, rowsPerPage)])]);
 				setHasMore(true);
 				setLoading(false);
@@ -55,14 +55,15 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
+			headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 		})
 			.then((res) => {
 				if (clear) {
 					return;
 				}
-				
+
 				const newAds = res.data;
-				console.log("real one", pageNumber, cache.restore, cache.from(pageNumber, rowsPerPage).length)
+				console.log('real one', pageNumber, cache.restore, cache.from(pageNumber, rowsPerPage).length);
 				setAds((prev) => {
 					cache.to([...new Set([...prev, ...newAds])]);
 					return [...new Set([...prev, ...newAds])];

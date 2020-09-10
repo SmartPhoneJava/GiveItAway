@@ -496,6 +496,7 @@ const AddsTab = (props) => {
 				}
 			}
 
+			console.log('mode is', mode, User.getState().vk_id);
 			let url = BASE_AD + 'find';
 			if (mode != MODE_ALL && mode != MODE_WANTED) {
 				params.author_id = User.getState().vk_id;
@@ -509,6 +510,10 @@ const AddsTab = (props) => {
 				params,
 				withCredentials: true,
 				cancelToken: new axios.CancelToken((c) => (cancel = c)),
+				headers: {
+					...axios.defaults.headers,
+					Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken'),
+				},
 			})
 				.then((res) => {
 					const newAds = res.data;

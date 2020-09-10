@@ -17,6 +17,7 @@ export async function getUser(user_id, successCallback, failCallback, inVisible)
 		withCredentials: true,
 		url: Addr.getState() + BASE_USER + user_id + '/profile',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('response from getUser:', response);

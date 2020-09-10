@@ -27,6 +27,7 @@ export default function useNotificationsGet(pageNumber, rowsPerPage) {
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
+			headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 		})
 			.then((res) => {
 				const newNots = res.data;

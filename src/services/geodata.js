@@ -16,6 +16,7 @@ export function getAdress(geodata, successCallback, failCallBack) {
 		url: DADATA + GEOLOCATE,
 		params: { lat: geodata.lat, lon: geodata.long, count: 1 },
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('response from GET_ADDRESS:', response);
@@ -29,7 +30,7 @@ export function getAdress(geodata, successCallback, failCallBack) {
 			const story = store.getState().router.activeStory;
 			store.dispatch(setGeoDataString(story, response.value));
 			console.log('get address done', response);
-			
+
 			store.dispatch(
 				setGeoData(story, {
 					lat: response.geo_lat,
@@ -58,6 +59,7 @@ export function getMetro(addr, successCallback, failCallBack) {
 		url: DADATA + FINDBYID,
 		params: { query: addr },
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
+		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
 	})
 		.then(function (response) {
 			console.log('response from getMetro:', response);
