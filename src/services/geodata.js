@@ -17,7 +17,6 @@ export function getAdress(geodata, successCallback, failCallBack) {
 		url: DADATA + GEOLOCATE,
 		params: { lat: geodata.lat, lon: geodata.long, count: 1 },
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: Headers(),
 	})
 		.then(function (response) {
 			if (!response.data.suggestions || response.data.suggestions.length == 0) {

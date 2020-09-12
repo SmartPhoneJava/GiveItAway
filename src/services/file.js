@@ -1,4 +1,4 @@
-import { fail, failEasy } from "../requests";
+import { fail, failEasy } from '../requests';
 
 let KEY = 0;
 
@@ -16,10 +16,10 @@ export function NEWhandleFiles(file, addPhoto, index, v) {
 		console.log('we wanna start');
 		img.onerror = function () {
 			console.log('we wanna abort');
-			failEasy("Изображение поломано, загрузка не удалась")
+			failEasy('Изображение поломано, загрузка не удалась');
 			KEY++;
 			v(index);
-		}
+		};
 		img.onload = function () {
 			console.log('we wanna end');
 			var ctx = canvas.getContext('2d');
@@ -124,17 +124,24 @@ function checkFileType(file) {
 	return file.type.match('image.*');
 }
 
-export const loadPhotos = (e, handleWrongSize, handleWrongType, addPhoto, end) => {
+export const loadPhotos = async (e, handleWrongSize, handleWrongType, addPhoto, end) => {
 	var files = e.target.files; // FileList object
-	
+
 	if (files.length == 0) {
-		console.log("end is here")
+		console.log('end is here');
 		end();
 		return;
 	}
-	const flen = files.length
+	let flen = files.length;
+	if (flen > 3) {
+		flen = 3
+	}
+	
 	console.log('files.length', flen);
 	for (var i = 0, file; (file = files[i]); i++) {
+		if (i > 2) {
+			break;
+		}
 		console.log('we start 1');
 		if (!file) {
 			continue;
@@ -152,11 +159,10 @@ export const loadPhotos = (e, handleWrongSize, handleWrongType, addPhoto, end) =
 			continue;
 		}
 		NEWhandleFiles(file, addPhoto, i, (i) => {
-			console.log("loooook", i, flen - 1)
+			console.log('loooook', i, flen - 1);
 			if (i == flen - 1) {
-				console.log("eeeeend")
+				console.log('eeeeend');
 				end();
-				
 			}
 		});
 		// handleFileSelect(file, addPhoto);

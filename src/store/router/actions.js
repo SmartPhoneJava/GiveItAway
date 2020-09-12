@@ -19,12 +19,11 @@ import {
 } from './actionTypes';
 import { PANEL_USER, PANEL_ONE } from './panelTypes';
 
-export const setStory = (story, panel, save_to_history) => ({
+export const setStory = (story, panel) => ({
 	type: SET_STORY,
 	payload: {
 		story,
 		panel,
-		save_to_history,
 	},
 });
 

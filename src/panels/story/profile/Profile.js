@@ -16,10 +16,9 @@ import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 
 import './profile.css';
 import { setFormData } from '../../../store/create_post/actions';
-import { setStory, updateContext, setPage } from '../../../store/router/actions';
-import { STORY_ADS, STORY_CREATE } from '../../../store/router/storyTypes';
+import { updateContext, setPage } from '../../../store/router/actions';
 import { ADS_FILTERS } from '../../../store/create_post/types';
-import { MODE_WANTED } from '../../../const/ads';
+import { MODE_WANTED, MODE_ALL } from '../../../const/ads';
 
 import GivenPanel from './given';
 import ReceivedPanel from './received';
@@ -30,7 +29,7 @@ import { Collapse } from 'react-collapse';
 import { CardWithPadding } from '../../../App';
 import { openTab } from '../../../services/_functions';
 import { DIRECTION_BACK } from '../../../store/router/directionTypes';
-import { PANEL_ADS } from '../../../store/router/panelTypes';
+import { PANEL_ADS, PANEL_CREATE } from '../../../store/router/panelTypes';
 
 function getImage(backuser) {
 	if (!backuser || !backuser.photo_url) {
@@ -59,7 +58,7 @@ function getAuthorHref(backuser) {
 
 const Profile = (props) => {
 	const { myID, inputData, direction, activeContext, activePanels, story } = props;
-	const { setFormData, setStory, updateContext, setPage } = props;
+	const { setFormData, updateContext, setPage } = props;
 	const [profileID, setProfileID] = useState(myID);
 	const [userRequestSucess, setUserRequestSucess] = useState(false);
 
@@ -178,13 +177,13 @@ const Profile = (props) => {
 		);
 	}
 
-	useEffect(()=>{
+	useEffect(() => {
 		if (activeContext[story].vk_id == myID) {
 			props.setProfileName('Мой профиль');
 		} else {
 			props.setProfileName('Профиль');
 		}
-	}, [activeContext[story].vk_id])
+	}, [activeContext[story].vk_id]);
 
 	const [carmaPanel, setCarmaPanel] = useState();
 	const [collapseOpen, setCollapseOpen] = useState(false);
@@ -270,7 +269,7 @@ const Profile = (props) => {
 					icon={<Icon56DoNotDisturbOutline />}
 					header="Пусто"
 					action={
-						<Button style={{ cursor: 'pointer' }} size="l" onClick={openCreateStory}>
+						<Button style={{ cursor: 'pointer' }} size="l" onClick={openCreatePage}>
 							Отдать даром
 						</Button>
 					}
@@ -318,7 +317,7 @@ const Profile = (props) => {
 					icon={<Icon56DoNotDisturbOutline />}
 					header="Пусто"
 					action={
-						<Button style={{ cursor: 'pointer' }} size="l" onClick={openAdsStory}>
+						<Button style={{ cursor: 'pointer' }} size="l" onClick={openAdsAll}>
 							Получить даром
 						</Button>
 					}
@@ -355,7 +354,7 @@ const Profile = (props) => {
 				console.log('getUser done', v);
 
 				updateContext({ backUser: v });
-			
+
 				setFailed(false);
 				setUserRequestSucess(true);
 			},
@@ -396,16 +395,19 @@ const Profile = (props) => {
 				mode: MODE_WANTED,
 			});
 			setPage(PANEL_ADS);
-			//setStory(STORY_ADS);
 		}
 	}
 
-	function openCreateStory() {
-		setStory(STORY_CREATE);
+	function openCreatePage() {
+		setPage(PANEL_CREATE);
 	}
 
-	function openAdsStory() {
-		setStory(STORY_ADS);
+	function openAdsAll() {
+		setFormData(story + ADS_FILTERS, {
+			...inputData[story + ADS_FILTERS],
+			mode: MODE_ALL,
+		});
+		setPage(PANEL_ADS);
 	}
 
 	const [supportPanel, setSupportPanel] = useState();
@@ -477,7 +479,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
 	setFormData,
-	setStory,
 	setPage,
 	updateContext,
 };

@@ -13,7 +13,7 @@ import {
 	Cell,
 } from '@vkontakte/vkui';
 
-import background from './../img/backgrounds/1_dark.jpg';
+const background = 'https://giveitaway.ru/img/backgrounds/1_dark.jpg'
 
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 

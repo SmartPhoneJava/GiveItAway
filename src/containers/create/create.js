@@ -59,6 +59,7 @@ const getAd = (activeStory, myUser, inputData) => {
 	const geodata = inputData[activeStory + GEO_DATA] ? inputData[activeStory + GEO_DATA].geodata : { long: 0, lat: 0 };
 	const geodata_string = inputData[activeStory + GEO_DATA] ? inputData[activeStory + GEO_DATA].geodata_string : '';
 	console.log('location is', location);
+	console.log('full_adress is', geodata_string);
 	return {
 		ad_id,
 		author: { vk_id: myUser.id, name: myUser.first_name, surname: myUser.last_name, photo_url: myUser.photo_100 },
@@ -69,7 +70,7 @@ const getAd = (activeStory, myUser, inputData) => {
 		comments_enabled: main.comments_enabled,
 		ad_type: main.type,
 		// feedback_type: (main.ls ? ' ls' : '') + (main.comments ? ' comments' : ''),
-		extra_field: geodata_string,
+		full_adress: geodata_string,
 		category: category.category,
 		subcat_list: category.subcategory,
 		subcat: category.incategory,
@@ -99,7 +100,6 @@ const createAd = (activeStory, myUser, inputData, dispatch) => {
 	const ad = getAd(activeStory, myUser, inputData);
 	const obj = JSON.stringify(ad);
 	const photos = getItemInfo(activeStory, inputData).photosUrl;
-	console.log('create categories', ad);
 	CreateAd(
 		ad,
 		obj,

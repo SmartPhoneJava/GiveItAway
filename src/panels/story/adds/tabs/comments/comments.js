@@ -149,8 +149,11 @@ const CommentsI = (props) => {
 	);
 
 	useEffect(() => {
+		if (props.from == PANEL_COMMENTS) {
+			return;
+		}
 		const comments = props.activeContext[props.activeStory].comments || [];
-		console.log('comments are', comments);
+		console.log('comments are', props.activeContext[props.activeStory].comments);
 		setNots(comments);
 	}, [props.activeContext[props.activeStory].comments, props.activeContext[props.activeStory].comments_update]);
 
@@ -514,6 +517,7 @@ const mapStateToProps = (state) => {
 		myID: state.vkui.myID,
 		activeStory: state.router.activeStory,
 		activeContext: state.router.activeContext,
+
 		to: state.router.to,
 		from: state.router.from,
 	};

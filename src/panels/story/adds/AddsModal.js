@@ -28,6 +28,7 @@ import { ModalPageAdsGeo } from '../../../components/modal/geo_filter';
 import { ModalPageAdsSort } from '../../../components/modal/ad_sort';
 import { AdFilters } from '../../../components/modal/ad_filters';
 import { ADS_FILTERS, ADS_FILTERS_ON } from '../../../store/create_post/types';
+import { TYPE_CHOICE, TYPE_AUCTION } from '../../../const/ads';
 
 const AddsModal = (props) => {
 	const { closeModal, openCarma, inputData, activeStory } = props;
@@ -35,8 +36,8 @@ const AddsModal = (props) => {
 
 	const activeModal = props.activeModals[activeStory];
 
-
 	const cost = props.activeContext[props.activeStory].cost || 0;
+	const ad_type = props.activeContext[props.activeStory].ad_type || TYPE_CHOICE;
 	const isSubscriber = props.activeContext[props.activeStory].isSub || 0;
 
 	useEffect(() => {
@@ -57,7 +58,7 @@ const AddsModal = (props) => {
 	}, [isSubscriber]);
 
 	function getCost() {
-		if (!(backUser)) {
+		if (!backUser) {
 			return 'Информация недоступна';
 		}
 
@@ -159,7 +160,7 @@ const AddsModal = (props) => {
 				icon={
 					<Avatar mode="app" style={{ background: 'var(--background_content)' }} src={Freeze100} size={64} />
 				}
-				header={cost + K}
+				header={ad_type == TYPE_AUCTION ? cost - 1 + K : cost + K}
 				caption={
 					'Карма будет списана после того, как вы ' +
 					'подтвердите получение вещи. До тех пор ' +

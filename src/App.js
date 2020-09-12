@@ -57,15 +57,7 @@ import {
 import * as VK from './services/VK';
 import { setAppID, setPlatform } from './store/vk/actions';
 
-import {
-	addComment,
-	addSub,
-	setStatus,
-	setExtraInfo,
-	setToHistory,
-	clearAds,
-	backToPrevAd,
-} from './store/detailed_ad/actions';
+import { setExtraInfo, setToHistory, clearAds, backToPrevAd } from './store/detailed_ad/actions';
 
 import CategoriesPanel from './components/categories/panel';
 import Countries from './components/location/countries';
@@ -166,19 +158,17 @@ let GO_BACK_DO = 0;
 
 const App = (props) => {
 	const { colorScheme, myUser, myID, inputData } = props;
-	const { activeStory, activePanels, panelsHistory, popouts, snackbars, scrollPosition } = props;
+	const { activeStory, activePanels, panelsHistory, panelsHistoryVKUI, popouts, snackbars, scrollPosition } = props;
 	const {
 		goBack,
 		setAd,
 		setStory,
 		setStoryProfile,
 		setProfile,
-		setStatus,
 		openModal,
 		setFormData,
 		openPopout,
-		addComment,
-		addSub,
+
 		clearAds,
 		setPage,
 		updateContext,
@@ -295,15 +285,6 @@ const App = (props) => {
 			const ad = store.getState().ad;
 
 			console.log('noteAdId ', noteType, noteAdId, ad, NT_STATUS);
-
-			if (ad.ad_id == noteAdId) {
-				switch (noteType) {
-					case NT_RESPOND: {
-						const noteValue = note.data.payload.author;
-						addSub(noteValue);
-					}
-				}
-			}
 			handleNotifications(note);
 		});
 	}
@@ -361,10 +342,8 @@ const App = (props) => {
 					case NT_SUB: {
 						const router = store.getState().router;
 						let newSubs = router.activeContext[router.activeStory].subs || [];
-						console.log('new_subs before', newSubs);
 						newSubs = [...newSubs.filter((v) => v.vk_id != noteValue.user_id), noteValue];
 
-						console.log('new_subs after', newSubs);
 						updateContext({ subs: newSubs, subscribers_num: newSubs.length });
 						break;
 					}
@@ -372,29 +351,24 @@ const App = (props) => {
 						const router = store.getState().router;
 						let newSubs = router.activeContext[router.activeStory].subs || [];
 						newSubs = newSubs.filter((v, i) => {
-							console.log('newSubs iter', v, noteValue);
 							return v.vk_id != noteValue.user_id;
 						});
 
-						console.log('delete_subs', newSubs);
 						updateContext({ subs: newSubs, subscribers_num: newSubs.length });
 						break;
 					}
 					case NT_CLOSE: {
 						updateContext({ status: STATUS_CHOSEN });
-						setStatus(STATUS_CHOSEN);
 						updateDealInfo();
 						break;
 					}
 					case NT_SUB_CANCEL: {
 						updateContext({ status: STATUS_CHOSEN });
-						setStatus(STATUS_CHOSEN);
 						updateDealInfo();
 						break;
 					}
 					case NT_AD_STATUS: {
 						const noteValue = note.data.payload.new_status;
-						setStatus(noteValue);
 						updateContext({ status: noteValue });
 						if (noteValue == STATUS_CHOSEN) {
 							updateDealInfo();
@@ -587,19 +561,18 @@ const App = (props) => {
 		openModal(MODAL_ADS_GEO, DIRECTION_BACK);
 	}
 
-	const adPanels = panelsHistory[STORY_ADS];
-	const adActivePanel = activePanels[STORY_ADS];
+	const adPanels = panelsHistoryVKUI[STORY_ADS];
+	const adActivePanel = [activePanels[STORY_ADS]];
 	useEffect(() => {
-		console.log('adActivePanel is', adActivePanel);
-		console.log('adPanels is', adPanels);
-	}, [adActivePanel]);
+		console.log('adPanels are', adPanels);
+	}, [adPanels]);
 
 	const [adsScheme, setAdsScheme] = useState([]);
 	useEffect(() => {
 		setSchemeToView(STORY_ADS, setAdsScheme, deleteID, snackbars, historyLen);
 	}, [deleteID, snackbars, historyLen]);
 
-	let createPanels = panelsHistory[STORY_CREATE];
+	let createPanels = panelsHistoryVKUI[STORY_CREATE];
 	let createActivePanel = activePanels[STORY_CREATE];
 
 	const [createScheme, setCreateScheme] = useState([]);
@@ -607,7 +580,7 @@ const App = (props) => {
 		setSchemeToView(STORY_CREATE, setCreateScheme, deleteID, snackbars, historyLen);
 	}, [deleteID, snackbars, historyLen]);
 
-	let notsPanels = panelsHistory[STORY_NOTIFICATIONS];
+	let notsPanels = panelsHistoryVKUI[STORY_NOTIFICATIONS];
 	let notsActivePanel = activePanels[STORY_NOTIFICATIONS];
 
 	const [notsScheme, setNotsScheme] = useState([]);
@@ -615,7 +588,7 @@ const App = (props) => {
 		setSchemeToView(STORY_NOTIFICATIONS, setNotsScheme, deleteID, snackbars, historyLen);
 	}, [deleteID, snackbars, historyLen]);
 
-	let profilePanels = panelsHistory[STORY_PROFILE];
+	let profilePanels = panelsHistoryVKUI[STORY_PROFILE];
 	let profileActivePanel = activePanels[STORY_PROFILE];
 
 	const [profileScheme, setProfileScheme] = useState([]);
@@ -807,7 +780,6 @@ const App = (props) => {
 					id={STORY_NOTIFICATIONS}
 					popout={notsPopout}
 					activePanel={notsActivePanel}
-					popout={createPopout}
 					onSwipeBack={goBack}
 					modal={<AdsModal />}
 					history={notsPanels}
@@ -836,6 +808,7 @@ const mapStateToProps = (state) => {
 		activeStory: state.router.activeStory,
 		activeContext: state.router.activeContext,
 		panelsHistory: state.router.panelsHistory,
+		panelsHistoryVKUI: state.router.panelsHistoryVKUI,
 		activeModals: state.router.activeModals,
 		popouts: state.router.popouts,
 		scrollPosition: state.router.scrollPosition,
@@ -866,9 +839,6 @@ function mapDispatchToProps(dispatch) {
 				openModal,
 				setFormData,
 				openPopout,
-				addComment,
-				addSub,
-				setStatus,
 				clearAds,
 				setPage,
 				pushToCache,
@@ -891,4 +861,4 @@ export const CardWithPadding = (value, mode) => (
 );
 
 // 477 -> 516 -> 674 -> 703 -> 795 -> 749 -> 587 -> 524 -> 583
-// 722 -> 645 -> 930 -> 754
+// 722 -> 645 -> 930 -> 754 -> 864

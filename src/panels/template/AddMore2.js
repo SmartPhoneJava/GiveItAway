@@ -66,7 +66,7 @@ import {
 import { setIsSub, setIsHidden, setExtraInfo, setIsAuthor } from '../../store/detailed_ad/actions';
 import { AdDefault, AD_LOADING, STATUS_CLOSED, STATUS_ABORTED, TYPE_CHOICE, TYPE_AUCTION } from '../../const/ads';
 import { shareInVK } from '../../services/VK';
-import { EDIT_MODE, CREATE_AD_MAIN, CREATE_AD_ITEM } from '../../store/create_post/types';
+import { EDIT_MODE, CREATE_AD_MAIN, CREATE_AD_ITEM, GEO_DATA } from '../../store/create_post/types';
 import { setFormData } from '../../store/create_post/actions';
 import { FORM_CREATE } from '../../components/categories/redux';
 import { FORM_LOCATION_CREATE } from '../../components/location/redux';
@@ -136,9 +136,24 @@ const AddMore2r = (props) => {
 	const [rAd, setrAd] = useState(AD);
 
 	const [costRequestSuccess, setCostRequestSuccess] = useState(false);
+	useEffect(() => {
+		setCostRequestSuccess(props.activeContext[props.story].costRequestSuccess)
+	}, [props.activeContext[props.story].costRequestSuccess]);
+
 	const [dealRequestSuccess, setDealRequestSuccess] = useState(false);
+	useEffect(() => {
+		setDealRequestSuccess(props.activeContext[props.story].dealRequestSuccess)
+	}, [props.activeContext[props.story].dealRequestSuccess]);
+
 	const [subsRequestSuccess, setSubsRequestSuccess] = useState(false);
+	useEffect(() => {
+		setSubsRequestSuccess(props.activeContext[props.story].subsRequestSuccess)
+	}, [props.activeContext[props.story].subsRequestSuccess]);
+
 	const [detailsRequestSuccess, setDetailsRequestSuccess] = useState(false);
+	useEffect(() => {
+		setDetailsRequestSuccess(props.activeContext[props.story].detailsRequestSuccess)
+	}, [props.activeContext[props.story].detailsRequestSuccess]);
 
 	useEffect(() => {
 		const contextInfo = activeContext[story];
@@ -276,7 +291,7 @@ const AddMore2r = (props) => {
 				)}
 			</div>
 		);
-	}, [rAd]);
+	}, [rAd, imgs]);
 
 	const handleClose = () => {
 		setIsOpen(false);
@@ -303,12 +318,7 @@ const AddMore2r = (props) => {
 	};
 
 	function isNotValid() {
-		return (
-			rAd == null ||
-			rAd.ad_id == null ||
-			rAd.ad_id == AD_LOADING.ad_id ||
-			rAd.ad_id == AdDefault.ad_id
-		);
+		return rAd == null || rAd.ad_id == null || rAd.ad_id == AD_LOADING.ad_id || rAd.ad_id == AdDefault.ad_id;
 	}
 
 	const width = document.body.clientWidth;
@@ -429,7 +439,7 @@ const AddMore2r = (props) => {
 			);
 		};
 		if (props.activePanels[props.story] != PANEL_ONE) {
-			return
+			return;
 		}
 		if (direction == DIRECTION_FORWARD) {
 			dispatch(init());
@@ -762,6 +772,11 @@ const AddMore2r = (props) => {
 			comments_enabled: rAd.comments_enabled,
 		});
 
+		setFormData(story + GEO_DATA, {
+			geodata_string: rAd.full_adress,
+			geodata: rAd.geo_position,
+		});
+
 		setPage(PANEL_CREATE);
 	}
 
@@ -813,7 +828,7 @@ const mapStateToProps = (state) => {
 
 		story: state.router.activeStory,
 		activeContext: state.router.activeContext,
-		activePanels:  state.router.activePanels,
+		activePanels: state.router.activePanels,
 	};
 };
 

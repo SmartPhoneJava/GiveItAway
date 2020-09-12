@@ -14,9 +14,7 @@ import {
 	Banner,
 	Checkbox,
 	FormLayout,
-	SimpleCell,
 	Placeholder,
-	platform,
 } from '@vkontakte/vkui';
 import { ReactDadata } from 'react-dadata';
 
@@ -31,19 +29,14 @@ import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 import Icon24Place from '@vkontakte/icons/dist/24/place';
 import Icon56PlaceOutline from '@vkontakte/icons/dist/56/place_outline';
 
-import {
-	PANEL_CITIES,
-	PANEL_CATEGORIES,
-	PANEL_COUNTRIES,
-	PANEL_CATEGORIES_B,
-} from './../../../../store/router/panelTypes';
+import { PANEL_CATEGORIES_B } from './../../../../store/router/panelTypes';
 
 import { Transition } from 'react-transition-group';
 
 // import { canWritePrivateMessage } from '../../../../requests';
 import { FORM_LOCATION_CREATE } from '../../../../components/location/redux';
 import { SNACKBAR_DURATION_DEFAULT } from '../../../../store/const';
-import { EDIT_MODE, CREATE_AD_MAIN } from '../../../../store/create_post/types';
+import { EDIT_MODE, CREATE_AD_MAIN, GEO_DATA } from '../../../../store/create_post/types';
 import { getGeodata } from '../../../../services/VK';
 import { getAdress, getMetro } from '../../../../services/geodata';
 import { NoRegion } from '../../../../components/location/const';
@@ -68,15 +61,17 @@ const CreateAddRedux = (props) => {
 	const { openSnackbar, closeSnackbar, setGeoDataString, setGeoData, setFormData, setPage, openLicence } = props;
 
 	const [geodata_string, set_geodata_string_i] = useState(
-		(inputData[activeStory + CREATE_AD_MAIN] && inputData[activeStory + CREATE_AD_MAIN].geo_data_string) || ''
+		(inputData[activeStory + GEO_DATA] && inputData[activeStory + GEO_DATA].geodata_string) || ''
 	);
 
 	const set_geodata_string = (value) => {
-		setFormData(activeStory + CREATE_AD_MAIN, {
-			...props.inputData[activeStory + CREATE_AD_MAIN],
-			...defaultInputData,
-			geo_data_string: value,
+		console.log("seet data_string before", value)
+		setFormData(activeStory + GEO_DATA, {
+			...props.inputData[activeStory + GEO_DATA],
+		
+			geodata_string: value,
 		});
+		console.log("seet data_string", value)
 		set_geodata_string_i(value);
 	};
 
@@ -135,7 +130,7 @@ const CreateAddRedux = (props) => {
 		let cleanupFunction = false;
 		let { v, header, text } = props.isValid(activeStory, inputData);
 		var l = needEdit ? true : licenceAgree;
-		var p = needEdit || category == CategoryOnline ? true : validPlace;
+		var p = category == CategoryOnline ? true : validPlace;
 		if (v && !l) {
 			v = l;
 			text = 'Прочтите и согласитесь с правилами использования';
@@ -208,6 +203,7 @@ const CreateAddRedux = (props) => {
 							if (cancelFunc) {
 								return;
 							}
+							console.log("alll rrrrr")
 							const data_string = data.value;
 							set_geodata_string(data_string);
 
@@ -229,6 +225,7 @@ const CreateAddRedux = (props) => {
 							// });
 						},
 						(e) => {
+							console.log("some rrrrr", e)
 							if (cancelFunc) {
 								return;
 							}
@@ -335,7 +332,7 @@ const CreateAddRedux = (props) => {
 	useEffect(() => {
 		setIsGeoDataOkComponent(
 			<div className="create-geodata-status">
-				<div style={{ display: needEdit || isLoading ? 'none' : null }}>
+				<div style={{ display: isLoading ? 'none' : null }}>
 					{animateOnChange(
 						validPlace ? (
 							<Icon24DoneOutline style={{ color: 'var(--button_commerce_background)' }} />
@@ -367,7 +364,6 @@ const CreateAddRedux = (props) => {
 						transition: '0.3s',
 						width: `${width - 40}px`,
 					}}
-					disabled={needEdit}
 					token={'efb37d1dc6b04c11116d3ab7ef9482fa13e0b664'}
 					query={geodata_string}
 					onChange={(e) => {

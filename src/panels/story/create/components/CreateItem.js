@@ -27,10 +27,8 @@ import CategoriesLabel from './../../../../components/categories/label';
 import { FORM_CREATE } from './../../../../components/categories/redux';
 
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
-import Icon24Camera from '@vkontakte/icons/dist/24/camera';
 import Icon24Favorite from '@vkontakte/icons/dist/24/favorite';
 
-import Icon56DocumentOutline from '@vkontakte/icons/dist/56/document_outline';
 import Icon48Camera from '@vkontakte/icons/dist/48/camera';
 
 import { connect } from 'react-redux';
@@ -44,6 +42,7 @@ import './createItem.css';
 import { closeSnackbar, openSnackbar, setDummy } from '../../../../store/router/actions';
 import { CategoryOnline } from '../../../../components/categories/const';
 import { store } from '../../../..';
+import { failEasy } from '../../../../requests';
 
 const nameLabel = 'Название';
 const descriptionLabel = 'Описание';
@@ -128,21 +127,32 @@ const CreateItem = (props) => {
 
 	const loadPhoto = (e) => {
 		setLoading(true);
+
+		const flen = e.target.files.length
+
 		loadPhotos(
 			e,
 			handleWrongSize,
 			handleWrongType,
 			(value) => {
-				const photosUrl = !inputData.photosUrl ? [value] : [...inputData.photosUrl, value];
+				const data = store.getState().formData.forms[activeStory + CREATE_AD_ITEM] || {};
+				console.log('inputData.photosUrl', data, data.photosUrl, value);
+				const photosUrl = !data.photosUrl ? [value] : [...data.photosUrl, value];
 				const photoText = '' + PHOTO_TEXT + 'Загружено ' + photosUrl.length + '/3 снимков';
-				setFormData(activeStory + CREATE_AD_ITEM, {
-					...inputData,
-					photosUrl,
-					photoText,
-				});
+				store.dispatch(
+					setFormData(activeStory + CREATE_AD_ITEM, {
+						...data,
+						photosUrl,
+						photoText,
+						edw: 1,
+					})
+				);
 			},
 			() => {
 				setLoading(false);
+				if (flen > 3) {
+					failEasy('Нельзя загрузить более трёх снимков. Загружены только три.', 3000);
+				}
 			}
 		);
 	};
@@ -332,15 +342,13 @@ const CreateItem = (props) => {
 
 	return (
 		<>
-			{!needEdit ? (
-				<PhotoSwipe
-					style={{ marginTop: '50px' }}
-					isOpen={isOpen}
-					items={photoSwipeImgs}
-					options={options}
-					onClose={handleClose}
-				/>
-			) : null}
+			<PhotoSwipe
+				style={{ marginTop: '50px' }}
+				isOpen={isOpen}
+				items={photoSwipeImgs}
+				options={options}
+				onClose={handleClose}
+			/>
 			<CardGrid>
 				<Card size="l">
 					<FormLayout>

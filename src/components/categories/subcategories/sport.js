@@ -153,7 +153,7 @@ export const s12Sport5 = 'Тренировочные снаряды';
 export const s12Sport6 = 'Защита';
 
 export const gSport13 = 'Чемоданы, сумки, рюкзаки';
-export const s13Sport1 = 'Рюкзамки';
+export const s13Sport1 = 'Рюкзаки';
 export const s13Sport2 = 'Чемоданы';
 export const s13Sport3 = 'Дорожные сумки';
 export const s13Sport4 = 'Дорожные аксессуары';
