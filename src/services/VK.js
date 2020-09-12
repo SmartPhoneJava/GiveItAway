@@ -106,7 +106,7 @@ export const getuser = (success) => (dispatch) => {
 	return bridge
 		.send('VKWebAppGetUserInfo')
 		.then((data) => {
-			console.log("user is data ", data)
+			console.log('user is data ', data);
 			dispatch(setMyID(data.id));
 			dispatch(setMyUser(data));
 			if (success) {
@@ -306,7 +306,7 @@ export const postStoryApp = () => {
 		});
 };
 
-export const getGeodata = (activeStory, successCallback, failCallback) => {
+export const getGeodata = (activeStory, successCallback, failCallback, hide) => {
 	let cleanupFunction = false;
 	const s = successCallback || (() => {});
 	const f = failCallback || (() => {});
@@ -327,7 +327,9 @@ export const getGeodata = (activeStory, successCallback, failCallback) => {
 		.catch((error) => {
 			console.log('VKWebAppGetGeodata error', error);
 			f(error);
-			fail('Не удалось получить местоположение. Проверьте, включен ли GPS');
+			if (!hide) {
+				fail('Не удалось получить местоположение. Проверьте, включен ли GPS');
+			}
 		});
 	return () => (cleanupFunction = true);
 };

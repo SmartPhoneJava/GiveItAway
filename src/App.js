@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useMutex } from 'react-context-mutex';
 import {
 	View,
@@ -152,7 +152,7 @@ export const scrollWindow = (to) => {
 	if (scrolledSoFar == scrollEnd) {
 		return;
 	}
-	let repeat = 50;
+	let repeat = 10;
 	let timerID = setInterval(function () {
 		repeat--;
 		window.scrollTo(0, scrollEnd);
@@ -266,18 +266,18 @@ const App = (props) => {
 		}
 	}, [scrollPosition]);
 
-	useEffect(() => {
-		if (props.from == PANEL_SUBS || props.to == PANEL_SUBS) {
-			return;
-		}
-		if (props.from == PANEL_ONE || props.to == PANEL_ONE) {
-			if (props.direction == DIRECTION_BACK) {
-				props.backToPrevAd();
-			} else {
-				store.dispatch(setToHistory());
-			}
-		}
-	}, [props.from]);
+	// useEffect(() => {
+	// 	if (props.from == PANEL_SUBS || props.to == PANEL_SUBS) {
+	// 		return;
+	// 	}
+	// 	if (props.from == PANEL_ONE || props.to == PANEL_ONE) {
+	// 		if (props.direction == DIRECTION_BACK) {
+	// 			props.backToPrevAd();
+	// 		} else {
+	// 			store.dispatch(setToHistory());
+	// 		}
+	// 	}
+	// }, [props.from]);
 
 	const [notHere, setNotHere] = useState(false);
 	const [subscription, setSubscription] = useState(null);
@@ -356,13 +356,15 @@ const App = (props) => {
 					}
 					case NT_MAX_BID: {
 						updateContext({ cost: noteValue.new_bid + 1 });
+						break;
 					}
 					case NT_SUB: {
 						const router = store.getState().router;
 						let newSubs = router.activeContext[router.activeStory].subs || [];
+						console.log('new_subs before', newSubs);
 						newSubs = [...newSubs.filter((v) => v.vk_id != noteValue.user_id), noteValue];
 
-						console.log('new_subs', newSubs);
+						console.log('new_subs after', newSubs);
 						updateContext({ subs: newSubs, subscribers_num: newSubs.length });
 						break;
 					}
@@ -405,6 +407,61 @@ const App = (props) => {
 		);
 	}, [props.activeContext[props.activeStory].ad_id]);
 
+	const [tabbar, setTabbar] = useState(<></>);
+	useEffect(() => {
+		console.log('props.dummies', props.dummies);
+		if (props.dummies[props.activeStory].length == 0) {
+			setTabbar(
+				<Tabbar>
+					<TabbarItem
+						style={{ cursor: 'pointer' }}
+						onClick={onStoryChange}
+						selected={activeStory === STORY_ADS}
+						data-story={STORY_ADS}
+						data-text={adsText}
+						text={adsText}
+					>
+						<Icon28NewsfeedOutline style={{ cursor: 'pointer' }} onClick={onStoryChange} />
+					</TabbarItem>
+
+					<TabbarItem
+						style={{ cursor: 'pointer' }}
+						onClick={onStoryChange}
+						data-text={addText}
+						selected={activeStory === STORY_CREATE}
+						data-story={STORY_CREATE}
+						text={addText}
+					>
+						<Icon28Add onClick={onStoryChange} />
+					</TabbarItem>
+					<TabbarItem
+						style={{ cursor: 'pointer' }}
+						onClick={onStoryChange}
+						data-text={notText}
+						selected={activeStory === STORY_NOTIFICATIONS}
+						data-story={STORY_NOTIFICATIONS}
+						label={notsCounterrr == 0 ? null : notsCounterrr}
+						text={notText}
+					>
+						<Icon28Notification style={{ cursor: 'pointer' }} onClick={onStoryChange} />
+					</TabbarItem>
+					<TabbarItem
+						style={{ cursor: 'pointer' }}
+						onClick={onStoryChange}
+						selected={activeStory === STORY_PROFILE}
+						data-story={STORY_PROFILE}
+						data-text={profileText}
+						text={profileText}
+					>
+						<Icon28User style={{ cursor: 'pointer' }} onClick={onStoryChange} />
+					</TabbarItem>
+				</Tabbar>
+			);
+		} else {
+			setTabbar(null);
+		}
+	}, [props.dummies, activeStory]);
+
 	useEffect(() => {
 		openPopout(<ScreenSpinner size="large" />);
 		const { dispatch } = props;
@@ -427,9 +484,31 @@ const App = (props) => {
 
 		window.history.pushState({ currPanel: PANEL_ADS, ad: AdDefault }, PANEL_ADS);
 		window.onpopstate = function (event) {
-			mutex.lock();
-			GO_BACK_DO++;
-			mutex.unlock();
+			const router = store.getState().router;
+			const fromAdsFeed = router.panelsHistory[router.activeStory] == PANEL_ADS;
+			const context = router.activeContext[router.activeStory];
+			console.log('panelsHistory', router.panelsHistory[router.activeStory]);
+			if (fromAdsFeed) {
+				const thisPanel = router.activePanels[router.activeStory];
+				if (thisPanel == PANEL_CITIES) {
+					goBack();
+					openModal(MODAL_ADS_FILTERS);
+					setTimeout(() => {
+						openModal(MODAL_ADS_GEO, DIRECTION_BACK);
+					}, 600);
+				} else if (thisPanel == PANEL_CATEGORIES) {
+					goBack();
+					openModal(MODAL_ADS_FILTERS);
+				}
+			} else {
+				if (context.goBack) {
+					context.goBack();
+				} else {
+					mutex.lock();
+					GO_BACK_DO++;
+					mutex.unlock();
+				}
+			}
 		};
 
 		setInterval(() => {
@@ -467,7 +546,6 @@ const App = (props) => {
 				Auth(
 					us,
 					(v) => {
-						console.log('FAILED');
 						setInited(true);
 						getToken((v) => {
 							centrifuge.setToken(v.token);
@@ -485,7 +563,6 @@ const App = (props) => {
 						);
 					},
 					(e) => {
-						console.log('SUCCESS');
 						setInited(true);
 						fail('Не удалось получить ваши данные');
 					}
@@ -551,7 +628,6 @@ const App = (props) => {
 		setScheme([
 			<Panel id={PANEL_ADS}>
 				<AddsTabs
-					notsCounter={notsCounterrr}
 					zeroNots={() => {
 						notsCounterrr = 0;
 					}}
@@ -704,55 +780,7 @@ const App = (props) => {
 
 	return (
 		<ConfigProvider isWebView={true} scheme={colorScheme}>
-			<Epic
-				activeStory={activeStory}
-				tabbar={
-					<Tabbar>
-						<TabbarItem
-							style={{ cursor: 'pointer' }}
-							onClick={onStoryChange}
-							selected={activeStory === STORY_ADS}
-							data-story={STORY_ADS}
-							data-text={adsText}
-							text={adsText}
-						>
-							<Icon28NewsfeedOutline style={{ cursor: 'pointer' }} onClick={onStoryChange} />
-						</TabbarItem>
-
-						<TabbarItem
-							style={{ cursor: 'pointer' }}
-							onClick={onStoryChange}
-							data-text={addText}
-							selected={activeStory === STORY_CREATE}
-							data-story={STORY_CREATE}
-							text={addText}
-						>
-							<Icon28Add onClick={onStoryChange} />
-						</TabbarItem>
-						<TabbarItem
-							style={{ cursor: 'pointer' }}
-							onClick={onStoryChange}
-							data-text={notText}
-							selected={activeStory === STORY_NOTIFICATIONS}
-							data-story={STORY_NOTIFICATIONS}
-							label={notsCounterrr == 0 ? null : notsCounterrr}
-							text={notText}
-						>
-							<Icon28Notification style={{ cursor: 'pointer' }} onClick={onStoryChange} />
-						</TabbarItem>
-						<TabbarItem
-							style={{ cursor: 'pointer' }}
-							onClick={onStoryChange}
-							selected={activeStory === STORY_PROFILE}
-							data-story={STORY_PROFILE}
-							data-text={profileText}
-							text={profileText}
-						>
-							<Icon28User style={{ cursor: 'pointer' }} onClick={onStoryChange} />
-						</TabbarItem>
-					</Tabbar>
-				}
-			>
+			<Epic activeStory={activeStory} tabbar={tabbar}>
 				<View
 					popout={adPopout}
 					id={STORY_ADS}
@@ -790,9 +818,9 @@ const App = (props) => {
 					popout={profilePopout}
 					id={STORY_PROFILE}
 					activePanel={profileActivePanel}
-					onSwipeBack={profilePanels}
+					onSwipeBack={goBack}
 					modal={<AdsModal />}
-					history={adPanels}
+					history={profilePanels}
 					header={false}
 				>
 					{profileScheme}
@@ -821,6 +849,7 @@ const mapStateToProps = (state) => {
 		direction: state.router.direction,
 		from: state.router.from,
 		to: state.router.to,
+		dummies: state.router.dummies,
 	};
 };
 

@@ -202,7 +202,6 @@ const CreateAddRedux = (props) => {
 					setMapState({ ...mapState, center });
 					setPlace(center);
 					setIsLoading(false);
-					console.log('getGeodata wtfffff');
 					getAdress(
 						data,
 						(data) => {
@@ -493,7 +492,7 @@ const CreateAddRedux = (props) => {
 						<Cell
 							style={{ padding: '0px' }}
 							multiline
-							description="Кликни по полю ввода, чтобы указать свое местоположение, или по иконке, чтобы определить его автоматически"
+							description="Кликните по полю ввода, чтобы указать свое местоположение, или по иконке, чтобы определить его автоматически"
 						>
 							<div style={{ fontWeight: 600 }}>Где забрать вещь</div>
 						</Cell>

@@ -47,7 +47,7 @@ export const s3Electronics4 = 'Промышленные';
 export const s3Electronics5 = 'Игровые приставки';
 export const s3Electronics6 = 'Комплектующие для компьютеров';
 
-export const gElectronics4 = 'Перифийные устройства';
+export const gElectronics4 = 'Периферийные устройства';
 export const s4Electronics1 = 'Мониторы';
 export const s4Electronics2 = 'Мыши';
 export const s4Electronics3 = 'Клавиатуры';

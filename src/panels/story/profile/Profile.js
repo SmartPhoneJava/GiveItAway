@@ -178,6 +178,14 @@ const Profile = (props) => {
 		);
 	}
 
+	useEffect(()=>{
+		if (activeContext[story].vk_id == myID) {
+			props.setProfileName('Мой профиль');
+		} else {
+			props.setProfileName('Профиль');
+		}
+	}, [activeContext[story].vk_id])
+
 	const [carmaPanel, setCarmaPanel] = useState();
 	const [collapseOpen, setCollapseOpen] = useState(false);
 	useEffect(() => {
@@ -347,11 +355,7 @@ const Profile = (props) => {
 				console.log('getUser done', v);
 
 				updateContext({ backUser: v });
-				if (activeContext[story].vk_id == myID) {
-					props.setProfileName('Мой профиль');
-				} else {
-					props.setProfileName('Профиль');
-				}
+			
 				setFailed(false);
 				setUserRequestSucess(true);
 			},

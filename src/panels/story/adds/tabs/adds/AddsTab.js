@@ -43,6 +43,7 @@ import { STORY_ADS } from '../../../../../store/router/storyTypes';
 import { TagsLabel, tag } from '../../../../../components/categories/label';
 import { Collapse } from 'react-collapse';
 import formPanel from '../../../../../components/template/formPanel';
+import { Headers, handleNetworkError } from '../../../../../requests';
 
 let i = 0;
 
@@ -391,7 +392,7 @@ const AddsTab = (props) => {
 		}
 		setPageNumber(-1);
 		setHasMore(true);
-	}, [category, mode, searchR, city, country, sort, geodata, geoType, radius, refreshMe]);
+	}, [category, incategory, subcategory, mode, searchR, city, country, sort, geodata, geoType, radius, refreshMe]);
 
 	useEffect(() => {
 		const c = ColumnsFunc(
@@ -467,13 +468,14 @@ const AddsTab = (props) => {
 			if (query != '') {
 				params.query = '' + query;
 			}
+			console.log('city is city', category, subcategory, incategory);
 			if (category != CategoryNo) {
 				params.category = category;
 				if (subcategory != CategoryNo) {
 					params.subcat_list = subcategory;
-					if (incategory != CategoryNo) {
-						params.subcat = incategory;
-					}
+				}
+				if (incategory != CategoryNo) {
+					params.subcat = incategory;
 				}
 			}
 
@@ -481,8 +483,6 @@ const AddsTab = (props) => {
 				params.lat = geodata.lat;
 				params.long = geodata.long;
 			}
-
-			console.log('city is city', city);
 
 			if (geoType == GEO_TYPE_NEAR) {
 				params.radius = radius || 0.5;
@@ -510,10 +510,7 @@ const AddsTab = (props) => {
 				params,
 				withCredentials: true,
 				cancelToken: new axios.CancelToken((c) => (cancel = c)),
-				headers: {
-					...axios.defaults.headers,
-					Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken'),
-				},
+				headers: Headers(),
 			})
 				.then((res) => {
 					const newAds = res.data;
@@ -534,29 +531,31 @@ const AddsTab = (props) => {
 
 					setInited(true);
 				})
-				.catch((e) => {
-					console.log('fail', e);
-					props.pushToCache([...rads], 'ads_list');
-					props.pushToCache(pageNumber, 'ads_page');
+				.catch((error) =>
+					handleNetworkError(error, null, (e) => {
+						console.log('fail', e);
+						props.pushToCache([...rads], 'ads_list');
+						props.pushToCache(pageNumber, 'ads_page');
 
-					if (axios.isCancel(e)) return;
-					if (('' + e).indexOf('404') == -1) {
-						console.log('real err', e);
+						if (axios.isCancel(e)) return;
+						if (('' + e).indexOf('404') == -1) {
+							console.log('real err', e);
 
-						setError(true);
-					} else {
-						console.log('non real err', e);
-						setError404(true);
-						setHasMore(false);
-						setPageNumber((prev) => (prev == 1 ? 1 : prev - 1));
-					}
-					setLoading(false);
+							setError(true);
+						} else {
+							console.log('non real err', e);
+							setError404(true);
+							setHasMore(false);
+							setPageNumber((prev) => (prev == 1 ? 1 : prev - 1));
+						}
+						setLoading(false);
 
-					setInited(true);
-					if (pageNumber == 1) {
-						setRads([]);
-					}
-				});
+						setInited(true);
+						if (pageNumber == 1) {
+							setRads([]);
+						}
+					})
+				);
 		}
 		f();
 		return () => {

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Spinner } from '@vkontakte/vkui';
 
 import { Addr, BASE_USER } from '../../../../../store/addr';
+import { handleNetworkError, Headers } from '../../../../../requests';
 
 export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id, cache) {
 	const [inited, setInited] = useState(false);
@@ -52,7 +53,7 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id, 
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
-			headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+			headers: Headers(),
 		})
 			.then((res) => {
 				if (clear) {
@@ -70,18 +71,20 @@ export default function useAdGiven(setPopout, pageNumber, rowsPerPage, user_id, 
 				setPopout(null);
 				setInited(true);
 			})
-			.catch((e) => {
-				if (clear) {
-					return;
-				}
-				console.log('fail', e);
-				if (axios.isCancel(e)) return;
-				if (('' + e).indexOf('404') == -1) {
-					setError(true);
-				}
-				setPopout(null);
-				setInited(true);
-			});
+			.catch((error) =>
+				handleNetworkError(error, null, (e) => {
+					if (clear) {
+						return;
+					}
+					console.log('fail', e);
+					if (axios.isCancel(e)) return;
+					if (('' + e).indexOf('404') == -1) {
+						setError(true);
+					}
+					setPopout(null);
+					setInited(true);
+				})
+			);
 		return () => {
 			clear = true;
 			cancel();

@@ -46,7 +46,7 @@ import { subscribe, unsubscribe } from './../story/adds/tabs/subs/requests';
 
 import { K } from './../story/profile/const';
 
-import { adVisible, adHide, deleteAd, getSubscribers, getDetails, acceptDeal, denyDeal, fail } from './../../requests';
+import { adVisible, adHide, deleteAd, getDetails, acceptDeal, denyDeal, fail } from './../../requests';
 
 import './styles.css';
 
@@ -829,7 +829,6 @@ const mapDispatchToProps = (dispatch) => {
 				adVisible,
 				adHide,
 				deleteAd,
-				getSubscribers,
 				getDetails,
 				goBack,
 				acceptDeal,

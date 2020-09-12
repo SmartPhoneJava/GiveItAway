@@ -23,15 +23,34 @@ import AddsTab from './tabs/adds/AddsTab';
 import { setFormData } from '../../../store/create_post/actions';
 import { ADS_FILTERS } from '../../../store/create_post/types';
 import { TAB_ADS, TAB_NOTIFICATIONS, MODE_ALL, MODE_WANTED, MODE_GIVEN } from '../../../const/ads';
-import { setTab, openModal } from '../../../store/router/actions';
+import { setTab, openModal, updateContext, goBack } from '../../../store/router/actions';
 import { MODAL_ADS_FILTERS, MODAL_ADS_SUBS } from '../../../store/router/modalTypes';
 import { scrollWindow } from '../../../App';
 
 const AddsTabs = (props) => {
-	const { setFormData, setTab, openModal, inputData, activeTabs, activeStory } = props;
+	const { setFormData, setTab, openModal, updateContext, goBack } = props;
+	const { inputData, activeTabs, activeStory } = props;
 	const mode = (inputData[activeStory + ADS_FILTERS] ? inputData[activeStory + ADS_FILTERS].mode : null) || MODE_ALL;
 	const activeTab = activeTabs[activeStory] || TAB_ADS;
-	const [contextOpened, setContextOpened] = useState(false);
+	const [contextOpened, setContextOpenedR] = useState(false);
+
+	// Обработка хардверного нажатия назад
+	useEffect(() => {
+		updateContext({
+			goBack: () => {
+				if (contextOpened) {
+					setContextOpened(false);
+				} else {
+					goBack();
+				}
+			},
+		});
+	}, [contextOpened]);
+
+	function setContextOpened(value) {
+		updateContext({ contextOpened: value });
+		setContextOpenedR(value);
+	}
 
 	useEffect(() => {
 		const listener = function () {
@@ -166,6 +185,8 @@ const mapDispatchToProps = {
 	setFormData,
 	setTab,
 	openModal,
+	updateContext,
+	goBack,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddsTabs);

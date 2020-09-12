@@ -53,7 +53,7 @@ export const s5Office1 = 'Рюкзаки и ранцы';
 export const s5Office2 = 'Мешки для обуви и формы';
 export const s5Office3 = 'Подставки для книг';
 export const s5Office4 = 'Обложки';
-export const s5Office5 = 'Детские микроскопвы и телескопы';
+export const s5Office5 = 'Детские микроскопы и телескопы';
 export const s5Office6 = 'Школьные глобусы';
 export const s5Office7 = 'Учебные карты';
 

@@ -126,7 +126,7 @@ export const AutoStruct = {
 		},
 		{
 			header: gAuto2,
-			array: [s2Auto1, s2Auto2, s2Auto3, s2Auto4, s2Auto5, s2Auto6, s2Auto7, s2Auto8, s2Auto9, s2Auto9, s2Auto10],
+			array: [s2Auto1, s2Auto2, s2Auto3, s2Auto4, s2Auto5, s2Auto6, s2Auto7, s2Auto8, s2Auto9, s2Auto10],
 		},
 		{
 			header: gAuto3,

@@ -3,36 +3,36 @@ import axios from 'axios';
 
 import { Addr, BASE_USER } from './../../../store/addr';
 
-import { fail, success } from './../../../requests';
+import { fail, success, Headers, handleNetworkError } from './../../../requests';
 import { store } from '../../..';
 
 let request_id = 0;
 
-export async function getUser(user_id, successCallback, failCallback, inVisible) {
-	let err = false;
+export function getUser(user_id, successCallback, failCallback, inVisible) {
 	let cancel;
 
-	await axios({
+	axios({
 		method: 'get',
 		withCredentials: true,
 		url: Addr.getState() + BASE_USER + user_id + '/profile',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
 		.then(function (response) {
-			console.log('response from getUser:', response);
 			successCallback(response.data);
 			return response.data;
 		})
-		.catch(function (error) {
-			console.log('ERROR getUser:', error);
-			err = true;
-			failCallback(error);
-			if (!inVisible) {
-				fail('Нет соединения с сервером');
-			}
-		});
-	return err;
+		.catch((error) =>
+			handleNetworkError(
+				error,
+				(e) => {
+					if (!inVisible) {
+						fail('Нет соединения с сервером');
+					}
+				},
+				failCallback
+			)
+		);
 }
 
 export async function getUserVK(id, successCallback, failCallback) {

@@ -7,6 +7,7 @@ import { ScreenSpinner } from '@vkontakte/vkui';
 import { Addr, BASE_AD } from '../../../../../store/addr';
 import { setSubs, addSub } from '../../../../../store/detailed_ad/actions';
 import { openPopout, closePopout } from '../../../../../store/router/actions';
+import { Headers, handleNetworkError } from '../../../../../requests';
 
 export default function useSubsGet(
 	ignorePopout,
@@ -53,10 +54,9 @@ export default function useSubsGet(
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
-			headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+			headers: Headers(),
 		})
 			.then((res) => {
-				console.log('sucess subs', res);
 				const newNots = res.data;
 
 				newNots.forEach((sub) => {
@@ -66,21 +66,19 @@ export default function useSubsGet(
 				setHasMore(newNots.length > 0);
 				setLoading(false);
 
-				if (!ignorePopout) {
-					store.dispatch(closePopout());
-				}
 				setInited(true);
 				successCallback(newNots);
 			})
-			.catch((e) => {
-				console.log('ERROR useSubsGet:', e);
-				if (axios.isCancel(e)) return;
-
+			.catch((error) =>
+				handleNetworkError(error, null, (e) => {
+					failCallback(e);
+					setInited(true);
+				})
+			)
+			.finally(() => {
 				if (!ignorePopout) {
 					store.dispatch(closePopout());
 				}
-				failCallback(e);
-				setInited(true);
 			});
 		return () => cancel();
 	}, [pageNumber]);

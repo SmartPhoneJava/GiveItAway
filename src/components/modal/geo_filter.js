@@ -80,7 +80,7 @@ const ModalPageAdsGeoInner = (props) => {
 
 	useEffect(() => {
 		props.updateModalHeight();
-	}, [changed, valid, radius, props.direction]);
+	});
 
 	useEffect(() => {
 		if (props.direction == DIRECTION_BACK) {
@@ -147,7 +147,8 @@ const ModalPageAdsGeoInner = (props) => {
 			(err) => {
 				setValid(false);
 				setLoading(false);
-			}
+			},
+			true
 		);
 	}
 

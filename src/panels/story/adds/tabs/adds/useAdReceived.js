@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Spinner } from '@vkontakte/vkui';
 
 import { Addr, BASE_USER } from '../../../../../store/addr';
+import { Headers, handleNetworkError } from '../../../../../requests';
 
 export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_id, cache) {
 	const [inited, setInited] = useState(false);
@@ -55,7 +56,7 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
-			headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+			headers: Headers(),
 		})
 			.then((res) => {
 				if (clear) {
@@ -63,7 +64,6 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 				}
 
 				const newAds = res.data;
-				console.log('real one', pageNumber, cache.restore, cache.from(pageNumber, rowsPerPage).length);
 				setAds((prev) => {
 					cache.to([...new Set([...prev, ...newAds])]);
 					return [...new Set([...prev, ...newAds])];
@@ -74,18 +74,21 @@ export default function useAdReceived(setPopout, pageNumber, rowsPerPage, user_i
 				setPopout(null);
 				setInited(true);
 			})
-			.catch((e) => {
-				if (clear) {
-					return;
-				}
-				console.log('fail', e);
-				if (axios.isCancel(e)) return;
-				if (('' + e).indexOf('404') == -1) {
-					setError(true);
-				}
-				setPopout(null);
-				setInited(true);
-			});
+			.catch((error) =>
+				handleNetworkError(error, null, (e) => {
+					if (clear) {
+						return;
+					}
+					console.log('fail', e);
+					if (axios.isCancel(e)) return;
+					if (('' + e).indexOf('404') == -1) {
+						setError(true);
+					}
+					setPopout(null);
+					setInited(true);
+				})
+			);
+
 		return () => {
 			cancel();
 			clear = true;

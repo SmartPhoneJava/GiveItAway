@@ -66,7 +66,7 @@ const ModalPageAdsSortInner = (props) => {
 
 	useEffect(() => {
 		props.updateModalHeight();
-	}, [changed, valid]);
+	});
 
 	function applyTimeSort() {
 		setIsTimeSort(true);
@@ -98,7 +98,8 @@ const ModalPageAdsSortInner = (props) => {
 				setLoading(false);
 				setValid(false);
 				applyTimeSort();
-			}
+			},
+			true
 		);
 	}
 

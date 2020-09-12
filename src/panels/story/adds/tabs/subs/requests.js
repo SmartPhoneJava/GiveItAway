@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import { Addr, BASE_AD } from '../../../../../store/addr';
 
-import { fail, success } from '../../../../../requests';
+import { fail, success, Headers, handleNetworkError, StandardError, handleSpamError } from '../../../../../requests';
 import { store } from '../../../../..';
 import { deleteSub, addSub } from '../../../../../store/detailed_ad/actions';
 import { updateContext } from '../../../../../store/router/actions';
@@ -17,18 +17,26 @@ export function getMyUser() {
 	};
 }
 
+const handleCarmaError = (error, another) => {
+	if (error.response.status === 409) {
+		fail('Недостаточно кармы. Откажитесь от другой вещи, чтобы получить эту!', null, end);
+	} else {
+		another(error);
+	}
+};
+
 export function subscribe(ad_id, clCancel, s, f, e) {
 	const end = e || (() => {});
 	const successCallback = s || ((v) => {});
 	const failCallback = f || ((v) => {});
-	let err = false;
+
 	let cancel;
 	axios({
 		method: 'post',
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/subscribe',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
 		.then(function (response) {
 			return response.data;
@@ -48,69 +56,71 @@ export function subscribe(ad_id, clCancel, s, f, e) {
 			success('Теперь вы будете получать уведомления, связанные с этим постом', clCancel, end);
 			return response;
 		})
-		.catch(function (error) {
-			err = true;
-			failCallback(error);
-
-			if (error == 'Error: Request failed with status code 409') {
-				fail('Недостаточно кармы. Откажитесь от другой вещи, чтобы получить эту!', null, end);
-			} else {
-				if (error.response.status === 429) {
-					failEasy('Вы не можете откликнуться на это объявление, поскольку отписались от него несколько раз');
-				} else {
-					fail(
-						'Нет соединения с сервером',
-						() => {
-							subscribe(ad_id, clCancel, successCallback, failCallback, end);
-						},
-						end
-					);
-				}
-			}
-		});
-	return err;
+		.catch(
+			(error) =>
+				handleNetworkError(
+					error,
+					(error) =>
+						handleSpamError(error, (error) =>
+							handleCarmaError(error, (error) =>
+								StandardError(
+									error,
+									() => {
+										subscribe(ad_id, clCancel, successCallback, failCallback, end);
+									},
+									null,
+									end
+								)
+							)
+						),
+					'Вы не можете откликнуться на это объявление, поскольку отписались от него несколько раз',
+					null,
+					end
+				),
+			end
+		);
 }
 
 export function unsubscribe(ad_id, clCancel, s, f, e) {
 	const end = e || (() => {});
 	const successCallback = s || ((v) => {});
 	const failCallback = f || ((v) => {});
-	let err = false;
 	let cancel;
 	axios({
 		method: 'post',
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/unsubscribe',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
 		.then(function (response) {
 			return response.data;
 		})
 		.then(function (response) {
 			successCallback(response);
-			const router = store.getState().router;
 			const myID = getMyUser().vk_id;
 			store.dispatch(deleteSub(myID));
 			store.dispatch(
 				updateContext({
 					isSub: false,
-					//subs: router.activeContext[router.activeStory].subs.filter((v) => v.vk_id != myID),
 				})
 			);
 			success('Больше вы не будете получать связанные с этим постом уведомления', clCancel, end);
 			return response;
 		})
-		.catch(function (error) {
-			err = true;
-			failCallback(error);
-			fail(
-				'Нет соединения с сервером',
-				() => {
-					unsubscribe(ad_id, clCancel);
-				},
-				end
-			);
-		});
-	return err;
+		.catch((error) =>
+			handleNetworkError(
+				error,
+				(error) =>
+					StandardError(
+						error,
+						() => {
+							unsubscribe(ad_id, clCancel);
+						},
+						null,
+						end
+					),
+				failCallback
+			)
+		);
 }

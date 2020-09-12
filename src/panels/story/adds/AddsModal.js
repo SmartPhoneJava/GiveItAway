@@ -147,7 +147,7 @@ const AddsModal = (props) => {
 						</InfoRow>
 					</Cell>
 					{/* <Cell>
-						<InfoRow header="Заморожено в других обьявлениях">
+						<InfoRow header="Заморожено в других объявлениях">
 							{props.backUser ? props.backUser.frozen_carma + '' + K : 'Информация недоступна'}
 						</InfoRow>
 					</Cell> */}

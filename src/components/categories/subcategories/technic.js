@@ -44,7 +44,7 @@ export const s4Technic2 = 'Варочные панели';
 export const s4Technic3 = 'Морозильники';
 export const s4Technic4 = 'Винные шкафы';
 export const s4Technic5 = 'Подогреватели посуды';
-export const s4Technic6 = 'Измельчатили пищевых отходов';
+export const s4Technic6 = 'Измельчители пищевых отходов';
 
 export const gTechnic5 = 'Мелкая техника для кухни';
 export const s5Technic1 = 'Кофеварки и кофемашины';

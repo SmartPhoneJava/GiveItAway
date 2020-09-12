@@ -87,16 +87,16 @@ export function handleNotifications(note) {
 			sendSnack('Объявление удалено');
 			return;
 		case NT_RESPOND:
-			sendSnack('Кто то откикнулся на объявление');
+			sendSnack('Кто-то откликнулся на объявление');
 			return;
 		case NT_FULFILL:
 			sendSnack('Объявление завершено');
 			return;
 		case NT_COMMENT_NEW:
-			sendSnack('Обьявление прокомментировано');
+			sendSnack('Объявление прокомментировано');
 			return;
 		case NT_MAX_BID:
-			sendSnack('Кто то перебил вашу ставку');
+			sendSnack('Кто-то перебил вашу ставку');
 	}
 }
 

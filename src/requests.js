@@ -71,324 +71,187 @@ export function getToken(successCallback, failCallBack) {
 		withCredentials: true,
 		url: Addr.getState() + BASE + 'ws_token',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
-		.then(function (response) {
-			console.log('response from getToken:', response);
-
-			return response.data;
-		})
-		.then(function (response) {
-			if (successCallback) {
-				successCallback(response);
-			}
-			return response;
-		})
-		.catch(function (error) {
-			if (failCallBack) {
-				failCallBack(error);
-			}
-		});
+		.then((response) => handleSuccess(response, successCallback))
+		.catch((error) => handleNetworkError(error, null, failCallBack));
 }
 
-//
-// export function sendNotificationToBot(successCallback, failCallBack, notification, user_id) {
-
-// 	let cancel;
-// 	axios({
-// 		method: 'get',
-// 		withCredentials: true,
-// 		url: AddrBot.getState() + '/',
-// 		data: JSON.stringify({
-// 			notification,
-// 			user_id,
-// 		}),
-// 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-// 	})
-// 		.then(function (response) {
-// 			console.log('response from getNotificationCounter:', response);
-
-// 			return response.data;
-// 		})
-// 		.then(function (response) {
-// 			if (successCallback) {
-// 				successCallback(response);
-// 			}
-// 			return response;
-// 		})
-// 		.catch(function (error) {
-// 			if (failCallBack) {
-// 				failCallBack(error);
-// 			}
-// 		});
-// 	return;
-// }
-//
-
-export async function getNotificationCounter(successCallback, failCallBack) {
-	let err = false;
+export function getNotificationCounter(successCallback, failCallBack) {
 	let cancel;
-	const deal = await axios({
+	axios({
 		method: 'get',
 		withCredentials: true,
 		url: Addr.getState() + BASE + 'notifications_count',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
-		.then(function (response) {
-			console.log('response from getNotificationCounter:', response);
-
-			return response.data;
-		})
-		.then(function (response) {
-			if (successCallback) {
-				successCallback(response);
-			}
-			return response;
-		})
-		.catch(function (error) {
-			if (failCallBack) {
+		.then((response) => handleSuccess(response, successCallback))
+		.catch((error) =>
+			handleNetworkError(error, null, (error) => {
+				err = true;
 				failCallBack(error);
-			}
-			err = true;
-		});
-	return { deal, err };
+			})
+		);
 }
 
-export async function adHide(ad_id, callback) {
+export function adHide(ad_id, successCallbackR, failCallBackR) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
-	let err = false;
 	let cancel;
+	const successCallback = (response) => {
+		success('Объявление скрыто');
+		successCallbackR(response);
+		return response;
+	};
 
-	await axios({
+	axios({
 		method: 'post',
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/set_hidden',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
-		.then(function (response) {
-			console.log('response from adHide:', response);
-			return response.data;
-		})
-		.then(function (response) {
+		.then((response) => handleSuccess(response, successCallback))
+		.catch((error) =>
+			handleNetworkError(
+				error,
+				(error) => StandardError(error, () => adVisible(ad_id, successCallbackR, failCallBackR)),
+				failCallBackR
+			)
+		)
+		.finally(() => {
 			store.dispatch(closePopout());
-			success('Объявление скрыто');
-			callback(response);
-			return response;
-		})
-		.catch(function (error) {
-			store.dispatch(closePopout());
-			err = true;
-			fail('Нет соединения с сервером', () => adHide(ad_id, callback));
 		});
-	return err;
 }
 
-export async function adVisible(ad_id, callback) {
+export function adVisible(ad_id, successCallbackR, failCallBackR) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
-	let err = false;
-	let cancel;
 
-	await axios({
+	let cancel;
+	const successCallback = (response) => {
+		success('Объявление открыто для просмотра');
+		successCallbackR(response);
+		return response;
+	};
+
+	axios({
 		method: 'post',
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/set_visible',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
-		.then(function (response) {
-			console.log('response from adVisible:', response);
-			return response.data;
-		})
-		.then(function (response) {
+		.then((response) => handleSuccess(response, successCallback))
+		.catch((error) =>
+			handleNetworkError(
+				error,
+				(error) => StandardError(error, () => adVisible(ad_id, successCallbackR, failCallBackR)),
+				failCallBackR
+			)
+		)
+		.finally(() => {
 			store.dispatch(closePopout());
-			success('Объявление открыто для просмотра');
-			callback(response);
-			return response;
-		})
-		.catch(function (error) {
-			store.dispatch(closePopout());
-			err = true;
-			fail('Нет соединения с сервером', () => adVisible(ad_id, callback));
 		});
-	return err;
 }
 
-export async function getDeal(ad_id, successCallback, failCallback) {
-	let err = false;
+export function getDeal(ad_id, successCallback, failCallback) {
 	let cancel;
-	const deal = await axios({
+	axios({
 		method: 'get',
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/deal',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
-		.then(function (response) {
-			console.log('response from getDeal:', response);
-			return response.data;
-		})
-		.then(function (response) {
-			if (successCallback) {
-				successCallback(response);
-			}
-			return response;
-		})
-		.catch(function (error) {
-			err = true;
-			if (failCallback) {
-				failCallback(error);
-			}
-		});
-	return { deal, err };
+		.then((response) => handleSuccess(response, successCallback))
+		.catch((error) => handleNetworkError(error, null, failCallback));
 }
 
-export async function getCost(ad_id, successCallback, failCallback) {
+export function getCost(ad_id, successCallback, failCallback) {
 	let cancel;
 	axios({
 		method: 'get',
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/bid_for_user',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
-		.then(function (response) {
-			console.log('getCost response:', response);
-			return response.data;
-		})
-		.then(function (response) {
-			if (successCallback) {
-				successCallback(response);
-			}
-			return response;
-		})
-		.catch(function (error) {
-			console.log('ERROR getCost:', error);
-			if (failCallback) {
-				failCallback(error);
-			}
-		});
+		.then((response) => handleSuccess(response, successCallback))
+		.catch((error) => handleNetworkError(error, null, failCallback));
 }
 
-export async function getAuctionMaxUser(ad_id, successCallback, failCallback) {
+export function getAuctionMaxUser(ad_id, successCallback, failCallback) {
 	let cancel;
 	axios({
 		method: 'get',
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/max_bid_user',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
-		.then(function (response) {
-			console.log('getAuctionMaxUser response:', response);
-			return response.data;
-		})
-		.then(function (response) {
-			if (successCallback) {
-				successCallback(response);
-			}
-			return response;
-		})
-		.catch(function (error) {
-			console.log('getAuctionMaxUser getCashback:', error);
-			if (failCallback) {
-				failCallback(error);
-			}
-		});
+		.then((response) => handleSuccess(response, successCallback))
+		.catch((error) => handleNetworkError(error, null, failCallback));
 }
 
-export async function increaseAuctionRate(ad_id, successCallback, failCallback) {
+export function increaseAuctionRate(ad_id, successCallback, failCallback) {
 	let cancel;
 	axios({
 		method: 'put',
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/increase_bid',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
-		.then(function (response) {
-			console.log('increaseAuctionRate response:', response);
-			return response.data;
-		})
-		.then(function (response) {
-			if (successCallback) {
-				successCallback(response);
-			}
-			return response;
-		})
-		.catch(function (error) {
-			console.log('increaseAuctionRate fail:', error);
-			if (failCallback) {
-				failCallback(error);
-			}
-		});
+		.then((response) => handleSuccess(response, successCallback))
+		.catch((error) => handleNetworkError(error, null, failCallback));
 }
 
-export async function getCashback(ad_id, successCallback, failCallback) {
+export function getCashback(ad_id, successCallback, failCallback) {
 	let cancel;
+	const rsuccessCallback = (response) => {
+		if (successCallback) {
+			successCallback(response);
+		}
+		store.dispatch(setCost(response.bid));
+		return response;
+	};
 	axios({
 		method: 'get',
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/return_bid_size',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
-		.then(function (response) {
-			console.log('getCashback response:', response);
-			return response.data;
-		})
-		.then(function (response) {
-			if (successCallback) {
-				successCallback(response);
-			}
-			store.dispatch(setCost(response.bid));
-			return response;
-		})
-		.catch(function (error) {
-			console.log('ERROR getCashback:', error);
-			if (failCallback) {
-				failCallback(error);
-			}
-		});
+		.then((response) => handleSuccess(response, rsuccessCallback))
+		.catch((error) => handleNetworkError(error, null, failCallback));
 }
 
-export async function denyDeal(deal_id, successCallback, failCallback, end, text) {
-	console.log('denyDeall', deal_id);
+export function denyDeal(deal_id, successCallback, failCallback, end, text) {
 	let dtext = text || 'Ваш отказ принят!';
-	let err = false;
 	let cancel;
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 
-	console.log('denyDeal', deal_id);
+	const rsuccessCallback = (response) => {
+		if (successCallback) {
+			successCallback(response);
+		}
+		success(dtext, null, end);
+		return response;
+	};
 
-	await axios({
+	const anotherErr = (error) =>
+		StandardError(error, () => denyDeal(deal_id, successCallback, failCallback, end, text));
+
+	axios({
 		method: 'post',
 		withCredentials: true,
 		url: Addr.getState() + BASE_DEAL + deal_id + '/cancel',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
-		.then(function (response) {
-			console.log('response from denyDeal:', response);
-			return response.data;
-		})
-		.then(function (response) {
-			successCallback(response);
-			success(dtext, null, end);
-			store.dispatch(closePopout());
-			return response;
-		})
-		.catch(function (error) {
-			err = true;
-			fail(
-				'Нет соединения с сервером',
-				() => {
-					denyDeal(deal_id, successCallback, failCallback, end, text);
-				},
-				end
-			);
-			failCallback(error);
+		.then((response) => handleSuccess(response, rsuccessCallback))
+		.catch((error) => handleNetworkError(error, anotherErr, failCallback))
+		.finally(() => {
 			store.dispatch(closePopout());
 		});
 	return err;
@@ -398,38 +261,31 @@ export function acceptDeal(deal_id, successCallback, failCallback, end) {
 	let cancel;
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 
+	const rsuccessCallback = (response) => {
+		if (successCallback) {
+			successCallback(response);
+		}
+		success('Автор благодарит вас за подтверждение!', null, end);
+		return response;
+	};
+
+	const anotherErr = (error) => StandardError(error, () => acceptDeal(deal_id, successCallback, failCallback, end));
+
 	axios({
 		method: 'post',
 		withCredentials: true,
 		url: Addr.getState() + BASE_DEAL + deal_id + '/fulfill',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
-		.then(function (response) {
-			console.log('response from acceptDeal:', response);
-
-			return response.data;
-		})
-		.then(function (response) {
-			successCallback(response);
-			store.dispatch(closePopout());
-			success('Автор благодарит вас за подтверждение!', null, end);
-			return response;
-		})
-		.catch(function (error) {
-			fail(
-				'Нет соединения с сервером',
-				() => {
-					acceptDeal(deal_id, successCallback, failCallback, end);
-				},
-				end
-			);
-			failCallback(error);
+		.then((response) => handleSuccess(response, rsuccessCallback))
+		.catch((error) => handleNetworkError(error, anotherErr, failCallback))
+		.finally(() => {
 			store.dispatch(closePopout());
 		});
 }
 
-export async function CancelClose(ad_id, s, f, blockSnackbar) {
+export function CancelClose(ad_id, s, f, blockSnackbar) {
 	const successCallback = s || ((v) => {});
 	const failCallback = f || ((v) => {});
 	getDeal(
@@ -452,9 +308,7 @@ export async function CancelClose(ad_id, s, f, blockSnackbar) {
 				'Предложение о передаче вещи отменено'
 			);
 		},
-		(err) => {
-			console.log('CancelClose 3', err);
-		}
+		(err) => {}
 	);
 }
 
@@ -462,106 +316,74 @@ export function Close(ad_id, ad_type, subscriber_id, s, f) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	const successCallback = s || ((v) => {});
 	const failCallback = f || ((e) => {});
-	let err = false;
 	let cancel;
 	let params = { type: ad_type };
 	if (subscriber_id > 0) {
 		params.subscriber_id = subscriber_id;
 	}
-	console.log('loooook at ad_type', ad_type);
+
+	const rsuccessCallback = (response) => {
+		if (successCallback) {
+			successCallback(response);
+		}
+		store.dispatch(setStatus(STATUS_CHOSEN));
+		store.dispatch(updateContext({ status: STATUS_CHOSEN }));
+		updateDealInfo();
+
+		success('Спасибо, что делаете других людей счастливыми :) Ждем подтверждения от второй стороны!', () => {
+			CancelClose(ad_id);
+		});
+		return response;
+	};
+
+	const anotherErr = (error) => StandardError(error);
+
 	axios({
 		method: 'put',
 		withCredentials: true,
 		params,
 		url: Addr.getState() + BASE_AD + ad_id + '/make_deal',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
-		.then(function (response) {
-			store.dispatch(closePopout());
-			store.dispatch(setStatus(STATUS_CHOSEN));
-			store.dispatch(updateContext({ status: STATUS_CHOSEN }));
-			updateDealInfo();
-			console.log('response from Close:', response);
-			success('Спасибо, что делаете других людей счастливыми :) Ждем подтверждения от второй стороны!', () => {
-				CancelClose(ad_id);
-			});
-			return response.data;
-		})
-		.then(function (data) {
-			successCallback(data);
-			return data;
-		})
-		.catch(function (error) {
-			err = true;
-			failCallback(error);
-			fail('Нет соединения с сервером');
+		.then((response) => handleSuccess(response, rsuccessCallback))
+		.catch((error) => handleNetworkError(error, anotherErr, failCallback))
+		.finally(() => {
 			store.dispatch(closePopout());
 		});
-	return err;
 }
 
-export async function getSubscribers(ad_id, successCallback, failCallback, count) {
-	let err = false;
+export function getSubscribers(ad_id, successCallback, failCallback, count) {
 	let cancel;
-	const subscribers = await axios({
+
+	const anotherErr = (error) => StandardError(error);
+
+	axios({
 		method: 'get',
 		withCredentials: true,
 		params: { page: 1, rows_per_page: count },
 		url: Addr.getState() + BASE_AD + ad_id + '/subscribers',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
-		.then(function (response) {
-			console.log('response from getSubscribes:', response);
-			if (response.status != 404 && response.status != 200) {
-				err = true;
-			}
-			return response.data;
-		})
-		.then(function (response) {
-			successCallback(response);
-			return response;
-		})
-		.catch(function (error) {
-			if (err) {
-				fail('Нет соединения с сервером');
-			}
-			if (failCallback) {
-				failCallback(error);
-			}
-		});
-	return { subscribers, err };
+		.then((response) => handleSuccess(response, successCallback))
+		.catch((error) => handleNetworkError(error, anotherErr, failCallback));
 }
 
-export async function getDetails(ad_id, successCallback, failCallback) {
-	let err = false;
+export function getDetails(ad_id, successCallback, failCallback) {
 	let cancel;
-	const data = await axios({
+
+	const anotherErr = (error) => StandardError(error);
+
+	axios({
 		method: 'get',
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/details',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
-		.then(function (response) {
-			console.log('response from getDetails:', response);
-			return response.data;
-		})
-		.then(function (response) {
-			if (successCallback) {
-				successCallback(response);
-			}
-			return response;
-		})
-		.catch(function (error) {
-			err = true;
-			if (failCallback) {
-				failCallback(error);
-			}
-		});
-
-	return { details: data, err };
+		.then((response) => handleSuccess(response, successCallback))
+		.catch((error) => handleNetworkError(error, anotherErr, failCallback));
 }
 
 // export async function canWritePrivateMessage(id, appID, apiVersion, successCallback, failCallback) {
@@ -606,39 +428,44 @@ export async function getDetails(ad_id, successCallback, failCallback) {
 // 	request_id++;
 // }
 
-export async function Auth(user, successCallback, failCallback) {
+export function Auth(user, successCallback, failCallback) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	// console.log('secret:', window.location.href);
 	// console.log('user:', user);
 	let cancel;
+	const obj = JSON.stringify({
+		vk_id: user.id,
+		Url: window.location.href,
+		name: user.first_name,
+		surname: user.last_name,
+		photo_url: user.photo_100,
+	});
+
+	const anotherErr = (e) => {
+		fail('Не удалось авторизоваться');
+		return e;
+	};
+
 	axios({
 		method: 'post',
 		withCredentials: true,
-		data: JSON.stringify({
-			vk_id: user.id,
-			Url: window.location.href,
-			name: user.first_name,
-			surname: user.last_name,
-			photo_url: user.photo_100,
-		}),
+		data: obj,
 		url: Addr.getState() + BASE_USER + 'auth',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
 		.then(function (response) {
 			return response.data;
 		})
 		.then(function (data) {
-			store.dispatch(closePopout());
 			successCallback(data);
 			User.dispatch({ type: 'set', new_state: data.user });
 			window.sessionStorage.setItem('jwtToken', data.token);
 			return data;
 		})
-		.catch(function (error) {
+		.catch((error) => handleNetworkError(error, anotherErr, failCallback))
+		.finally(() => {
 			store.dispatch(closePopout());
-			failCallback(error);
-			fail('Не удалось авторизоваться');
 		});
 }
 
@@ -677,7 +504,7 @@ export async function CreateImages(photos, id, goToAds) {
 			withCredentials: true,
 			data: data,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
-			headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+			headers: Headers(),
 		})
 			.then(function (response) {
 				console.log('success uploaded', s, photos.length - 1);
@@ -700,19 +527,22 @@ export async function CreateImages(photos, id, goToAds) {
 }
 
 export function CreateAd(ad, obj, photos, openAd, loadAd, successcallback) {
-	store.dispatch(openPopout(<Spinner size="large" />));
+	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let cancel;
+	const anotherErr = (error) =>
+		StandardError(error, () => createAd(ad, obj, photos, openAd, loadAd, successcallback));
+
+	const spamError =
+		'Вы создали слишком много объявлений за короткий промежуток времени, поэтому в ближайший час вы не можете создать новое.';
 	axios({
 		method: 'post',
 		url: Addr.getState() + BASE_AD + 'create',
 		withCredentials: true,
 		data: obj,
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
 		.then(async function (response) {
-			store.dispatch(closePopout());
-
 			if (response.status != 201) {
 				throw new Error('Не тот код!');
 			}
@@ -727,44 +557,30 @@ export function CreateAd(ad, obj, photos, openAd, loadAd, successcallback) {
 			});
 			return response;
 		})
-		.then(function (response) {
-			return response;
-		})
-		.catch(function (error) {
+
+		.catch((error) => handleNetworkError(error, (error) => handleSpamError(error, anotherErr, spamError)))
+		.finally(() => {
 			store.dispatch(closePopout());
-			console.log('Request failed', error);
-
-			if (error.message == 'Network Error') {
-				fail('Нет соединения с интернетом', () => createAd(ad, obj, photos, openAd, loadAd, successcallback));
-				return;
-			}
-
-			if (error.response.status === 429) {
-				failEasy(
-					'Вы создали слишком много объявлений за короткий промежуток времени, поэтому в ближайший час вы не можете создать новое.'
-				);
-			} else {
-				fail('Нет соединения с сервером', () => createAd(ad, obj, photos, openAd, loadAd, successcallback));
-			}
 		});
-	return;
 }
 
-export async function EditAd(ad, obj, openAd, successcallback) {
+export function EditAd(ad, obj, openAd, successcallback, failCallback) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let cancel;
 
-	await axios({
+	const anotherErr = () => {
+		fail('Нет соединения с сервером', () => EditAd(ad, obj, openAd, successcallback));
+	};
+
+	axios({
 		method: 'put',
 		url: Addr.getState() + BASE_AD + ad.ad_id + '/edit',
 		withCredentials: true,
 		data: obj,
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
 		.then(async function (response) {
-			store.dispatch(closePopout());
-
 			openAd(ad);
 			if (successcallback) {
 				successcallback();
@@ -772,28 +588,28 @@ export async function EditAd(ad, obj, openAd, successcallback) {
 			success('Изменения сохранены');
 			return response;
 		})
-		.catch(function (error) {
+		.catch((error) => handleNetworkError(error, anotherErr, failCallback))
+		.finally(() => {
 			store.dispatch(closePopout());
-			console.log('Request failed', error);
-			fail('Нет соединения с сервером', () => EditAd(ad, obj, openAd, successcallback));
 		});
-	return;
 }
 
 export const deleteAd = (ad_id, refresh) => {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let cancel;
 
+	const anotherErr = () => {
+		fail('Нет соединения с сервером', () => deleteAd(ad_id, refresh));
+	};
+
 	axios({
 		method: 'post',
 		withCredentials: true,
 		url: Addr.getState() + BASE_AD + ad_id + '/delete',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
 		.then(function (response) {
-			store.dispatch(closePopout());
-			console.log('wanna delete', response.status);
 			if (response.status != 200) {
 				fail(response.status + ' - ' + response.statusText, () => deleteAd(ad_id, refresh));
 			} else {
@@ -802,10 +618,9 @@ export const deleteAd = (ad_id, refresh) => {
 			}
 			return response.data;
 		})
-		.catch(function (error) {
+		.catch((error) => handleNetworkError(error, anotherErr))
+		.finally(() => {
 			store.dispatch(closePopout());
-			console.log('Request failed', error);
-			fail('Нет соединения с сервером', () => deleteAd(ad_id, refresh));
 		});
 };
 
@@ -813,7 +628,6 @@ export function fail(err, repeat, end, dur) {
 	{
 		const duration = dur || SNACKBAR_DURATION_DEFAULT;
 		let open;
-		console.log('we wanna set snackbar', err);
 		if (repeat) {
 			open = () =>
 				store.dispatch(
@@ -847,7 +661,12 @@ export function fail(err, repeat, end, dur) {
 					openSnackbar(
 						<Snackbar
 							duration={duration}
-							onClose={() => store.dispatch(closeSnackbar())}
+							onClose={() => {
+								store.dispatch(closeSnackbar());
+								if (end) {
+									end();
+								}
+							}}
 							before={
 								<Avatar size={24} style={{ background: 'red' }}>
 									<Icon24Cancel fill="#fff" width={14} height={14} />
@@ -863,7 +682,7 @@ export function fail(err, repeat, end, dur) {
 	}
 }
 
-export function failEasy(err, dur) {
+export function failEasy(err, dur, end) {
 	{
 		const duration = dur || SNACKBAR_DURATION_DEFAULT;
 
@@ -871,7 +690,12 @@ export function failEasy(err, dur) {
 			openSnackbar(
 				<Snackbar
 					duration={duration}
-					onClose={() => store.dispatch(closeSnackbar())}
+					onClose={() => {
+						store.dispatch(closeSnackbar());
+						if (end) {
+							end();
+						}
+					}}
 					before={
 						<Avatar size={24} style={{ background: 'red' }}>
 							<Icon24Cancel fill="#fff" width={14} height={14} />
@@ -885,40 +709,75 @@ export function failEasy(err, dur) {
 	}
 }
 
-export async function getPermissionPM(user_id, successCallback, failCallback) {
-	let err = false;
+export function StandardError(error, repeat, dur, end) {
+	if (error.response.status === 404) {
+		console.log('not found');
+	} else if (error.response.status === 500) {
+		fail('На сервере ведутся технические работы', repeat, end, dur);
+	} else {
+		fail('Произошла непредвиденная ошибка', repeat, end, dur);
+	}
+}
+
+export function handleSpamError(error, another, text, dur, end) {
+	if (error.response.status === 429) {
+		failEasy(text, dur, end);
+	} else {
+		if (another) {
+			another(error);
+		}
+	}
+}
+
+export function handleNetworkError(error, another, final, end) {
+	if (!axios.isCancel(error)) {
+		if (error.message == 'Network Error') {
+			fail('Нет соединения с интернетом', null, end);
+		} else {
+			if (another) {
+				another(error);
+			}
+		}
+	}
+	if (final) {
+		final(error);
+	}
+	return error;
+}
+
+export function handleSuccess(response, successCallback) {
+	if (successCallback) {
+		successCallback(response.data);
+	}
+	return response.data;
+}
+
+export function Headers() {
+	return { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') };
+}
+
+export function getPermissionPM(user_id, successCallback, failCallback) {
 	let cancel;
-	const deal = await axios({
+	axios({
 		method: 'get',
 		withCredentials: true,
 		url: Addr.getState() + BASE_USER + user_id + '/nots_pm',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
 		.then(function (response) {
-			console.log('response from getPermissionPM:', response);
-			return response.data;
-		})
-		.then(function (response) {
-			const canSend = response.can_send;
+			const canSend = response.data.can_send;
 			if (successCallback) {
 				successCallback(canSend);
 			}
 			return canSend;
 		})
-		.catch(function (error) {
-			err = true;
-			if (failCallback) {
-				failCallback(error);
-			}
-		});
-	return { deal, err };
+		.catch((error) => handleNetworkError(error, null, failCallback));
 }
 
-export async function setPermissionPM(user_id, can_send, successCallback, failCallback) {
-	let err = false;
+export function setPermissionPM(user_id, can_send, successCallback, failCallback) {
 	let cancel;
-	const deal = await axios({
+	axios({
 		method: 'post',
 		withCredentials: true,
 		data: JSON.stringify({
@@ -926,25 +785,10 @@ export async function setPermissionPM(user_id, can_send, successCallback, failCa
 		}),
 		url: Addr.getState() + BASE_USER + user_id + '/nots_pm',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
-		.then(function (response) {
-			console.log('response from setPermissionPM:', response);
-			return response.data;
-		})
-		.then(function (response) {
-			if (successCallback) {
-				successCallback(response);
-			}
-			return response;
-		})
-		.catch(function (error) {
-			err = true;
-			if (failCallback) {
-				failCallback(error);
-			}
-		});
-	return { deal, err };
+		.then((response) => handleSuccess(response, successCallback))
+		.catch((error) => handleNetworkError(error, null, failCallback));
 }
 
-// 745 -> 600 -> 806
+// 745 -> 600 -> 806 -> 963 -> 812 -> 792

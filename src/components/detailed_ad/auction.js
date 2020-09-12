@@ -305,4 +305,4 @@ const mapDispatchToProps = {
 
 export const AuctionLabel = connect(mapStateToProps, mapDispatchToProps)(AuctionLabelInner);
 
-// 125 -> 195
+// 308

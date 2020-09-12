@@ -27,7 +27,7 @@ export const s2Books8 = 'Приключенческая литература';
 export const s2Books9 = 'Проза';
 export const s2Books10 = 'Триллеры';
 export const s2Books11 = 'Фантастика и фэнтези';
-export const s2Books12 = 'юмор и сатира';
+export const s2Books12 = 'Юмор и сатира';
 export const s2Books13 = 'Мир увлечений';
 
 export const gBooks3 = 'Другая литература';

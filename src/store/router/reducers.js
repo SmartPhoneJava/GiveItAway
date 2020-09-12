@@ -92,7 +92,12 @@ const initialState = {
 	},
 	snackbars: {},
 
-	dummies: {},
+	dummies: {
+		[STORY_ADS]: [],
+		[STORY_CREATE]: [],
+		[STORY_NOTIFICATIONS]: [],
+		[STORY_PROFILE]: [],
+	},
 
 	scrollHistory: {
 		[STORY_ADS]: [],

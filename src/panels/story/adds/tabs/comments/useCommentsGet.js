@@ -6,6 +6,7 @@ import { ScreenSpinner } from '@vkontakte/vkui';
 
 import { Addr, BASE_AD } from '../../../../../store/addr';
 import { openPopout, closePopout, updateContext } from '../../../../../store/router/actions';
+import { Headers, handleNetworkError } from '../../../../../requests';
 
 export default function useCommentsGet(ignorePopout, pageNumber, rowsPerPage, ad_id, maxAmount) {
 	const [inited, setInited] = useState(false);
@@ -45,7 +46,7 @@ export default function useCommentsGet(ignorePopout, pageNumber, rowsPerPage, ad
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
-			headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+			headers: Headers(),
 		})
 			.then((res) => {
 				const newNots = res.data;
@@ -69,22 +70,21 @@ export default function useCommentsGet(ignorePopout, pageNumber, rowsPerPage, ad
 
 				setHasMore(newNots.length > 0);
 				setLoading(false);
-				if (!ignorePopout) {
-					store.dispatch(closePopout());
-				}
 				setInited(true);
-				console.log('success get comments', newNots);
 			})
-			.catch((e) => {
-				console.log('fail comments', e);
-				if (axios.isCancel(e)) return;
+			.catch((error) =>
+				handleNetworkError(error, null, (e) => {
+					if (axios.isCancel(e)) return;
 
+					setLoading(false);
+					setInited(true);
+					setHasMore(false);
+				})
+			)
+			.finally(() => {
 				if (!ignorePopout) {
 					store.dispatch(closePopout());
 				}
-				setLoading(false);
-				setInited(true);
-				setHasMore(false);
 			});
 		return () => cancel();
 	}, [pageNumber]);

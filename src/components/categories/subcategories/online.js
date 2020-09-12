@@ -58,14 +58,13 @@ export const s5Online9 = 'Лабораторные работы';
 export const s5Online10 = 'Изложения';
 export const s5Online11 = 'Карты и атласы';
 export const s5Online12 = 'Подготовка к контрольным мероприятиям';
-export const s5Online13 = 'Лабораторные';
-export const s5Online14 = 'Чертежи';
-export const s5Online15 = '3D-модели';
-export const s5Online16 = 'Плакаты';
-export const s5Online17 = 'Презентации';
-export const s5Online18 = 'Конспекты семинаров';
-export const s5Online19 = 'Отчёты по практике';
-export const s5Online20 = 'Стандарты';
+export const s5Online13 = 'Чертежи';
+export const s5Online14 = '3D-модели';
+export const s5Online15 = 'Плакаты';
+export const s5Online16 = 'Презентации';
+export const s5Online17 = 'Конспекты семинаров';
+export const s5Online18 = 'Отчёты по практике';
+export const s5Online19 = 'Стандарты';
 
 export const OnlineStruct = {
 	grouping: true,
@@ -147,7 +146,6 @@ export const OnlineStruct = {
 				s5Online17,
 				s5Online18,
 				s5Online19,
-				s5Online20,
 			],
 		},
 	],

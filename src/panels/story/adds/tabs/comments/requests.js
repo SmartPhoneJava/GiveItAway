@@ -5,34 +5,29 @@ import axios from 'axios';
 
 import { Addr, BASE_AD, BASE_COMMENT } from './../../../../../store/addr';
 
-import { fail, failEasy, success } from './../../../../../requests';
+import { fail, failEasy, success, handleNetworkError, Headers, handleSpamError } from './../../../../../requests';
 import { store } from '../../../../..';
 import { openPopout, closePopout, updateContext } from '../../../../../store/router/actions';
-import { addComment } from '../../../../../store/detailed_ad/actions';
 import { now } from 'moment';
 
-let request_id = 0;
-
-export async function postComment(ad_id, comment, comment_text, successCallback, failCallback, end) {
+export function postComment(ad_id, comment, comment_text, successCallback, failCallback, end) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 
 	let err = false;
 	let cancel;
 
-	await axios({
+	axios({
 		method: 'post',
 		withCredentials: true,
 		data: comment,
 		url: Addr.getState() + BASE_AD + ad_id + '/comments',
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
 		.then(function (response) {
 			return response.data;
 		})
 		.then(function (response) {
-			store.dispatch(closePopout());
-
 			const comment = response;
 
 			const router = store.getState().router;
@@ -44,34 +39,42 @@ export async function postComment(ad_id, comment, comment_text, successCallback,
 			end();
 			return response;
 		})
-		.catch(function (error) {
-			if (error.response.status === 429) {
-				failEasy('Воу, слишком много комментариев. Нельзя отправить более 50 комментариев за 15 минут');
-			} else {
-				fail(
-					'Комментарий не отправлен',
-					() => {
-						postComment(ad_id, comment, text, successCallback, failCallback, end);
-					},
-					end
-				);
-			}
-			err = true;
-			failCallback(error);
+		.catch((error) =>
+			handleNetworkError(
+				error,
+				(error) =>
+					handleSpamError(
+						error,
+						() => {
+							fail(
+								'Комментарий не отправлен',
+								() => {
+									postComment(ad_id, comment, text, successCallback, failCallback, end);
+								},
+								end
+							);
+						},
+						'Воу, слишком много комментариев. Нельзя отправить более 50 комментариев за 15 минут',
+						null,
+						end
+					),
+				failCallback,
+				end
+			)
+		)
 
-			console.log('err is ', error);
-
+		.finally(() => {
 			store.dispatch(closePopout());
 		});
 	return err;
 }
 
-export async function deleteComment(comment, successCallback, failCallback, end) {
+export function deleteComment(comment, successCallback, failCallback, end) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;
 
-	await axios({
+	axios({
 		method: 'delete',
 		withCredentials: true,
 		data: JSON.stringify({
@@ -79,7 +82,7 @@ export async function deleteComment(comment, successCallback, failCallback, end)
 		}),
 		url: Addr.getState() + BASE_COMMENT + comment.comment_id,
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
 		.then(function (response) {
 			return response.data;
@@ -92,42 +95,47 @@ export async function deleteComment(comment, successCallback, failCallback, end)
 			store.dispatch(updateContext({ comments: newComments }));
 
 			successCallback(response);
-			store.dispatch(closePopout());
 			return response;
 		})
-		.catch(function (error) {
-			err = true;
-			fail(
-				'Комментарий не удален',
-				() => {
-					deleteComment(comment, successCallback, failCallback, end);
+		.catch((error) =>
+			handleNetworkError(
+				error,
+				(error) => {
+					fail(
+						'Комментарий не удален',
+						() => {
+							deleteComment(comment, successCallback, failCallback, end);
+						},
+						end
+					);
 				},
+				failCallback,
 				end
-			);
-			failCallback(error);
+			)
+		)
+		.finally(() => {
 			store.dispatch(closePopout());
 		});
 	return err;
 }
 
-export async function editComment(real_comment, id, comment, successCallback, failCallback, end) {
+export function editComment(real_comment, id, comment, successCallback, failCallback, end) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 	let err = false;
 	let cancel;
 
-	await axios({
+	axios({
 		method: 'put',
 		withCredentials: true,
 		data: comment,
 		url: Addr.getState() + BASE_COMMENT + id,
 		cancelToken: new axios.CancelToken((c) => (cancel = c)),
-		headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+		headers: Headers(),
 	})
 		.then(function (response) {
 			return response.data;
 		})
 		.then(function (response) {
-			console.log('success we are');
 			successCallback(response);
 			success('Комментарий отредактирован', null, end);
 			const router = store.getState().router;
@@ -141,19 +149,25 @@ export async function editComment(real_comment, id, comment, successCallback, fa
 
 			store.dispatch(updateContext({ comments: newComments, comments_update: now() }));
 
-			store.dispatch(closePopout());
 			return response;
 		})
-		.catch(function (error) {
-			err = true;
-			failCallback(error);
-			fail(
-				'Комментарий не отредактирован',
-				() => {
-					editComment(real_comment, id, comment, successCallback, failCallback, end);
+		.catch((error) =>
+			handleNetworkError(
+				error,
+				(error) => {
+					fail(
+						'Комментарий не отредактирован',
+						() => {
+							editComment(real_comment, id, comment, successCallback, failCallback, end);
+						},
+						end
+					);
 				},
+				failCallback,
 				end
-			);
+			)
+		)
+		.finally(() => {
 			store.dispatch(closePopout());
 		});
 	return err;

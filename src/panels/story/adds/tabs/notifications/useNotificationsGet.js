@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 import { Addr, BASE } from '../../../../../store/addr';
+import { Headers, handleNetworkError } from '../../../../../requests';
 
 export default function useNotificationsGet(pageNumber, rowsPerPage) {
 	const [inited, setInited] = useState(false);
@@ -27,7 +28,7 @@ export default function useNotificationsGet(pageNumber, rowsPerPage) {
 			params,
 			withCredentials: true,
 			cancelToken: new axios.CancelToken((c) => (cancel = c)),
-			headers: { ...axios.defaults.headers, Authorization: 'Bearer' + window.sessionStorage.getItem('jwtToken') },
+			headers: Headers(),
 		})
 			.then((res) => {
 				const newNots = res.data;
@@ -38,14 +39,16 @@ export default function useNotificationsGet(pageNumber, rowsPerPage) {
 				setLoading(false);
 				setInited(true);
 			})
-			.catch((e) => {
-				console.log('fail', e);
-				setError(true);
-				if (axios.isCancel(e)) return;
+			.catch((error) =>
+				handleNetworkError(error, null, (e) => {
+					setError(true);
+					if (axios.isCancel(e)) return;
 
-				setLoading(false);
-				setInited(true);
-			});
+					setLoading(false);
+					setInited(true);
+				})
+			);
+
 		return () => cancel();
 	}, [pageNumber]);
 
