@@ -30,7 +30,7 @@ import {
 	GEO_TYPE_NO,
 } from '../../../../../const/ads';
 import { ADS_FILTERS, ADS_FILTERS_ON, GEO_DATA, ADS_FILTERS_S } from '../../../../../store/create_post/types';
-import { openPopout, closePopout } from '../../../../../store/router/actions';
+import { openPopout, closePopout, updateContext } from '../../../../../store/router/actions';
 import AdNoWanted from '../../../../placeholders/adNoWanted';
 import { setFormData } from '../../../../../store/create_post/actions';
 import AdNoGiven from '../../../../placeholders/adNoGiven';
@@ -44,6 +44,7 @@ import { TagsLabel, tag } from '../../../../../components/categories/label';
 import { Collapse } from 'react-collapse';
 import formPanel from '../../../../../components/template/formPanel';
 import { Headers, handleNetworkError } from '../../../../../requests';
+import { PANEL_ADS } from '../../../../../store/router/panelTypes';
 
 let i = 0;
 
@@ -57,12 +58,18 @@ const SEARCH_WAIT = 650;
 
 const AddsTab = (props) => {
 	const width = document.body.clientWidth;
-	const { inputData, openPopout, closePopout, setFormData, dropFilters, activeStory } = props;
+	const { inputData, openPopout, closePopout, setFormData, dropFilters, activeStory, updateContext } = props;
 
 	const activeModal = props.activeModals[STORY_ADS];
 
 	const [tagsLabel, setTags] = useState([]);
+	useEffect(() => {
+		setTags(props.activeContext[props.activeStory].tags);
+	}, [props.activeContext[props.activeStory].tags]);
 	const [tagsNum, setTagsNum] = useState(0);
+	useEffect(() => {
+		setTagsNum(props.activeContext[props.activeStory].tagsNum);
+	}, [props.activeContext[props.activeStory].tagsNum]);
 
 	const [geoType, setGeoType] = useState(GEO_TYPE_FILTERS);
 	const [radius, setRadius] = useState(0);
@@ -77,7 +84,11 @@ const AddsTab = (props) => {
 	const [search, setSearch] = useState('');
 	const [filtersOn, setFiltersOn] = useState(false);
 	useEffect(() => {
-		if (activeModal) {
+		console.log('we have filters', props.activeContext[props.activeStory].filtersOn);
+		setFiltersOn(props.activeContext[props.activeStory].filtersOn);
+	}, [props.activeContext[props.activeStory].filtersOn]);
+	useEffect(() => {
+		if (activeModal || props.activePanels[props.activeStory] != PANEL_ADS) {
 			return;
 		}
 		setSoftLoading(false);
@@ -137,7 +148,8 @@ const AddsTab = (props) => {
 			categor != CategoryNo ||
 			(gt == GEO_TYPE_NEAR && rad != 0) ||
 			(s != undefined && s != '');
-		setFiltersOn(hasFilters);
+
+		updateContext({ filtersOn: hasFilters });
 		setFormData(activeStory + ADS_FILTERS_ON, {
 			...inputData[activeStory + ADS_FILTERS],
 			filtersOn: hasFilters,
@@ -310,8 +322,7 @@ const AddsTab = (props) => {
 			);
 		}
 
-		setTagsNum(tags.length);
-		setTags(
+		const tagsPanel =
 			tags.length == 0 ? null : (
 				<div style={{ paddingLeft: '8px', paddingRight: '8px' }}>
 					{!searchValid && (
@@ -325,9 +336,9 @@ const AddsTab = (props) => {
 
 					<TagsLabel Y={true} tags={tags} />
 				</div>
-			)
-		);
-	}, [props.inputData[activeStory + ADS_FILTERS], searchValid]);
+			);
+		updateContext({ tagsNum: tags.length, tags: tagsPanel });
+	}, [props.inputData[activeStory + ADS_FILTERS], searchValid, props.activePanels[props.activeStory], activeModal]);
 
 	const [searchValid, setSearchValid] = useState(true);
 	const [searchR, setSearchR] = useState('');
@@ -336,6 +347,7 @@ const AddsTab = (props) => {
 			return;
 		}
 		let s = search;
+		console.log('s isssss', s);
 		if (s.length > SEARCH_MAX_LENGTH) {
 			setSearchValid(false);
 			s = s.substr(0, SEARCH_MAX_LENGTH);
@@ -378,7 +390,8 @@ const AddsTab = (props) => {
 	const [cols, setCols] = useState([]);
 
 	useEffect(() => {
-		if (activeModal) {
+		console.log('activeModal', activeModal, filtersOn, props.cache.ignore_cache);
+		if (activeModal || props.activePanels[props.activeStory] != PANEL_ADS) {
 			return;
 		}
 		if (props.cache.ignore_cache) {
@@ -390,9 +403,25 @@ const AddsTab = (props) => {
 				return;
 			}
 		}
+
+		setRads([]);
 		setPageNumber(-1);
 		setHasMore(true);
-	}, [category, incategory, subcategory, mode, searchR, city, country, sort, geodata, geoType, radius, refreshMe]);
+	}, [
+		category,
+		incategory,
+		subcategory,
+		mode,
+		searchR,
+		city,
+		country,
+		sort,
+		geodata,
+		geoType,
+		radius,
+		refreshMe,
+		filtersOn,
+	]);
 
 	useEffect(() => {
 		const c = ColumnsFunc(
@@ -712,6 +741,8 @@ const AddsTab = (props) => {
 					{!loading &&
 						(rads.length > 0 ? null : error ? (
 							<Error />
+						) : filtersOn ? (
+							<AdNotFound dropFilters={dropFilters} />
 						) : mode == MODE_ALL ? (
 							<AdNotFound dropFilters={dropFilters} />
 						) : mode == MODE_GIVEN ? (
@@ -752,6 +783,9 @@ const mapStateToProps = (state) => {
 		cache: state.cache,
 
 		activeModals: state.router.activeModals,
+		activeContext: state.router.activeContext,
+		activeStory: state.router.activeStory,
+		activePanels: state.router.activePanels,
 	};
 };
 
@@ -760,6 +794,7 @@ const mapDispatchToProps = {
 	closePopout,
 	setFormData,
 	pushToCache,
+	updateContext,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddsTab);

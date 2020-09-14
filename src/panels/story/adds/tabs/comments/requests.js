@@ -13,7 +13,6 @@ import { now } from 'moment';
 export function postComment(ad_id, comment, comment_text, successCallback, failCallback, end) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
 
-	let err = false;
 	let cancel;
 
 	axios({
@@ -66,12 +65,11 @@ export function postComment(ad_id, comment, comment_text, successCallback, failC
 		.finally(() => {
 			store.dispatch(closePopout());
 		});
-	return err;
 }
 
 export function deleteComment(comment, successCallback, failCallback, end) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
-	let err = false;
+
 	let cancel;
 
 	axios({
@@ -116,12 +114,11 @@ export function deleteComment(comment, successCallback, failCallback, end) {
 		.finally(() => {
 			store.dispatch(closePopout());
 		});
-	return err;
 }
 
 export function editComment(real_comment, id, comment, successCallback, failCallback, end) {
 	store.dispatch(openPopout(<ScreenSpinner size="large" />));
-	let err = false;
+
 	let cancel;
 
 	axios({
@@ -170,5 +167,4 @@ export function editComment(real_comment, id, comment, successCallback, failCall
 		.finally(() => {
 			store.dispatch(closePopout());
 		});
-	return err;
 }

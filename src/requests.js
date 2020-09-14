@@ -89,7 +89,6 @@ export function getNotificationCounter(successCallback, failCallBack) {
 		.then((response) => handleSuccess(response, successCallback))
 		.catch((error) =>
 			handleNetworkError(error, null, (error) => {
-				err = true;
 				failCallBack(error);
 			})
 		);
@@ -347,7 +346,18 @@ export function Close(ad_id, ad_type, subscriber_id, s, f) {
 		headers: Headers(),
 	})
 		.then((response) => handleSuccess(response, rsuccessCallback))
-		.catch((error) => handleNetworkError(error, anotherErr, failCallback))
+		.catch((error) =>
+			handleNetworkError(
+				error,
+				(error) =>
+					handleSpamError(
+						error,
+						anotherErr,
+						'Вы слишком часто отменяли выбор данного пользователя, поэтому вы больше не можете его выбрать.'
+					),
+				failCallback
+			)
+		)
 		.finally(() => {
 			store.dispatch(closePopout());
 		});
@@ -548,6 +558,7 @@ export function CreateAd(ad, obj, photos, openAd, loadAd, successcallback) {
 			}
 			ad.ad_id = response.data.ad_id;
 			openAd(ad);
+
 			await CreateImages(photos, response.data.ad_id, (snackbar) => {
 				if (successcallback) {
 					successcallback();
@@ -713,9 +724,11 @@ export function StandardError(error, repeat, dur, end) {
 	if (error.response.status === 404) {
 		console.log('not found');
 	} else if (error.response.status === 500) {
-		fail('На сервере ведутся технические работы', repeat, end, dur);
+		failEasy('На сервере ведутся технические работы', dur, end);
+	} else if (error.response.status === 409) {
+		failEasy('Невозможно выполнить уже выполненное действие ;)', dur, end);
 	} else {
-		fail('Произошла непредвиденная ошибка', repeat, end, dur);
+		failEasy('Произошла непредвиденная ошибка:' + error.message, dur, end);
 	}
 }
 

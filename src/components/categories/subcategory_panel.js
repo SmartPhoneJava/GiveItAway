@@ -10,6 +10,7 @@ import GroupsPanel, { CHOOSE_ANOTHER } from '../template/groupsPanel';
 import { ChildStruct } from './subcategories/child';
 import { GetGroups, Subcategories } from './Subcategories';
 import { setFormData } from '../../store/create_post/actions';
+import { DIRECTION_BACK } from '../../store/router/directionTypes';
 
 const SubcategoriesPanel = (props) => {
 	const [category, setCategory] = useState(CategoryNo);
@@ -26,6 +27,12 @@ const SubcategoriesPanel = (props) => {
 			setChoosenGroup(formData.forms[redux_form].sublist);
 		}
 	}, [formData.forms[redux_form].sublist]);
+
+	useEffect(() => {
+		if (props.direction == DIRECTION_BACK) {
+			setSubList(null);
+		}
+	}, [props.direction]);
 
 	useEffect(() => {
 		const cat = (formData.forms[redux_form] ? formData.forms[redux_form].category : null) || CategoryNo;
@@ -46,21 +53,7 @@ const SubcategoriesPanel = (props) => {
 
 	return (
 		<>
-			<PanelHeader
-				left={
-					<PanelHeaderBack
-						style={{ cursor: 'pointer' }}
-						onClick={
-							choosenGroup
-								? () => {
-										setSubList(null);
-										props.goBack();
-								  }
-								: props.goBack
-						}
-					/>
-				}
-			>
+			<PanelHeader left={<PanelHeaderBack style={{ cursor: 'pointer' }} onClick={props.goBack} />}>
 				<p className="panel-header">{choosenGroup ? choosenGroup.header : category}</p>
 			</PanelHeader>
 			<GroupsPanel
@@ -180,6 +173,7 @@ const SubcategoriesPanel = (props) => {
 const mapStateToProps = (state) => {
 	return {
 		formData: state.formData,
+		direction: state.router.direction,
 	};
 };
 

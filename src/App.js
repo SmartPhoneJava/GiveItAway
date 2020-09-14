@@ -53,6 +53,7 @@ import {
 	setPage,
 	setStoryProfile,
 	updateContext,
+	closeDummy,
 } from './store/router/actions';
 import * as VK from './services/VK';
 import { setAppID, setPlatform } from './store/vk/actions';
@@ -87,13 +88,14 @@ import {
 	NT_UNSUB,
 	NT_SUB,
 	NT_MAX_BID,
+	NT_FULFILL,
 } from './panels/story/adds/tabs/notifications/notifications';
 
 import AddMore2 from './panels/template/AddMore2';
 
 import Notifications from './panels/story/adds/tabs/notifications/notifications';
 
-import { AdDefault, STATUS_CHOSEN } from './const/ads';
+import { AdDefault, STATUS_CHOSEN, STATUS_CLOSED, STATUS_ABORTED } from './const/ads';
 
 import { Auth, getToken, fail, getNotificationCounter } from './requests';
 
@@ -195,7 +197,8 @@ const App = (props) => {
 	const historyLen = panelsHistory ? (panelsHistory[activeStory] ? panelsHistory[activeStory].length : 0) : 0;
 
 	function dropFilters() {
-		store.dispatch(setFormData(activeStory + ADS_FILTERS, null));
+		const mode = store.getState().formData.forms[activeStory + ADS_FILTERS].mode;
+		store.dispatch(setFormData(activeStory + ADS_FILTERS, { mode }));
 	}
 
 	const onStoryChange = (e) => {
@@ -221,12 +224,14 @@ const App = (props) => {
 			setFormData(activeStory + FORM_CREATE, { category: CategoryNo });
 			setFormData(activeStory + CREATE_AD_MAIN, defaultInputData);
 			setFormData(activeStory + CREATE_AD_ITEM, defaultInputData);
+			console.log('!!!!!!!!!!!! 2');
 		} else {
 			if (story == STORY_PROFILE) {
 				setStoryProfile(myID);
 				return;
+			} else {
+				setStory(story);
 			}
-			setStory(story);
 			if (story != activeStory) {
 				return;
 			}
@@ -277,23 +282,35 @@ const App = (props) => {
 
 		centrifuge.subscribe('user#' + id, (note) => {
 			notsCounterrr++;
+			console.log('notsCounterrr', notsCounterrr);
 			console.log('note.data ', note);
 			setNotsCounterr(notsCounterrr);
 			const noteType = note.data.notification_type;
 			const noteAdId = note.data.payload.ad.ad_id;
 
-			const ad = store.getState().ad;
+			const router = store.getState().router;
+			const ad = router.activeContext[router.activeStory];
 
 			console.log('noteAdId ', noteType, noteAdId, ad, NT_STATUS);
+			if (ad && ad.ad_id == noteAdId)
+				if (noteType == NT_FULFILL) {
+					console.log("noteType == NT_FULFILL")
+					store.dispatch(updateContext({ status: STATUS_CLOSED }));
+				} else if (noteType == NT_SUB_CANCEL) {
+					console.log("noteType == NT_SUB_CANCEL")
+					store.dispatch(updateContext({ status: STATUS_ABORTED }));
+				}
 			handleNotifications(note);
 		});
 	}
 
+	const [saveId, setsaveId] = useState(-1);
 	useEffect(() => {
 		const ad = props.activeContext[props.activeStory];
-		if (ad.ad_id <= 0) {
+		if (ad == null || ad.ad_id <= 0 || ad.ad_id == saveId) {
 			return;
 		}
+		setsaveId(ad.ad_id);
 
 		if (subscription) {
 			subscription.unsubscribe();
@@ -379,7 +396,7 @@ const App = (props) => {
 				console.log('centrifugu notenote', note);
 			})
 		);
-	}, [props.activeContext[props.activeStory].ad_id]);
+	}, [props.activeContext[props.activeStory]]);
 
 	const [tabbar, setTabbar] = useState(<></>);
 	useEffect(() => {
@@ -434,7 +451,7 @@ const App = (props) => {
 		} else {
 			setTabbar(null);
 		}
-	}, [props.dummies, activeStory]);
+	}, [props.dummies, activeStory, notsCounterrr]);
 
 	useEffect(() => {
 		openPopout(<ScreenSpinner size="large" />);
@@ -459,35 +476,49 @@ const App = (props) => {
 		window.history.pushState({ currPanel: PANEL_ADS, ad: AdDefault }, PANEL_ADS);
 		window.onpopstate = function (event) {
 			const router = store.getState().router;
-			const fromAdsFeed = router.panelsHistory[router.activeStory] == PANEL_ADS;
-			const context = router.activeContext[router.activeStory];
-			console.log('panelsHistory', router.panelsHistory[router.activeStory]);
-			if (fromAdsFeed) {
-				const thisPanel = router.activePanels[router.activeStory];
-				if (thisPanel == PANEL_CITIES) {
-					goBack();
-					openModal(MODAL_ADS_FILTERS);
-					setTimeout(() => {
-						openModal(MODAL_ADS_GEO, DIRECTION_BACK);
-					}, 600);
-				} else if (thisPanel == PANEL_CATEGORIES) {
-					goBack();
-					openModal(MODAL_ADS_FILTERS);
-				}
+			const story = [router.activeStory];
+			const fromAdsFeed = router.panelsHistory[story] == PANEL_ADS;
+			const fromCreateFeed = router.panelsHistory[story] == PANEL_CREATE;
+			const context = router.activeContext[story];
+			const dummies = router.dummies[story];
+			console.log('dummies are', dummies);
+			if (dummies.length > 0) {
+				props.closeDummy();
+				return;
+			}
+			console.log('context.goBack', context.goBack);
+
+			const thisPanel = router.activePanels[router.activeStory];
+			if (thisPanel == PANEL_CITIES) {
+				goBack();
+				openModal(MODAL_ADS_FILTERS);
+				setTimeout(() => {
+					openModal(MODAL_ADS_GEO, DIRECTION_BACK);
+				}, 600);
+				return;
+			} else if (thisPanel == PANEL_CATEGORIES) {
+				goBack();
+				openModal(MODAL_ADS_FILTERS);
+				return;
+			}
+
+			console.log('agaaa', context.goBack);
+			if (context.goBack != undefined) {
+				console.log('context.goBack done');
+				context.goBack();
 			} else {
-				if (context.goBack) {
-					context.goBack();
-				} else {
-					mutex.lock();
-					GO_BACK_DO++;
-					mutex.unlock();
-				}
+				console.log('GO_BACK_DO do');
+				mutex.lock();
+				console.log('GO_BACK_DO do');
+				GO_BACK_DO++;
+				mutex.unlock();
 			}
 		};
 
 		setInterval(() => {
 			mutex.lock();
 			if (GO_BACK_DO > 0) {
+				console.log('goBack do', GO_BACK_DO);
 				goBack();
 				GO_BACK_DO--;
 			}
@@ -846,6 +877,7 @@ function mapDispatchToProps(dispatch) {
 				setToHistory,
 				backToPrevAd,
 				updateContext,
+				closeDummy,
 			},
 			dispatch
 		),

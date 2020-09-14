@@ -29,6 +29,8 @@ import { ModalPageAdsSort } from '../../../components/modal/ad_sort';
 import { AdFilters } from '../../../components/modal/ad_filters';
 import { ADS_FILTERS, ADS_FILTERS_ON } from '../../../store/create_post/types';
 import { TYPE_CHOICE, TYPE_AUCTION } from '../../../const/ads';
+import { store } from '../../..';
+import { setFormData } from '../../../store/create_post/actions';
 
 const AddsModal = (props) => {
 	const { closeModal, openCarma, inputData, activeStory } = props;
@@ -85,7 +87,8 @@ const AddsModal = (props) => {
 								<CellButton
 									onClick={() => {
 										props.closeModal();
-										props.setFormData(activeStory + ADS_FILTERS, null);
+										const mode = store.getState().formData.forms[activeStory + ADS_FILTERS].mode;
+										store.dispatch(setFormData(activeStory + ADS_FILTERS, { mode }));
 									}}
 									mode="danger"
 									style={{ cursor: 'pointer' }}

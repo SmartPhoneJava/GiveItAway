@@ -394,7 +394,7 @@ const Notifications = (props) => {
 					</Group>
 				) : null}
 				{!inited || loading ? null : arrNotRead.length + arrRead.length == 0 ? (
-					<Placeholder icon={<Icon56CheckCircleOutline />}>Непрочитанных объявлений нет</Placeholder>
+					<Placeholder icon={<Icon56CheckCircleOutline />}>Уведомлений нет</Placeholder>
 				) : null}
 			</div>
 		);

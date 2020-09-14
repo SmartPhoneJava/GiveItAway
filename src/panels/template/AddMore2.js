@@ -771,6 +771,7 @@ const AddMore2r = (props) => {
 			ls_enabled: rAd.ls_enabled,
 			comments_enabled: rAd.comments_enabled,
 		});
+		console.log("!!!!!!!!!!!! 4")
 
 		setFormData(story + GEO_DATA, {
 			geodata_string: rAd.full_adress,

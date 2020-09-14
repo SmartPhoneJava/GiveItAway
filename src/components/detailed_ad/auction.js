@@ -63,6 +63,7 @@ const AuctionLabelInner = (props) => {
 			(v) => {
 				const user = v.user;
 				user.cost = v.bid;
+				console.log("cost is", v.bid)
 				props.updateContext({ cost: v.bid + 1 });
 				setActionMaxUser(user);
 				setAmuDone(true);
@@ -72,7 +73,7 @@ const AuctionLabelInner = (props) => {
 				setActionMaxUser(null);
 			}
 		);
-	}, [props.activeContext[props.activeStory].isSub, props.activeContext[props.activeStory].subs, amuUpdate]);
+	}, [props.activeContext[props.activeStory].isSub, props.activeContext[props.activeStory].cost, props.activeContext[props.activeStory].subs, amuUpdate]);
 
 	const [componentMaxUser, setComponentMaxUser] = useState(<></>);
 	useEffect(() => {
@@ -250,6 +251,7 @@ const AuctionLabelInner = (props) => {
 		props.activeContext[props.activeStory].isSub,
 		props.activeContext[props.activeStory].dealer,
 		props.activeContext[props.activeStory].cost,
+		props.activeContext[props.activeStory].status,
 		actionMaxUser,
 		myRate,
 	]);

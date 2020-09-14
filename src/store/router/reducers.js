@@ -15,6 +15,7 @@ import {
 	SET_TAB,
 	SET_STORY_PROFILE,
 	UPDATE_CONTEXT,
+	CLOSE_DUMMY,
 } from './actionTypes';
 
 import * as VK from '../../services/VK';
@@ -189,6 +190,18 @@ export const routerReducer = (state = initialState, action) => {
 			};
 		}
 
+		case CLOSE_DUMMY: {
+			const Story = state.activeStory;
+
+			return {
+				...state,
+				dummies: {
+					...state.dummies,
+					[Story]: [],
+				},
+			};
+		}
+
 		case SET_PROFILE: {
 			const pos = { x: window.pageXOffset, y: window.pageYOffset };
 			window.history.pushState(null, null);
@@ -327,7 +340,7 @@ export const routerReducer = (state = initialState, action) => {
 				VK.swipeBackOff();
 			}
 
-			console.log("based state", state)
+			console.log('based state', state);
 
 			const newPanel = the_same_story ? panel : state.activePanels[story];
 			const newPanelsHistory = the_same_story ? [] : state.panelsHistory[story];
@@ -391,7 +404,7 @@ export const routerReducer = (state = initialState, action) => {
 			let storiesHistory = state.storiesHistory || [];
 			storiesHistory = [...storiesHistory, Story];
 
-			const the_same_story = story == state.activeStory;
+			const the_same_story = story == Story;
 			if (!the_same_story) {
 				VK.swipeBackOn();
 			} else {
@@ -399,7 +412,7 @@ export const routerReducer = (state = initialState, action) => {
 			}
 
 			const newPanel = the_same_story ? panel : state.activePanels[story];
-			const newPanelsHistory = the_same_story ? [panel] : state.panelsHistory[story];
+			const newPanelsHistory = the_same_story ? [] : state.panelsHistory[story];
 			const newPanelsHistoryVKUI = the_same_story ? [panel] : state.panelsHistoryVKUI[story];
 
 			const newContext = the_same_story
@@ -518,7 +531,9 @@ export const routerReducer = (state = initialState, action) => {
 			VK.swipeBackOn();
 
 			let Panels = state.panelsHistory[Story];
+			console.log("need close", Panels)
 			if (Panels.length == 0) {
+				console.log("we close app")
 				VK.closeApp();
 				return state;
 			}

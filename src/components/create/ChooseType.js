@@ -23,6 +23,7 @@ const ChooseType = (props) => {
 			...props.inputData[activeStory + CREATE_AD_MAIN],
 			type: e.currentTarget.value,
 		});
+		console.log("!!!!!!!!!!!! 1")
 	}
 
 	return (

@@ -124,22 +124,23 @@ function checkFileType(file) {
 	return file.type.match('image.*');
 }
 
-export const loadPhotos = async (e, handleWrongSize, handleWrongType, addPhoto, end) => {
+export const loadPhotos = async (e, handleWrongSize, handleWrongType, loaded, addPhoto, end) => {
 	var files = e.target.files; // FileList object
 
-	if (files.length == 0) {
+	if (files.length == 0 || loaded == 3) {
 		console.log('end is here');
 		end();
 		return;
 	}
 	let flen = files.length;
 	if (flen > 3) {
-		flen = 3
+		flen = 3;
 	}
-	
-	console.log('files.length', flen);
+
+	var done = loaded;
+	console.log('files.length', flen, loaded);
 	for (var i = 0, file; (file = files[i]); i++) {
-		if (i > 2) {
+		if (i + loaded > 2) {
 			break;
 		}
 		console.log('we start 1');
@@ -159,12 +160,12 @@ export const loadPhotos = async (e, handleWrongSize, handleWrongType, addPhoto, 
 			continue;
 		}
 		NEWhandleFiles(file, addPhoto, i, (i) => {
-			console.log('loooook', i, flen - 1);
-			if (i == flen - 1) {
+			done++;
+			console.log('loooook', i, flen - loaded - 1);
+			if (loaded + flen > 3 ? done == 3 : i == flen - 1) {
 				console.log('eeeeend');
 				end();
 			}
 		});
-		// handleFileSelect(file, addPhoto);
 	}
 };

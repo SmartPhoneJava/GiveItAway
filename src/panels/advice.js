@@ -158,7 +158,7 @@ const AdvicePanel = (props) => {
 				header={
 					<Div>
 						<Title level="2" weight="heavy">
-							Что делать, если что то пошло не так?
+							Что делать, если что-то пошло не так?
 						</Title>
 					</Div>
 				}

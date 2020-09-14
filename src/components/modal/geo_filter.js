@@ -14,6 +14,7 @@ import { getGeodata } from '../../services/VK';
 import { pushToCache } from '../../store/cache/actions';
 import { DIRECTION_BACK } from '../../store/router/directionTypes';
 import { SaveCancelButtons } from './ad_sort';
+import { store } from '../..';
 
 const { GEO_TYPE_FILTERS, GEO_TYPE_NEAR, GEO_TYPE_NO } = require('../../const/ads');
 
@@ -76,7 +77,15 @@ const ModalPageAdsGeoInner = (props) => {
 		if (inputData[WHERE].changed) {
 			setChanged(true);
 		}
-	}
+	}       
+	const [needDisable, setNeedDisable] = useState();
+	useEffect(() => {
+		const city =
+			(props.inputData[activeStory + ADS_FILTERS_B] ? store.getState().formData.forms[activeStory + ADS_FILTERS_B].city : null) ||
+			NoRegion;
+		console.log('city is', city, store.getState().formData.forms[activeStory + ADS_FILTERS_B]);
+		setNeedDisable(geoType == GEO_TYPE_NEAR ? !isRadiusValid() : city == NoRegion);
+	}, [geoType, props.inputData[activeStory + ADS_FILTERS_B]]);
 
 	useEffect(() => {
 		props.updateModalHeight();
@@ -263,7 +272,7 @@ const ModalPageAdsGeoInner = (props) => {
 						</FormStatus>
 					</Div>
 				)}
-				{changed && SaveCancelButtons(save, closeModal, !isRadiusValid())}
+				{changed && SaveCancelButtons(save, closeModal, needDisable)}
 			</div>
 		</>
 	);

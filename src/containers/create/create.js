@@ -46,11 +46,11 @@ const getAd = (activeStory, myUser, inputData) => {
 	console.log('myUser is', myUser); //{"vk_id":45863670,"name":"Артём","surname":"Ягами","photo_url":"ht
 	const location = getLocationInfo(activeStory, inputData) || {};
 	const main = getMainInfo(activeStory, inputData);
-	if (main.comments_enabled === null) {
-		main.comments_enabled = true
+	if (main.comments_enabled == undefined) {
+		main.comments_enabled = true;
 	}
-	if (main.type === null) {
-		main.type = TYPE_CHOICE
+	if (main.type == undefined) {
+		main.type = TYPE_CHOICE;
 	}
 	console.log('main is', activeStory, inputData[activeStory + CREATE_AD_MAIN]);
 	const item = getItemInfo(activeStory, inputData);
@@ -58,7 +58,7 @@ const getAd = (activeStory, myUser, inputData) => {
 	const ad_id = store.getState().ad ? store.getState().ad.ad_id : 0;
 	const geodata = inputData[activeStory + GEO_DATA] ? inputData[activeStory + GEO_DATA].geodata : { long: 0, lat: 0 };
 	const geodata_string = inputData[activeStory + GEO_DATA] ? inputData[activeStory + GEO_DATA].geodata_string : '';
-	console.log('location is', location);
+	console.log('location is', inputData[activeStory + GEO_DATA]);
 	console.log('full_adress is', geodata_string);
 	return {
 		ad_id,
@@ -99,7 +99,7 @@ const loadAd = (ad, dispatch) => {
 const createAd = (activeStory, myUser, inputData, dispatch) => {
 	const ad = getAd(activeStory, myUser, inputData);
 	const obj = JSON.stringify(ad);
-	const photos = getItemInfo(activeStory, inputData).photosUrl;
+	const photos = ad.category == CategoryOnline ? [] : getItemInfo(activeStory, inputData).photosUrl;
 	CreateAd(
 		ad,
 		obj,

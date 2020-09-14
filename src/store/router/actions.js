@@ -16,6 +16,7 @@ import {
 	SET_SCROLL,
 	SET_STORY_PROFILE,
 	UPDATE_CONTEXT,
+	CLOSE_DUMMY,
 } from './actionTypes';
 import { PANEL_USER, PANEL_ONE } from './panelTypes';
 
@@ -39,6 +40,10 @@ export const setDummy = (dummy) => ({
 	payload: {
 		dummy,
 	},
+});
+
+export const closeDummy = () => ({
+	type: CLOSE_DUMMY,
 });
 
 export const setPage = (panel, clearAll) => ({

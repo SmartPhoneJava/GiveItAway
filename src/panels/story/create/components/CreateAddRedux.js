@@ -45,6 +45,7 @@ import { FORM_CREATE } from '../../../../components/categories/redux';
 import { GetCategory400 } from '../../../../components/categories/Categories';
 import { animateOnChange } from '../../../../components/image/image_cache';
 import { defaultInputData } from '../../../../components/create/default';
+import { store } from '../../../..';
 
 const duration = 300;
 
@@ -65,13 +66,10 @@ const CreateAddRedux = (props) => {
 	);
 
 	const set_geodata_string = (value) => {
-		console.log("seet data_string before", value)
-		setFormData(activeStory + GEO_DATA, {
-			...props.inputData[activeStory + GEO_DATA],
-		
-			geodata_string: value,
-		});
-		console.log("seet data_string", value)
+		console.log('seet data_string before', value);
+
+		setGeoDataString(store.getState().router.activeStory, value);
+		console.log('seet data_string', value);
 		set_geodata_string_i(value);
 	};
 
@@ -99,9 +97,11 @@ const CreateAddRedux = (props) => {
 
 	const setLicenceAgree = (value) => {
 		setFormData(activeStory + CREATE_AD_MAIN, {
+			...defaultInputData,
 			...inputData[activeStory + CREATE_AD_MAIN],
 			licenceAgree: value,
 		});
+		console.log('!!!!!!!!!!!! 3');
 		setLicenceAgreeI(value);
 	};
 
@@ -203,7 +203,7 @@ const CreateAddRedux = (props) => {
 							if (cancelFunc) {
 								return;
 							}
-							console.log("alll rrrrr")
+							console.log('alll rrrrr');
 							const data_string = data.value;
 							set_geodata_string(data_string);
 
@@ -225,7 +225,7 @@ const CreateAddRedux = (props) => {
 							// });
 						},
 						(e) => {
-							console.log("some rrrrr", e)
+							console.log('some rrrrr', e);
 							if (cancelFunc) {
 								return;
 							}

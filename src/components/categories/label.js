@@ -44,7 +44,7 @@ export const TagsLabel = (props) => {
 		<div className="tag-container">
 			{' '}
 			{props.tags.map((tag, index) => (
-				<div className="tag-item">
+				<div className="tag-item" key={tag + index}>
 					<div style={{ display: 'flex' }}>
 						<Transition in={tagsUpdate} timeout={duration}>
 							{(state) => {

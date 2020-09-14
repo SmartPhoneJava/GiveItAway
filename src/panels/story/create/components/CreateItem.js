@@ -128,12 +128,14 @@ const CreateItem = (props) => {
 	const loadPhoto = (e) => {
 		setLoading(true);
 
-		const flen = e.target.files.length
-
+		const data = store.getState().formData.forms[activeStory + CREATE_AD_ITEM];
+		const loaded = (data ? data.photosUrl : null) || [];
+		const flen = e.target.files.length + loaded.length;
 		loadPhotos(
 			e,
 			handleWrongSize,
 			handleWrongType,
+			loaded.length,
 			(value) => {
 				const data = store.getState().formData.forms[activeStory + CREATE_AD_ITEM] || {};
 				console.log('inputData.photosUrl', data, data.photosUrl, value);
@@ -150,8 +152,9 @@ const CreateItem = (props) => {
 			},
 			() => {
 				setLoading(false);
+				console.log('flen is', flen);
 				if (flen > 3) {
-					failEasy('Нельзя загрузить более трёх снимков. Загружены только три.', 3000);
+					failEasy('Нельзя загрузить более трёх снимков. Остальные фотографии пропущены.', 3000);
 				}
 			}
 		);
@@ -170,9 +173,21 @@ const CreateItem = (props) => {
 		});
 	}
 
-	function openPhotos(i) {
-		openPhotoSwipe(i);
-	}
+	const openPhotos = (imgs, photoIndex) => {
+		if (needEdit) {
+			bridge
+				.send('VKWebAppShowImages', {
+					images: imgs,
+					start_index: photoIndex,
+				})
+				.catch(function (error) {
+					setDummy('imager');
+					openPhotoSwipe(photoIndex);
+				});
+		} else {
+			openPhotoSwipe(photoIndex);
+		}
+	};
 
 	const photoSwipeImgs = inputData.photosUrl
 		? inputData.photosUrl &&
@@ -261,7 +276,11 @@ const CreateItem = (props) => {
 									}}
 								>
 									<div className="create-photo-panel">
-										<img onClick={() => openPhotos(i)} src={img.src} className="create-photo" />
+										<img
+											onClick={() => openPhotos(inputData.photosUrl, i)}
+											src={img.src}
+											className="create-photo"
+										/>
 										{needEdit ? null : (
 											<div
 												onClick={() => {

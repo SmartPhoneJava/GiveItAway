@@ -51,6 +51,7 @@ export const closeApp = () => {
 			return data;
 		})
 		.catch((error) => {
+			console.log("error is", error)
 			return error;
 		});
 };
@@ -316,7 +317,7 @@ export const getGeodata = (activeStory, successCallback, failCallback, hide) => 
 			if (!cleanupFunction) {
 				if (geodata.available) {
 					s(geodata);
-					store.dispatch(setGeoData(activeStory, geodata));
+					store.dispatch(setGeoData(store.getState().router.activeStory, geodata));
 				} else {
 					f(error);
 					fail('Не удалось получить местоположение. Проверьте, включен ли GPS');

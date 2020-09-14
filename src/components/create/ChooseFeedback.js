@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Group, Cell, Avatar, Snackbar, Switch } from '@vkontakte/vkui';
 
 import { setFormData } from './../../store/create_post/actions';
@@ -34,6 +34,10 @@ const ChooseFeedback = (props) => {
 		);
 	}
 
+	useEffect(()=>{
+		console.log("props.inputData[activeStory + CREATE_AD_MAIN]", activeStory + CREATE_AD_MAIN, props.inputData[activeStory + CREATE_AD_MAIN])
+	}, [props.inputData[activeStory + CREATE_AD_MAIN]])
+
 	function handleChecked(e) {
 		setInputData({
 			...inputData,
@@ -43,6 +47,7 @@ const ChooseFeedback = (props) => {
 			...props.inputData[activeStory + CREATE_AD_MAIN],
 			[e.currentTarget.name]: e.currentTarget.checked,
 		});
+		console.log("!!!!!!!!!!!! 2")
 	}
 
 	return (

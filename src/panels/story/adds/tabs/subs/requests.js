@@ -61,19 +61,24 @@ export function subscribe(ad_id, clCancel, s, f, e) {
 				handleNetworkError(
 					error,
 					(error) =>
-						handleSpamError(error, (error) =>
-							handleCarmaError(error, (error) =>
-								StandardError(
-									error,
-									() => {
-										subscribe(ad_id, clCancel, successCallback, failCallback, end);
-									},
-									null,
-									end
-								)
-							)
+						handleSpamError(
+							error,
+							(error) =>
+								handleCarmaError(error, (error) =>
+									StandardError(
+										error,
+										() => {
+											subscribe(ad_id, clCancel, successCallback, failCallback, end);
+										},
+										null,
+										end
+									)
+								),
+							'Вы не можете откликнуться на это объявление, поскольку отписались от него несколько раз',
+							null,
+							end
 						),
-					'Вы не можете откликнуться на это объявление, поскольку отписались от него несколько раз',
+
 					null,
 					end
 				),
