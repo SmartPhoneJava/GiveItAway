@@ -32,7 +32,7 @@
 		"@vkontakte/vk-bridge": "^2.2.4",
 		"@vkontakte/vk-miniapps-deploy": "0.0.17",
 		"@vkontakte/vkui": "^3.12.0",
-		"axios": "^0.19.2",
+		"axios": "^0.21.1",
 		"babel-eslint": "^10.1.0",
 		"centrifuge": "^2.6.4",
 		"cleanup-dependencies": "0.0.6",
